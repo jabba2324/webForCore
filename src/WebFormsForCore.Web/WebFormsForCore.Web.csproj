@@ -124,9 +124,6 @@
         <Reference Include="System.Windows.Forms" />
     </ItemGroup>
 
-	<ItemGroup>
-		<None Include="WebFormsForCore\NativeDlls\runtimes\**\*.dll" Pack="true" PackagePath="runtimes" />
-	</ItemGroup>
     
 	<Target Name="Preprocess">
         <MSBuild Projects="WebFormsForCore.Web.Cpp.vcxproj" Targets="Build" />

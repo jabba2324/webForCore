@@ -127,11 +127,11 @@ the key directory; containers exported with `aspnet_regiis -px` can be imported.
 | System.Web.ApplicationServices | `System.Web.Security` (MembershipProvider, RoleProvider, ...), `System.Web.Configuration`, `System.Web.Hosting` | System.Web forwards the membership types here, as on .NET Framework |
 | System.Web.DataVisualization | `System.Web.UI.DataVisualization.Charting` (Chart control) | Renders through the SkiaSharp System.Drawing |
 | System.Web.Mobile | `System.Web.Mobile`, `System.Web.UI.MobileControls` (+ `.Adapters`) | Designers are .NET Framework only |
-| System.Web.RegularExpressions | `System.Web.RegularExpressions` | The public regex classes (`TagRegex`, `DirectiveRegex`, ...) are .NET Framework only; on .NET, System.Web's parser uses source-generated regexes (`NetCoreRegexes`). Code that uses these classes directly won't compile |
-| Microsoft.Web.Infrastructure | `Microsoft.Web.Infrastructure`, `.DynamicModuleHelper`, `.DynamicValidationHelper` | `PreApplicationStartMethod` module registration works |
+| System.Web.RegularExpressions | `System.Web.RegularExpressions` (`NetCoreRegexes`) | The classic public regex classes (`TagRegex`, `DirectiveRegex`, ...) are .NET Framework only; on .NET, System.Web's parser uses source-generated regexes. Code that uses the classic classes directly won't compile |
+| Microsoft.Web.Infrastructure | `Microsoft.Web.Infrastructure`, `.DynamicModuleHelper`, `.DynamicValidationHelper` | webForCore's implementation of the documented API: `DynamicModuleUtility.RegisterModule` (on `HttpApplication.RegisterModule`), `HttpContextHelper`, `InfrastructureHelper`, `ValidationUtility` (granular request validation) |
 | System.Web.Optimization, WebGrease | `System.Web.Optimization`, `Microsoft.AspNet.Web.Optimization.WebForms`, `WebGrease`, `Microsoft.Ajax.Utilities` | Bundling and minification |
 | AjaxControlToolkit | `AjaxControlToolkit`, `.HtmlEditor`, `.Bundling` | Designers are .NET Framework only |
-| System.Web.DynamicData, System.Web.Entity, Microsoft.ReportViewer.WebForms | | Not built by the solution |
+| System.Web.DynamicData, System.Web.Entity | | Not built by the solution |
 
 ## ASP.NET MVC, Web Pages, Razor (lifted)
 

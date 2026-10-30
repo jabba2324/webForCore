@@ -1309,3 +1309,43 @@ page compiled. A broken page fails the precompilation with its error.
     BSD-3-Clause. The copyright and authors fields replace "Estrellas de Esperanza", and the project URL is this
     repository.
 
+## Licence cleanup: inherited non-open material (30 Oct 2026)
+
+`docs/LICENSING.md` lists what WebFormsForCore's fork base contained that no open licence covers. Done:
+- **webengine.dll / webengine4.dll removed** (.NET Framework native binaries, packed for `runtimes/win-*`), with the
+  empty `WebFormsForCore.NativeDlls` project. `UnsafeNativeMethods.GetHMACSHA1Hash`/`GetSHA1Hash` use the managed code
+  on every OS (they called webengine4 on Windows).
+- **Microsoft.Web.Infrastructure rewritten.** The 27 decompiled files went: the csproj's `Compile Remove` named a folder
+  that doesn't exist, so the `DynamicValidationHelper` copy compiled too. The documented API is now four files:
+  - `DynamicModuleUtility.RegisterModule` → `HttpApplication.RegisterModule`;
+  - `HttpContextHelper.ExecuteInNullContext`;
+  - `InfrastructureHelper.UnloadAppDomain` / `IsCodeDomDefinedExtension`;
+  - `ValidationUtility`, which forwards to System.Web's `DynamicValidationShim`, the hook System.Web keeps for this
+    assembly to find by reflection.
+
+  The Windows-registry "kill bit" and the integrated-pipeline module shim are gone. The assembly name, version
+  (2.0.0.0) and key are kept.
+- **System.Web.RegularExpressions:** the decompiled classic regex classes (`Regex.CompileToAssembly` output) compile for
+  .NET Framework only. System.Web on .NET already used `NetCoreRegexes`; one designer-only `typeof(TagRegex35)`
+  check in `BaseParser` is `#if NETFRAMEWORK`.
+- **`DataProtector` rewritten** from the documented API. The decompiled class was not abstract, and its `Create`
+  ignored `providerClass`, so `<machineKey dataProtectorType>` always used DPAPI through `ProtectedDataPortable`. That
+  is Mono's managed DPAPI, which needs CAPI (`CspParameters`) and threw on Linux. Now `Create` resolves the type
+  (CryptoConfig, then `BuildManager.GetType`), and `DpapiDataProtector` uses `LocalDataProtection`.
+- **Microsoft Report Viewer removed** (`src/WebFormsForCore.Web.Reporting`, decompiled, never built).
+- **System.Web.Mobile** stopped building in the full solution after the System.Drawing lift: `FontNameConverter` used
+  `SystemEvents`, which came with the NuGet System.Drawing.Common. The test suites only build their dependencies, so
+  this went unnoticed. It also threw `PlatformNotSupportedException` on Linux when created, and `FontInfo.Name` uses
+  it at run time. The `InstalledFontsChanged` subscription was dropped instead of adding the Windows-only package; the
+  font list is read once per converter. Checked on Linux: `FontInfo.Name`'s converter turns "arial" into "Arial".
+
+Open: about 140 decompiled System.Configuration files. 125 have their originals in the Reference Source and the
+configuration builders in dotnet/runtime. A trial replacement (an isolated copy, 128 files out, 93 Reference Source
+files in) built with 113 errors:
+- 47 accessibility mismatches (`protected` vs `protected internal` overrides);
+- 28 duplicate types (`TypeUtil`, System.dll internals in `Internal.cs`);
+- 10 unsafe blocks;
+- about 20 missing types.
+
+To be done as a lift script with fixups.
+

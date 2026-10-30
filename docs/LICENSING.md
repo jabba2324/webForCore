@@ -2,11 +2,11 @@
 
 **Short answer.** Almost all of webForCore is under three permissive open-source licences: MIT, Apache 2.0 and
 BSD 3-Clause. All three allow commercial use: you may use, modify and ship the code in commercial, closed-source
-products, for free, as long as you keep the copyright and licence notices. **However, a small number of files
-inherited from WebFormsForCore, the project webForCore forked, came from Microsoft products that aren't open source.
-Some of them are compiled into the .NET 11 build.** They're listed under [Not yet cleared](#not-yet-cleared), each with
-a fix. Until those are resolved, a commercial distribution of webForCore's binaries shouldn't rely on the summary
-above alone.
+products, for free, as long as you keep the copyright and licence notices. **However, some files
+inherited from WebFormsForCore, the project webForCore forked, came from Microsoft products or binaries that aren't
+open source.** Most have been removed or rewritten. What remains is in System.Configuration and is listed under
+[Not yet cleared](#not-yet-cleared), with its fix. Until that's done, a commercial distribution of webForCore's
+binaries shouldn't rely on the summary above alone.
 
 This page summarises; [NOTICE](../NOTICE) is the authoritative list of components and copyright holders. It isn't
 legal advice: for a product decision, have counsel review NOTICE and the items below.
@@ -16,7 +16,8 @@ legal advice: for a product decision, have counsel review NOTICE and the items b
 | Part | Where | Licence | Commercial use |
 | --- | --- | --- | --- |
 | webForCore's own code (hosting layer, IIS modules, PseudoAppDomain, DPAPI emulation, System.Drawing engine, tools, docs, tests) | throughout; files marked `webForCore` | MIT | ✅ Yes |
-| WebFormsForCore's port of System.Web, System.Configuration, System.Web.Extensions, System.Web.Services, Mobile, DataVisualization (from Microsoft's .NET Framework Reference Source) | `src/WebFormsForCore.*` | MIT (Microsoft's Reference Source licence; port © Simon Jakob Egli) | ✅ Yes, except the files under [Not yet cleared](#not-yet-cleared) |
+| WebFormsForCore's port of System.Web, System.Configuration, System.Web.Extensions, System.Web.Services, Mobile, DataVisualization (from Microsoft's .NET Framework Reference Source) | `src/WebFormsForCore.*` | MIT (Microsoft's Reference Source licence; port © Simon Jakob Egli) | ✅ Yes, except the System.Configuration files under [Not yet cleared](#not-yet-cleared) |
+| Microsoft.Web.Infrastructure, `DataProtector` | `src/WebFormsForCore.Web.Infrastructure`, `src/WebFormsForCore.Web/WebFormsForCore/DataProtector.cs` | MIT (webForCore, written from the documented API) | ✅ Yes |
 | ASP.NET MVC 5, Web API 2, Web Pages, Razor, Helpers, CORS, MVC Futures | `src/webForCore.System.Web.*`, `src/webForCore.System.Net.Http.Formatting`, `src/webForCore.Microsoft.Web.Mvc` | Apache 2.0 (© .NET Foundation) | ✅ Yes |
 | Katana (Microsoft.Owin and friends) | `src/webForCore.Microsoft.Owin*` | Apache 2.0 (© .NET Foundation) | ✅ Yes |
 | SignalR 2 | `src/webForCore.Microsoft.AspNet.SignalR.*` | Apache 2.0 (© .NET Foundation) | ✅ Yes |
@@ -47,23 +48,29 @@ assemblies keep Microsoft's names for compatibility.
 ## Not yet cleared
 
 These files came with the WebFormsForCore fork base. Their origins are Microsoft binaries or products that aren't
-under an open-source licence, so the licences above don't cover them. "In the .NET 11 build" means they're compiled
-or packed into what an app on Linux uses.
+under an open-source licence, so the licences above don't cover them.
 
-| Item | In the .NET 11 build? | Why it isn't covered | Fix |
+### Resolved
+
+| Item | What was done |
+| --- | --- |
+| `webengine.dll`, `webengine4.dll` (.NET Framework native binaries, packed into the System.Web package for Windows) | Removed, with the empty `WebFormsForCore.NativeDlls` project. SHA-1 and HMAC for the machine key and view state now use the managed code on every OS, as they already did on Linux |
+| Microsoft.Web.Infrastructure (27 files decompiled from the 2.0.0 package, which is under Microsoft's .NET Library EULA) | Rewritten from the documented public API (`DynamicModuleUtility`, `HttpContextHelper`, `InfrastructureHelper`, `ValidationUtility`): four files on System.Web's public API and its `DynamicValidationShim` hook. Same assembly identity |
+| System.Web.RegularExpressions (classes decompiled from Microsoft's generated regex DLL) | Compiled for .NET Framework only. On .NET, System.Web uses webForCore's source-generated `NetCoreRegexes` |
+| `DataProtector.cs` (decompiled from System.Security.dll) | Rewritten from the documented API, with `DpapiDataProtector` on webForCore's DPAPI emulation. `<machineKey dataProtectorType>` now creates the configured type; before, it was ignored and the protector failed on Linux |
+| Microsoft Report Viewer (`src/WebFormsForCore.Web.Reporting`, decompiled, never built) | Removed |
+
+### Still open
+
+| Item | In the .NET 11 build? | Why it isn't covered | Plan |
 | --- | --- | --- | --- |
-| `webengine.dll`, `webengine4.dll` (`src/WebFormsForCore.Web/WebFormsForCore/NativeDlls/runtimes/win-*`) | **Packed** into the System.Web NuGet package (`runtimes/win-*`); used only on Windows | .NET Framework 4.8 native binaries, under the .NET Framework licence | Stop packing them and remove them from the repository; Linux never loads them |
-| Microsoft.Web.Infrastructure (`src/WebFormsForCore.Web.Infrastructure`, 13 compiled files) | **Yes** | Decompiled from the Microsoft.Web.Infrastructure 2.0.0 package, which is under Microsoft's .NET Library EULA (no source was published) | Rewrite it. It's small: `DynamicModuleUtility.RegisterModule` and the infrastructure helpers |
-| System.Web.RegularExpressions (`src/WebFormsForCore.Web.RegularExpressions`, 31 files compiled on .NET 11; 50 more are .NET Framework only) | **Yes** | Decompiled from the regex classes Microsoft generated into System.Web.RegularExpressions.dll; the Reference Source doesn't include them | Compile them for .NET Framework only. On .NET, System.Web already parses with webForCore's source-generated `NetCoreRegexes` |
-| `DataProtector.cs` (`src/WebFormsForCore.Web/WebFormsForCore/`) | **Yes** | Its header says it was decompiled from .NET Framework's System.Security.dll | Rewrite it (one abstract base class) |
-| Parts of System.Configuration (about 60 files without a header or a same-named Reference Source file, mostly `System.Net.Configuration` and the settings attributes) and of System.Web.ApplicationServices (3 files) | **Yes** | Appear to be decompiled from .NET Framework assemblies. Most of these types do exist in the MIT Reference Source, possibly in differently named files | Review file by file; replace each with its Reference Source original where one exists, and rewrite the rest |
-| `machine.config`, `web.config` templates (`src/WebFormsForCore.Configuration/Config`) | **Yes** (embedded) | Copied from a .NET Framework installation; no licence stated | Low risk (configuration data), but confirm or regenerate them |
-| `src/WebFormsForCore.Web.Reporting` | No (the solution doesn't build it) | Decompiled from Microsoft Report Viewer 12.0, a proprietary product | Remove it from the repository |
+| System.Configuration: about 140 files decompiled from .NET Framework's System.Configuration.dll and System.dll (settings, `System.Net.Configuration`, config XML classes, configuration builders) | **Yes** | Decompiled; the equivalent Microsoft source is MIT-licensed, but these copies came from binaries | Replace them with their MIT originals: 125 are in the .NET Framework Reference Source, and the configuration builders are in dotnet/runtime. A trial replacement built with 113 compile errors, mostly mechanical; it needs a lift script and a full test pass |
+| `machine.config`, `web.config` templates (`src/WebFormsForCore.Configuration/Config`) | **Yes** (embedded) | Copied from a .NET Framework installation; no licence stated | Low risk (configuration data); confirm or regenerate |
 | BundleTransformer sample assets (a CC BY-ND font, an MVC 3 `vsdoc` script, images) | No (submodule, not built) | Mixed or unknown licences | None needed unless the samples are redistributed |
 
 webForCore itself hasn't added any of this material. The files it lifted are all from Microsoft's open-source
 repositories, under the licences in the table above, and every lifted file is traceable to its upstream commit
 ([lifted-changes.md](lifted-changes.md), `tools/lift/manifests/`).
 
-Once the items marked **Yes** and the packed `webengine` binaries are dealt with, everything in the .NET 11 build is
-under MIT, Apache 2.0 or BSD 3-Clause.
+Once System.Configuration's decompiled files are replaced, everything in the .NET 11 build is under MIT, Apache 2.0 or
+BSD 3-Clause, apart from the `machine.config` templates noted above.

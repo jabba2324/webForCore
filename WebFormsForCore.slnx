@@ -73,9 +73,6 @@
   <Project Path="src/WebFormsForCore.Web.RegularExpressions/WebFormsForCore.Web.RegularExpressions.csproj">
     <BuildDependency Project="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
   </Project>
-  <Project Path="src/WebFormsForCore.Web.Reporting/WebFormsForCore.Web.Reporting.csproj">
-    <Build Project="false" />
-  </Project>
   <Project Path="src/WebFormsForCore.Web.Services/WebFormsForCore.Web.Services.csproj">
     <BuildDependency Project="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
   </Project>

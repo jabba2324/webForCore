@@ -198,21 +198,17 @@ The TestApp (src/WebFormsForCore.TestApp) includes Bootstrap 5.2.3 (MIT, The Boo
 Licensing issues inherited from WebFormsForCore
 -----------------------------------------------
 
-These files came with the fork base and are not covered by the licences above. They are listed here so they can be
-reviewed; webForCore has not added to them.
+These came with the fork base and are not covered by the licences above (docs/LICENSING.md has the details):
 
-  * src/WebFormsForCore.Web/WebFormsForCore/NativeDlls/runtimes/win-*/native/webengine.dll and webengine4.dll are
-    Microsoft .NET Framework 4.8 native binaries, under the .NET Framework licence terms. They are only used on
-    Windows.
-  * src/WebFormsForCore.Web.Reporting is decompiled from Microsoft Report Viewer 12.0
-    (Microsoft.ReportViewer.WebForms), which is under Microsoft's proprietary licence terms. The solution does not
-    build it.
-  * src/WebFormsForCore.Web.RegularExpressions, parts of src/WebFormsForCore.Web.ApplicationServices,
-    src/WebFormsForCore.Web.Infrastructure and src/WebFormsForCore.Configuration, and
-    src/WebFormsForCore.Web/WebFormsForCore/DataProtector.cs appear to be decompiled from .NET Framework assemblies
-    or Microsoft.Web.Infrastructure rather than taken from the Reference Source. Equivalent Reference Source (MIT)
-    exists for most of them.
+  * Resolved: the .NET Framework webengine.dll/webengine4.dll binaries and the decompiled Microsoft Report Viewer
+    were removed; the decompiled Microsoft.Web.Infrastructure and System.Security.Cryptography.DataProtector were
+    rewritten by webForCore from their documented APIs (MIT); the decompiled System.Web.RegularExpressions classes are
+    compiled only for .NET Framework.
+  * Open: about 140 files in src/WebFormsForCore.Configuration (settings, System.Net.Configuration, the config XML
+    classes, configuration builders) were decompiled from .NET Framework assemblies. Their originals are MIT-licensed
+    (Reference Source, dotnet/runtime) and are to replace them.
   * The machine.config and web.config files in src/WebFormsForCore.Configuration/Config come from a .NET Framework
     installation.
-  * Sample assets in src/BundleTransformer/samples include the Blogger Sans font (CC BY-ND 4.0), the Bitstream Vera
-    font, a jquery.validate-vsdoc.js under Microsoft's ASP.NET MVC 3 licence terms, and images of unknown origin.
+  * Sample assets in src/BundleTransformer/samples (not built) include the Blogger Sans font (CC BY-ND 4.0), the
+    Bitstream Vera font, a jquery.validate-vsdoc.js under Microsoft's ASP.NET MVC 3 licence terms, and images of
+    unknown origin.

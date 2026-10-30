@@ -1,302 +1,138 @@
-﻿#region Assembly System.Security, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
-// C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.Security.dll
-// Decompiled with ICSharpCode.Decompiler 8.1.1.7464
-#endregion
-
+// webForCore: System.Security.Cryptography.DataProtector and DpapiDataProtector, which .NET does not have (they were in
+// .NET Framework's System.Security.dll). Licensed under the MIT license; written from the documented public API, replacing
+// a decompiled copy (docs/LICENSING.md). System.Web uses them for <machineKey dataProtectorType="...">.
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
-using System.Web;
 
-namespace System.Security.Cryptography;
-
-//
-// Summary:
-//     Provides the base class for data protectors.
-public class DataProtector
+namespace System.Security.Cryptography
 {
-	private string m_applicationName;
-
-	private string m_primaryPurpose;
-
-	private IEnumerable<string> m_specificPurposes;
-
-	private volatile byte[] m_hashedPurpose;
-
-	//
-	// Summary:
-	//     Gets the name of the application.
-	//
-	// Returns:
-	//     The name of the application.
-	protected string ApplicationName => m_applicationName;
-
-	//
-	// Summary:
-	//     Specifies whether the hash is prepended to the text array before encryption.
-	//
-	//
-	// Returns:
-	//     Always true.
-	protected virtual bool PrependHashedPurposeToPlaintext => true;
-
-	//
-	// Summary:
-	//     Gets the primary purpose for the protected data.
-	//
-	// Returns:
-	//     The primary purpose for the protected data.
-	protected string PrimaryPurpose => m_primaryPurpose;
-
-	//
-	// Summary:
-	//     Gets the specific purposes for the protected data.
-	//
-	// Returns:
-	//     A collection of the specific purposes for the protected data.
-	protected IEnumerable<string> SpecificPurposes => m_specificPurposes;
-
-	//
-	// Summary:
-	//     Creates a new instance of the System.Security.Cryptography.DataProtector class
-	//     by using the provided application name, primary purpose, and specific purposes.
-	//
-	//
-	// Parameters:
-	//   applicationName:
-	//     The name of the application.
-	//
-	//   primaryPurpose:
-	//     The primary purpose for the protected data.
-	//
-	//   specificPurposes:
-	//     The specific purposes for the protected data.
-	//
-	// Exceptions:
-	//   T:System.ArgumentException:
-	//     applicationName is an empty string or null. -or- primaryPurpose is an empty string
-	//     or null. -or- specificPurposes contains an empty string or null.
-	protected DataProtector(string applicationName, string primaryPurpose, string[] specificPurposes)
+	// The base class for data protectors: protection bound to an application name and purposes. Protect prepends a hash of
+	// the purposes to the data (unless PrependHashedPurposeToPlaintext is false) and Unprotect checks it, so data protected
+	// for one purpose cannot be unprotected for another.
+	public abstract class DataProtector
 	{
-		if (string.IsNullOrWhiteSpace(applicationName))
+		private readonly string[] _specificPurposes;
+		private byte[] _hashedPurpose;
+
+		protected DataProtector(string applicationName, string primaryPurpose, string[] specificPurposes)
 		{
-			throw new ArgumentException(SR.GetString(SR.Cryptography_DataProtector_InvalidAppNameOrPurpose));
+			if (string.IsNullOrWhiteSpace(applicationName))
+				throw new ArgumentException("The application name must be a non-empty string.", nameof(applicationName));
+			if (string.IsNullOrWhiteSpace(primaryPurpose))
+				throw new ArgumentException("The primary purpose must be a non-empty string.", nameof(primaryPurpose));
+			if (specificPurposes != null && specificPurposes.Any(string.IsNullOrWhiteSpace))
+				throw new ArgumentException("Each specific purpose must be a non-empty string.", nameof(specificPurposes));
+			ApplicationName = applicationName;
+			PrimaryPurpose = primaryPurpose;
+			_specificPurposes = specificPurposes?.ToArray() ?? Array.Empty<string>();
 		}
 
-		if (string.IsNullOrWhiteSpace(primaryPurpose))
-		{
-			throw new ArgumentException(SR.GetString(SR.Cryptography_DataProtector_InvalidAppNameOrPurpose));
-		}
+		protected string ApplicationName { get; }
 
-		if (specificPurposes != null)
+		protected string PrimaryPurpose { get; }
+
+		protected IEnumerable<string> SpecificPurposes => _specificPurposes;
+
+		protected virtual bool PrependHashedPurposeToPlaintext => true;
+
+		// Creates the protector named by providerClass: a name CryptoConfig knows, or a type name (the application's
+		// assemblies included), constructed with (applicationName, primaryPurpose, specificPurposes).
+		public static DataProtector Create(string providerClass, string applicationName, string primaryPurpose, params string[] specificPurposes)
 		{
-			foreach (string value in specificPurposes)
+			if (providerClass == null)
+				throw new ArgumentNullException(nameof(providerClass));
+			object[] args = { applicationName, primaryPurpose, specificPurposes };
+			if (IsDpapiDataProtector(providerClass))
+				return new DpapiDataProtector(applicationName, primaryPurpose, specificPurposes);
+			object created = CryptoConfig.CreateFromName(providerClass, args);
+			if (created == null)
 			{
-				if (string.IsNullOrWhiteSpace(value))
+				Type type = System.Web.Compilation.BuildManager.GetType(providerClass, throwOnError: false);
+				if (type != null)
+					created = Activator.CreateInstance(type, args);
+			}
+			return created as DataProtector
+				?? throw new CryptographicException($"'{providerClass}' is not a DataProtector type that can be created.");
+		}
+
+		// .NET Framework's System.Security.Cryptography.DpapiDataProtector, by short or assembly-qualified name.
+		private static bool IsDpapiDataProtector(string providerClass)
+		{
+			string name = providerClass.Split(',')[0].Trim();
+			return name == "DpapiDataProtector" || name == "System.Security.Cryptography.DpapiDataProtector";
+		}
+
+		// SHA-256 over the application name and purposes, each written length-prefixed in UTF-8.
+		protected virtual byte[] GetHashedPurpose()
+		{
+			if (_hashedPurpose == null)
+			{
+				using var stream = new MemoryStream();
+				using (var writer = new BinaryWriter(stream, Encoding.UTF8, leaveOpen: true))
 				{
-					throw new ArgumentException(SR.GetString(SR.Cryptography_DataProtector_InvalidAppNameOrPurpose));
+					writer.Write(ApplicationName);
+					writer.Write(PrimaryPurpose);
+					foreach (string purpose in _specificPurposes)
+						writer.Write(purpose);
 				}
+				_hashedPurpose = SHA256.HashData(stream.ToArray());
 			}
+			return _hashedPurpose;
 		}
 
-		m_applicationName = applicationName;
-		m_primaryPurpose = primaryPurpose;
-		List<string> list = new List<string>();
-		if (specificPurposes != null)
+		public abstract bool IsReprotectRequired(byte[] encryptedData);
+
+		public byte[] Protect(byte[] userData)
 		{
-			list.AddRange(specificPurposes);
+			if (userData == null)
+				throw new ArgumentNullException(nameof(userData));
+			if (!PrependHashedPurposeToPlaintext)
+				return ProviderProtect(userData);
+			byte[] hash = GetHashedPurpose();
+			byte[] data = new byte[hash.Length + userData.Length];
+			Buffer.BlockCopy(hash, 0, data, 0, hash.Length);
+			Buffer.BlockCopy(userData, 0, data, hash.Length, userData.Length);
+			return ProviderProtect(data);
 		}
 
-		m_specificPurposes = list;
+		public byte[] Unprotect(byte[] encryptedData)
+		{
+			if (encryptedData == null)
+				throw new ArgumentNullException(nameof(encryptedData));
+			byte[] data = ProviderUnprotect(encryptedData);
+			if (!PrependHashedPurposeToPlaintext)
+				return data;
+			byte[] hash = GetHashedPurpose();
+			if (data.Length < hash.Length || !CryptographicOperations.FixedTimeEquals(data.AsSpan(0, hash.Length), hash))
+				throw new CryptographicException("The data was not protected for this application name and purpose.");
+			return data.AsSpan(hash.Length).ToArray();
+		}
+
+		protected abstract byte[] ProviderProtect(byte[] userData);
+
+		protected abstract byte[] ProviderUnprotect(byte[] encryptedData);
 	}
 
-	//
-	// Summary:
-	//     Creates a hash of the property values specified by the constructor.
-	//
-	// Returns:
-	//     An array of bytes that contain the hash of the System.Security.Cryptography.DataProtector.ApplicationName,
-	//     System.Security.Cryptography.DataProtector.PrimaryPurpose, and System.Security.Cryptography.DataProtector.SpecificPurposes
-	//     properties.
-	protected virtual byte[] GetHashedPurpose()
+	// DPAPI protection, as .NET Framework's DpapiDataProtector: ProtectedData on Windows, webForCore's DPAPI emulation
+	// (WebFormsForCore.Security.LocalDataProtection, its key files) elsewhere. The purposes are bound through the hashed
+	// purpose, not DPAPI entropy.
+	public sealed class DpapiDataProtector : DataProtector
 	{
-		if (m_hashedPurpose == null)
+		public DpapiDataProtector(string appName, string primaryPurpose, params string[] specificPurpose)
+			: base(appName, primaryPurpose, specificPurpose)
 		{
-			using HashAlgorithm hashAlgorithm = HashAlgorithm.Create("System.Security.Cryptography.Sha256Cng");
-			using (BinaryWriter binaryWriter = new BinaryWriter(new CryptoStream(new MemoryStream(), hashAlgorithm, CryptoStreamMode.Write), new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true)))
-			{
-				binaryWriter.Write(ApplicationName);
-				binaryWriter.Write(PrimaryPurpose);
-				foreach (string specificPurpose in SpecificPurposes)
-				{
-					binaryWriter.Write(specificPurpose);
-				}
-			}
-
-			m_hashedPurpose = hashAlgorithm.Hash;
 		}
 
-		return m_hashedPurpose;
-	}
+		public DataProtectionScope Scope { get; set; } = DataProtectionScope.CurrentUser;
 
-	//
-	// Summary:
-	//     Determines if re-encryption is required for the specified encrypted data.
-	//
-	// Parameters:
-	//   encryptedData:
-	//     The encrypted data to be evaluated.
-	//
-	// Returns:
-	//     true if the data must be re-encrypted; otherwise, false.
-	public bool IsReprotectRequired(byte[] encryptedData) => false;
+		public override bool IsReprotectRequired(byte[] encryptedData) => false;
 
-	//
-	// Summary:
-	//     Creates an instance of a data protector implementation by using the specified
-	//     class name of the data protector, the application name, the primary purpose,
-	//     and the specific purposes.
-	//
-	// Parameters:
-	//   providerClass:
-	//     The class name for the data protector.
-	//
-	//   applicationName:
-	//     The name of the application.
-	//
-	//   primaryPurpose:
-	//     The primary purpose for the protected data.
-	//
-	//   specificPurposes:
-	//     The specific purposes for the protected data.
-	//
-	// Returns:
-	//     A data protector implementation object.
-	//
-	// Exceptions:
-	//   T:System.ArgumentNullException:
-	//     providerClass is null.
-	public static DataProtector Create(string providerClass, string applicationName, string primaryPurpose, params string[] specificPurposes)
-		=> new(applicationName, primaryPurpose, specificPurposes);
+		protected override byte[] ProviderProtect(byte[] userData) =>
+			WebFormsForCore.Security.LocalDataProtection.Protect(userData, null, Scope == DataProtectionScope.LocalMachine);
 
-	//
-	// Summary:
-	//     Protects the specified user data.
-	//
-	// Parameters:
-	//   userData:
-	//     The data to be protected.
-	//
-	// Returns:
-	//     A byte array that contains the encrypted data.
-	//
-	// Exceptions:
-	//   T:System.ArgumentNullException:
-	//     userData is null.
-	public byte[] Protect(byte[] userData)
-	{
-		if (userData == null)
-		{
-			throw new ArgumentNullException("userData");
-		}
-
-		if (PrependHashedPurposeToPlaintext)
-		{
-			byte[] hashedPurpose = GetHashedPurpose();
-			byte[] array = new byte[userData.Length + hashedPurpose.Length];
-			Array.Copy(hashedPurpose, 0, array, 0, hashedPurpose.Length);
-			Array.Copy(userData, 0, array, hashedPurpose.Length, userData.Length);
-			userData = array;
-		}
-
-		return ProviderProtect(userData);
-	}
-
-	//
-	// Summary:
-	//     Specifies the delegate method in the derived class that the System.Security.Cryptography.DataProtector.Protect(System.Byte[])
-	//     method in the base class calls back into.
-	//
-	// Parameters:
-	//   userData:
-	//     The data to be encrypted.
-	//
-	// Returns:
-	//     A byte array that contains the encrypted data.
-	protected byte[] ProviderProtect(byte[] userData)
-	{
-		return ProtectedDataPortable.Protect(userData, null, DataProtectionScope.CurrentUser);
-	}
-
-	//
-	// Summary:
-	//     Specifies the delegate method in the derived class that the System.Security.Cryptography.DataProtector.Unprotect(System.Byte[])
-	//     method in the base class calls back into.
-	//
-	// Parameters:
-	//   encryptedData:
-	//     The data to be unencrypted.
-	//
-	// Returns:
-	//     The unencrypted data.
-	protected byte[] ProviderUnprotect(byte[] encryptedData)
-	{
-		return ProtectedDataPortable.Unprotect(encryptedData, null, DataProtectionScope.CurrentUser);
-	}
-	bool CryptographicEquals(byte[] a, byte[] b, int count)
-	{
-		int num = 0;
-		if (a.Length < count || b.Length < count)
-		{
-			return false;
-		}
-
-		for (int i = 0; i < count; i++)
-		{
-			num |= a[i] - b[i];
-		}
-
-		return num == 0;
-	}
-
-	//
-	// Summary:
-	//     Unprotects the specified protected data.
-	//
-	// Parameters:
-	//   encryptedData:
-	//     The encrypted data to be unprotected.
-	//
-	// Returns:
-	//     A byte array that contains the plain-text data.
-	//
-	// Exceptions:
-	//   T:System.ArgumentNullException:
-	//     encryptedData is null.
-	//
-	//   T:System.Security.Cryptography.CryptographicException:
-	//     encryptedData contained an invalid purpose.
-	public byte[] Unprotect(byte[] encryptedData)
-	{
-		if (encryptedData == null)
-		{
-			throw new ArgumentNullException("encryptedData");
-		}
-
-		if (PrependHashedPurposeToPlaintext)
-		{
-			byte[] array = ProviderUnprotect(encryptedData);
-			byte[] hashedPurpose = GetHashedPurpose();
-			if (!CryptographicEquals(hashedPurpose, array, hashedPurpose.Length))
-			{
-				throw new CryptographicException(SR.GetString(SR.Cryptography_DataProtector_InvalidPurpose));
-			}
-
-			byte[] array2 = new byte[array.Length - hashedPurpose.Length];
-			Array.Copy(array, hashedPurpose.Length, array2, 0, array2.Length);
-			return array2;
-		}
-
-		return ProviderUnprotect(encryptedData);
+		protected override byte[] ProviderUnprotect(byte[] encryptedData) =>
+			WebFormsForCore.Security.LocalDataProtection.Unprotect(encryptedData, null, Scope == DataProtectionScope.LocalMachine);
 	}
 }

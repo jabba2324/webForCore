@@ -149,7 +149,11 @@ namespace System.Web.UI
 			{
 				// Otherwise, we are in the designer, and thus should check using the type description provider.
 				// The new type TagRegex35 only exists when targeting 4.0 and above.
+#if NETFRAMEWORK
 				return TargetFrameworkUtil.IsSupportedType(typeof(TagRegex35));
+#else
+				return true; // webForCore: .NET only runs 4.0+ sites; the classic regex classes are .NET Framework only
+#endif
 			}
 		}
 

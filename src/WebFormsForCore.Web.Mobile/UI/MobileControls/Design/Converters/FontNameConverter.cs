@@ -6,7 +6,6 @@
 
 namespace System.Web.UI.Design.MobileControls.Converters
 {
-    using Microsoft.Win32;
 
     using System.Collections;
     using System.ComponentModel;
@@ -28,10 +27,9 @@ namespace System.Web.UI.Design.MobileControls.Converters
         /// </devdoc>
         public FontNameConverter() 
         {
-            // Sink an event to let us know when the installed
-            // set of fonts changes.
-            //
-            SystemEvents.InstalledFontsChanged += new EventHandler(this.OnInstalledFontsChanged);
+            // webForCore: .NET Framework subscribed to SystemEvents.InstalledFontsChanged here to refresh the cached font
+            // names. SystemEvents is Windows only on .NET (PlatformNotSupportedException elsewhere), and FontInfo.Name
+            // uses this converter at run time, so the subscription is dropped: the font list is read once per converter.
         }
 
         /// <devdoc>
@@ -57,14 +55,6 @@ namespace System.Web.UI.Design.MobileControls.Converters
                 return MatchFontName((string)value, context);
             }
             return base.ConvertFrom(context, culture, value);
-        }
-
-        /// <devdoc>
-        ///      We need to know when we're finalized.
-        /// </devdoc>
-        ~FontNameConverter() 
-        {
-            SystemEvents.InstalledFontsChanged -= new EventHandler(this.OnInstalledFontsChanged);
         }
 
         /// <devdoc>
@@ -153,15 +143,6 @@ namespace System.Web.UI.Design.MobileControls.Converters
                 bestMatch = name;
             }
             return bestMatch;
-        }
-
-        /// <devdoc>
-        ///      Called by system events when someone adds or removes a font.  Here
-        ///      we invalidate our font name collection.
-        /// </devdoc>
-        private void OnInstalledFontsChanged(object sender, EventArgs e) 
-        {
-            values = null;
         }
     }
 }

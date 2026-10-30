@@ -1,32 +1,26 @@
-﻿using System;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Security;
-using System.Security.Permissions;
+// webForCore: written from Microsoft.Web.Infrastructure's documented public API. MIT license.
+using System;
 using System.Web;
 
-namespace Microsoft.Web.Infrastructure;
-
-[EditorBrowsable(EditorBrowsableState.Never)]
-public static class HttpContextHelper
+namespace Microsoft.Web.Infrastructure
 {
-	[SecuritySafeCritical]
-	public static void ExecuteInNullContext(Action action)
+	public static class HttpContextHelper
 	{
-		HttpContext current = HttpContext.Current;
-		try
+		// Runs an action with HttpContext.Current set to null (Web Pages runs _AppStart this way), then restores it.
+		public static void ExecuteInNullContext(Action action)
 		{
-			HttpContextHelper.SetCurrentContext((HttpContext)null);
-			action();
-		}
-		finally
-		{
-			HttpContextHelper.SetCurrentContext(current);
+			if (action == null)
+				throw new ArgumentNullException(nameof(action));
+			HttpContext current = HttpContext.Current;
+			try
+			{
+				HttpContext.Current = null;
+				action();
+			}
+			finally
+			{
+				HttpContext.Current = current;
+			}
 		}
 	}
-
-	[SecurityCritical]
-	[SuppressMessage("Microsoft.Security", "CA2106:SecureAsserts", Justification = "This is fully critical, and we carefully control the callers.")]
-	[PermissionSet(SecurityAction.Assert, Unrestricted = true)]
-	private static void SetCurrentContext(HttpContext context) => HttpContext.Current = context;
 }
