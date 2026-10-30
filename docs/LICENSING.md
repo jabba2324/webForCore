@@ -1,36 +1,34 @@
 # Licensing: what's under which licence, and commercial use
 
-**Short answer.** Almost all of webForCore is under three permissive open-source licences: MIT, Apache 2.0 and
+**Short answer.** All of webForCore's code is under three permissive open-source licences: MIT, Apache 2.0 and
 BSD 3-Clause. All three allow commercial use: you may use, modify and ship the code in commercial, closed-source
-products, for free, as long as you keep the copyright and licence notices. **However, some files
-inherited from WebFormsForCore, the project webForCore forked, came from Microsoft products or binaries that aren't
-open source.** Most have been removed or rewritten. What remains is in System.Configuration and is listed under
-[Not yet cleared](#not-yet-cleared), with its fix. Until that's done, a commercial distribution of webForCore's
-binaries shouldn't rely on the summary above alone.
+products, for free, as long as you keep the copyright and licence notices. The material WebFormsForCore (the project
+webForCore forked) had copied or decompiled from closed Microsoft products has been replaced or removed; see
+[What was replaced](#what-was-replaced).
 
 This page summarises; [NOTICE](../NOTICE) is the authoritative list of components and copyright holders. It isn't
-legal advice: for a product decision, have counsel review NOTICE and the items below.
+legal advice: for a product decision, have counsel review NOTICE and this page.
 
 ## Which parts have which licence
 
 | Part | Where | Licence | Commercial use |
 | --- | --- | --- | --- |
-| webForCore's own code (hosting layer, IIS modules, PseudoAppDomain, DPAPI emulation, System.Drawing engine, tools, docs, tests) | throughout; files marked `webForCore` | MIT | ✅ Yes |
-| WebFormsForCore's port of System.Web, System.Configuration, System.Web.Extensions, System.Web.Services, Mobile, DataVisualization (from Microsoft's .NET Framework Reference Source) | `src/WebFormsForCore.*` | MIT (Microsoft's Reference Source licence; port © Simon Jakob Egli) | ✅ Yes, except the System.Configuration files under [Not yet cleared](#not-yet-cleared) |
-| Microsoft.Web.Infrastructure, `DataProtector` | `src/WebFormsForCore.Web.Infrastructure`, `src/WebFormsForCore.Web/WebFormsForCore/DataProtector.cs` | MIT (webForCore, written from the documented API) | ✅ Yes |
+| webForCore's own code (hosting layer, IIS modules, PseudoAppDomain, DPAPI emulation, System.Drawing engine, Microsoft.Web.Infrastructure, generated resource accessors, tools, docs, tests) | throughout; files marked `webForCore` | MIT | ✅ Yes |
+| WebFormsForCore's port of System.Web, System.Configuration, System.Web.ApplicationServices, System.Web.Extensions, System.Web.Services, Mobile, DataVisualization and aspnet_compiler, from Microsoft's .NET Framework Reference Source | `src/WebFormsForCore.*` (originals copied by the lift scripts are under `ReferenceSource/` folders) | MIT (Microsoft's Reference Source; port © Simon Jakob Egli) | ✅ Yes |
 | ASP.NET MVC 5, Web API 2, Web Pages, Razor, Helpers, CORS, MVC Futures | `src/webForCore.System.Web.*`, `src/webForCore.System.Net.Http.Formatting`, `src/webForCore.Microsoft.Web.Mvc` | Apache 2.0 (© .NET Foundation) | ✅ Yes |
 | Katana (Microsoft.Owin and friends) | `src/webForCore.Microsoft.Owin*` | Apache 2.0 (© .NET Foundation) | ✅ Yes |
 | SignalR 2 | `src/webForCore.Microsoft.AspNet.SignalR.*` | Apache 2.0 (© .NET Foundation) | ✅ Yes |
 | ASP.NET Identity 2 | `src/webForCore.Microsoft.AspNet.Identity.*` | MIT (© Microsoft) | ✅ Yes |
 | System.Drawing.Common 6.0 | `src/webForCore.System.Drawing.Common` | MIT (© .NET Foundation) | ✅ Yes |
+| ResX reader and writer (from dotnet/winforms) | `src/WebFormsForCore.Web/WebFormsForCore/System.Resources/winforms` | MIT (© .NET Foundation) | ✅ Yes |
+| StronglyTypedResourceBuilder (from Mono); Mono code in System.Web, WebGrease and the SoapFormatter | `src/WebFormsForCore.Web/WebFormsForCore/mono` and others | MIT (© Novell and others) | ✅ Yes |
+| BinaryFormatter port, FontConverter (from .NET) | `src/WebFormsForCore.Serialization.Formatters`, `src/WebFormsForCore.Drawing` | MIT (© .NET Foundation) | ✅ Yes |
 | ASP.NET Web Optimization, WebGrease, Microsoft Ajax Minifier | `src/WebFormsForCore.Web.Optimization*`, `src/WebFormsForCore.WebGrease` | Apache 2.0 (© Microsoft) | ✅ Yes |
 | AjaxControlToolkit | `src/WebFormsForCore.AjaxControlToolkit` | BSD 3-Clause (© CodePlex Foundation) | ✅ Yes |
 | Redesigner (build-time designer file generator) | `src/WebFormsForCore.Build/Redesigner` | BSD 3-Clause (© Sean Werkema) | ✅ Yes |
-| BinaryFormatter port, FontConverter (from .NET); Mono code; SoapFormatter | `src/WebFormsForCore.Serialization.Formatters`, parts of `src/WebFormsForCore.Web`, `src/WebFormsForCore.Drawing` | MIT | ✅ Yes |
 | Roslyn compilers (binaries) | `src/WebFormsForCore.Compilers` | MIT (© .NET Foundation) | ✅ Yes |
 | Dependencies from NuGet: SkiaSharp, EntityFramework 6, Newtonsoft.Json, CoreWCF, System.Data.SqlClient, ... | restored at build time | MIT or Apache 2.0, each package's own | ✅ Yes |
 | Tests lifted from Microsoft and Mono | `test/webForCore.*` | Apache 2.0 or MIT | ✅ Yes (not shipped in packages) |
-| BundleTransformer | `src/BundleTransformer` (git submodule, not built) | Apache 2.0, with bundled tools under their own licences | Not part of the build |
 
 ### What the permissive licences ask of you
 
@@ -45,32 +43,38 @@ satisfies all three. None of the three requires you to release your own source c
 **Trademarks** aren't licensed: don't present your product as Microsoft's or as "ASP.NET", even though the
 assemblies keep Microsoft's names for compatibility.
 
-## Not yet cleared
+The test suites need two things that aren't in the repository: the System.Drawing test fonts, which
+`tools/ci/fetch-test-fonts.sh` downloads (their licence text forbids redistribution), and SQL Server for the Identity
+tests, which runs as a container (Developer edition, not shipped).
 
-These files came with the WebFormsForCore fork base. Their origins are Microsoft binaries or products that aren't
-under an open-source licence, so the licences above don't cover them.
+## What was replaced
 
-### Resolved
+WebFormsForCore's fork base contained material that no open licence covered: binaries from .NET Framework, and code
+decompiled from .NET Framework assemblies and other Microsoft products. webForCore replaced every piece. Where
+Microsoft published the original source under MIT, the decompiled copy was replaced with that original, through a lift
+script that records each change. Where no MIT source exists, webForCore wrote the code from the documented public API.
 
-| Item | What was done |
-| --- | --- |
-| `webengine.dll`, `webengine4.dll` (.NET Framework native binaries, packed into the System.Web package for Windows) | Removed, with the empty `WebFormsForCore.NativeDlls` project. SHA-1 and HMAC for the machine key and view state now use the managed code on every OS, as they already did on Linux |
-| Microsoft.Web.Infrastructure (27 files decompiled from the 2.0.0 package, which is under Microsoft's .NET Library EULA) | Rewritten from the documented public API (`DynamicModuleUtility`, `HttpContextHelper`, `InfrastructureHelper`, `ValidationUtility`): four files on System.Web's public API and its `DynamicValidationShim` hook. Same assembly identity |
-| System.Web.RegularExpressions (classes decompiled from Microsoft's generated regex DLL) | Compiled for .NET Framework only. On .NET, System.Web uses webForCore's source-generated `NetCoreRegexes` |
-| `DataProtector.cs` (decompiled from System.Security.dll) | Rewritten from the documented API, with `DpapiDataProtector` on webForCore's DPAPI emulation. `<machineKey dataProtectorType>` now creates the configured type; before, it was ignored and the protector failed on Linux |
-| Microsoft Report Viewer (`src/WebFormsForCore.Web.Reporting`, decompiled, never built) | Removed |
+| Was | Now | How |
+| --- | --- | --- |
+| `webengine.dll`, `webengine4.dll` (.NET Framework native binaries) | Removed | Hashing uses managed code on every OS |
+| System.Configuration: ~150 files decompiled from System.Configuration.dll and System.dll | The Reference Source originals (89 files) | `tools/lift/lift_configuration.py` |
+| Configuration builders, `WindowsAuthenticationElement` | Written from the documented API | No MIT source exists |
+| System.Web.ApplicationServices (decompiled) | The Reference Source originals (21 files) | `tools/lift/lift_appservices.py` |
+| aspnet_compiler's front end (decompiled aspnet_compiler.exe) | The Reference Source's `aspnet_compiler.cs` and resources, plus WebFormsForCore's own additions | `tools/lift/lift_aspnet_compiler.py` |
+| ResX classes (decompiled System.Windows.Forms.dll) | dotnet/winforms' originals (MIT) | `tools/lift/lift_resx.py` |
+| StronglyTypedResourceBuilder (System.Design API reconstruction) | Mono's implementation (MIT) | `tools/lift/lift_strb.py` |
+| `BindableTypeAttribute` | The Reference Source original | `tools/lift/lift_strb.py` |
+| Microsoft.Web.Infrastructure (decompiled from the EULA-licensed 2.0.0 package) | Written from the documented API | Four files |
+| `DataProtector` (decompiled from System.Security.dll), `CallContext`, `AppDomainManager`, `UrlBuilder`, `TransactionOption` | Written from the documented API | |
+| Resource accessor classes (`SR`, `Res`, decompiled from build-generated code) | Generated from the projects' own `.resx` files | `tools/lift/gen_sr.py` |
+| Assembly identity constants (`AssemblyRef`, `ThisAssembly`, decompiled) | Rewritten with the identity strings they hold | |
+| System.Web.RegularExpressions classes (decompiled; never compiled for .NET) | Removed; System.Web uses source-generated regexes | |
+| Microsoft Report Viewer 12.0 (decompiled, never built) | Removed | |
+| `machine.config` templates copied from a .NET Framework installation | Microsoft's descriptive text removed; what remains is the functional configuration (section, handler and module declarations), adapted to webForCore's assemblies | |
+| Unused copies of .NET Framework config files, `GlobalSuppressions` files with no original | Removed | |
+| BundleTransformer and the old website (git submodules with mixed-licence sample assets, not built) | Removed from the repository | |
 
-### Still open
-
-| Item | In the .NET 11 build? | Why it isn't covered | Plan |
-| --- | --- | --- | --- |
-| System.Configuration: about 140 files decompiled from .NET Framework's System.Configuration.dll and System.dll (settings, `System.Net.Configuration`, config XML classes, configuration builders) | **Yes** | Decompiled; the equivalent Microsoft source is MIT-licensed, but these copies came from binaries | Replace them with their MIT originals: 125 are in the .NET Framework Reference Source, and the configuration builders are in dotnet/runtime. A trial replacement built with 113 compile errors, mostly mechanical; it needs a lift script and a full test pass |
-| `machine.config`, `web.config` templates (`src/WebFormsForCore.Configuration/Config`) | **Yes** (embedded) | Copied from a .NET Framework installation; no licence stated | Low risk (configuration data); confirm or regenerate |
-| BundleTransformer sample assets (a CC BY-ND font, an MVC 3 `vsdoc` script, images) | No (submodule, not built) | Mixed or unknown licences | None needed unless the samples are redistributed |
-
-webForCore itself hasn't added any of this material. The files it lifted are all from Microsoft's open-source
-repositories, under the licences in the table above, and every lifted file is traceable to its upstream commit
-([lifted-changes.md](lifted-changes.md), `tools/lift/manifests/`).
-
-Once System.Configuration's decompiled files are replaced, everything in the .NET 11 build is under MIT, Apache 2.0 or
-BSD 3-Clause, apart from the `machine.config` templates noted above.
+How this was checked: every source file in the port without a licence header was compared, line by line, with the
+Reference Source. Files that match it are Microsoft's MIT code with the header missing; files that don't were traced
+to their origin and replaced or rewritten. The full list of lifted files and changes is in
+[lifted-changes.md](lifted-changes.md), and each lifted file's upstream source is in `tools/lift/manifests/`.

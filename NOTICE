@@ -14,9 +14,10 @@ Summary
   Component                                   Location                                      Licence
   ------------------------------------------  --------------------------------------------  --------------------------
   .NET Framework Reference Source             src/WebFormsForCore.Web, .Configuration,      MIT (Microsoft)
-    (System.Web, System.Configuration, ...)   .Web.Extensions, .Web.Services, .Web.Mobile,
-                                              .Web.DataVisualization, .Web.DynamicData,
-                                              .Web.Entity, .AspNetCompiler
+    (System.Web, System.Configuration,        .Web.ApplicationServices, .Web.Extensions,
+    aspnet_compiler, ...)                     .Web.Services, .Web.Mobile, .Web.DataVisualiz-
+                                              ation, .Web.DynamicData, .Web.Entity,
+                                              .AspNetCompiler (lifted copies: ReferenceSource/)
   ASP.NET Web Stack                           src/webForCore.System.*, src/webForCore.      Apache-2.0 (.NET Foundation)
                                               Microsoft.Web.Mvc, test/webForCore.System.*
                                               (except MonoTests), Microsoft.TestCommon,
@@ -35,7 +36,10 @@ Summary
   Mono System.Web tests                       test/webForCore.System.Web.MonoTests          MIT (Novell, Xamarin and
                                                                                             contributors)
   Mono class library code                     src/WebFormsForCore.Web (Mono.Security,       MIT (Novell, Ximian)
-                                              ManagedProtection), Serialization.Formatters
+                                              ManagedProtection, mono/StronglyTyped-
+                                              ResourceBuilder), Serialization.Formatters
+  dotnet/winforms ResX classes                src/WebFormsForCore.Web/WebFormsForCore/      MIT (.NET Foundation)
+                                              System.Resources/winforms
   dotnet/runtime BinaryFormatter, FontConverter src/WebFormsForCore.Serialization.Formatters MIT (.NET Foundation)
                                               /Serialization, src/WebFormsForCore.Drawing
   SoapFormatter (novotnyllc/SoapFormatter)    src/WebFormsForCore.Serialization.Formatters  MIT (Novell, Ximian,
@@ -52,10 +56,6 @@ Summary
   AjaxControlToolkit                          src/WebFormsForCore.AjaxControlToolkit        BSD-3-Clause (CodePlex
                                                                                             Foundation)
   Redesigner                                  src/WebFormsForCore.Build/Redesigner          BSD-3-Clause (Sean Werkema)
-  BundleTransformer (git submodule; not       src/BundleTransformer                         Apache-2.0 (Andrey
-    built by the solution)                                                                  Taritsyn); bundled tools
-                                                                                            under their own licences,
-                                                                                            src/BundleTransformer/Licenses
   JavaScript libraries in the TestApp and     Bootstrap, jQuery, Modernizr, Jasmine,        MIT (their authors)
     AjaxControlToolkit test site              Detect.js (MIT option of MIT/GPL)
   SkiaSharp (NuGet), Skia                     package dependency of System.Drawing.Common   MIT (Microsoft, Xamarin);
@@ -187,28 +187,21 @@ Inc., Ximian) and Reference Source code (MIT License, Microsoft). Mono's MIT-lic
 src/WebFormsForCore.Web/WebFormsForCore (ManagedProtection.Mono.cs, ProtectedDataPortable.cs: Copyright (c) 2005
 Novell, Inc., Sebastien Pouliot).
 
-BundleTransformer (https://github.com/Taritsyn/BundleTransformer, through https://github.com/simonegli8/BundleTransformer)
-is a git submodule at src/BundleTransformer, licensed under the Apache License, Version 2.0, Copyright (c) 2012-2026
-Andrey Taritsyn. The solution does not build it. The third-party tools and scripts it bundles keep their own
-licences, listed in src/BundleTransformer/Licenses.
-
 The TestApp (src/WebFormsForCore.TestApp) includes Bootstrap 5.2.3 (MIT, The Bootstrap Authors), jQuery 3.4.1 and
 3.7.1 (MIT, OpenJS Foundation), Modernizr 2.8.3 (MIT) and Microsoft's ASP.NET ScriptManager scripts.
 
-Licensing issues inherited from WebFormsForCore
------------------------------------------------
+dotnet/winforms (https://github.com/dotnet/winforms, release/8.0, commit 8266870), MIT License, Copyright (c) .NET
+Foundation and Contributors: the ResX classes in src/WebFormsForCore.Web/WebFormsForCore/System.Resources/winforms, copied
+by tools/lift/lift_resx.py (per-file source in tools/lift/manifests/ResX.tsv). Mono's StronglyTypedResourceBuilder
+(mcs/class/System.Design, MIT License, Copyright (C) 2007 Novell, Inc.) is in
+src/WebFormsForCore.Web/WebFormsForCore/mono, copied by tools/lift/lift_strb.py. The Reference Source files that
+tools/lift/lift_configuration.py, lift_appservices.py, lift_aspnet_compiler.py and lift_strb.py copy are listed in
+tools/lift/manifests/.
 
-These came with the fork base and are not covered by the licences above (docs/LICENSING.md has the details):
+Material inherited from WebFormsForCore
+---------------------------------------
 
-  * Resolved: the .NET Framework webengine.dll/webengine4.dll binaries and the decompiled Microsoft Report Viewer
-    were removed; the decompiled Microsoft.Web.Infrastructure and System.Security.Cryptography.DataProtector were
-    rewritten by webForCore from their documented APIs (MIT); the decompiled System.Web.RegularExpressions classes are
-    compiled only for .NET Framework.
-  * Open: about 140 files in src/WebFormsForCore.Configuration (settings, System.Net.Configuration, the config XML
-    classes, configuration builders) were decompiled from .NET Framework assemblies. Their originals are MIT-licensed
-    (Reference Source, dotnet/runtime) and are to replace them.
-  * The machine.config and web.config files in src/WebFormsForCore.Configuration/Config come from a .NET Framework
-    installation.
-  * Sample assets in src/BundleTransformer/samples (not built) include the Blogger Sans font (CC BY-ND 4.0), the
-    Bitstream Vera font, a jquery.validate-vsdoc.js under Microsoft's ASP.NET MVC 3 licence terms, and images of
-    unknown origin.
+The fork base contained .NET Framework binaries and code decompiled from .NET Framework assemblies and other Microsoft
+products, which no open licence covers. webForCore replaced all of it with Microsoft's MIT-licensed originals, other
+MIT-licensed sources, or its own code written from the documented APIs, or removed it. docs/LICENSING.md lists each
+item and what replaced it.

@@ -14,7 +14,8 @@ and tested with the upstream project's own tests. This page explains the rules f
 1. **Copy, don't rewrite.** Each file is copied as it is upstream and keeps its copyright header. The Web Stack copies
    have their line endings normalised to CRLF; nothing else changes on copy.
 2. **Every change is scripted and listed.** Changes are search-and-replace pairs in the lift scripts (`FIXUPS` in
-   `tools/lift/lift_project.py`, `lift_aspnet.py`, `lift_drawing.py`, `lift_drawing_tests.py`, `lift_mono_tests.py`).
+   `tools/lift/lift_project.py`, `lift_aspnet.py`, `lift_drawing.py`, `lift_drawing_tests.py`, `lift_mono_tests.py`,
+   `lift_configuration.py`, `lift_appservices.py`, `lift_aspnet_compiler.py`, `lift_resx.py`, `lift_strb.py`).
    A pair that no longer matches upstream stops the lift. Most changes carry a `// webForCore:` comment that gives the
    reason.
 3. **Additions are kept separate.** Code webForCore wrote is in `tools/lift/additions/` and is copied in as new files,
@@ -40,12 +41,16 @@ and tested with the upstream project's own tests. This page explains the rules f
 | System.Drawing.Common 6.0 | [dotnet/runtime@76b9680](https://github.com/dotnet/runtime/tree/76b9680) (release/6.0) | MIT | 199 | 4, plus the new engine |
 | System.Drawing.Common tests, TestUtilities | dotnet/runtime@76b9680, [dotnet/arcade@565a800](https://github.com/dotnet/arcade/tree/565a8005), [dotnet/runtime-assets@848e27e](https://github.com/dotnet/runtime-assets/tree/848e27e) | MIT | 233 | 2 |
 | System.Web tests | [mono/mono@0f53e9e](https://github.com/mono/mono/tree/0f53e9e) (`mcs/class/System.Web/Test`) | MIT | 188 | 30 |
-| **Total** | | | **4,389** | **196** |
+| System.Configuration, System.Web.ApplicationServices, aspnet_compiler, `BindableTypeAttribute` (replacing WebFormsForCore's decompiled copies) | [microsoft/referencesource@ec9fa9a](https://github.com/microsoft/referencesource/tree/ec9fa9ae770d522a5b5f0607898044b7478574a3) | MIT | 113 | 40 |
+| ResX classes (replacing decompiled copies) | [dotnet/winforms@8266870](https://github.com/dotnet/winforms/tree/8266870) (release/8.0) | MIT | 13 | 13 |
+| StronglyTypedResourceBuilder (replacing an API reconstruction) | mono/mono@0f53e9e (`mcs/class/System.Design`) | MIT | 1 | 1 |
+| **Total** | | | **4,516** | **250** |
 
 The fork itself starts from [webformsforcore/WebFormsForCore@52f4172](https://github.com/webformsforcore/WebFormsForCore/tree/52f4172dbc09b3ad0b849c97642720fa7a49aa22),
 whose System.Web, System.Configuration and related assemblies were ported from Microsoft's .NET Framework reference
-source. webForCore's changes to that port are listed at the end of [lifted-changes.md](lifted-changes.md) (138 source
-and project files).
+source. Some of that port had been decompiled from .NET Framework assemblies instead; webForCore replaced those parts
+with the MIT originals (the last four rows above) or its own code ([LICENSING.md](LICENSING.md#what-was-replaced)).
+webForCore's changes to the port are listed at the end of [lifted-changes.md](lifted-changes.md).
 
 ## Library changes, by kind
 

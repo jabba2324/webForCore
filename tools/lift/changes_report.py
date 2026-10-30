@@ -19,6 +19,8 @@ CHECKOUTS = {  # manifest repository name -> (checkout directory, GitHub reposit
     "mono/mono": ("mono", "mono/mono"),
     "identity": ("AspNetIdentity", "aspnet/AspNetIdentity"),
     "signalr": ("SignalR", "SignalR/SignalR"),
+    "microsoft/referencesource": ("referencesource", "microsoft/referencesource"),
+    "dotnet/winforms": ("winforms-8.0", "dotnet/winforms"),
 }
 
 

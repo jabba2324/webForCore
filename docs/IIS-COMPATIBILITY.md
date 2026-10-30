@@ -6,7 +6,7 @@ application, on Kestrel, and reads their settings from the `<system.webServer>` 
 An app keeps its IIS configuration as it is.
 
 The reference behaviour is IIS 10 with ASP.NET 4.8. Every feature marked **Works** below has at least one test in the
-IIS gate (`test/webForCore.IIS.Gate.Tests`, 57 tests) that drives `test/webForCore.IIS.Sample` over HTTP.
+IIS gate (`test/webForCore.IIS.Gate.Tests`, 58 tests) that drives `test/webForCore.IIS.Sample` over HTTP.
 
 Status key: **Works**: implemented and tested. **Partial**: some of it, or by other means. **Not built**: could be done
 and hasn't been. **Not possible**: Windows-native and can't exist on Linux.

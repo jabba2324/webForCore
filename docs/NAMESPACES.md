@@ -115,7 +115,9 @@ Assembly `System.Configuration.ConfigurationManager`, which replaces both the Nu
 System.Configuration. Namespaces `System.Configuration` (`ConfigurationManager`, sections, providers, protected
 configuration, CodeDom compiler configuration), `.Internal`, `.Provider`, and `System.Net.Configuration`.
 
-Caveats: `DataProtectionConfigurationProvider` uses webForCore's DPAPI emulation, so a section Windows DPAPI encrypted
+The sources are Microsoft's Reference Source (System.Configuration.dll and the configuration parts of System.dll).
+
+Caveats: `<system.net>` sections (`SmtpSection`, `DefaultProxySection`, ...) can be read with `ConfigurationManager.GetSection`, but .NET's System.Net doesn't apply them, so settings such as the default proxy or connection limits have to be set in code. `DataProtectionConfigurationProvider` uses webForCore's DPAPI emulation, so a section Windows DPAPI encrypted
 can't be read on Linux (the error says so). `RsaProtectedConfigurationProvider` keeps key containers as XML files in
 the key directory; containers exported with `aspnet_regiis -px` can be imported. The key directory is
 `$WEBFORCORE_KEYS`, `/var/lib/webforcore/keys` or `~/.webforcore/keys`.

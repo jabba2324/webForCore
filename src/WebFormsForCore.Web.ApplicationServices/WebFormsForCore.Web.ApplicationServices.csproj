@@ -52,4 +52,8 @@
         </None>
         <Compile Include="..\VersionInfo.cs" Link="Properties\VersionInfo.cs" />
     </ItemGroup>
+    <ItemGroup>
+        <!-- The Reference Source's ApplicationServicesStrings.Designer.cs looks its strings up by this name. -->
+        <EmbeddedResource Update="ApplicationServicesStrings.resx" LogicalName="System.Web.ApplicationServicesStrings.resources" />
+    </ItemGroup>
 </Project>

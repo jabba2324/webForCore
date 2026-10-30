@@ -407,3 +407,8 @@ lib/WebFormsForCore.Build
 bin_dotnet
 # webForCore: test samples extract the fork's machine.config here at startup
 test/*/App_Data/machine.config
+
+# webForCore: extracted from System.Configuration at run time
+src/WebFormsForCore.TestApp/App_Data/machine.config
+# webForCore: former submodule, no longer part of the repository (unused by the build)
+src/BundleTransformer/

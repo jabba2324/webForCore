@@ -17,8 +17,8 @@ restore the old behaviour, the difference is documented.
 | --- | --- |
 | Target | .NET 11 (`net11.0`), Linux x64 (Windows builds too) |
 | Status | Pre-release. No production app has been migrated yet; NuGet packages aren't published yet |
-| Tests | 27,275 tests in 24 suites, almost all of them Microsoft's and Mono's; all pass except 151 known System.Drawing failures, 141 of them metafiles ([TESTING.md](docs/TESTING.md)) |
-| Licence | MIT, Apache 2.0 and BSD 3-Clause: all allow commercial use. A few files inherited from WebFormsForCore aren't cleared yet; see [docs/LICENSING.md](docs/LICENSING.md) |
+| Tests | 27,276 tests in 24 suites, almost all of them Microsoft's and Mono's; all pass except 151 known System.Drawing failures, 141 of them metafiles ([TESTING.md](docs/TESTING.md)) |
+| Licence | MIT, Apache 2.0 and BSD 3-Clause, all of which allow commercial use; see [docs/LICENSING.md](docs/LICENSING.md) |
 
 ## What works
 
@@ -49,7 +49,7 @@ Code Access Security).
 | [docs/TESTING.md](docs/TESTING.md) | The test suites, where they come from, results and code coverage |
 | [docs/MODIFICATIONS.md](docs/MODIFICATIONS.md) | How Microsoft's code was lifted and what had to change, with links to upstream |
 | [docs/lifted-changes.md](docs/lifted-changes.md) | Generated list of every lifted file that differs from upstream |
-| [docs/LICENSING.md](docs/LICENSING.md) | Which parts have which licence, commercial use, and the files not yet cleared |
+| [docs/LICENSING.md](docs/LICENSING.md) | Which parts have which licence, commercial use, and what was replaced to get there |
 | [LIFT.md](LIFT.md) | The engineering log: every change, decision and test result, in order |
 
 ## Migrating an app: the short version
