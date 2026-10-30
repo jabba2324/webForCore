@@ -48,7 +48,7 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void InheritsBlockOutputsErrorIfInheritsNotFollowedByTypeButAcceptsEntireLineAsCode()
         {
-            ParseBlockTest("inherits                " + Environment.NewLine
+            ParseBlockTest("inherits                " + "\r\n"
                          + "foo",
                 new DirectiveBlock(
                     Factory.MetaCode("inherits                ").Accepts(AcceptedCharacters.None),
@@ -72,7 +72,7 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseBlockShowsErrorIfNamespaceNotOnSameLineAsImportsKeyword()
         {
-            ParseBlockTest("Imports" + Environment.NewLine
+            ParseBlockTest("Imports" + "\r\n"
                          + "Foo",
                 new DirectiveBlock(
                     Factory.MetaCode("Imports\r\n")
@@ -87,7 +87,7 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseBlockShowsErrorIfTypeBeingAliasedNotOnSameLineAsImportsKeyword()
         {
-            ParseBlockTest("Imports Foo =" + Environment.NewLine
+            ParseBlockTest("Imports Foo =" + "\r\n"
                          + "System.Bar",
                 new DirectiveBlock(
                     Factory.MetaCode("Imports Foo =\r\n")

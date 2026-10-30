@@ -546,7 +546,7 @@ namespace System.Web.Hosting
             var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly()); ;
             Type appContextType = Type.GetType("System.AppContext, " + AssemblyRef.Mscorlib,
                     assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                    (asm, typeName, ignoreCase) => asm?.GetType(typeName, false, ignoreCase));
+                    (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)));
             if (appContextType == null)
             {
                 return; // wrong version of mscorlib - do nothing
@@ -864,7 +864,7 @@ namespace System.Web.Hosting
             var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
             Type type = Type.GetType(assemblyQualifiedName,
                 assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                (asm, typeName, ignoreCase) => asm?.GetType(typeName, true, ignoreCase),
+                (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, true, ignoreCase) : global::System.Type.GetType(typeName, true, ignoreCase)),
                 true);
             return new ObjectHandle(Activator.CreateInstance(type));
         }
@@ -877,7 +877,7 @@ namespace System.Web.Hosting
             var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
             Type type = Type.GetType(assemblyQualifiedName,
                 assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                (asm, typeName, ignoreCase) => asm?.GetType(typeName, true, ignoreCase),
+                (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, true, ignoreCase) : global::System.Type.GetType(typeName, true, ignoreCase)),
                 true);
             return Activator.CreateInstance(type);
         }
@@ -890,7 +890,7 @@ namespace System.Web.Hosting
             var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
             Type type = Type.GetType(assemblyQualifiedName,
                 assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                (asm, typeName, ignoreCase) => asm?.GetType(typeName, true, ignoreCase),
+                (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, true, ignoreCase) : global::System.Type.GetType(typeName, true, ignoreCase)),
                 true);
             IRegisteredObject obj = null;
             String key = type.FullName;
@@ -926,7 +926,7 @@ namespace System.Web.Hosting
             var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
             Type type = Type.GetType(assemblyQualifiedName,
                 assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                (asm, typeName, ignoreCase) => asm?.GetType(typeName, true, ignoreCase),
+                (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, true, ignoreCase) : global::System.Type.GetType(typeName, true, ignoreCase)),
                 true);
             IRegisteredObject obj = null;
             String key = type.FullName;
@@ -979,7 +979,7 @@ namespace System.Web.Hosting
             var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
             Type type = Type.GetType(assemblyQualifiedName,
                 assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                (asm, typeName, ignoreCase) => asm?.GetType(typeName, true, ignoreCase),
+                (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, true, ignoreCase) : global::System.Type.GetType(typeName, true, ignoreCase)),
                 true);
             IRegisteredObject obj = null;
             String key = type.FullName;
@@ -1000,7 +1000,7 @@ namespace System.Web.Hosting
             var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
             Type type = Type.GetType(assemblyQualifiedName,
                 assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                (asm, typeName, ignoreCase) => asm?.GetType(typeName, true, ignoreCase),
+                (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, true, ignoreCase) : global::System.Type.GetType(typeName, true, ignoreCase)),
                 true);
             IRegisteredObject obj = null;
             String key = type.FullName;

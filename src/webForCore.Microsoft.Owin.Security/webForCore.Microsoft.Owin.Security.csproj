@@ -1,0 +1,100 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Lifted from aspnet/AspNetKatana 096e225 (src/Microsoft.Owin.Security/Microsoft.Owin.Security.csproj) by tools/lift/lift_project.py.
+       Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <AssemblyName>Microsoft.Owin.Security</AssemblyName>
+    <RootNamespace>Microsoft.Owin.Security</RootNamespace>
+    <PackageId>webForCore.Microsoft.Owin.Security</PackageId>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- Microsoft's builds use C# 9 (Web Stack, tools/WebStack.settings.targets) and Latest (Katana). -->
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;SYSLIB0003;SYSLIB0011;SYSLIB0051</NoWarn>
+    <DefineConstants>$(DefineConstants);</DefineConstants>
+    <!-- Delay signed with Microsoft's public key, as Microsoft's build does: PublicKeyToken=31bf3856ad364e35. -->
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>../SigningKey/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <AssemblyVersion>4.2.3.0</AssemblyVersion>
+    <FileVersion>4.200.325.35202</FileVersion>
+    <InformationalVersion>4.2.3</InformationalVersion>
+    <Company>Microsoft Corporation</Company>
+    <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
+    <Product>Microsoft.Owin.Security</Product>
+    <Description>Common types which are shared by the various authentication middleware components.</Description>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+  </PropertyGroup>
+
+  <Import Project="../webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="AppBuilderSecurityExtensions.cs" />
+    <Compile Include="AuthenticationMode.cs" />
+    <Compile Include="AuthenticationOptions.cs" />
+    <Compile Include="AuthenticationTicket.cs" />
+    <Compile Include="CertificateSubjectKeyIdentifierValidator.cs" />
+    <Compile Include="CertificateSubjectPublicKeyInfoValidator.cs" />
+    <Compile Include="CertificateThumbprintValidator.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="DataHandler/Encoder/Base64TextEncoder.cs" />
+    <Compile Include="DataHandler/Encoder/Base64UrlTextEncoder.cs" />
+    <Compile Include="DataHandler/Encoder/ITextEncoder.cs" />
+    <Compile Include="DataHandler/Encoder/TextEncodings.cs" />
+    <Compile Include="DataHandler/ISecureDataFormat.cs" />
+    <Compile Include="DataHandler/PropertiesDataFormat.cs" />
+    <Compile Include="DataHandler/SecureDataFormat.cs" />
+    <Compile Include="DataHandler/Serializer/DataSerializers.cs" />
+    <Compile Include="DataHandler/Serializer/IDataSerializer.cs" />
+    <Compile Include="DataHandler/Serializer/PropertiesSerializer.cs" />
+    <Compile Include="DataHandler/Serializer/TicketSerializer.cs" />
+    <Compile Include="DataHandler/TicketDataFormat.cs" />
+    <Compile Include="DataProtection/AppBuilderExtensions.cs" />
+    <Compile Include="DataProtection/DpapiDataProtectionProvider.cs" />
+    <Compile Include="DataProtection/DpapiDataProtector.cs" />
+    <Compile Include="DataProtection/IDataProtectionProvider.cs" />
+    <Compile Include="DataProtection/IDataProtector.cs" />
+    <Compile Include="ICertificateValidator.cs" />
+    <Compile Include="Infrastructure/AuthenticationHandler.cs" />
+    <Compile Include="Infrastructure/AuthenticationHandler`1.cs" />
+    <Compile Include="Infrastructure/AuthenticationMiddleware.cs" />
+    <Compile Include="Infrastructure/AuthenticationTokenCreateContext.cs" />
+    <Compile Include="Infrastructure/AuthenticationTokenProvider.cs" />
+    <Compile Include="Infrastructure/AuthenticationTokenReceiveContext.cs" />
+    <Compile Include="Infrastructure/Constants.cs" />
+    <Compile Include="Infrastructure/IAuthenticationTokenProvider.cs" />
+    <Compile Include="Infrastructure/OwinRequestExtensions.cs" />
+    <Compile Include="Infrastructure/SecurityHelper.cs" />
+    <Compile Include="Notifications/AuthenticationFailedNotification.cs" />
+    <Compile Include="Notifications/BaseNotification`1.cs" />
+    <Compile Include="Notifications/MessageReceivedNotification.cs" />
+    <Compile Include="Notifications/NotificationResultState.cs" />
+    <Compile Include="Notifications/RedirectToIdentityProviderNotification.cs" />
+    <Compile Include="Notifications/SecurityTokenReceivedNotification.cs" />
+    <Compile Include="Notifications/SecurityTokenValidatedNotification.cs" />
+    <Compile Include="Properties/AssemblyInfo.cs" />
+    <Compile Include="Provider/BaseContext.cs" />
+    <Compile Include="Provider/BaseContext`1.cs" />
+    <Compile Include="Provider/EndpointContext.cs" />
+    <Compile Include="Provider/EndpointContext`1.cs" />
+    <Compile Include="Provider/ReturnEndpointContext.cs" />
+    <Compile Include="Resources.Designer.cs" />
+    <Compile Include="SubjectPublicKeyInfoAlgorithm.cs" />
+    <Compile Include="Win32.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.resx" LogicalName="Microsoft.Owin.Security.Resources.resources" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../webForCore.Microsoft.Owin/webForCore.Microsoft.Owin.csproj" />
+    <PackageReference Include="Owin" Version="1.0.0" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="11.0.0-rc.3.26522.148" />
+  </ItemGroup>
+</Project>

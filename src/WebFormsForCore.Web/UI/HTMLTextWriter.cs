@@ -1309,7 +1309,7 @@ namespace System.Web.UI {
 #if NETFRAMEWORK
                         HttpUtility.UrlEncodeNonAscii(Char.ToString(ch), Encoding.UTF8));
 #else
-                        HttpUtilityInternal.UrlEncodeNonAscii(Char.ToString(ch), Encoding.UTF8));
+                        HttpUtility.UrlEncodeNonAscii(Char.ToString(ch), Encoding.UTF8));
 #endif
 				}
 			}

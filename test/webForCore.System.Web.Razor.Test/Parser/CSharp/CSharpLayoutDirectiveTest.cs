@@ -70,7 +70,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void LayoutDirectiveAcceptsTrailingNewlineButDoesNotIncludeItInLayoutPath()
         {
-            ParseBlockTest("@layout Foo" + Environment.NewLine,
+            ParseBlockTest("@layout Foo" + "\r\n",
                 new DirectiveBlock(
                     Factory.CodeTransition(),
                     Factory.MetaCode("layout ").Accepts(AcceptedCharacters.None),
@@ -85,7 +85,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void LayoutDirectiveCorrectlyRestoresContextAfterCompleting()
         {
-            ParseDocumentTest("@layout Foo" + Environment.NewLine
+            ParseDocumentTest("@layout Foo" + "\r\n"
                             + "@foo",
                 new MarkupBlock(
                     Factory.EmptyHtml(),

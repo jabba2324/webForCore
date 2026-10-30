@@ -34,7 +34,7 @@ public class VBCodeProviderBase : W.CodeDomProvider
             var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
             return Type.GetType($"Microsoft.VisualBasic.VBCodeGenerator, {CodeDomAssembly}",
                 assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                (asm, typeName, ignoreCase) => asm?.GetType(typeName, false, ignoreCase));
+                (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)));
         }
     } 
 	private Type typeAttributeConverterType
@@ -44,7 +44,7 @@ public class VBCodeProviderBase : W.CodeDomProvider
             var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
             return Type.GetType($"Microsoft.VisualBasic.VBTypeAttributeConverter, {CodeDomAssembly}",
                 assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                (asm, typeName, ignoreCase) => asm?.GetType(typeName, false, ignoreCase));
+                (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)));
         }
     }
 	private Type memberAttributeConverterType
@@ -54,7 +54,7 @@ public class VBCodeProviderBase : W.CodeDomProvider
             var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
             return Type.GetType($"Microsoft.VisualBasic.VBMemberAttributeConverter, {CodeDomAssembly}",
                 assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                (asm, typeName, ignoreCase) => asm?.GetType(typeName, false, ignoreCase));
+                (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)));
         }
     }
 #else

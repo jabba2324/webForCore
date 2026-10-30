@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Lifted from aspnet/AspNetWebStack 2106565 (System.Web.WebPages.Deployment) by tools/lift/lift_project.py.
+       Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <AssemblyName>System.Web.WebPages.Deployment</AssemblyName>
+    <RootNamespace>System.Web.WebPages.Deployment</RootNamespace>
+    <PackageId>webForCore.Web.WebPages.Deployment</PackageId>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- Microsoft's builds use C# 9 (Web Stack, tools/WebStack.settings.targets) and Latest (Katana). -->
+    <LangVersion>9.0</LangVersion>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;SYSLIB0003;SYSLIB0011;SYSLIB0051</NoWarn>
+    <DefineConstants>$(DefineConstants);ASPNETWEBPAGES</DefineConstants>
+    <!-- Delay signed with Microsoft's public key, as Microsoft's build does: PublicKeyToken=31bf3856ad364e35. -->
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>../SigningKey/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <Import Project="../webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="AppDomainHelper.cs" />
+    <Compile Include="AssemblyUtils.cs" />
+    <Compile Include="BuildManagerWrapper.cs" />
+    <Compile Include="Common/CommonResources.Designer.cs" />
+    <Compile Include="Common/GlobalSuppressions.cs" />
+    <Compile Include="Common/IFileSystem.cs" />
+    <Compile Include="Common/PhysicalFileSystem.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="IBuildManager.cs" />
+    <Compile Include="PreApplicationStartCode.cs" />
+    <Compile Include="Properties/AssemblyInfo.cs" />
+    <Compile Include="Properties/CommonAssemblyInfo.cs" />
+    <Compile Include="Resources/ConfigurationResources.Designer.cs" />
+    <Compile Include="WebPagesDeployment.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Common/CommonResources.resx" LogicalName="System.Web.WebPages.Deployment.Common.CommonResources.resources" />
+    <EmbeddedResource Include="Resources/ConfigurationResources.resx" LogicalName="System.Web.WebPages.Deployment.Resources.ConfigurationResources.resources" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../WebFormsForCore.Web.Infrastructure/WebFormsForCore.Web.Infrastructure.csproj" />
+    <ProjectReference Include="../WebFormsForCore.Configuration/WebFormsForCore.Configuration.csproj" />
+    <ProjectReference Include="../WebFormsForCore.Web/WebFormsForCore.Web.csproj" />
+    <PackageReference Include="System.CodeDom" Version="11.0.0-rc.3.26522.148" />
+  </ItemGroup>
+</Project>

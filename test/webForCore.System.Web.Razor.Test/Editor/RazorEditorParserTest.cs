@@ -140,8 +140,8 @@ namespace System.Web.Razor.Test.Editor
                     string generatedCode = capturedArgs.GeneratorResults.GeneratedCode.GenerateCode<CSharpCodeProvider>();
 
                     Assert.Equal(
-                        SimpleCSHTMLDocumentGenerated.ReadAllText(),
-                        MiscUtils.StripRuntimeVersion(generatedCode));
+                        MiscUtils.NormalizeGeneratedCode(SimpleCSHTMLDocumentGenerated.ReadAllText()),
+                        MiscUtils.NormalizeGeneratedCode(generatedCode));
                 }
             }
         }

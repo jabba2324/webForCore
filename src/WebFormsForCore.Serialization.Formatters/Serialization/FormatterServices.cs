@@ -328,7 +328,7 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
             }
 
             hasTypeForwardedFrom = false;
-            return type.Assembly.FullName!;
+            return FrameworkSurrogates.GetAssemblyName(type.Assembly); // webForCore: .NET Framework versions for this repository's System.Web etc.
         }
 
         internal static string GetClrTypeFullName(Type type)

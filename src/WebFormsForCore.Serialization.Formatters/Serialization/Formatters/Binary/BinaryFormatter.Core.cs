@@ -41,7 +41,8 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
                 _securityLevel = _securityLevel,
             };
 
-            var reader = new ObjectReader(serializationStream, _surrogates, _context, formatterEnums, _binder)
+            // webForCore: FrameworkSurrogateSelector adds .NET Framework types .NET no longer serializes (FrameworkSurrogates.cs).
+            var reader = new ObjectReader(serializationStream, FrameworkSurrogateSelector.Wrap(_surrogates), _context, formatterEnums, _binder)
             {
                 _crossAppDomainArray = _crossAppDomainArray
             };
@@ -51,14 +52,9 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
                 var parser = new BinaryParser(serializationStream, reader);
                 return reader.Deserialize(parser);
             }
-            catch (SerializationException)
-            {
-                throw;
-            }
-            catch (Exception e)
-            {
-                throw new SerializationException(SR.Serialization_CorruptedStream, e);
-            }
+            // webForCore: .NET wraps any other exception in SerializationException ("Invalid BinaryFormatter stream");
+            // .NET Framework's BinaryFormatter let it through (an ArgumentException from a delegate that no longer binds,
+            // for example), and System.Web's callers expect that.
             finally
             {
                 BinaryFormatterEventSource.Log.DeserializationStop();
@@ -90,7 +86,7 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
             try
             {
                 BinaryFormatterEventSource.Log.SerializationStart();
-                var sow = new ObjectWriter(_surrogates, _context, formatterEnums, _binder);
+                var sow = new ObjectWriter(FrameworkSurrogateSelector.Wrap(_surrogates), _context, formatterEnums, _binder); // webForCore: as in Deserialize
                 BinaryFormatterWriter binaryWriter = new BinaryFormatterWriter(serializationStream, sow, _typeFormat);
                 sow.Serialize(graph, binaryWriter);
                 _crossAppDomainArray = sow._crossAppDomainArray;

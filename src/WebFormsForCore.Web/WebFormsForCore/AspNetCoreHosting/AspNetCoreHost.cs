@@ -45,7 +45,10 @@ namespace System.Web.Hosting
         private string virtualPath;
         public bool HandleAllRequestsWithWebForms { get; set; } = false;
 		public string[] HandleExtensions { get; set; } = new string[] { ".aspx", ".ashx", ".asmx", ".axd" };
-        public string[] ProhibitedExtensions { get; set; } = new string[] { ".razor", ".cshtml", ".vbhtml", ".cs", ".vb", ".resx", ".resource", ".master", ".asax", ".ascx", "web.config", "appsettings.json" };
+        // webForCore: only files System.Web knows nothing about. The machine.config maps the others as .NET Framework's root
+        // web.config does (HttpForbiddenHandler for *.cs, *.vb, *.resx, *.master, *.asax, *.ascx, *.config, ...: 403;
+        // *.cshtml and *.vbhtml served by Web Pages when it is enabled), so they go to System.Web as on IIS.
+        public string[] ProhibitedExtensions { get; set; } = new string[] { ".razor", "appsettings.json" };
         public string[] DefaultDocuments { get; set; } = new string[] { "index.htm", "index.html", "Index.html", "Index.htm", "Default.htm", "iistart.htm", "Default.aspx", "default.aspx" };
         public bool UseClassicMode = false;
         public Compilation.ClientBuildManager ClientBuildManager { get; set; } 
@@ -253,6 +256,9 @@ namespace System.Web.Hosting
             if (HandleExtensions.Any(ext => path.LastIndexOf('/') is var index and > 0 && path[..index].EndsWith(ext, StringComparison.OrdinalIgnoreCase))) 
                 return true;
             if (ProhibitedExtensions.Any(ext => path.EndsWith(ext, StringComparison.OrdinalIgnoreCase))) return false;
+            // webForCore: ASP.NET Core's environment settings files (appsettings.Production.json, ...), not only appsettings.json.
+            string fileName = path[(path.LastIndexOf('/') + 1)..];
+            if (fileName.StartsWith("appsettings.", StringComparison.OrdinalIgnoreCase) && fileName.EndsWith(".json", StringComparison.OrdinalIgnoreCase)) return false;
 
             var mappedPath = MapPath(fullpath);
             if (Directory.Exists(mappedPath))

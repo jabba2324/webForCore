@@ -259,7 +259,8 @@ namespace System.Net.Http.Formatting
         [InlineData("ABC \\udc00\\ud800 DEF", "ABC \ufffd\ufffd DEF")]
         // make sure unencoded invalid surrogate characters don't make it through
 #if NETCOREAPP // Json.NET uses its regular invalid Unicode character on .NET Core 2.1; '?' elsewhere.
-        [InlineData("\udc00\ud800\ud800", "\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd")]
+        // webForCore: .NET Core 3.0+'s UTF-8 decoder replaces each byte of the invalid sequences (3 per surrogate).
+        [InlineData("\udc00\ud800\ud800", "\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd")]
 #else
         [InlineData("\udc00\ud800\ud800", "??????")]
 #endif

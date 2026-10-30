@@ -51,7 +51,16 @@ namespace System.Web.Mvc.Routing.Constraints
 
                 double result;
                 string valueString = Convert.ToString(value, CultureInfo.InvariantCulture);
-                return Double.TryParse(valueString, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out result);
+                // webForCore: .NET Framework's TryParse fails on overflow; .NET's returns Infinity. Accept an infinite
+                // result only for the invariant infinity symbols, as .NET Framework did.
+                if (!Double.TryParse(valueString, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out result))
+                {
+                    return false;
+                }
+                string trimmed = valueString.Trim();
+                return !Double.IsInfinity(result)
+                    || trimmed == NumberFormatInfo.InvariantInfo.PositiveInfinitySymbol
+                    || trimmed == NumberFormatInfo.InvariantInfo.NegativeInfinitySymbol;
             }
             return false;
         }

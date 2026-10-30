@@ -108,8 +108,8 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseBlockHandlesSimpleAnonymousSectionInStatementWithinCodeBlock()
         {
-            ParseBlockTest("For Each foo in Bar " + Environment.NewLine
-                         + "    Html.ExecuteTemplate(foo," + TestTemplateCode + ")" + Environment.NewLine
+            ParseBlockTest("For Each foo in Bar " + "\r\n"
+                         + "    Html.ExecuteTemplate(foo," + TestTemplateCode + ")" + "\r\n"
                          + "Next foo",
                 new StatementBlock(
                     Factory.Code("For Each foo in Bar \r\n    Html.ExecuteTemplate(foo,")
@@ -123,8 +123,8 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseBlockHandlesTwoAnonymousSectionsInStatementWithinCodeBlock()
         {
-            ParseBlockTest("For Each foo in Bar " + Environment.NewLine
-                         + "    Html.ExecuteTemplate(foo," + TestTemplateCode + "," + TestTemplateCode + ")" + Environment.NewLine
+            ParseBlockTest("For Each foo in Bar " + "\r\n"
+                         + "    Html.ExecuteTemplate(foo," + TestTemplateCode + "," + TestTemplateCode + ")" + "\r\n"
                          + "Next foo",
                 new StatementBlock(
                     Factory.Code("For Each foo in Bar \r\n    Html.ExecuteTemplate(foo,")
@@ -140,8 +140,8 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseBlockProducesErrorButCorrectlyParsesNestedAnonymousSectionInStatementWithinCodeBlock()
         {
-            ParseBlockTest("For Each foo in Bar " + Environment.NewLine
-                         + "    Html.ExecuteTemplate(foo," + TestNestedTemplateCode + ")" + Environment.NewLine
+            ParseBlockTest("For Each foo in Bar " + "\r\n"
+                         + "    Html.ExecuteTemplate(foo," + TestNestedTemplateCode + ")" + "\r\n"
                          + "Next foo",
                 new StatementBlock(
                     Factory.Code("For Each foo in Bar \r\n    Html.ExecuteTemplate(foo,")
@@ -156,9 +156,9 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseBlockHandlesSimpleAnonymousSectionInStatementWithinStatementBlock()
         {
-            ParseBlockTest("Code " + Environment.NewLine
-                         + "    Dim foo = bar" + Environment.NewLine
-                         + "    Html.ExecuteTemplate(foo," + TestTemplateCode + ")" + Environment.NewLine
+            ParseBlockTest("Code " + "\r\n"
+                         + "    Dim foo = bar" + "\r\n"
+                         + "    Html.ExecuteTemplate(foo," + TestTemplateCode + ")" + "\r\n"
                          + "End Code",
                 new StatementBlock(
                     Factory.MetaCode("Code").Accepts(AcceptedCharacters.None),
@@ -172,9 +172,9 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseBlockHandlessTwoAnonymousSectionsInStatementWithinStatementBlock()
         {
-            ParseBlockTest("Code" + Environment.NewLine
-                         + "    Dim foo = bar" + Environment.NewLine
-                         + "    Html.ExecuteTemplate(foo," + TestTemplateCode + "," + TestTemplateCode + ")" + Environment.NewLine
+            ParseBlockTest("Code" + "\r\n"
+                         + "    Dim foo = bar" + "\r\n"
+                         + "    Html.ExecuteTemplate(foo," + TestTemplateCode + "," + TestTemplateCode + ")" + "\r\n"
                          + "End Code",
                 new StatementBlock(
                     Factory.MetaCode("Code").Accepts(AcceptedCharacters.None),
@@ -190,9 +190,9 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseBlockProducesErrorButCorrectlyParsesNestedAnonymousSectionInStatementWithinStatementBlock()
         {
-            ParseBlockTest("Code" + Environment.NewLine
-                         + "    Dim foo = bar" + Environment.NewLine
-                         + "    Html.ExecuteTemplate(foo," + TestNestedTemplateCode + ")" + Environment.NewLine
+            ParseBlockTest("Code" + "\r\n"
+                         + "    Dim foo = bar" + "\r\n"
+                         + "    Html.ExecuteTemplate(foo," + TestNestedTemplateCode + ")" + "\r\n"
                          + "End Code",
                 new StatementBlock(
                     Factory.MetaCode("Code").Accepts(AcceptedCharacters.None),

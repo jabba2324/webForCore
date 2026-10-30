@@ -1,0 +1,81 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Lifted from aspnet/AspNetWebStack 2106565 (System.Web.Http.WebHost.Test) by tools/lift/lift_project.py.
+       Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <AssemblyName>System.Web.Http.WebHost.Test</AssemblyName>
+    <RootNamespace>System.Web.Http.WebHost</RootNamespace>
+    <PackageId>webForCore.Web.Http.WebHost.Test</PackageId>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- Microsoft's builds use C# 9 (Web Stack, tools/WebStack.settings.targets) and Latest (Katana). -->
+    <LangVersion>9.0</LangVersion>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;SYSLIB0003;SYSLIB0011;SYSLIB0051</NoWarn>
+    <DefineConstants>$(DefineConstants);</DefineConstants>
+    <!-- Delay signed with Microsoft's public key, as Microsoft's build does: PublicKeyToken=31bf3856ad364e35. -->
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>../../src/SigningKey/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <Import Project="../../src/webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="BatchingTest.cs" />
+    <Compile Include="GlobalConfigurationTest.cs" />
+    <Compile Include="HttpControllerHandlerTest.cs" />
+    <Compile Include="HttpRequestMessageExtensions.cs" />
+    <Compile Include="Properties/AssemblyInfo.cs" />
+    <Compile Include="RouteCollectionExtensionsTest.cs" />
+    <Compile Include="Routing/HostedHttpRouteCollectionTest.cs" />
+    <Compile Include="Routing/HostedUrlHelperTest.cs" />
+    <Compile Include="Routing/HttpContextBaseExtensionsTest.cs" />
+    <Compile Include="Routing/HttpRequestMessageWrapperTest.cs" />
+    <Compile Include="Routing/HttpRouteExceptionHandlerTests.cs" />
+    <Compile Include="Routing/HttpRouteExceptionRouteHandlerTests.cs" />
+    <Compile Include="Routing/HttpWebRouteTests.cs" />
+    <Compile Include="SeekableBufferedRequestStreamTest.cs" />
+    <Compile Include="SuppressFormsAuthRedirectHelperTest.cs" />
+    <Compile Include="WebHostBufferPolicySelectorTest.cs" />
+    <Compile Include="WebHostExceptionCatchBlocksTests.cs" />
+    <Compile Include="WebHostExceptionHandlerTests.cs" />
+    <Compile Include="WebHostHttpRequestContextTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/WebFormsForCore.Configuration/WebFormsForCore.Configuration.csproj" />
+    <ProjectReference Include="../../src/WebFormsForCore.Web/WebFormsForCore.Web.csproj" />
+    <ProjectReference Include="../../src/webForCore.System.Net.Http.Formatting/webForCore.System.Net.Http.Formatting.csproj" />
+    <ProjectReference Include="../../src/webForCore.System.Web.Http.Owin/webForCore.System.Web.Http.Owin.csproj" />
+    <ProjectReference Include="../../src/webForCore.System.Web.Http.WebHost/webForCore.System.Web.Http.WebHost.csproj" />
+    <ProjectReference Include="../../src/webForCore.System.Web.Http/webForCore.System.Web.Http.csproj" />
+    <ProjectReference Include="../../src/webForCore.System.Web.Mvc/webForCore.System.Web.Mvc.csproj" />
+    <ProjectReference Include="../webForCore.Microsoft.TestCommon/webForCore.Microsoft.TestCommon.csproj" />
+    <PackageReference Include="System.CodeDom" Version="11.0.0-rc.3.26522.148" />
+    <PackageReference Include="Castle.Core" Version="5.2.1" />
+    <PackageReference Include="Moq" Version="4.21.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.3" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.abstractions" Version="2.0.3" />
+    <PackageReference Include="xunit.analyzers" Version="1.27.0" />
+    <PackageReference Include="xunit.assert" Version="2.9.3" />
+    <PackageReference Include="xunit.core" Version="2.9.3" />
+    <PackageReference Include="xunit.extensibility.core" Version="2.9.3" />
+    <PackageReference Include="xunit.extensibility.execution" Version="2.9.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+  </ItemGroup>
+</Project>

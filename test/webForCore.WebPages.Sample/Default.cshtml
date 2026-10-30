@@ -1,0 +1,14 @@
+@{
+    Page.Title = "Home";
+    var name = Request["name"] ?? "world";
+}
+@helper Shout(string text) {
+    <strong>@text.ToUpperInvariant()</strong>
+}
+<h1>Hello, @name!</h1>
+<p id="helper">@Shout(name)</p>
+<p id="input">@Html.TextBox("name", name)</p>
+<p id="href">@Href("~/Products", "a b")</p>
+@section footer {
+    <footer>Footer section</footer>
+}

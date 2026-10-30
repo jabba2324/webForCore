@@ -1,0 +1,17 @@
+# aspnet/AspNetWebStack 2106565: source path (relative to repo root)	destination (relative to fork root)
+src/CommonAssemblyInfo.cs	src/webForCore.System.Web.WebPages.Deployment/Properties/CommonAssemblyInfo.cs
+src/CommonResources.Designer.cs	src/webForCore.System.Web.WebPages.Deployment/Common/CommonResources.Designer.cs
+src/CommonResources.resx	src/webForCore.System.Web.WebPages.Deployment/Common/CommonResources.resx
+src/GlobalSuppressions.cs	src/webForCore.System.Web.WebPages.Deployment/Common/GlobalSuppressions.cs
+src/System.Web.WebPages.Deployment/AppDomainHelper.cs	src/webForCore.System.Web.WebPages.Deployment/AppDomainHelper.cs
+src/System.Web.WebPages.Deployment/AssemblyUtils.cs	src/webForCore.System.Web.WebPages.Deployment/AssemblyUtils.cs
+src/System.Web.WebPages.Deployment/BuildManagerWrapper.cs	src/webForCore.System.Web.WebPages.Deployment/BuildManagerWrapper.cs
+src/System.Web.WebPages.Deployment/Common/IFileSystem.cs	src/webForCore.System.Web.WebPages.Deployment/Common/IFileSystem.cs
+src/System.Web.WebPages.Deployment/Common/PhysicalFileSystem.cs	src/webForCore.System.Web.WebPages.Deployment/Common/PhysicalFileSystem.cs
+src/System.Web.WebPages.Deployment/GlobalSuppressions.cs	src/webForCore.System.Web.WebPages.Deployment/GlobalSuppressions.cs
+src/System.Web.WebPages.Deployment/IBuildManager.cs	src/webForCore.System.Web.WebPages.Deployment/IBuildManager.cs
+src/System.Web.WebPages.Deployment/PreApplicationStartCode.cs	src/webForCore.System.Web.WebPages.Deployment/PreApplicationStartCode.cs
+src/System.Web.WebPages.Deployment/Properties/AssemblyInfo.cs	src/webForCore.System.Web.WebPages.Deployment/Properties/AssemblyInfo.cs
+src/System.Web.WebPages.Deployment/Resources/ConfigurationResources.Designer.cs	src/webForCore.System.Web.WebPages.Deployment/Resources/ConfigurationResources.Designer.cs
+src/System.Web.WebPages.Deployment/Resources/ConfigurationResources.resx	src/webForCore.System.Web.WebPages.Deployment/Resources/ConfigurationResources.resx
+src/System.Web.WebPages.Deployment/WebPagesDeployment.cs	src/webForCore.System.Web.WebPages.Deployment/WebPagesDeployment.cs

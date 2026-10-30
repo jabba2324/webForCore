@@ -597,10 +597,36 @@ namespace System.Web {
         [DllImport(ModName.ENGINE_FULL_NAME, CharSet=CharSet.Unicode)]
         internal static extern int GetGroupsForUser(IntPtr token, StringBuilder allGroups, int allGrpSize, StringBuilder error, int errorSize);
 
-        [DllImport(ModName.ENGINE_FULL_NAME)]
-        internal static extern int GetHMACSHA1Hash(byte[] data1, int dataOffset1, int dataSize1, byte[] data2, int dataSize2,
+        [DllImport(ModName.ENGINE_FULL_NAME, EntryPoint = "GetHMACSHA1Hash")]
+        private static extern int GetHMACSHA1HashNative(byte[] data1, int dataOffset1, int dataSize1, byte[] data2, int dataSize2,
                                                    byte[] innerKey, int innerKeySize, byte[] outerKey, int outerKeySize,
                                                    byte[] hash, int hashSize);
+
+        // webForCore: webengine4.dll (IIS's native engine) does not exist off Windows, so MachineKey.Encode, LosFormatter
+        // and ViewState MACs with SHA1 validation threw DllNotFoundException. The managed version computes the same
+        // value: HMAC from the precomputed pads, SHA1(outer || SHA1(inner || data1[offset..offset+size] || data2)).
+        internal static int GetHMACSHA1Hash(byte[] data1, int dataOffset1, int dataSize1, byte[] data2, int dataSize2,
+                                            byte[] innerKey, int innerKeySize, byte[] outerKey, int outerKeySize,
+                                            byte[] hash, int hashSize) {
+            if (OSInfo.IsWindows)
+                return GetHMACSHA1HashNative(data1, dataOffset1, dataSize1, data2, dataSize2, innerKey, innerKeySize, outerKey, outerKeySize, hash, hashSize);
+            if (hash == null || hashSize < SHA1HashSize)
+                return E_INVALIDARG;
+            using (var inner = System.Security.Cryptography.IncrementalHash.CreateHash(System.Security.Cryptography.HashAlgorithmName.SHA1))
+            using (var outer = System.Security.Cryptography.IncrementalHash.CreateHash(System.Security.Cryptography.HashAlgorithmName.SHA1)) {
+                inner.AppendData(innerKey, 0, innerKeySize);
+                inner.AppendData(data1, dataOffset1, dataSize1);
+                if (data2 != null && dataSize2 > 0)
+                    inner.AppendData(data2, 0, dataSize2);
+                outer.AppendData(outerKey, 0, outerKeySize);
+                outer.AppendData(inner.GetHashAndReset());
+                outer.GetHashAndReset().CopyTo(hash, 0);
+            }
+            return 0;
+        }
+
+        private const int SHA1HashSize = 20;
+        private const int E_INVALIDARG = unchecked((int)0x80070057);
 
 #if !FEATURE_PAL
 
@@ -622,9 +648,19 @@ namespace System.Web {
         }
 #endif // !FEATURE_PAL
 
-        [DllImport(ModName.ENGINE_FULL_NAME)]
-        internal static extern int GetSHA1Hash(byte[] data, int dataSize,
+        [DllImport(ModName.ENGINE_FULL_NAME, EntryPoint = "GetSHA1Hash")]
+        private static extern int GetSHA1HashNative(byte[] data, int dataSize,
                                                byte[] hash, int hashSize);
+
+        // webForCore: managed SHA1 off Windows, where webengine4.dll does not exist (see GetHMACSHA1Hash).
+        internal static int GetSHA1Hash(byte[] data, int dataSize, byte[] hash, int hashSize) {
+            if (OSInfo.IsWindows)
+                return GetSHA1HashNative(data, dataSize, hash, hashSize);
+            if (hash == null || hashSize < SHA1HashSize)
+                return E_INVALIDARG;
+            System.Security.Cryptography.SHA1.HashData(new ReadOnlySpan<byte>(data, 0, dataSize)).CopyTo(hash, 0);
+            return 0;
+        }
 
         [DllImport(ModName.ENGINE_FULL_NAME)]
         internal static extern int GetW3WPMemoryLimitInKB();

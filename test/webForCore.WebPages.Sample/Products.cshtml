@@ -1,0 +1,10 @@
+@{
+    Page.Title = "Products";
+    var id = UrlData[0];
+    var all = new[] { "Tomato Soup", "Yo-yo", "Hammer" };
+}
+@if (string.IsNullOrEmpty(id)) {
+    <ul>@foreach (var p in all.OrderBy(x => x)) { <li>@p</li> }</ul>
+} else {
+    <p id="product">Product @id: @all[int.Parse(id) - 1]</p>
+}

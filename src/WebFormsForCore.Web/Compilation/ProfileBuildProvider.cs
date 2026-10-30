@@ -104,7 +104,7 @@ namespace System.Web.Compilation {
                         return null;
                     }
                 },
-                (asm, typeName, ignoreCase) => asm?.GetType(typeName, false, ignoreCase),
+                (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)),
                 false);
 
             // namespace ASP {

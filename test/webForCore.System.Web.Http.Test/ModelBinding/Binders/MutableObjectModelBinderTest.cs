@@ -713,8 +713,8 @@ namespace System.Web.Http.ModelBinding.Binders
             testableBinder.SetPropertyPublic(null, bindingContext, propertyMetadata, dtoResult, requiredValidator: null);
 
             // Assert
-            Assert.Equal("Date of death can't be before date of birth." + Environment.NewLine
-                       + "Parameter name: value",
+            // webForCore: .NET formats ArgumentException messages as "<message> (Parameter '<name>')"
+            Assert.Equal("Date of death can't be before date of birth. (Parameter 'value')",
                          bindingContext.ModelState["foo"].Errors[0].Exception.Message);
         }
 
@@ -796,7 +796,7 @@ namespace System.Web.Http.ModelBinding.Binders
             Assert.False(bindingContext.ModelState.IsValid);
             ModelError modelError = Assert.Single(bindingContext.ModelState["foo.NameNoAttribute"].Errors);
             Assert.Equal(
-                "This is a different exception." + Environment.NewLine + "Parameter name: value",
+                "This is a different exception. (Parameter 'value')", // webForCore: .NET formats ArgumentException messages as "<message> (Parameter '<name>')"
                 modelError.Exception.Message);
         }
 

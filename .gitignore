@@ -405,3 +405,5 @@ FodyWeavers.xsd
 
 lib/WebFormsForCore.Build
 bin_dotnet
+# webForCore: test samples extract the fork's machine.config here at startup
+test/*/App_Data/machine.config

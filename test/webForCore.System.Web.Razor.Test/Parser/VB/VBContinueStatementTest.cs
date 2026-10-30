@@ -14,9 +14,9 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void VB_Do_Statement_With_Continue()
         {
-            ParseBlockTest("@Do While True" + Environment.NewLine
-                         + "    Continue Do" + Environment.NewLine
-                         + "Loop" + Environment.NewLine
+            ParseBlockTest("@Do While True" + "\r\n"
+                         + "    Continue Do" + "\r\n"
+                         + "Loop" + "\r\n"
                          + "' Not in the block!",
                 new StatementBlock(
                     Factory.CodeTransition(SyntaxConstants.TransitionString)
@@ -29,9 +29,9 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void VB_For_Statement_With_Continue()
         {
-            ParseBlockTest("@For i = 1 To 12" + Environment.NewLine
-                         + "    Continue For" + Environment.NewLine
-                         + "Next i" + Environment.NewLine
+            ParseBlockTest("@For i = 1 To 12" + "\r\n"
+                         + "    Continue For" + "\r\n"
+                         + "Next i" + "\r\n"
                          + "' Not in the block!",
                 new StatementBlock(
                     Factory.CodeTransition(SyntaxConstants.TransitionString)
@@ -44,9 +44,9 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void VB_While_Statement_With_Continue()
         {
-            ParseBlockTest("@While True" + Environment.NewLine
-                         + "    Continue While" + Environment.NewLine
-                         + "End While" + Environment.NewLine
+            ParseBlockTest("@While True" + "\r\n"
+                         + "    Continue While" + "\r\n"
+                         + "End While" + "\r\n"
                          + "' Not in the block!",
                 new StatementBlock(
                     Factory.CodeTransition(SyntaxConstants.TransitionString)

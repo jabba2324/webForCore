@@ -38,7 +38,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void InheritsBlockOutputsErrorIfInheritsNotFollowedByTypeButAcceptsEntireLineAsCode()
         {
-            ParseBlockTest("inherits                " + Environment.NewLine
+            ParseBlockTest("inherits                " + "\r\n"
                          + "foo",
                            new DirectiveBlock(
                                Factory.MetaCode("inherits ").Accepts(AcceptedCharacters.None),
@@ -90,8 +90,8 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void NonKeywordStatementInCodeBlockIsHandledCorrectly()
         {
-            ParseBlockTest("{" + Environment.NewLine
-                         + "    List<dynamic> photos = gallery.Photo.ToList();" + Environment.NewLine
+            ParseBlockTest("{" + "\r\n"
+                         + "    List<dynamic> photos = gallery.Photo.ToList();" + "\r\n"
                          + "}",
                            new StatementBlock(
                                Factory.MetaCode("{").Accepts(AcceptedCharacters.None),
@@ -182,9 +182,9 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockTerminatesSingleLineCommentAtEndOfLine()
         {
-            ParseBlockTest("if(!false) {" + Environment.NewLine
-                         + "    // Foo" + Environment.NewLine
-                         + "\t<p>A real tag!</p>" + Environment.NewLine
+            ParseBlockTest("if(!false) {" + "\r\n"
+                         + "    // Foo" + "\r\n"
+                         + "\t<p>A real tag!</p>" + "\r\n"
                          + "}",
                            new StatementBlock(
                                Factory.Code("if(!false) {\r\n    // Foo\r\n").AsStatement(),

@@ -619,7 +619,7 @@ public sealed class BuildManager
         var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
         Type t = Type.GetType(AppSettings.PortableCompilationOutputSnapshotType,
             assemblyName => alc.LoadFromAssemblyName(assemblyName),
-            (asm, typeName, ignoreCase) => asm?.GetType(typeName, true, ignoreCase),
+            (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, true, ignoreCase) : global::System.Type.GetType(typeName, true, ignoreCase)),
             true);
         object[] args = new Object[] { AppSettings.PortableCompilationOutputSnapshotTypeOptions };
         t.InvokeMember("RestoreSnapshot", BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod, null, t, args, CultureInfo.InvariantCulture);
@@ -1502,7 +1502,9 @@ public sealed class BuildManager
             var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
             type = Type.GetType(typeName,
                 assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                (asm, typeName, ignoreCase) => asm?.GetType(typeName, false, ignoreCase),
+                // webForCore: a name without an assembly reaches the resolver with asm == null; like Type.GetType(string), search
+                // the calling assembly and the core library (was asm?.GetType, so "System.Guid" was never found).
+                (asm, typeName, ignoreCase) => asm != null ? asm.GetType(typeName, false, ignoreCase) : Type.GetType(typeName, false, ignoreCase),
                 throwOnError, ignoreCase);
 
             if (type != null)
@@ -1518,7 +1520,8 @@ public sealed class BuildManager
             var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
             return Type.GetType(typeName,
                 assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                (asm, typeName, ignoreCase) => asm?.GetType(typeName, false, ignoreCase),
+                // webForCore: see above.
+                (asm, typeName, ignoreCase) => asm != null ? asm.GetType(typeName, false, ignoreCase) : Type.GetType(typeName, false, ignoreCase),
                 throwOnError, ignoreCase);
         }
 

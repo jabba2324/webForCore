@@ -1,0 +1,110 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Lifted from aspnet/AspNetKatana 096e225 (src/Microsoft.Owin.Host.SystemWeb/Microsoft.Owin.Host.SystemWeb.csproj) by tools/lift/lift_project.py.
+       Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <AssemblyName>Microsoft.Owin.Host.SystemWeb</AssemblyName>
+    <RootNamespace>Microsoft.Owin.Host.SystemWeb</RootNamespace>
+    <PackageId>webForCore.Microsoft.Owin.Host.SystemWeb</PackageId>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- Microsoft's builds use C# 9 (Web Stack, tools/WebStack.settings.targets) and Latest (Katana). -->
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;SYSLIB0003;SYSLIB0011;SYSLIB0051</NoWarn>
+    <DefineConstants>$(DefineConstants);</DefineConstants>
+    <!-- Delay signed with Microsoft's public key, as Microsoft's build does: PublicKeyToken=31bf3856ad364e35. -->
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>../SigningKey/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <AssemblyVersion>4.2.3.0</AssemblyVersion>
+    <FileVersion>4.200.325.35202</FileVersion>
+    <InformationalVersion>4.2.3</InformationalVersion>
+    <Company>Microsoft Corporation</Company>
+    <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
+    <Product>Microsoft.Owin.Host.SystemWeb</Product>
+    <Description>OWIN server that enables OWIN-based applications to run on IIS using the ASP.NET request pipeline.</Description>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+  </PropertyGroup>
+
+  <Import Project="../webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="App_Packages/Owin.Loader/LoaderResources.Designer.cs" />
+    <Compile Include="CallContextAsyncResult.cs" />
+    <Compile Include="CallEnvironment/AspNetDictionary.Generated.cs" />
+    <Compile Include="CallEnvironment/AspNetDictionary.cs" />
+    <Compile Include="CallEnvironment/NilDictionary.cs" />
+    <Compile Include="CallEnvironment/TraceTextWriter.cs" />
+    <Compile Include="CallHeaders/AspNetRequestHeaders.cs" />
+    <Compile Include="CallHeaders/AspNetResponseHeaders.cs" />
+    <Compile Include="CallHeaders/SendingHeadersEvent.cs" />
+    <Compile Include="CallStreams/DelegatingStream.cs" />
+    <Compile Include="CallStreams/InputStream.cs" />
+    <Compile Include="CallStreams/OutputStream.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="DataProtection/MachineKeyDataProtectionProvider.cs" />
+    <Compile Include="DataProtection/MachineKeyDataProtector.cs" />
+    <Compile Include="DictionaryExtensions.cs" />
+    <Compile Include="DisconnectWatcher.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="HttpContextBaseExtensions.cs" />
+    <Compile Include="HttpContextExtensions.cs" />
+    <Compile Include="HttpContextItemKeys.cs" />
+    <Compile Include="Infrastructure/DefaultTrace.cs" />
+    <Compile Include="Infrastructure/DefaultTraceFactory.cs" />
+    <Compile Include="Infrastructure/ErrorState.cs" />
+    <Compile Include="Infrastructure/ITrace.cs" />
+    <Compile Include="Infrastructure/ITraceFactory.cs" />
+    <Compile Include="Infrastructure/ReferencedAssemblyWrapper.cs" />
+    <Compile Include="Infrastructure/TraceExtensions.cs" />
+    <Compile Include="Infrastructure/TraceFactory.cs" />
+    <Compile Include="IntegratedPipeline/IntegratedPipelineBlueprint.cs" />
+    <Compile Include="IntegratedPipeline/IntegratedPipelineBlueprintStage.cs" />
+    <Compile Include="IntegratedPipeline/IntegratedPipelineContext.cs" />
+    <Compile Include="IntegratedPipeline/IntegratedPipelineContextStage.cs" />
+    <Compile Include="IntegratedPipeline/StageAsyncResult.cs" />
+    <Compile Include="Loader/Constants.cs" />
+    <Compile Include="Loader/DefaultLoader.cs" />
+    <Compile Include="Loader/NullLoader.cs" />
+    <Compile Include="OwinAppContext.cs" />
+    <Compile Include="OwinApplication.cs" />
+    <Compile Include="OwinBuilder.cs" />
+    <Compile Include="OwinCallContext.DisableResponseCompression.cs" />
+    <Compile Include="OwinCallContext.Environment.cs" />
+    <Compile Include="OwinCallContext.WebSockets.cs" />
+    <Compile Include="OwinCallContext.cs" />
+    <Compile Include="OwinHttpHandler.cs" />
+    <Compile Include="OwinHttpModule.cs" />
+    <Compile Include="OwinRoute.cs" />
+    <Compile Include="OwinRouteHandler.cs" />
+    <Compile Include="PreApplicationStart.cs" />
+    <Compile Include="Properties/AssemblyInfo.cs" />
+    <Compile Include="Resources.Designer.cs" />
+    <Compile Include="RouteCollectionExtensions.cs" />
+    <Compile Include="ShutdownDetector.cs" />
+    <Compile Include="SystemWebChunkingCookieManager.cs" />
+    <Compile Include="SystemWebCookieManager.cs" />
+    <Compile Include="UnsafeIISMethods.cs" />
+    <Compile Include="Utils.cs" />
+    <Compile Include="WebSockets/OwinWebSocketWrapper.cs" />
+    <Compile Include="WebSockets/WebSocketConstants.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Microsoft.Owin.Host.SystemWeb.Tests" Key="0024000004800000940000000602000000240000525341310004000001000100b5fc90e7027f67871e773a8fde8938c81dd402ba65b9201d60593e96c492651e889cc13f1415ebb53fac1131ae0bd333c5ee6021672d9718ea31a8aebd0da0072f25d87dba6fc90ffd598ed4da35e44c398c454307e8e33b8426143daec9f596836f97c8f74750e5975c64e2189f45def46b2a2b1247adc3652bf5c308055da9" />
+    <EmbeddedResource Include="App_Packages/Owin.Loader/LoaderResources.resx" LogicalName="Microsoft.Owin.Host.SystemWeb.App_Packages.Owin.Loader.LoaderResources.resources" />
+    <EmbeddedResource Include="Resources.resx" LogicalName="Microsoft.Owin.Host.SystemWeb.Resources.resources" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../webForCore.Microsoft.Owin/webForCore.Microsoft.Owin.csproj" />
+    <ProjectReference Include="../WebFormsForCore.Configuration/WebFormsForCore.Configuration.csproj" />
+    <ProjectReference Include="../WebFormsForCore.Web/WebFormsForCore.Web.csproj" />
+    <PackageReference Include="Owin" Version="1.0.0" />
+  </ItemGroup>
+</Project>

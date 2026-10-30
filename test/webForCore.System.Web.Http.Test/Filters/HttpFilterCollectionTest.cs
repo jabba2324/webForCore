@@ -64,8 +64,7 @@ namespace System.Web.Http.Filters
 
             Assert.Throws<ArgumentException>(
                 () => _collection.AddRange(filters),
-                "The parameter 'filters' cannot contain a null element." + Environment.NewLine +
-                "Parameter name: filters");
+                "The parameter 'filters' cannot contain a null element. (Parameter 'filters')"); // webForCore: .NET formats ArgumentException messages as "<message> (Parameter '<name>')"
 
             Assert.Equal(0, _collection.Count);
         }

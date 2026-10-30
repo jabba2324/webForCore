@@ -45,10 +45,10 @@ namespace WebFormsForCore.Compilers
 
                 var loader = Activator.CreateInstance(Type.GetType("Microsoft.CodeAnalysis.AnalyzerAssemblyLoader, Microsoft.CodeAnalysis",
 					assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                    (asm, typeName, ignoreCase) => asm?.GetType(typeName, true, ignoreCase)), true);
+                    (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, true, ignoreCase) : global::System.Type.GetType(typeName, true, ignoreCase))), true);
                 var buildPaths = Activator.CreateInstance(Type.GetType("Microsoft.CodeAnalysis.BuildPaths, Microsoft.CodeAnalysis",
                    assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                   (asm, typeName, ignoreCase) => asm?.GetType(typeName, false, ignoreCase), false),
+                   (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)), false),
                        BindingFlags.NonPublic | BindingFlags.Instance,
                        null,
                        new object[] { clientPath, workingDirectory, sdkPath, tempPath },

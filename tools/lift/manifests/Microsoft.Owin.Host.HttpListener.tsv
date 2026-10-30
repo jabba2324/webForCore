@@ -1,0 +1,25 @@
+# aspnet/AspNetKatana 096e225: source path (relative to repo root)	destination (relative to fork root)
+src/Microsoft.Owin.Host.HttpListener/Constants.cs	src/webForCore.Microsoft.Owin.Host.HttpListener/Constants.cs
+src/Microsoft.Owin.Host.HttpListener/DictionaryExtensions.cs	src/webForCore.Microsoft.Owin.Host.HttpListener/DictionaryExtensions.cs
+src/Microsoft.Owin.Host.HttpListener/DisconnectHandler.cs	src/webForCore.Microsoft.Owin.Host.HttpListener/DisconnectHandler.cs
+src/Microsoft.Owin.Host.HttpListener/LogHelper.cs	src/webForCore.Microsoft.Owin.Host.HttpListener/LogHelper.cs
+src/Microsoft.Owin.Host.HttpListener/NativeMethods.cs	src/webForCore.Microsoft.Owin.Host.HttpListener/NativeMethods.cs
+src/Microsoft.Owin.Host.HttpListener/OwinHttpListener.cs	src/webForCore.Microsoft.Owin.Host.HttpListener/OwinHttpListener.cs
+src/Microsoft.Owin.Host.HttpListener/OwinServerFactory.cs	src/webForCore.Microsoft.Owin.Host.HttpListener/OwinServerFactory.cs
+src/Microsoft.Owin.Host.HttpListener/Properties/AssemblyInfo.cs	src/webForCore.Microsoft.Owin.Host.HttpListener/Properties/AssemblyInfo.cs
+src/Microsoft.Owin.Host.HttpListener/PumpLimits.cs	src/webForCore.Microsoft.Owin.Host.HttpListener/PumpLimits.cs
+src/Microsoft.Owin.Host.HttpListener/RequestProcessing/CallEnvironment.Generated.cs	src/webForCore.Microsoft.Owin.Host.HttpListener/RequestProcessing/CallEnvironment.Generated.cs
+src/Microsoft.Owin.Host.HttpListener/RequestProcessing/CallEnvironment.cs	src/webForCore.Microsoft.Owin.Host.HttpListener/RequestProcessing/CallEnvironment.cs
+src/Microsoft.Owin.Host.HttpListener/RequestProcessing/ExceptionFilterStream.cs	src/webForCore.Microsoft.Owin.Host.HttpListener/RequestProcessing/ExceptionFilterStream.cs
+src/Microsoft.Owin.Host.HttpListener/RequestProcessing/HeadersDictionaryBase.cs	src/webForCore.Microsoft.Owin.Host.HttpListener/RequestProcessing/HeadersDictionaryBase.cs
+src/Microsoft.Owin.Host.HttpListener/RequestProcessing/HttpListenerStreamWrapper.cs	src/webForCore.Microsoft.Owin.Host.HttpListener/RequestProcessing/HttpListenerStreamWrapper.cs
+src/Microsoft.Owin.Host.HttpListener/RequestProcessing/NilDictionary.cs	src/webForCore.Microsoft.Owin.Host.HttpListener/RequestProcessing/NilDictionary.cs
+src/Microsoft.Owin.Host.HttpListener/RequestProcessing/OwinHttpListenerContext.cs	src/webForCore.Microsoft.Owin.Host.HttpListener/RequestProcessing/OwinHttpListenerContext.cs
+src/Microsoft.Owin.Host.HttpListener/RequestProcessing/OwinHttpListenerRequest.cs	src/webForCore.Microsoft.Owin.Host.HttpListener/RequestProcessing/OwinHttpListenerRequest.cs
+src/Microsoft.Owin.Host.HttpListener/RequestProcessing/OwinHttpListenerResponse.cs	src/webForCore.Microsoft.Owin.Host.HttpListener/RequestProcessing/OwinHttpListenerResponse.cs
+src/Microsoft.Owin.Host.HttpListener/RequestProcessing/RequestHeadersDictionary.cs	src/webForCore.Microsoft.Owin.Host.HttpListener/RequestProcessing/RequestHeadersDictionary.cs
+src/Microsoft.Owin.Host.HttpListener/RequestProcessing/ResponseHeadersDictionary.cs	src/webForCore.Microsoft.Owin.Host.HttpListener/RequestProcessing/ResponseHeadersDictionary.cs
+src/Microsoft.Owin.Host.HttpListener/Resources.Designer.cs	src/webForCore.Microsoft.Owin.Host.HttpListener/Resources.Designer.cs
+src/Microsoft.Owin.Host.HttpListener/Resources.resx	src/webForCore.Microsoft.Owin.Host.HttpListener/Resources.resx
+src/Microsoft.Owin.Host.HttpListener/WebSockets/Constants.cs	src/webForCore.Microsoft.Owin.Host.HttpListener/WebSockets/Constants.cs
+src/Microsoft.Owin.Host.HttpListener/WebSockets/OwinWebSocketWrapper.cs	src/webForCore.Microsoft.Owin.Host.HttpListener/WebSockets/OwinWebSocketWrapper.cs

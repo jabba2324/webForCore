@@ -120,6 +120,32 @@ namespace System.Web.Configuration {
 
         // Given a path and a VirtualDirectoryMapping, return the corresponding
         // physical path.
+        // webForCore: see GetPhysicalPathForPath. Segments that do not exist in any case are kept as given.
+        static string ResolveIgnoreCase(string directory, string relativePath) {
+            string current = directory;
+            string[] segments = relativePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < segments.Length; i++) {
+                string exact = Path.Combine(current, segments[i]);
+                string found = null;
+                if (!File.Exists(exact) && !Directory.Exists(exact) && Directory.Exists(current)) {
+                    try {
+                        foreach (string entry in Directory.EnumerateFileSystemEntries(current)) {
+                            if (String.Equals(Path.GetFileName(entry), segments[i], StringComparison.OrdinalIgnoreCase)) {
+                                found = entry;
+                                break;
+                            }
+                        }
+                    }
+                    catch (IOException) {
+                    }
+                    catch (UnauthorizedAccessException) {
+                    }
+                }
+                current = found ?? exact;
+            }
+            return current;
+        }
+
         string GetPhysicalPathForPath(string path, VirtualDirectoryMapping mapping) {
             string physicalPath;
 
@@ -138,6 +164,11 @@ namespace System.Web.Configuration {
 
                 if (OSInfo.IsWindows) childPart = childPart.Replace('/', Path.DirectorySeparatorChar);
                 physicalPath = Path.Combine(mapping.PhysicalDirectory, childPart);
+                // webForCore: configuration paths are lower case (machine/webroot/1/views/...), as Windows paths are case
+                // insensitive. On a case-sensitive file system find each segment as it is on disk.
+                if (!OSInfo.IsWindows && !File.Exists(physicalPath) && !Directory.Exists(physicalPath)) {
+                    physicalPath = ResolveIgnoreCase(mapping.PhysicalDirectory, childPart);
+                }
             }
 
             // Throw if the resulting physical path is not canonical, to prevent potential

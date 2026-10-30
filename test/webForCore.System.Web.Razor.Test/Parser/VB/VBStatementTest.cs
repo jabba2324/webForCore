@@ -91,8 +91,8 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void VB_Using_Statement()
         {
-            ParseBlockTest("@Using foo as Bar" + Environment.NewLine
-                         + "    foo()" + Environment.NewLine
+            ParseBlockTest("@Using foo as Bar" + "\r\n"
+                         + "    foo()" + "\r\n"
                          + "End Using",
                 new StatementBlock(
                     Factory.CodeTransition(),
@@ -104,8 +104,8 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void VB_Do_Loop_Statement()
         {
-            ParseBlockTest("@Do" + Environment.NewLine
-                         + "    foo()" + Environment.NewLine
+            ParseBlockTest("@Do" + "\r\n"
+                         + "    foo()" + "\r\n"
                          + "Loop While True",
                 new StatementBlock(
                     Factory.CodeTransition(),
@@ -117,8 +117,8 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void VB_While_Statement()
         {
-            ParseBlockTest("@While True" + Environment.NewLine
-                         + "    foo()" + Environment.NewLine
+            ParseBlockTest("@While True" + "\r\n"
+                         + "    foo()" + "\r\n"
                          + "End While",
                 new StatementBlock(
                     Factory.CodeTransition(),
@@ -130,12 +130,12 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void VB_If_Statement()
         {
-            ParseBlockTest("@If True Then" + Environment.NewLine
-                         + "    foo()" + Environment.NewLine
-                         + "ElseIf False Then" + Environment.NewLine
-                         + "    bar()" + Environment.NewLine
-                         + "Else" + Environment.NewLine
-                         + "    baz()" + Environment.NewLine
+            ParseBlockTest("@If True Then" + "\r\n"
+                         + "    foo()" + "\r\n"
+                         + "ElseIf False Then" + "\r\n"
+                         + "    bar()" + "\r\n"
+                         + "Else" + "\r\n"
+                         + "    baz()" + "\r\n"
                          + "End If",
                 new StatementBlock(
                     Factory.CodeTransition(),
@@ -147,13 +147,13 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void VB_Select_Statement()
         {
-            ParseBlockTest("@Select Case foo" + Environment.NewLine
-                         + "    Case 1" + Environment.NewLine
-                         + "        foo()" + Environment.NewLine
-                         + "    Case 2" + Environment.NewLine
-                         + "        bar()" + Environment.NewLine
-                         + "    Case Else" + Environment.NewLine
-                         + "        baz()" + Environment.NewLine
+            ParseBlockTest("@Select Case foo" + "\r\n"
+                         + "    Case 1" + "\r\n"
+                         + "        foo()" + "\r\n"
+                         + "    Case 2" + "\r\n"
+                         + "        bar()" + "\r\n"
+                         + "    Case Else" + "\r\n"
+                         + "        baz()" + "\r\n"
                          + "End Select",
                 new StatementBlock(
                     Factory.CodeTransition(),
@@ -165,8 +165,8 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void VB_For_Statement()
         {
-            ParseBlockTest("@For Each foo In bar" + Environment.NewLine
-                         + "    baz()" + Environment.NewLine
+            ParseBlockTest("@For Each foo In bar" + "\r\n"
+                         + "    baz()" + "\r\n"
                          + "Next",
                 new StatementBlock(
                     Factory.CodeTransition(),
@@ -178,12 +178,12 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void VB_Try_Statement()
         {
-            ParseBlockTest("@Try" + Environment.NewLine
-                         + "    foo()" + Environment.NewLine
-                         + "Catch ex as Exception" + Environment.NewLine
-                         + "    bar()" + Environment.NewLine
-                         + "Finally" + Environment.NewLine
-                         + "    baz()" + Environment.NewLine
+            ParseBlockTest("@Try" + "\r\n"
+                         + "    foo()" + "\r\n"
+                         + "Catch ex as Exception" + "\r\n"
+                         + "    bar()" + "\r\n"
+                         + "Finally" + "\r\n"
+                         + "    baz()" + "\r\n"
                          + "End Try",
                 new StatementBlock(
                     Factory.CodeTransition(),
@@ -195,8 +195,8 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void VB_With_Statement()
         {
-            ParseBlockTest("@With foo" + Environment.NewLine
-                         + "    .bar()" + Environment.NewLine
+            ParseBlockTest("@With foo" + "\r\n"
+                         + "    .bar()" + "\r\n"
                          + "End With",
                 new StatementBlock(
                     Factory.CodeTransition(),
@@ -208,8 +208,8 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void VB_SyncLock_Statement()
         {
-            ParseBlockTest("@SyncLock foo" + Environment.NewLine
-                         + "    foo.bar()" + Environment.NewLine
+            ParseBlockTest("@SyncLock foo" + "\r\n"
+                         + "    foo.bar()" + "\r\n"
                          + "End SyncLock",
                 new StatementBlock(
                     Factory.CodeTransition(),

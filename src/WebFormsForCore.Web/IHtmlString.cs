@@ -4,7 +4,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-#if NETFRAMEWORK
+// webForCore: compiled on .NET too, like Microsoft's HttpUtility (was #if NETFRAMEWORK, using .NET's System.Web.IHtmlString)
 using System.Diagnostics.CodeAnalysis;
 
 namespace System.Web {
@@ -13,4 +13,3 @@ namespace System.Web {
         string ToHtmlString();
     }
 }
-#endif

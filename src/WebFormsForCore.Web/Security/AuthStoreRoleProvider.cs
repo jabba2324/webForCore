@@ -589,7 +589,7 @@ namespace System.Web.Security
                                         return null;
                                     }
                                 },
-                                (asm, typeName, ignoreCase) => asm?.GetType(typeName, false, ignoreCase),
+                                (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)),
                                                                          false /*throwOnError*/);
                             if (typeAzAuthorizationStoreClass == null)
                                 typeAzAuthorizationStoreClass = Type.GetType("Microsoft.Interop.Security.AzRoles.AzAuthorizationStoreClass, Microsoft.Interop.Security.AzRoles, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35",
@@ -603,13 +603,13 @@ namespace System.Web.Security
                                             return null;
                                         }
                                     },
-                                    (asm, typeName, ignoreCase) => asm?.GetType(typeName, false, ignoreCase),
+                                    (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)),
                                                                          false /*throwOnError*/);
                             if (typeAzAuthorizationStoreClass == null) {
                                 _NewAuthInterface = false;
                                 typeAzAuthorizationStoreClass = Type.GetType("Microsoft.Interop.Security.AzRoles.AzAuthorizationStoreClass, Microsoft.Interop.Security.AzRoles, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35",
                                     assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                                    (asm, typeName, ignoreCase) => asm?.GetType(typeName, true, ignoreCase),
+                                    (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, true, ignoreCase) : global::System.Type.GetType(typeName, true, ignoreCase)),
                                                                         true /*throwOnError*/);
                             } 
                         } 

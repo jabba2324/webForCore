@@ -66,7 +66,7 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseHelperStatementTerminatesEarlyIfHeaderNotComplete()
         {
-            ParseDocumentTest("@Helper" + Environment.NewLine
+            ParseDocumentTest("@Helper" + "\r\n"
                             + "@Helper",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -125,7 +125,7 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseHelperStatementAllowsDifferentlyCasedEndHelperKeyword()
         {
-            ParseDocumentTest("@Helper Foo()" + Environment.NewLine
+            ParseDocumentTest("@Helper Foo()" + "\r\n"
                             + "end helper",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -142,7 +142,7 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseHelperStatementCapturesWhitespaceToEndOfLineIfHelperStatementMissingName()
         {
-            ParseDocumentTest("@Helper                       " + Environment.NewLine
+            ParseDocumentTest("@Helper                       " + "\r\n"
                             + "    ",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -161,7 +161,7 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseHelperStatementCapturesWhitespaceToEndOfLineIfHelperStatementMissingOpenParen()
         {
-            ParseDocumentTest("@Helper Foo    " + Environment.NewLine
+            ParseDocumentTest("@Helper Foo    " + "\r\n"
                             + "    ",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -178,8 +178,8 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseHelperStatementCapturesAllContentToEndOfFileIfHelperStatementMissingCloseParenInParameterList()
         {
-            ParseDocumentTest("@Helper Foo(Foo Bar" + Environment.NewLine
-                            + "Biz" + Environment.NewLine
+            ParseDocumentTest("@Helper Foo(Foo Bar" + "\r\n"
+                            + "Biz" + "\r\n"
                             + "Boz",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -193,7 +193,7 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseHelperStatementCapturesWhitespaceToEndOfLineIfHelperStatementMissingOpenBraceAfterParameterList()
         {
-            ParseDocumentTest("@Helper Foo(foo as String)    " + Environment.NewLine,
+            ParseDocumentTest("@Helper Foo(foo as String)    " + "\r\n",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
                     new HelperBlock(new HelperCodeGenerator(new LocationTagged<string>("Foo(foo as String)", 8, 0, 8), headerComplete: true),
@@ -212,7 +212,7 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseHelperStatementContinuesParsingHelperUntilEOF()
         {
-            ParseDocumentTest("@Helper Foo(foo as String)" + Environment.NewLine
+            ParseDocumentTest("@Helper Foo(foo as String)" + "\r\n"
                             + "    @<p>Foo</p>",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -237,8 +237,8 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseHelperStatementCorrectlyParsesHelperWithEmbeddedCode()
         {
-            ParseDocumentTest("@Helper Foo(foo as String, bar as String)" + Environment.NewLine
-                            + "    @<p>@foo</p>" + Environment.NewLine
+            ParseDocumentTest("@Helper Foo(foo as String, bar as String)" + "\r\n"
+                            + "    @<p>@foo</p>" + "\r\n"
                             + "End Helper",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -266,7 +266,7 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseHelperStatementGivesWhitespaceAfterCloseParenToMarkup()
         {
-            ParseDocumentTest("@Helper Foo(string foo)     " + Environment.NewLine
+            ParseDocumentTest("@Helper Foo(string foo)     " + "\r\n"
                             + "    ",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -290,9 +290,9 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseHelperAcceptsNestedHelpersButOutputsError()
         {
-            ParseDocumentTest("@Helper Foo(string foo)" + Environment.NewLine
-                            + "    @Helper Bar(string baz)" + Environment.NewLine
-                            + "    End Helper" + Environment.NewLine
+            ParseDocumentTest("@Helper Foo(string foo)" + "\r\n"
+                            + "    @Helper Bar(string baz)" + "\r\n"
+                            + "    End Helper" + "\r\n"
                             + "End Helper",
                 new MarkupBlock(
                     Factory.EmptyHtml(),

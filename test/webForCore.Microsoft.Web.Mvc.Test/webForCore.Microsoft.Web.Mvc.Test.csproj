@@ -1,0 +1,134 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Lifted from aspnet/AspNetWebStack 2106565 (Microsoft.Web.Mvc.Test) by tools/lift/lift_project.py.
+       Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <AssemblyName>Microsoft.Web.Mvc.Test</AssemblyName>
+    <RootNamespace>Microsoft.Web</RootNamespace>
+    <PackageId>webForCore.Microsoft.Web.Mvc.Test</PackageId>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- Microsoft's builds use C# 9 (Web Stack, tools/WebStack.settings.targets) and Latest (Katana). -->
+    <LangVersion>9.0</LangVersion>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;SYSLIB0003;SYSLIB0011;SYSLIB0051</NoWarn>
+    <DefineConstants>$(DefineConstants);</DefineConstants>
+    <!-- Not signed, as in Microsoft's build. -->
+    <SignAssembly>false</SignAssembly>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <Import Project="../../src/webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="Controls/Test/DesignModeSite.cs" />
+    <Compile Include="Controls/Test/DropDownListTest.cs" />
+    <Compile Include="Controls/Test/MvcControlTest.cs" />
+    <Compile Include="Controls/Test/MvcTestHelper.cs" />
+    <Compile Include="Controls/Test/ViewDataContainer.cs" />
+    <Compile Include="ModelBinding/Test/ArrayModelBinderProviderTest.cs" />
+    <Compile Include="ModelBinding/Test/ArrayModelBinderTest.cs" />
+    <Compile Include="ModelBinding/Test/BinaryDataModelBinderProviderTest.cs" />
+    <Compile Include="ModelBinding/Test/BindingBehaviorAttributeTest.cs" />
+    <Compile Include="ModelBinding/Test/CollectionModelBinderProviderTest.cs" />
+    <Compile Include="ModelBinding/Test/CollectionModelBinderTest.cs" />
+    <Compile Include="ModelBinding/Test/CollectionModelBinderUtilTest.cs" />
+    <Compile Include="ModelBinding/Test/ComplexModelDtoModelBinderProviderTest.cs" />
+    <Compile Include="ModelBinding/Test/ComplexModelDtoModelBinderTest.cs" />
+    <Compile Include="ModelBinding/Test/ComplexModelDtoResultTest.cs" />
+    <Compile Include="ModelBinding/Test/ComplexModelDtoTest.cs" />
+    <Compile Include="ModelBinding/Test/DictionaryModelBinderProviderTest.cs" />
+    <Compile Include="ModelBinding/Test/DictionaryModelBinderTest.cs" />
+    <Compile Include="ModelBinding/Test/ExtensibleModelBinderAdapterTest.cs" />
+    <Compile Include="ModelBinding/Test/ExtensibleModelBindingContextTest.cs" />
+    <Compile Include="ModelBinding/Test/GenericModelBinderProviderTest.cs" />
+    <Compile Include="ModelBinding/Test/KeyValuePairModelBinderProviderTest.cs" />
+    <Compile Include="ModelBinding/Test/KeyValuePairModelBinderTest.cs" />
+    <Compile Include="ModelBinding/Test/KeyValuePairModelBinderUtilTest.cs" />
+    <Compile Include="ModelBinding/Test/ModelBinderConfigTest.cs" />
+    <Compile Include="ModelBinding/Test/ModelBinderProviderCollectionTest.cs" />
+    <Compile Include="ModelBinding/Test/ModelBinderProvidersTest.cs" />
+    <Compile Include="ModelBinding/Test/ModelBinderUtilTest.cs" />
+    <Compile Include="ModelBinding/Test/ModelValidationNodeTest.cs" />
+    <Compile Include="ModelBinding/Test/MutableObjectModelBinderProviderTest.cs" />
+    <Compile Include="ModelBinding/Test/MutableObjectModelBinderTest.cs" />
+    <Compile Include="ModelBinding/Test/SimpleModelBinderProviderTest.cs" />
+    <Compile Include="ModelBinding/Test/TypeConverterModelBinderProviderTest.cs" />
+    <Compile Include="ModelBinding/Test/TypeConverterModelBinderTest.cs" />
+    <Compile Include="ModelBinding/Test/TypeMatchModelBinderProviderTest.cs" />
+    <Compile Include="ModelBinding/Test/TypeMatchModelBinderTest.cs" />
+    <Compile Include="Test/AcceptAttributeTest.cs" />
+    <Compile Include="Test/AjaxOnlyAttributeTest.cs" />
+    <Compile Include="Test/AreaHelpersTest.cs" />
+    <Compile Include="Test/AsyncManagerExtensionsTest.cs" />
+    <Compile Include="Test/ButtonTest.cs" />
+    <Compile Include="Test/ContentTypeAttributeTest.cs" />
+    <Compile Include="Test/ControllerExtensionsTest.cs" />
+    <Compile Include="Test/CookieValueProviderFactoryTest.cs" />
+    <Compile Include="Test/CopyAsyncParametersAttributeTest.cs" />
+    <Compile Include="Test/CreditCardAttributeTest.cs" />
+    <Compile Include="Test/CssExtensionsTests.cs" />
+    <Compile Include="Test/DeserializeAttributeTest.cs" />
+    <Compile Include="Test/DynamicReflectionObjectTest.cs" />
+    <Compile Include="Test/DynamicViewDataDictionaryTest.cs" />
+    <Compile Include="Test/DynamicViewPageTest.cs" />
+    <Compile Include="Test/ElementalValueProviderTest.cs" />
+    <Compile Include="Test/EmailAddressAttribueTest.cs" />
+    <Compile Include="Test/ExpressionHelperTest.cs" />
+    <Compile Include="Test/FileExtensionsAttributeTest.cs" />
+    <Compile Include="Test/FormExtensionsTest.cs" />
+    <Compile Include="Test/ImageExtensionsTest.cs" />
+    <Compile Include="Test/MailToExtensionsTest.cs" />
+    <Compile Include="Test/ModelCopierTest.cs" />
+    <Compile Include="Test/MvcSerializerTest.cs" />
+    <Compile Include="Test/RadioExtensionsTest.cs" />
+    <Compile Include="Test/ReaderWriterCacheTest.cs" />
+    <Compile Include="Test/RenderActionTest.cs" />
+    <Compile Include="Test/ScriptExtensionsTest.cs" />
+    <Compile Include="Test/SerializationExtensionsTest.cs" />
+    <Compile Include="Test/ServerVariablesValueProviderFactoryTest.cs" />
+    <Compile Include="Test/SessionValueProviderFactoryTest.cs" />
+    <Compile Include="Test/SkipBindingAttributeTest.cs" />
+    <Compile Include="Test/SubmitButtonExtensionsTest.cs" />
+    <Compile Include="Test/SubmitImageExtensionsTest.cs" />
+    <Compile Include="Test/TempDataValueProviderFactoryTest.cs" />
+    <Compile Include="Test/TypeHelpersTest.cs" />
+    <Compile Include="Test/UrlAttributeTest.cs" />
+    <Compile Include="Test/ValueProviderUtilTest.cs" />
+    <Compile Include="Test/VersionTest.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/WebFormsForCore.Configuration/WebFormsForCore.Configuration.csproj" />
+    <ProjectReference Include="../../src/WebFormsForCore.Web/WebFormsForCore.Web.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Web.Mvc/webForCore.Microsoft.Web.Mvc.csproj" />
+    <ProjectReference Include="../../src/webForCore.System.Web.Mvc/webForCore.System.Web.Mvc.csproj" />
+    <ProjectReference Include="../../src/webForCore.System.Web.WebPages/webForCore.System.Web.WebPages.csproj" />
+    <ProjectReference Include="../webForCore.Microsoft.TestCommon/webForCore.Microsoft.TestCommon.csproj" />
+    <ProjectReference Include="../webForCore.System.Web.Mvc.Test/webForCore.System.Web.Mvc.Test.csproj" />
+    <PackageReference Include="System.CodeDom" Version="11.0.0-rc.3.26522.148" />
+    <PackageReference Include="Castle.Core" Version="5.2.1" />
+    <PackageReference Include="Moq" Version="4.21.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.3" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.abstractions" Version="2.0.3" />
+    <PackageReference Include="xunit.analyzers" Version="1.27.0" />
+    <PackageReference Include="xunit.assert" Version="2.9.3" />
+    <PackageReference Include="xunit.core" Version="2.9.3" />
+    <PackageReference Include="xunit.extensibility.core" Version="2.9.3" />
+    <PackageReference Include="xunit.extensibility.execution" Version="2.9.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+  </ItemGroup>
+</Project>

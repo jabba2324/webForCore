@@ -539,7 +539,7 @@ namespace System.Web.Security {
                     foreach (ProviderSettings ps in settings.Providers) {
                         Type t = Type.GetType(ps.Type,
                             assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                            (asm, typeName, ignoreCase) => asm?.GetType(typeName, false, ignoreCase),
+                            (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)),
                             true, true);
                         if (!typeof(RoleProvider).IsAssignableFrom(t))
                             throw new ArgumentException(SR.GetString(SR.Provider_must_implement_type, typeof(RoleProvider).ToString()));

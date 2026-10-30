@@ -1,0 +1,231 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Lifted from mono/mono 0f53e9e (mcs/class/System.Web/Test, MIT) by tools/lift/lift_mono_tests.py. See NOTICE. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <!-- The TARGET_DOTNET serialization baselines (OutputCacheTest) were recorded on .NET Framework from a test assembly
+         named DotNet4_NUnit_Tests, whose name they contain; Mono's own build calls it System.Web_test. -->
+    <AssemblyName>DotNet4_NUnit_Tests</AssemblyName>
+    <RootNamespace>MonoTests</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <!-- Mono's TEST_MCS_FLAGS: -nowarn:219,169,1591 (plus 436,618 from the library flags). -->
+    <NoWarn>$(NoWarn);CS0219;CS0169;CS1591;CS0436;CS0618;CS0612;CS0672;SYSLIB0003;SYSLIB0011;SYSLIB0051</NoWarn>
+    <DefineConstants>$(DefineConstants);TARGET_DOTNET;DOT_NET</DefineConstants>
+  </PropertyGroup>
+
+  <Import Project="..\..\src\webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="System.Web.Caching/AggregateCacheDependencyTest.cs" />
+    <Compile Include="System.Web.Caching/CacheItemPriorityQueueTestSupport.cs" />
+    <Compile Include="System.Web.Caching/CacheItemPriorityQueueTest_generated.cs" />
+    <Compile Include="System.Web.Caching/FileResponseElementTest.cs" />
+    <Compile Include="System.Web.Caching/HeaderElementTest.cs" />
+    <Compile Include="System.Web.Caching/MemoryResponseElementTest.cs" />
+    <Compile Include="System.Web.Caching/OutputCacheTest.cs" />
+    <Compile Include="System.Web.Caching/SqlCacheDependencyTest.cs" />
+    <Compile Include="System.Web.Caching/SubstitutionResponseElementTest.cs" />
+    <Compile Include="System.Web.Compilation/BuildManagerTest.cs" />
+    <Compile Include="System.Web.Compilation/ClientBuildManagerParameterTest.cs" />
+    <Compile Include="System.Web.Configuration/AnonymousIdentificationSectionTest.cs" />
+    <Compile Include="System.Web.Configuration/AssemblyCollectionTest.cs" />
+    <Compile Include="System.Web.Configuration/AssemblyInfoTest.cs" />
+    <Compile Include="System.Web.Configuration/AuthenticationSectionTest.cs" />
+    <Compile Include="System.Web.Configuration/AuthorizationRuleCollectionTest.cs" />
+    <Compile Include="System.Web.Configuration/AuthorizationRuleTest.cs" />
+    <Compile Include="System.Web.Configuration/AuthorizationSectionTest.cs" />
+    <Compile Include="System.Web.Configuration/BufferModeSettingsTest.cs" />
+    <Compile Include="System.Web.Configuration/BuildProviderTest.cs" />
+    <Compile Include="System.Web.Configuration/CacheSectionTest.cs" />
+    <Compile Include="System.Web.Configuration/ClientTargetSectionTest.cs" />
+    <Compile Include="System.Web.Configuration/ClientTargetTest.cs" />
+    <Compile Include="System.Web.Configuration/CodeSubDirectoryTest.cs" />
+    <Compile Include="System.Web.Configuration/CompilationSectionTest.cs" />
+    <Compile Include="System.Web.Configuration/CustomErrorCollectionTest.cs" />
+    <Compile Include="System.Web.Configuration/CustomErrorsSectionTest.cs" />
+    <Compile Include="System.Web.Configuration/DeploymentSectionTest.cs" />
+    <Compile Include="System.Web.Configuration/HostingEnvironmentSectionTest.cs" />
+    <Compile Include="System.Web.Configuration/MachineKeySectionTest.cs" />
+    <Compile Include="System.Web.Configuration/MachineKeyValidationConverterTest.cs" />
+    <Compile Include="System.Web.Configuration/NullableStringValidatorTest.cs" />
+    <Compile Include="System.Web.Configuration/ProfilePropertySettingsTest.cs" />
+    <Compile Include="System.Web.Configuration/SiteMapSectionTest.cs" />
+    <Compile Include="System.Web.Hosting/SimpleWorkerRequestTest.cs" />
+    <Compile Include="System.Web.Hosting/VirtualPathProviderTest.cs" />
+    <Compile Include="System.Web.Profile/ProfileInfoTest.cs" />
+    <Compile Include="System.Web.Security/FormsIdentityTest.cs" />
+    <Compile Include="System.Web.Security/MachineKeyTest.cs" />
+    <Compile Include="System.Web.Security/MembershipPasswordAttributeTest.cs" />
+    <Compile Include="System.Web.Security/MembershipProviderCollectionTest.cs" />
+    <Compile Include="System.Web.Security/MembershipTest.cs" />
+    <Compile Include="System.Web.Security/MembershipUserCollectionTest.cs" />
+    <Compile Include="System.Web.Security/RolePrincipalTest.cs" />
+    <Compile Include="System.Web.UI.HtmlControls/HtmlAnchorTest.cs" />
+    <Compile Include="System.Web.UI.HtmlControls/HtmlButtonTest.cs" />
+    <Compile Include="System.Web.UI.HtmlControls/HtmlContainerControlTest.cs" />
+    <Compile Include="System.Web.UI.HtmlControls/HtmlInputFileTest.cs" />
+    <Compile Include="System.Web.UI.HtmlControls/HtmlInputHiddenTest.cs" />
+    <Compile Include="System.Web.UI.HtmlControls/HtmlInputPasswordTest.cs" />
+    <Compile Include="System.Web.UI.HtmlControls/HtmlInputRadioButtonTest.cs" />
+    <Compile Include="System.Web.UI.HtmlControls/HtmlInputResetTest.cs" />
+    <Compile Include="System.Web.UI.HtmlControls/HtmlInputSubmitTest.cs" />
+    <Compile Include="System.Web.UI.HtmlControls/HtmlLinkTest.cs" />
+    <Compile Include="System.Web.UI.HtmlControls/HtmlTableCellTest.cs" />
+    <Compile Include="System.Web.UI.HtmlControls/HtmlTableRowTest.cs" />
+    <Compile Include="System.Web.UI.HtmlControls/HtmlTableTest.cs" />
+    <Compile Include="System.Web.UI.WebControls.WebParts/ConnectionInterfaceCollectionTest.cs" />
+    <Compile Include="System.Web.UI.WebControls.WebParts/WebPartTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/AccessDataSourceTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/AdCreatedEventArgsTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/AutoGeneratedFieldTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/BaseDataBoundControlTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/BaseDataListTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/BaseValidatorTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/BoundColumnTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/ButtonColumnTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/ButtonFieldBaseTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/ButtonFieldTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/CalendarDayTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/CalendarTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/CommandFieldTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/CompareValidatorTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/CompositeControlTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/CompositeDataBoundControlTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/ControlParameterTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/CookieParameterTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/DataControlFieldCollectionTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/DataControlFieldTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/DataGridColumnTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/DataGridItemCollectionTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/DataGridItemTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/DataGridPagerStyleTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/DataKeyArrayTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/DataKeyCollectionTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/DataKeyTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/DataListItemCollectionTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/DataListItemTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/DataListTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/DataSourceControlTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/DataSourceViewTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/FileUploadTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/FontInfoTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/FontNamesConverterTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/FontUnitTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/GridViewRowCollectionTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/GridViewRowTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/HyperLinkColumnTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/HyperLinkFieldTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/HyperLinkTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/ImageTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/LabelTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/ListItemCollectionTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/ListItemTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/LiteralTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/LoginNameTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/LoginStatusTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/MenuItemBindingTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/MonthChangedEventArgsTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/MultiViewControlBuilderTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/PagedDataSourceTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/PagerSettingsTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/QueryStringParameterTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/RangeValidatorTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/RegularExpressionValidatorTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/RepeatInfoTest.auto.4.0.cs" />
+    <Compile Include="System.Web.UI.WebControls/RepeatInfoTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/RepeatInfoUser.cs" />
+    <Compile Include="System.Web.UI.WebControls/RepeaterItemCollectionTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/RoleGroupCollectionTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/RoleGroupTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/RouteParameterTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/SelectedDatesCollectionTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/SiteMapDataSourceTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/SqlDataSourceViewTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/TableCellTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/TableFooterRowTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/TableHeaderCellTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/TableHeaderRowTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/TableItemStyleTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/TableRowTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/TableSectionStyleTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/TableStyleTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/TargetConverterTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/TemplateFieldTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/TestControlIDConverter.cs" />
+    <Compile Include="System.Web.UI.WebControls/UnitConverterTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/UnitTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/ValidatedControlConverterTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/ValidationSummaryTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/ValidatorTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/WebColorConverterTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/WizardStepCollectionTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/WizardStepTest.cs" />
+    <Compile Include="System.Web.UI.WebControls/XmlTest.cs" />
+    <Compile Include="System.Web.UI/AttributeCollectionTest.cs" />
+    <Compile Include="System.Web.UI/ChtmlTextWriterTest.cs" />
+    <Compile Include="System.Web.UI/CleanHtmlTextWriter.cs" />
+    <Compile Include="System.Web.UI/ControlCollectionTest.cs" />
+    <Compile Include="System.Web.UI/CssStyleCollectionTest.cs" />
+    <Compile Include="System.Web.UI/DataBinderTest.cs" />
+    <Compile Include="System.Web.UI/DataBindingCollectionTest.cs" />
+    <Compile Include="System.Web.UI/DataBindingHandlerAttributeTest.cs" />
+    <Compile Include="System.Web.UI/DataKeyPropertyAttributeTest.cs" />
+    <Compile Include="System.Web.UI/DataSourceCacheDurationConverterTest.cs" />
+    <Compile Include="System.Web.UI/DataSourceSelectArgumentsTest.cs" />
+    <Compile Include="System.Web.UI/HtmlTextWriterTest.cs" />
+    <Compile Include="System.Web.UI/LiteralControlTest.cs" />
+    <Compile Include="System.Web.UI/LosFormatterTest.cs" />
+    <Compile Include="System.Web.UI/MinimizableAttributeTypeConverterTest.cs" />
+    <Compile Include="System.Web.UI/OutputCacheParametersTest.cs" />
+    <Compile Include="System.Web.UI/PostBackOptionsTest.cs" />
+    <Compile Include="System.Web.UI/PropertyConverterTest.cs" />
+    <Compile Include="System.Web.UI/StateBagTest.cs" />
+    <Compile Include="System.Web.UI/TemplateInstanceAttributeTest.cs" />
+    <Compile Include="System.Web.UI/TestUrlPropertyAttribute.cs" />
+    <Compile Include="System.Web.UI/ToolboxDataAttributeTest.cs" />
+    <Compile Include="System.Web.UI/XhtmlTextWriterTest.cs" />
+    <Compile Include="System.Web/EventHandlerTaskAsyncHelperTest.cs" />
+    <Compile Include="System.Web/HttpApplicationTest.cs" />
+    <Compile Include="System.Web/HttpCacheVaryByContentEncodingsTest.cs" />
+    <Compile Include="System.Web/HttpCacheVaryByHeadersTest.cs" />
+    <Compile Include="System.Web/HttpCacheVaryByParamsTest.cs" />
+    <Compile Include="System.Web/HttpClientCertificateTest.cs" />
+    <Compile Include="System.Web/HttpCookieCollectionTest.cs" />
+    <Compile Include="System.Web/HttpCookieTest.cs" />
+    <Compile Include="System.Web/HttpExceptionTest.cs" />
+    <Compile Include="System.Web/HttpResponseTest.cs" />
+    <Compile Include="System.Web/HttpServerUtilityTest.cs" />
+    <Compile Include="System.Web/HttpTaskAsyncHandlerTest.cs" />
+    <Compile Include="System.Web/HttpUtilityTest.cs" />
+    <Compile Include="System.Web/HttpWriter.cs" />
+    <Compile Include="System.Web/SiteMapNodeTest.cs" />
+    <Compile Include="System.Web/SiteMapProviderTest.cs" />
+    <Compile Include="System.Web/TaskAsyncResultTest.cs" />
+    <Compile Include="System.Web/TraceContextRecordTest.cs" />
+    <Compile Include="test-helpers/NunitHelpers.cs" />
+    <Compile Include="test-helpers/TestResourceHelper.cs" />
+    <Compile Include="NUnit2Compat.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web\WebFormsForCore.Web.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Extensions\WebFormsForCore.Web.Extensions.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Services\WebFormsForCore.Web.Services.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.ApplicationServices\WebFormsForCore.Web.ApplicationServices.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Configuration\WebFormsForCore.Configuration.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Drawing\WebFormsForCore.Drawing.csproj" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.9.1" />
+    <PackageReference Include="NUnit" Version="3.14.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+  </ItemGroup>
+</Project>

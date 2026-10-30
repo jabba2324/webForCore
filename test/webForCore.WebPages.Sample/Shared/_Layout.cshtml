@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html>
+<head><title>@Page.Title - @AppState["SiteName"]</title></head>
+<body>
+    @RenderPage("~/Shared/_Header.cshtml", "header data")
+    @RenderBody()
+    @RenderSection("footer", required: false)
+</body>
+</html>

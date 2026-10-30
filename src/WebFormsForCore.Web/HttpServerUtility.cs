@@ -16,7 +16,8 @@
 
 using System.Runtime.CompilerServices;
 
-[assembly: TypeForwardedToAttribute(typeof(System.Web.HttpUtility))]
+// webForCore: Microsoft's HttpUtility is compiled on .NET too (was [assembly: TypeForwardedTo(typeof(System.Web.HttpUtility))],
+// which made HttpUtility .NET's System.Web.HttpUtility and ignored HttpEncoder/<httpRuntime encoderType>).
 
 
 namespace System.Web {
@@ -1092,7 +1093,6 @@ namespace System.Web {
     /// <devdoc>
     /// </devdoc>
 
-#if NETFRAMEWORK
     // VSWhidbey 473228 - removed link demand from HttpUtility for ClickOnce scenario
     public sealed class HttpUtility {
 
@@ -1522,9 +1522,6 @@ namespace System.Web {
         public static byte[] UrlDecodeToBytes(byte[] bytes, int offset, int count) {
             return HttpEncoder.Current.UrlDecode(bytes, offset, count);
         }
-#else
-    internal class HttpUtilityInternal { 
-#endif
 
         //////////////////////////////////////////////////////////////////////////
         //
@@ -1688,7 +1685,7 @@ namespace System.Web {
 
             return sb.ToString();
         }*/
-#if NETFRAMEWORK
+		// webForCore: compiled on .NET too, with the rest of Microsoft's HttpUtility (was #if NETFRAMEWORK)
 		//
 		// JavaScriptStringEncode
 		//
@@ -1701,7 +1698,6 @@ namespace System.Web {
             string encoded = HttpEncoder.Current.JavaScriptStringEncode(value);
             return (addDoubleQuotes) ? "\"" + encoded + "\"" : encoded;
         }
-#endif
 
         /// <summary>
         /// Attempts to parse a co-ordinate as a double precision floating point value. 

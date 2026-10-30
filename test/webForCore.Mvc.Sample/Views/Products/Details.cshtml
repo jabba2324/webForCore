@@ -1,0 +1,21 @@
+@model MvcSample.Models.Product
+@{
+    ViewBag.Title = Model.Name;
+}
+<h2>@Html.DisplayFor(m => m.Name)</h2>
+@if (ViewBag.Saved != null)
+{
+    <p id="saved">Saved @ViewBag.Saved</p>
+}
+<dl>
+    <dt>@Html.DisplayNameFor(m => m.Price)</dt>
+    <dd id="price">@Html.DisplayFor(m => m.Price)</dd>
+    <dt>Supplier</dt>
+    <dd id="supplier">@Html.DisplayFor(m => m.Supplier)</dd>
+</dl>
+<ul id="tags">
+@foreach (var tag in Model.Tags ?? new List<string>())
+{
+    <li>@tag</li>
+}
+</ul>

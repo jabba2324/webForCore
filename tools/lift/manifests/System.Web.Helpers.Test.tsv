@@ -1,0 +1,23 @@
+# aspnet/AspNetWebStack 2106565: source path (relative to repo root)	destination (relative to fork root)
+test/System.Web.Helpers.Test/ChartTest.cs	test/webForCore.System.Web.Helpers.Test/ChartTest.cs
+test/System.Web.Helpers.Test/ConversionUtilTest.cs	test/webForCore.System.Web.Helpers.Test/ConversionUtilTest.cs
+test/System.Web.Helpers.Test/CryptoTest.cs	test/webForCore.System.Web.Helpers.Test/CryptoTest.cs
+test/System.Web.Helpers.Test/DynamicDictionary.cs	test/webForCore.System.Web.Helpers.Test/DynamicDictionary.cs
+test/System.Web.Helpers.Test/DynamicHelperTest.cs	test/webForCore.System.Web.Helpers.Test/DynamicHelperTest.cs
+test/System.Web.Helpers.Test/DynamicWrapper.cs	test/webForCore.System.Web.Helpers.Test/DynamicWrapper.cs
+test/System.Web.Helpers.Test/HelperResultTest.cs	test/webForCore.System.Web.Helpers.Test/HelperResultTest.cs
+test/System.Web.Helpers.Test/JsonTest.cs	test/webForCore.System.Web.Helpers.Test/JsonTest.cs
+test/System.Web.Helpers.Test/ObjectInfoTest.cs	test/webForCore.System.Web.Helpers.Test/ObjectInfoTest.cs
+test/System.Web.Helpers.Test/PreComputedGridDataSourceTest.cs	test/webForCore.System.Web.Helpers.Test/PreComputedGridDataSourceTest.cs
+test/System.Web.Helpers.Test/ServerInfoTest.cs	test/webForCore.System.Web.Helpers.Test/ServerInfoTest.cs
+test/System.Web.Helpers.Test/TestFiles/LambdaFinal.jpg	test/webForCore.System.Web.Helpers.Test/TestFiles/LambdaFinal.jpg
+test/System.Web.Helpers.Test/TestFiles/NETLogo.png	test/webForCore.System.Web.Helpers.Test/TestFiles/NETLogo.png
+test/System.Web.Helpers.Test/TestFiles/Test.ico	test/webForCore.System.Web.Helpers.Test/TestFiles/Test.ico
+test/System.Web.Helpers.Test/TestFiles/logo.bmp	test/webForCore.System.Web.Helpers.Test/TestFiles/logo.bmp
+test/System.Web.Helpers.Test/TestFiles/xhtml11-flat.dtd	test/webForCore.System.Web.Helpers.Test/TestFiles/xhtml11-flat.dtd
+test/System.Web.Helpers.Test/WebCacheTest.cs	test/webForCore.System.Web.Helpers.Test/WebCacheTest.cs
+test/System.Web.Helpers.Test/WebGridDataSourceTest.cs	test/webForCore.System.Web.Helpers.Test/WebGridDataSourceTest.cs
+test/System.Web.Helpers.Test/WebGridTest.cs	test/webForCore.System.Web.Helpers.Test/WebGridTest.cs
+test/System.Web.Helpers.Test/WebImageTest.cs	test/webForCore.System.Web.Helpers.Test/WebImageTest.cs
+test/System.Web.Helpers.Test/WebMailTest.cs	test/webForCore.System.Web.Helpers.Test/WebMailTest.cs
+test/System.Web.Helpers.Test/XhtmlAssert.cs	test/webForCore.System.Web.Helpers.Test/XhtmlAssert.cs

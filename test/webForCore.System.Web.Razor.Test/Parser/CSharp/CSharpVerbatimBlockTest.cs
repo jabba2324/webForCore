@@ -71,8 +71,8 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void InnerImplicitExpressionWithOnlySingleAtAcceptsSingleSpaceOrNewlineAtDesignTime()
         {
-            ParseBlockTest("{" + Environment.NewLine
-                         + "    @" + Environment.NewLine
+            ParseBlockTest("{" + "\r\n"
+                         + "    @" + "\r\n"
                          + "}",
                            new StatementBlock(
                                Factory.MetaCode("{").Accepts(AcceptedCharacters.None),
@@ -90,7 +90,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void InnerImplicitExpressionDoesNotAcceptTrailingNewlineInRunTimeMode()
         {
-            ParseBlockTest("{@foo." + Environment.NewLine
+            ParseBlockTest("{@foo." + "\r\n"
                          + "}",
                            new StatementBlock(
                                Factory.MetaCode("{").Accepts(AcceptedCharacters.None),
@@ -105,7 +105,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void InnerImplicitExpressionAcceptsTrailingNewlineInDesignTimeMode()
         {
-            ParseBlockTest("{@foo." + Environment.NewLine
+            ParseBlockTest("{@foo." + "\r\n"
                          + "}",
                            new StatementBlock(
                                Factory.MetaCode("{").Accepts(AcceptedCharacters.None),

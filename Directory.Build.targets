@@ -1,0 +1,19 @@
+<Project>
+  <!-- webForCore: the fork's System.Web contains Microsoft's System.Web.HttpUtility (as on .NET Framework). The shared
+       framework also has a System.Web.HttpUtility.dll with a System.Web.HttpUtility type, so in projects that reference
+       the fork's System.Web the compiler would see two (CS0433). Drop the framework copy there, as the projects already
+       drop the framework's System.Web.dll facade. Projects without the fork's System.Web keep .NET's HttpUtility. -->
+  <Target Name="WebForCoreDropFrameworkHttpUtility" AfterTargets="ResolveAssemblyReferences" BeforeTargets="FindReferenceAssembliesForReferences" Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">
+    <ItemGroup>
+      <!-- Only this repository's System.Web (a project reference); upstream's NuGet WebFormsForCore.Web still forwards
+           HttpUtility to .NET's, so projects that use that package (WebFormsForCore.Build) keep .NET's HttpUtility. -->
+      <_WebForCoreSystemWeb Include="@(ReferencePath)" Condition="'%(FileName)' == 'System.Web' AND '%(ReferencePath.ReferenceSourceTarget)' == 'ProjectReference'" />
+    </ItemGroup>
+    <PropertyGroup>
+      <_WebForCoreHasSystemWeb Condition="'@(_WebForCoreSystemWeb)' != ''">true</_WebForCoreHasSystemWeb>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(_WebForCoreHasSystemWeb)' == 'true'">
+      <ReferencePath Remove="@(ReferencePath)" Condition="'%(FileName)' == 'System.Web.HttpUtility' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(FullPath),'[\\/]packs[\\/]Microsoft\.(NETCore|AspNetCore)\.App\.Ref[\\/]'))" />
+    </ItemGroup>
+  </Target>
+</Project>

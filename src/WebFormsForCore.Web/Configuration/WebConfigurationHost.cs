@@ -90,7 +90,7 @@ internal sealed class WebConfigurationHost : DelegatingConfigHost, IInternalConf
         var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
         Type type = Type.GetType(InternalHostTypeName,
             assemblyName => alc.LoadFromAssemblyName(assemblyName),
-            (asm, typeName, ignoreCase) => asm?.GetType(typeName, true, ignoreCase),
+            (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, true, ignoreCase) : global::System.Type.GetType(typeName, true, ignoreCase)),
             true);
         Host = (IInternalConfigHost)Activator.CreateInstance(type, true);
     }
@@ -560,11 +560,41 @@ internal sealed class WebConfigurationHost : DelegatingConfigHost, IInternalConf
                 // Dev10 Bug 835901: '?' (%3F), '*' (%2A), and ':' (%3A) are valid in a URL.  We need to return null
                 // if the path contains one of these characters.  Instead of explicitly checking for these characters, 
                 // we will rely on Path.Combine and Path.GetFullPath to throw when the path is invalid.
-                return CombineAndValidatePath(directory, baseName);
+                string streamName = CombineAndValidatePath(directory, baseName);
+                // webForCore: IIS finds web.config whatever its case. The mapping fixes one base name per application
+                // (VirtualDirectoryMapping picks "Web.config" when the root has no "web.config"), so on a case-sensitive
+                // file system look for the file in each directory.
+                if (streamName != null && !OperatingSystem.IsWindows() && !File.Exists(streamName))
+                {
+                    streamName = FindFileIgnoreCase(directory, baseName) ?? streamName;
+                }
+                return streamName;
             }
 
             return null;
         }
+    }
+
+    // webForCore: see GetStreamName.
+    private static string FindFileIgnoreCase(string directory, string fileName)
+    {
+        try
+        {
+            foreach (string file in Directory.EnumerateFiles(directory))
+            {
+                if (string.Equals(Path.GetFileName(file), fileName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return file;
+                }
+            }
+        }
+        catch (IOException)
+        {
+        }
+        catch (UnauthorizedAccessException)
+        {
+        }
+        return null;
     }
 
     [FileIOPermissionAttribute(SecurityAction.Assert, AllFiles = FileIOPermissionAccess.PathDiscovery)]
@@ -974,7 +1004,7 @@ internal sealed class WebConfigurationHost : DelegatingConfigHost, IInternalConf
                 var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
                 Type type = Type.GetType(InternalConfigConfigurationFactoryTypeName,
                     assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                    (asm, typeName, ignoreCase) => asm?.GetType(typeName, true, ignoreCase),
+                    (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, true, ignoreCase) : global::System.Type.GetType(typeName, true, ignoreCase)),
                     true);
                 s_configurationFactory = (IInternalConfigConfigurationFactory)Activator.CreateInstance(type, true);
             }

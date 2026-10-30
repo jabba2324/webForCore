@@ -249,7 +249,7 @@ namespace System.Web.Profile {
                 var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
                 Type t = Type.GetType(inheritsType,
                     assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                    (asm, typeName, ignoreCase) => asm?.GetType(typeName, false, ignoreCase),
+                    (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)),
                     false, true);
                 if (t == null)
                     return inheritsType;
@@ -275,7 +275,7 @@ namespace System.Web.Profile {
                 var alc = AssemblyLoadContext.GetLoadContext (Assembly.GetExecutingAssembly());
                 Type t = Type.GetType(inheritsType,
                     assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                    (asm, typeName, ignoreCase) => asm?.GetType(typeName, false, ignoreCase),
+                    (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)),
                     false, true);
                 if (t == null || t != typeof(ProfileBase))
                     return true;
@@ -635,7 +635,7 @@ namespace System.Web.Profile {
             var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
             return Type.GetType(typeName,
                 assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                (asm, typeName, ignoreCase) => asm?.GetType(typeName, false, ignoreCase),
+                (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)),
                 true, true);
         }
 

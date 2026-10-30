@@ -339,6 +339,11 @@ namespace System.Web {
         internal void GenerateResponseHeadersForHandler()
         {
             if ( !(_wr is IIS7WorkerRequest) ) {
+                // webForCore: on the Kestrel host, record that a managed handler ran, for IIS integrated mode's
+                // Content-Type rule in GenerateResponseHeaders.
+                if (_wr is IAspNetCoreWorkerRequest) {
+                    _contentTypeSetByManagedHandler = true;
+                }
                 return;
             }
 
@@ -467,7 +472,12 @@ namespace System.Web {
             //
             // content type
             //
-            if ( _statusCode != 204 && _contentType != null) {
+            // webForCore: on the Kestrel host, IIS integrated mode's rule (UpdateNativeResponse): Content-Type only if managed
+            // code set it, or a managed handler ran and the response has a body. The classic pipeline always sent it,
+            // so an empty response (an OWIN 401 or 302, say) had "text/html" there but has no Content-Type on IIS.
+            if ( _statusCode != 204 && _contentType != null
+                && (!(_wr is IAspNetCoreWorkerRequest) || _contentTypeSetByManagedCaller
+                    || (_contentTypeSetByManagedHandler && GetBufferedLength() > 0))) {
                 String contentType = AppendCharSetToContentType( _contentType );
                 headers.Add(new HttpResponseHeader(HttpWorkerRequest.HeaderContentType, contentType));
             }
@@ -932,6 +942,24 @@ namespace System.Web {
         public NameValueCollection Headers {
             get {
                 if ( !(_wr is IIS7WorkerRequest) ) {
+                    // webForCore: on the fork's Kestrel host (AspNetCoreWorkerRequest) Response.Headers, integrated-mode
+                    // API on IIS, is a writable view of this response's own header store (custom and cache headers, as
+                    // AppendHeader keeps them), in the order they were added. OWIN's System.Web host is built on it. The
+                    // fork's integrated pipeline is not emulated (it needs IIS notifications), so this is offered in the
+                    // classic pipeline too. Other worker requests keep .NET Framework's behaviour.
+                    if (_wr is IAspNetCoreWorkerRequest) {
+                        if (_headers == null) {
+                            _headers = new HttpHeaderCollection(this, 16);
+                            foreach (ArrayList list in new[] { _customHeaders, _cacheHeaders }) {
+                                if (list != null) {
+                                    foreach (HttpResponseHeader h in list) {
+                                        _headers.AddManagedResponseHeader(h.Name, h.Value);
+                                    }
+                                }
+                            }
+                        }
+                        return _headers;
+                    }
                     throw new PlatformNotSupportedException(SR.GetString(SR.Requires_Iis_Integrated_Mode));
                 }
 
@@ -2064,7 +2092,6 @@ namespace System.Web {
                     }
 
                     _cacheHeaders.Add(new HttpResponseHeader(knownHeaderIndex, value));
-                    return;
                 }
                 else {
                     HttpResponseHeader h;
@@ -2075,6 +2102,37 @@ namespace System.Web {
 
                     AppendHeader(h);
                 }
+
+                // webForCore: keep Response.Headers (emulated integrated pipeline) current.
+                if (_headers != null) {
+                    _headers.AddManagedResponseHeader(name, value);
+                }
+            }
+        }
+
+        // webForCore: removes a header from this response's own store, for Response.Headers.Set and Remove in the
+        // emulated integrated pipeline (IIS removes it from the native header block).
+        internal void RemoveManagedHeader(String name) {
+            foreach (ArrayList list in new[] { _customHeaders, _cacheHeaders }) {
+                if (list != null) {
+                    for (int i = list.Count - 1; i >= 0; i--) {
+                        if (StringUtil.EqualsIgnoreCase(((HttpResponseHeader)list[i]).Name, name)) {
+                            list.RemoveAt(i);
+                        }
+                    }
+                }
+            }
+
+            switch (HttpWorkerRequest.GetKnownResponseHeaderIndex(name)) {
+                case HttpWorkerRequest.HeaderContentLength:
+                    _contentLengthSet = false;
+                    break;
+                case HttpWorkerRequest.HeaderTransferEncoding:
+                    _transferEncodingSet = false;
+                    break;
+                case HttpWorkerRequest.HeaderCacheControl:
+                    _cacheControlHeaderAdded = false;
+                    break;
             }
         }
 
@@ -3406,7 +3464,7 @@ namespace System.Web {
 #if NETFRAMEWORK
                     HttpUtility.UrlEncodeNonAscii(path, Encoding.UTF8)
 #else
-					HttpUtilityInternal.UrlEncodeNonAscii(path, Encoding.UTF8)
+					HttpUtility.UrlEncodeNonAscii(path, Encoding.UTF8)
 #endif
 					) + queryAndFragment;
             }
@@ -3416,7 +3474,7 @@ namespace System.Web {
 #if NETFRAMEWORK
                     HttpUtility.UrlEncodeNonAscii(url, Encoding.UTF8));
 #else
-					HttpUtilityInternal.UrlEncodeNonAscii(url, Encoding.UTF8));
+					HttpUtility.UrlEncodeNonAscii(url, Encoding.UTF8));
 #endif
 			}
 		}
@@ -3433,7 +3491,7 @@ namespace System.Web {
 #if NETFRAMEWORK
                     HttpUtility.UrlEncodeNonAscii(url.Substring(iqs), qsEncoding);
 #else
-					HttpUtilityInternal.UrlEncodeNonAscii(url.Substring(iqs), qsEncoding);
+					HttpUtility.UrlEncodeNonAscii(url.Substring(iqs), qsEncoding);
 #endif
 			}
 			else {

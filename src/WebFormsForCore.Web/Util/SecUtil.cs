@@ -20,8 +20,8 @@ namespace System.Web.Util {
     using System.Data.SqlClient;
     using System.Data.SqlTypes;
 #else
-	using Microsoft.Data.SqlClient;
-    using Microsoft.Data.SqlTypes;
+	using System.Data.SqlClient; // webForCore: System.Data.SqlClient, as .NET Framework (upstream used Microsoft.Data.SqlClient)
+    using System.Data.SqlTypes; // webForCore: as .NET Framework
 #endif
 	using System.Configuration.Provider;
     using System.Configuration;

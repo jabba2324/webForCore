@@ -25,8 +25,8 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseBlockAcceptsImplicitExpression()
         {
-            ParseBlockTest("If True Then" + Environment.NewLine
-                         + "    @foo" + Environment.NewLine
+            ParseBlockTest("If True Then" + "\r\n"
+                         + "    @foo" + "\r\n"
                          + "End If",
                 new StatementBlock(
                     Factory.Code("If True Then\r\n    ").AsStatement(),
@@ -43,9 +43,9 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseBlockAcceptsIfStatementWithinCodeBlockIfInDesignTimeMode()
         {
-            ParseBlockTest("If True Then" + Environment.NewLine
-                         + "    @If True Then" + Environment.NewLine
-                         + "    End If" + Environment.NewLine
+            ParseBlockTest("If True Then" + "\r\n"
+                         + "    @If True Then" + "\r\n"
+                         + "    End If" + "\r\n"
                          + "End If",
                 new StatementBlock(
                     Factory.Code("If True Then\r\n    ").AsStatement(),
@@ -62,8 +62,8 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseBlockSupportsSpacesInStrings()
         {
-            ParseBlockTest("for each p in db.Query(\"SELECT * FROM PRODUCTS\")" + Environment.NewLine
-                         + "    @<p>@p.Name</p>" + Environment.NewLine
+            ParseBlockTest("for each p in db.Query(\"SELECT * FROM PRODUCTS\")" + "\r\n"
+                         + "    @<p>@p.Name</p>" + "\r\n"
                          + "next",
                 new StatementBlock(
                     Factory.Code("for each p in db.Query(\"SELECT * FROM PRODUCTS\")\r\n")
@@ -86,10 +86,10 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseBlockSupportsSimpleCodeBlock()
         {
-            ParseBlockTest("Code" + Environment.NewLine
-                         + "    If foo IsNot Nothing" + Environment.NewLine
-                         + "        Bar(foo)" + Environment.NewLine
-                         + "    End If" + Environment.NewLine
+            ParseBlockTest("Code" + "\r\n"
+                         + "    If foo IsNot Nothing" + "\r\n"
+                         + "        Bar(foo)" + "\r\n"
+                         + "    End If" + "\r\n"
                          + "End Code",
                 new StatementBlock(
                     Factory.MetaCode("Code").Accepts(AcceptedCharacters.None),
@@ -101,11 +101,11 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseBlockRejectsNewlineBetweenEndAndCodeIfNotPrefixedWithUnderscore()
         {
-            ParseBlockTest("Code" + Environment.NewLine
-                         + "    If foo IsNot Nothing" + Environment.NewLine
-                         + "        Bar(foo)" + Environment.NewLine
-                         + "    End If" + Environment.NewLine
-                         + "End" + Environment.NewLine
+            ParseBlockTest("Code" + "\r\n"
+                         + "    If foo IsNot Nothing" + "\r\n"
+                         + "        Bar(foo)" + "\r\n"
+                         + "    End If" + "\r\n"
+                         + "End" + "\r\n"
                          + "Code",
                 new StatementBlock(
                     Factory.MetaCode("Code").Accepts(AcceptedCharacters.None),
@@ -119,13 +119,13 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseBlockAcceptsNewlineBetweenEndAndCodeIfPrefixedWithUnderscore()
         {
-            ParseBlockTest("Code" + Environment.NewLine
-                         + "    If foo IsNot Nothing" + Environment.NewLine
-                         + "        Bar(foo)" + Environment.NewLine
-                         + "    End If" + Environment.NewLine
-                         + "End _" + Environment.NewLine
-                         + "_" + Environment.NewLine
-                         + " _" + Environment.NewLine
+            ParseBlockTest("Code" + "\r\n"
+                         + "    If foo IsNot Nothing" + "\r\n"
+                         + "        Bar(foo)" + "\r\n"
+                         + "    End If" + "\r\n"
+                         + "End _" + "\r\n"
+                         + "_" + "\r\n"
+                         + " _" + "\r\n"
                          + "Code",
                 new StatementBlock(
                     Factory.MetaCode("Code").Accepts(AcceptedCharacters.None),
@@ -137,14 +137,14 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseBlockSupportsSimpleFunctionsBlock()
         {
-            ParseBlockTest("Functions" + Environment.NewLine
-                         + "    Public Sub Foo()" + Environment.NewLine
-                         + "        Bar()" + Environment.NewLine
-                         + "    End Sub" + Environment.NewLine
-                         + Environment.NewLine
-                         + "    Private Function Bar() As Object" + Environment.NewLine
-                         + "        Return Nothing" + Environment.NewLine
-                         + "    End Function" + Environment.NewLine
+            ParseBlockTest("Functions" + "\r\n"
+                         + "    Public Sub Foo()" + "\r\n"
+                         + "        Bar()" + "\r\n"
+                         + "    End Sub" + "\r\n"
+                         + "\r\n"
+                         + "    Private Function Bar() As Object" + "\r\n"
+                         + "        Return Nothing" + "\r\n"
+                         + "    End Function" + "\r\n"
                          + "End Functions",
                 new FunctionsBlock(
                     Factory.MetaCode("Functions").Accepts(AcceptedCharacters.None),
@@ -156,11 +156,11 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseBlockRejectsNewlineBetweenEndAndFunctionsIfNotPrefixedWithUnderscore()
         {
-            ParseBlockTest("Functions" + Environment.NewLine
-                         + "    If foo IsNot Nothing" + Environment.NewLine
-                         + "        Bar(foo)" + Environment.NewLine
-                         + "    End If" + Environment.NewLine
-                         + "End" + Environment.NewLine
+            ParseBlockTest("Functions" + "\r\n"
+                         + "    If foo IsNot Nothing" + "\r\n"
+                         + "        Bar(foo)" + "\r\n"
+                         + "    End If" + "\r\n"
+                         + "End" + "\r\n"
                          + "Functions",
                 new FunctionsBlock(
                     Factory.MetaCode("Functions").Accepts(AcceptedCharacters.None),
@@ -174,13 +174,13 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseBlockAcceptsNewlineBetweenEndAndFunctionsIfPrefixedWithUnderscore()
         {
-            ParseBlockTest("Functions" + Environment.NewLine
-                         + "    If foo IsNot Nothing" + Environment.NewLine
-                         + "        Bar(foo)" + Environment.NewLine
-                         + "    End If" + Environment.NewLine
-                         + "End _" + Environment.NewLine
-                         + "_" + Environment.NewLine
-                         + " _" + Environment.NewLine
+            ParseBlockTest("Functions" + "\r\n"
+                         + "    If foo IsNot Nothing" + "\r\n"
+                         + "        Bar(foo)" + "\r\n"
+                         + "    End If" + "\r\n"
+                         + "End _" + "\r\n"
+                         + "_" + "\r\n"
+                         + " _" + "\r\n"
                          + "Functions",
                 new FunctionsBlock(
                     Factory.MetaCode("Functions").Accepts(AcceptedCharacters.None),
@@ -192,8 +192,8 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseBlockCorrectlyHandlesExtraEndsInEndCode()
         {
-            ParseBlockTest("Code" + Environment.NewLine
-                         + "    Bar End" + Environment.NewLine
+            ParseBlockTest("Code" + "\r\n"
+                         + "    Bar End" + "\r\n"
                          + "End Code",
                 new StatementBlock(
                     Factory.MetaCode("Code").Accepts(AcceptedCharacters.None),
@@ -204,8 +204,8 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseBlockCorrectlyHandlesExtraEndsInEndFunctions()
         {
-            ParseBlockTest("Functions" + Environment.NewLine
-                         + "    Bar End" + Environment.NewLine
+            ParseBlockTest("Functions" + "\r\n"
+                         + "    Bar End" + "\r\n"
                          + "End Functions",
                 new FunctionsBlock(
                     Factory.MetaCode("Functions").Accepts(AcceptedCharacters.None),
@@ -221,15 +221,15 @@ namespace System.Web.Razor.Test.Parser.VB
         [InlineData("With", "End", "With")]
         public void KeywordAllowsNewlinesIfPrefixedByUnderscore(string startKeyword, string endKeyword1, string endKeyword2)
         {
-            string code = startKeyword + Environment.NewLine
-                        + "    ' In the block" + Environment.NewLine
-                        + endKeyword1 + " _" + Environment.NewLine
-                        + "_" + Environment.NewLine
-                        + "_" + Environment.NewLine
-                        + "_" + Environment.NewLine
-                        + "_" + Environment.NewLine
-                        + "_" + Environment.NewLine
-                        + "  " + endKeyword2 + Environment.NewLine;
+            string code = startKeyword + "\r\n"
+                        + "    ' In the block" + "\r\n"
+                        + endKeyword1 + " _" + "\r\n"
+                        + "_" + "\r\n"
+                        + "_" + "\r\n"
+                        + "_" + "\r\n"
+                        + "_" + "\r\n"
+                        + "_" + "\r\n"
+                        + "  " + endKeyword2 + "\r\n";
             ParseBlockTest(code + "foo bar baz",
                 new StatementBlock(
                     Factory.Code(code)
@@ -246,10 +246,10 @@ namespace System.Web.Razor.Test.Parser.VB
         [InlineData("Using", "EndUsing", "End Using")]
         public void EndTerminatedKeywordRequiresSpaceBetweenEndAndKeyword(string startKeyword, string wrongEndKeyword, string endKeyword)
         {
-            string code = startKeyword + Environment.NewLine
-                        + "    ' This should not end the code" + Environment.NewLine
-                        + "    " + wrongEndKeyword + Environment.NewLine
-                        + "    ' But this should" + Environment.NewLine
+            string code = startKeyword + "\r\n"
+                        + "    ' This should not end the code" + "\r\n"
+                        + "    " + wrongEndKeyword + "\r\n"
+                        + "    ' But this should" + "\r\n"
                         + endKeyword;
             ParseBlockTest(code,
                 new StatementBlock(
@@ -269,9 +269,9 @@ namespace System.Web.Razor.Test.Parser.VB
         [InlineData("Using", "End Using", false)]
         public void EndSequenceInString(string keyword, string endSequence, bool acceptToEndOfLine)
         {
-            string code = keyword + Environment.NewLine
-                        + "    \"" + endSequence + "\"" + Environment.NewLine
-                        + endSequence + (acceptToEndOfLine ? " foo bar baz" : "") + Environment.NewLine;
+            string code = keyword + "\r\n"
+                        + "    \"" + endSequence + "\"" + "\r\n"
+                        + endSequence + (acceptToEndOfLine ? " foo bar baz" : "") + "\r\n";
             ParseBlockTest(code + "biz boz",
                 new StatementBlock(
                     Factory.Code(code).AsStatement().Accepts(GetAcceptedCharacters(acceptToEndOfLine))));
@@ -288,9 +288,9 @@ namespace System.Web.Razor.Test.Parser.VB
         [InlineData("Using", "End Using", false)]
         private void CommentedEndSequence(string keyword, string endSequence, bool acceptToEndOfLine)
         {
-            string code = keyword + Environment.NewLine
-                        + "    '" + endSequence + Environment.NewLine
-                        + endSequence + (acceptToEndOfLine ? @" foo bar baz" : "") + Environment.NewLine;
+            string code = keyword + "\r\n"
+                        + "    '" + endSequence + "\r\n"
+                        + endSequence + (acceptToEndOfLine ? @" foo bar baz" : "") + "\r\n";
             ParseBlockTest(code + "biz boz",
                 new StatementBlock(
                     Factory.Code(code).AsStatement().Accepts(GetAcceptedCharacters(acceptToEndOfLine))));
@@ -308,11 +308,11 @@ namespace System.Web.Razor.Test.Parser.VB
         [InlineData("Using", "End Using", false)]
         private void NestedKeywordBlock(string keyword, string endSequence, bool acceptToEndOfLine)
         {
-            string code = keyword + Environment.NewLine
-                        + "    " + keyword + Environment.NewLine
-                        + "        Bar(foo)" + Environment.NewLine
-                        + "    " + endSequence + Environment.NewLine
-                        + endSequence + (acceptToEndOfLine ? " foo bar baz" : "") + Environment.NewLine;
+            string code = keyword + "\r\n"
+                        + "    " + keyword + "\r\n"
+                        + "        Bar(foo)" + "\r\n"
+                        + "    " + endSequence + "\r\n"
+                        + endSequence + (acceptToEndOfLine ? " foo bar baz" : "") + "\r\n";
             ParseBlockTest(code + "biz boz",
                 new StatementBlock(
                     Factory.Code(code).AsStatement().Accepts(GetAcceptedCharacters(acceptToEndOfLine))));
@@ -330,9 +330,9 @@ namespace System.Web.Razor.Test.Parser.VB
         [InlineData("Using", "End Using", false)]
         private void SimpleKeywordBlock(string keyword, string endSequence, bool acceptToEndOfLine)
         {
-            string code = keyword + Environment.NewLine
-                        + "    Bar(foo)" + Environment.NewLine
-                        + endSequence + (acceptToEndOfLine ? " foo bar baz" : "") + Environment.NewLine;
+            string code = keyword + "\r\n"
+                        + "    Bar(foo)" + "\r\n"
+                        + endSequence + (acceptToEndOfLine ? " foo bar baz" : "") + "\r\n";
             ParseBlockTest(code + "biz boz",
                 new StatementBlock(
                     Factory.Code(code).AsStatement().Accepts(GetAcceptedCharacters(acceptToEndOfLine))));
@@ -347,11 +347,11 @@ namespace System.Web.Razor.Test.Parser.VB
         [InlineData("For Each p in Products", "Continue For", "Next", true)]
         private void KeywordWithExitOrContinue(string startKeyword, string exitKeyword, string endKeyword, bool acceptToEndOfLine)
         {
-            string code = startKeyword + Environment.NewLine
-                         + "    ' This is before the exit" + Environment.NewLine
-                         + "    " + exitKeyword + Environment.NewLine
-                         + "    ' This is after the exit" + Environment.NewLine
-                         + endKeyword + Environment.NewLine;
+            string code = startKeyword + "\r\n"
+                         + "    ' This is before the exit" + "\r\n"
+                         + "    " + exitKeyword + "\r\n"
+                         + "    ' This is after the exit" + "\r\n"
+                         + endKeyword + "\r\n";
             ParseBlockTest(code + "foo bar baz",
                 new StatementBlock(
                     Factory.Code(code).AsStatement().Accepts(GetAcceptedCharacters(acceptToEndOfLine))));

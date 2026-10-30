@@ -1,0 +1,4 @@
+@helper Money(decimal amount)
+{
+    <span class="money">@amount.ToString("N2", System.Globalization.CultureInfo.InvariantCulture)</span>
+}

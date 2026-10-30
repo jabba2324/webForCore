@@ -1,0 +1,8 @@
+# aspnet/AspNetKatana 096e225: source path (relative to repo root)	destination (relative to fork root)
+src/Microsoft.Owin.Testing/OwinClientHandler.cs	src/webForCore.Microsoft.Owin.Testing/OwinClientHandler.cs
+src/Microsoft.Owin.Testing/Properties/AssemblyInfo.cs	src/webForCore.Microsoft.Owin.Testing/Properties/AssemblyInfo.cs
+src/Microsoft.Owin.Testing/RequestBuilder.cs	src/webForCore.Microsoft.Owin.Testing/RequestBuilder.cs
+src/Microsoft.Owin.Testing/Resources.Designer.cs	src/webForCore.Microsoft.Owin.Testing/Resources.Designer.cs
+src/Microsoft.Owin.Testing/Resources.resx	src/webForCore.Microsoft.Owin.Testing/Resources.resx
+src/Microsoft.Owin.Testing/ResponseStream.cs	src/webForCore.Microsoft.Owin.Testing/ResponseStream.cs
+src/Microsoft.Owin.Testing/TestServer.cs	src/webForCore.Microsoft.Owin.Testing/TestServer.cs

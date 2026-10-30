@@ -464,14 +464,14 @@ namespace System.Web.Handlers {
 #if NETFRAMEWORK
                 tcell = AddCell(trow, HttpUtility.FormatPlainTextAsHtml((string) datarow[SR.Trace_Category]));
 #else
-				tcell = AddCell(trow, HttpUtilityInternal.FormatPlainTextAsHtml((string)datarow[SR.Trace_Category]));
+				tcell = AddCell(trow, HttpUtility.FormatPlainTextAsHtml((string)datarow[SR.Trace_Category]));
 #endif
 				if (isErr) tcell.CssClass = "err";
 
 #if NETFRAMEWORK
                 StringBuilder message = new StringBuilder(HttpUtility.FormatPlainTextAsHtml((string) datarow[SR.Trace_Message]));
 #else
-				StringBuilder message = new StringBuilder(HttpUtilityInternal.FormatPlainTextAsHtml((string)datarow[SR.Trace_Message]));
+				StringBuilder message = new StringBuilder(HttpUtility.FormatPlainTextAsHtml((string)datarow[SR.Trace_Message]));
 #endif
 				object errormessage = datarow["ErrorInfoMessage"];
                 object errorstack =   datarow["ErrorInfoStack"];
@@ -482,9 +482,9 @@ namespace System.Web.Handlers {
                     message.Append("<br>" + HttpUtility.FormatPlainTextAsHtml((string) errorstack));
 #else
 				if (!(errormessage is System.DBNull))
-					message.Append("<br>" + HttpUtilityInternal.FormatPlainTextAsHtml((string)errormessage));
+					message.Append("<br>" + HttpUtility.FormatPlainTextAsHtml((string)errormessage));
 				if (!(errorstack is System.DBNull))
-					message.Append("<br>" + HttpUtilityInternal.FormatPlainTextAsHtml((string)errorstack));
+					message.Append("<br>" + HttpUtility.FormatPlainTextAsHtml((string)errorstack));
 #endif
 				tcell = AddCell(trow, message.ToString());
                 if (isErr) tcell.CssClass = "err";
@@ -556,7 +556,7 @@ namespace System.Web.Handlers {
 #if NETFRAMEWORK
                         temp = HttpUtility.FormatPlainTextSpacesAsHtml(HttpUtility.HtmlEncode(cells[i].ToString()));
 #else
-						temp = HttpUtilityInternal.FormatPlainTextSpacesAsHtml(HttpUtility.HtmlEncode(cells[i].ToString()));
+						temp = HttpUtility.FormatPlainTextSpacesAsHtml(HttpUtility.HtmlEncode(cells[i].ToString()));
 #endif
 					else
 						temp = HttpUtility.HtmlEncode(cells[i].ToString());

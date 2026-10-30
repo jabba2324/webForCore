@@ -188,7 +188,7 @@ namespace System.Web.UI {
                             string typeName = (string)typedObjectTypeNames[typeIndex - GetKnownTypeCount()];
                             Type type = Type.GetType(typeName,
                                 assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                                (asm, typeName, ignoreCase) => asm?.GetType(typeName, false, ignoreCase));
+                                (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)));
 
                             o = Activator.CreateInstance(type);
                         }
@@ -269,7 +269,7 @@ namespace System.Web.UI {
                                 var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
                                 Type type = Type.GetType(typeName,
                                     assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                                    (asm, typeName, ignoreCase) => asm?.GetType(typeName, false, ignoreCase));
+                                    (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)));
 
                                 o = Activator.CreateInstance(type);
                             }

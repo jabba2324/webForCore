@@ -14,9 +14,9 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void VB_Do_Statement_With_Exit()
         {
-            ParseBlockTest("@Do While True" + Environment.NewLine
-                         + "    Exit Do" + Environment.NewLine
-                         + "Loop" + Environment.NewLine
+            ParseBlockTest("@Do While True" + "\r\n"
+                         + "    Exit Do" + "\r\n"
+                         + "Loop" + "\r\n"
                          + "' Not in the block!",
                 new StatementBlock(
                     Factory.CodeTransition(SyntaxConstants.TransitionString)
@@ -29,9 +29,9 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void VB_For_Statement_With_Exit()
         {
-            ParseBlockTest("@For i = 1 To 12" + Environment.NewLine
-                         + "    Exit For" + Environment.NewLine
-                         + "Next i" + Environment.NewLine
+            ParseBlockTest("@For i = 1 To 12" + "\r\n"
+                         + "    Exit For" + "\r\n"
+                         + "Next i" + "\r\n"
                          + "' Not in the block!",
                 new StatementBlock(
                     Factory.CodeTransition(SyntaxConstants.TransitionString)
@@ -44,12 +44,12 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void VB_Select_Statement_With_Exit()
         {
-            ParseBlockTest("@Select Case Foo" + Environment.NewLine
-                         + "    Case 1" + Environment.NewLine
-                         + "        Exit Select" + Environment.NewLine
-                         + "    Case 2" + Environment.NewLine
-                         + "        Exit Select" + Environment.NewLine
-                         + "End Select" + Environment.NewLine
+            ParseBlockTest("@Select Case Foo" + "\r\n"
+                         + "    Case 1" + "\r\n"
+                         + "        Exit Select" + "\r\n"
+                         + "    Case 2" + "\r\n"
+                         + "        Exit Select" + "\r\n"
+                         + "End Select" + "\r\n"
                          + "' Not in the block!",
                 new StatementBlock(
                     Factory.CodeTransition(SyntaxConstants.TransitionString)
@@ -62,14 +62,14 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void VB_Try_Statement_With_Exit()
         {
-            ParseBlockTest("@Try" + Environment.NewLine
-                         + "    Foo()" + Environment.NewLine
-                         + "    Exit Try" + Environment.NewLine
-                         + "Catch Bar" + Environment.NewLine
-                         + "    Throw Bar" + Environment.NewLine
-                         + "Finally" + Environment.NewLine
-                         + "    Baz()" + Environment.NewLine
-                         + "End Try" + Environment.NewLine
+            ParseBlockTest("@Try" + "\r\n"
+                         + "    Foo()" + "\r\n"
+                         + "    Exit Try" + "\r\n"
+                         + "Catch Bar" + "\r\n"
+                         + "    Throw Bar" + "\r\n"
+                         + "Finally" + "\r\n"
+                         + "    Baz()" + "\r\n"
+                         + "End Try" + "\r\n"
                          + "' Not in the block!",
                 new StatementBlock(
                     Factory.CodeTransition(SyntaxConstants.TransitionString)
@@ -82,9 +82,9 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void VB_While_Statement_With_Exit()
         {
-            ParseBlockTest("@While True" + Environment.NewLine
-                         + "    Exit While" + Environment.NewLine
-                         + "End While" + Environment.NewLine
+            ParseBlockTest("@While True" + "\r\n"
+                         + "    Exit While" + "\r\n"
+                         + "End While" + "\r\n"
                          + "' Not in the block!",
                 new StatementBlock(
                     Factory.CodeTransition(SyntaxConstants.TransitionString)

@@ -1,0 +1,21 @@
+@model MvcSample.Models.Product
+@{
+    ViewBag.Title = "Edit";
+}
+@using (Html.BeginForm("Create", "Products", FormMethod.Post, new { id = "edit-form" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    <div>
+        @Html.LabelFor(m => m.Name)
+        @Html.EditorFor(m => m.Name)
+        @Html.ValidationMessageFor(m => m.Name)
+    </div>
+    <div>
+        @Html.LabelFor(m => m.Price)
+        @Html.EditorFor(m => m.Price)
+        @Html.ValidationMessageFor(m => m.Price)
+    </div>
+    <div>@Html.EditorFor(m => m.Supplier)</div>
+    <input type="submit" value="Save" />
+}

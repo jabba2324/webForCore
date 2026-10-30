@@ -51,6 +51,12 @@ namespace System.Net.Http
                 throw Error.ArgumentMustBeGreaterThanOrEqualTo("bufferSize", bufferSize, MinBufferSize);
             }
 
+            // webForCore: .NET Framework's Path.GetFullPath rejected whitespace-only paths; .NET's accepts them on Linux.
+            if (rootPath.Trim().Length == 0)
+            {
+                throw new ArgumentException("The path is not of a legal form.");
+            }
+
             _rootPath = Path.GetFullPath(rootPath);
             _bufferSize = bufferSize;
         }

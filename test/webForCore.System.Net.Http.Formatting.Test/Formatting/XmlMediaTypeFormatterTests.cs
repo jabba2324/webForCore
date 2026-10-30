@@ -169,7 +169,7 @@ namespace System.Net.Http.Formatting
                 "SampleType should be serialized with data contract name DataContractSampleType because we're using DCS.");
             Assert.False(serializedString.Contains("version=\"1.0\" encoding=\"utf-8\""),
                     "Using DCS should not emit the xml declaration by default.");
-            Assert.False(serializedString.Contains("\r\n"), "Using DCS should emit data without indentation by default.");
+            Assert.False(serializedString.Contains("\n") /* webForCore: indentation uses the platform newline */, "Using DCS should emit data without indentation by default.");
         }
 
         [Fact]
@@ -181,7 +181,7 @@ namespace System.Net.Http.Formatting
             await Assert.Task.SucceedsAsync(xmlFormatter.WriteToStreamAsync(typeof(SampleType), new SampleType(), memoryStream, content, transportContext: null));
             memoryStream.Position = 0;
             string serializedString = new StreamReader(memoryStream).ReadToEnd();
-            Assert.True(serializedString.Contains("\r\n"), "Using DCS with indent set to true should emit data with indentation.");
+            Assert.True(serializedString.Contains("\n") /* webForCore: indentation uses the platform newline */, "Using DCS with indent set to true should emit data with indentation.");
         }
 #endif
 

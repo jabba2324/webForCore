@@ -1,0 +1,16 @@
+# aspnet/AspNetKatana 096e225: source path (relative to repo root)	destination (relative to fork root)
+tests/Microsoft.Owin.Tests/Builder/AppBuilderCookieTests.cs	test/webForCore.Microsoft.Owin.Tests/Builder/AppBuilderCookieTests.cs
+tests/Microsoft.Owin.Tests/Builder/AppBuilderTestExtensions.cs	test/webForCore.Microsoft.Owin.Tests/Builder/AppBuilderTestExtensions.cs
+tests/Microsoft.Owin.Tests/Builder/AppBuilderTests.cs	test/webForCore.Microsoft.Owin.Tests/Builder/AppBuilderTests.cs
+tests/Microsoft.Owin.Tests/CookieChunkingTests.cs	test/webForCore.Microsoft.Owin.Tests/CookieChunkingTests.cs
+tests/Microsoft.Owin.Tests/FormsTests.cs	test/webForCore.Microsoft.Owin.Tests/FormsTests.cs
+tests/Microsoft.Owin.Tests/HeaderTests.cs	test/webForCore.Microsoft.Owin.Tests/HeaderTests.cs
+tests/Microsoft.Owin.Tests/HostStringTests.cs	test/webForCore.Microsoft.Owin.Tests/HostStringTests.cs
+tests/Microsoft.Owin.Tests/Mapping/MapPathMiddlewareTests.cs	test/webForCore.Microsoft.Owin.Tests/Mapping/MapPathMiddlewareTests.cs
+tests/Microsoft.Owin.Tests/Mapping/MapPredicateMiddlewareTests.cs	test/webForCore.Microsoft.Owin.Tests/Mapping/MapPredicateMiddlewareTests.cs
+tests/Microsoft.Owin.Tests/PathStringTests.cs	test/webForCore.Microsoft.Owin.Tests/PathStringTests.cs
+tests/Microsoft.Owin.Tests/QueryStringTests.cs	test/webForCore.Microsoft.Owin.Tests/QueryStringTests.cs
+tests/Microsoft.Owin.Tests/QueryTests.cs	test/webForCore.Microsoft.Owin.Tests/QueryTests.cs
+tests/Microsoft.Owin.Tests/RequestCookieTests.cs	test/webForCore.Microsoft.Owin.Tests/RequestCookieTests.cs
+tests/Microsoft.Owin.Tests/Security/AuthenticationManagerTests.cs	test/webForCore.Microsoft.Owin.Tests/Security/AuthenticationManagerTests.cs
+tests/Microsoft.Owin.Tests/UriTests.cs	test/webForCore.Microsoft.Owin.Tests/UriTests.cs

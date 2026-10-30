@@ -152,7 +152,7 @@ namespace System.Web.Razor.Test.Generator
             options.IndentString = String.Empty;
 
             StringBuilder output = new StringBuilder();
-            using (StringWriter writer = new StringWriter(output))
+            using (StringWriter writer = new StringWriter(output) { NewLine = "\r\n" }) // webForCore: the platform newline is \n on Linux; CodeDom writes as on Windows
             {
                 codeProvider.GenerateCodeFromCompileUnit(ccu, writer, options);
             }
@@ -163,7 +163,7 @@ namespace System.Web.Razor.Test.Generator
             string textOutput = MiscUtils.StripRuntimeVersion(output.ToString());
 
             //// Verify code against baseline
-            Assert.Equal(expectedOutput, textOutput);
+            Assert.Equal(MiscUtils.NormalizeGeneratedCode(expectedOutput), MiscUtils.NormalizeGeneratedCode(textOutput));
 #endif
 
             IEnumerable<Span> generatedSpans = results.Document.Flatten();

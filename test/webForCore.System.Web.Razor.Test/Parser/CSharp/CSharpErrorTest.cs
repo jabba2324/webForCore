@@ -30,8 +30,8 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockCapturesWhitespaceToEndOfLineInInvalidUsingStatementAndTreatsAsFileCode()
         {
-            ParseBlockTest("using          " + Environment.NewLine
-                         + Environment.NewLine,
+            ParseBlockTest("using          " + "\r\n"
+                         + "\r\n",
                            new StatementBlock(
                                Factory.Code("using          \r\n").AsStatement()
                                ));
@@ -68,7 +68,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockMethodProducesErrorIfNewlineFollowsTransition()
         {
-            ParseBlockTest("@" + Environment.NewLine,
+            ParseBlockTest("@" + "\r\n",
                            new ExpressionBlock(
                                Factory.CodeTransition(),
                                Factory.EmptyCSharp()
@@ -80,8 +80,8 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockMethodProducesErrorIfWhitespaceBetweenTransitionAndBlockStartInEmbeddedExpression()
         {
-            ParseBlockTest("{" + Environment.NewLine
-                         + "    @   {}" + Environment.NewLine
+            ParseBlockTest("{" + "\r\n"
+                         + "    @   {}" + "\r\n"
                          + "}",
                            new StatementBlock(
                                Factory.MetaCode("{").Accepts(AcceptedCharacters.None),
@@ -100,7 +100,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockMethodProducesErrorIfEOFAfterTransitionInEmbeddedExpression()
         {
-            ParseBlockTest("{" + Environment.NewLine
+            ParseBlockTest("{" + "\r\n"
                          + "    @",
                            new StatementBlock(
                                Factory.MetaCode("{").Accepts(AcceptedCharacters.None),
@@ -135,7 +135,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockShouldReportErrorAndTerminateAtEOFIfIfParenInExplicitExpressionUnclosed()
         {
-            ParseBlockTest("(foo bar" + Environment.NewLine
+            ParseBlockTest("(foo bar" + "\r\n"
                          + "baz",
                            new ExpressionBlock(
                                Factory.MetaCode("(").Accepts(AcceptedCharacters.None),
@@ -150,9 +150,9 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockShouldReportErrorAndTerminateAtMarkupIfIfParenInExplicitExpressionUnclosed()
         {
-            ParseBlockTest("(foo bar" + Environment.NewLine
-                         + "<html>" + Environment.NewLine
-                         + "baz" + Environment.NewLine
+            ParseBlockTest("(foo bar" + "\r\n"
+                         + "<html>" + "\r\n"
+                         + "baz" + "\r\n"
                          + "</html",
                            new ExpressionBlock(
                                Factory.MetaCode("(").Accepts(AcceptedCharacters.None),
@@ -167,8 +167,8 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockCorrectlyHandlesInCorrectTransitionsIfImplicitExpressionParensUnclosed()
         {
-            ParseBlockTest("Href(" + Environment.NewLine
-                         + "<h1>@Html.Foo(Bar);</h1>" + Environment.NewLine,
+            ParseBlockTest("Href(" + "\r\n"
+                         + "<h1>@Html.Foo(Bar);</h1>" + "\r\n",
                            new ExpressionBlock(
                                Factory.Code("Href(\r\n")
                                    .AsImplicitExpression(CSharpCodeParser.DefaultKeywords)
@@ -183,8 +183,8 @@ namespace System.Web.Razor.Test.Parser.CSharp
         // Test for fix to Dev10 884975 - Incorrect Error Messaging
         public void ParseBlockShouldReportErrorAndTerminateAtEOFIfParenInImplicitExpressionUnclosed()
         {
-            ParseBlockTest("Foo(Bar(Baz)" + Environment.NewLine
-                         + "Biz" + Environment.NewLine
+            ParseBlockTest("Foo(Bar(Baz)" + "\r\n"
+                         + "Biz" + "\r\n"
                          + "Boz",
                            new ExpressionBlock(
                                Factory.Code("Foo(Bar(Baz)\r\nBiz\r\nBoz")
@@ -199,10 +199,10 @@ namespace System.Web.Razor.Test.Parser.CSharp
         // Test for fix to Dev10 884975 - Incorrect Error Messaging
         public void ParseBlockShouldReportErrorAndTerminateAtMarkupIfParenInImplicitExpressionUnclosed()
         {
-            ParseBlockTest("Foo(Bar(Baz)" + Environment.NewLine
-                         + "Biz" + Environment.NewLine
-                         + "<html>" + Environment.NewLine
-                         + "Boz" + Environment.NewLine
+            ParseBlockTest("Foo(Bar(Baz)" + "\r\n"
+                         + "Biz" + "\r\n"
+                         + "<html>" + "\r\n"
+                         + "Boz" + "\r\n"
                          + "</html>",
                            new ExpressionBlock(
                                Factory.Code("Foo(Bar(Baz)\r\nBiz\r\n")
@@ -217,8 +217,8 @@ namespace System.Web.Razor.Test.Parser.CSharp
         // Test for fix to Dev10 884975 - Incorrect Error Messaging
         public void ParseBlockShouldReportErrorAndTerminateAtEOFIfBracketInImplicitExpressionUnclosed()
         {
-            ParseBlockTest("Foo[Bar[Baz]" + Environment.NewLine
-                         + "Biz" + Environment.NewLine
+            ParseBlockTest("Foo[Bar[Baz]" + "\r\n"
+                         + "Biz" + "\r\n"
                          + "Boz",
                            new ExpressionBlock(
                                Factory.Code("Foo[Bar[Baz]\r\nBiz\r\nBoz")
@@ -234,10 +234,10 @@ namespace System.Web.Razor.Test.Parser.CSharp
         // Test for fix to Dev10 884975 - Incorrect Error Messaging
         public void ParseBlockShouldReportErrorAndTerminateAtMarkupIfBracketInImplicitExpressionUnclosed()
         {
-            ParseBlockTest("Foo[Bar[Baz]" + Environment.NewLine
-                         + "Biz" + Environment.NewLine
-                         + "<b>" + Environment.NewLine
-                         + "Boz" + Environment.NewLine
+            ParseBlockTest("Foo[Bar[Baz]" + "\r\n"
+                         + "Biz" + "\r\n"
+                         + "<b>" + "\r\n"
+                         + "Boz" + "\r\n"
                          + "</b>",
                            new ExpressionBlock(
                                Factory.Code("Foo[Bar[Baz]\r\nBiz\r\n")
@@ -457,7 +457,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockTerminatesIfBlockAtEOLWhenRecoveringFromMissingCloseParen()
         {
-            ParseBlockTest("if(foo bar" + Environment.NewLine
+            ParseBlockTest("if(foo bar" + "\r\n"
                          + "baz",
                            new StatementBlock(
                                Factory.Code("if(foo bar\r\n").AsStatement()
@@ -471,7 +471,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockTerminatesForeachBlockAtEOLWhenRecoveringFromMissingCloseParen()
         {
-            ParseBlockTest("foreach(foo bar" + Environment.NewLine
+            ParseBlockTest("foreach(foo bar" + "\r\n"
                          + "baz",
                            new StatementBlock(
                                Factory.Code("foreach(foo bar\r\n").AsStatement()
@@ -485,7 +485,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockTerminatesWhileClauseInDoStatementAtEOLWhenRecoveringFromMissingCloseParen()
         {
-            ParseBlockTest("do { } while(foo bar" + Environment.NewLine
+            ParseBlockTest("do { } while(foo bar" + "\r\n"
                          + "baz",
                            new StatementBlock(
                                Factory.Code("do { } while(foo bar\r\n").AsStatement()
@@ -499,7 +499,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockTerminatesUsingBlockAtEOLWhenRecoveringFromMissingCloseParen()
         {
-            ParseBlockTest("using(foo bar" + Environment.NewLine
+            ParseBlockTest("using(foo bar" + "\r\n"
                          + "baz",
                            new StatementBlock(
                                Factory.Code("using(foo bar\r\n").AsStatement()
@@ -513,7 +513,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockResumesIfStatementAfterOpenParen()
         {
-            ParseBlockTest("if(" + Environment.NewLine
+            ParseBlockTest("if(" + "\r\n"
                          + "else { <p>Foo</p> }",
                            new StatementBlock(
                                Factory.Code("if(\r\nelse {").AsStatement(),
@@ -531,9 +531,9 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockTerminatesNormalCSharpStringsAtEOLIfEndQuoteMissing()
         {
-            SingleSpanBlockTest("if(foo) {" + Environment.NewLine
-                              + "    var p = \"foo bar baz" + Environment.NewLine
-                              + ";" + Environment.NewLine
+            SingleSpanBlockTest("if(foo) {" + "\r\n"
+                              + "    var p = \"foo bar baz" + "\r\n"
+                              + ";" + "\r\n"
                               + "}",
                                 BlockType.Statement, SpanKind.Code,
                                 new RazorError(RazorResources.ParseError_Unterminated_String_Literal, 23, 1, 12));
@@ -550,10 +550,10 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockTerminatesVerbatimStringAtEndOfFile()
         {
-            SingleSpanBlockTest("if(foo) { var foo = @\"blah " + Environment.NewLine
-                              + "blah; " + Environment.NewLine
-                              + "<p>Foo</p>" + Environment.NewLine
-                              + "blah " + Environment.NewLine
+            SingleSpanBlockTest("if(foo) { var foo = @\"blah " + "\r\n"
+                              + "blah; " + "\r\n"
+                              + "<p>Foo</p>" + "\r\n"
+                              + "blah " + "\r\n"
                               + "blah",
                                 BlockType.Statement, SpanKind.Code,
                                 new RazorError(RazorResources.ParseError_Unterminated_String_Literal, 20, 0, 20),
@@ -563,9 +563,9 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockCorrectlyParsesMarkupIncorrectyAssumedToBeWithinAStatement()
         {
-            ParseBlockTest("if(foo) {" + Environment.NewLine
-                         + "    var foo = \"foo bar baz" + Environment.NewLine
-                         + "    <p>Foo is @foo</p>" + Environment.NewLine
+            ParseBlockTest("if(foo) {" + "\r\n"
+                         + "    var foo = \"foo bar baz" + "\r\n"
+                         + "    <p>Foo is @foo</p>" + "\r\n"
                          + "}",
                            new StatementBlock(
                                Factory.Code("if(foo) {\r\n    var foo = \"foo bar baz\r\n    ").AsStatement(),

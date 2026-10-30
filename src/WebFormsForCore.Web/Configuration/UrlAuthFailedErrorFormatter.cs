@@ -67,7 +67,7 @@ namespace System.Web.Configuration {
 #if NETFRAMEWORK
                 string miscContent = HttpUtility.FormatPlainTextAsHtml(SR.GetString(SR.Assess_Denied_Misc_Content2));
 #else
-				string miscContent = HttpUtilityInternal.FormatPlainTextAsHtml(SR.GetString(SR.Assess_Denied_Misc_Content2));
+				string miscContent = HttpUtility.FormatPlainTextAsHtml(SR.GetString(SR.Assess_Denied_Misc_Content2));
 #endif
 				AdaptiveMiscContent.Add(miscContent);
                 return miscContent;

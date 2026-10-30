@@ -147,7 +147,7 @@ namespace System.Web.Security {
 #if NETFRAMEWORK
                 return HttpUtility.AspCompatUrlEncode(strIn);
 #else
-                return HttpUtilityInternal.AspCompatUrlEncode(strIn);
+                return HttpUtility.AspCompatUrlEncode(strIn);
 #endif
 			iPos1++;
             int iPos2 = strIn.IndexOf(';', iPos1);
@@ -155,7 +155,7 @@ namespace System.Web.Security {
 #if NETFRAMEWORK
                 return HttpUtility.AspCompatUrlEncode(strIn);
 #else
-                return HttpUtilityInternal.AspCompatUrlEncode(strIn);
+                return HttpUtility.AspCompatUrlEncode(strIn);
 #endif
 			string str1 = strIn.Substring(0, iPos1);
             string str2 = strIn.Substring(iPos1, iPos2-iPos1);
@@ -164,7 +164,7 @@ namespace System.Web.Security {
 #if NETFRAMEWORK
             return str1 + HttpUtility.AspCompatUrlEncode(str2) + str3;
 #else
-            return str1 + HttpUtilityInternal.AspCompatUrlEncode(str2) + str3;
+            return str1 + HttpUtility.AspCompatUrlEncode(str2) + str3;
 #endif
 		}
 

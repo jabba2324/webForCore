@@ -122,7 +122,9 @@ namespace System.Net.Http
 
             Assert.Same(value, resultValue);
             contentMock.Verify();
-            _formatterMock.Verify(f => f.ReadFromStreamAsync(typeof(string), contentStream, content, null), Times.Once());
+            // webForCore: .NET reads back through a different stream over its internal buffer.
+            Assert.NotNull(contentStream);
+            _formatterMock.Verify(f => f.ReadFromStreamAsync(typeof(string), It.IsAny<Stream>(), content, null), Times.Once());
         }
 
         [Fact]

@@ -1,0 +1,7 @@
+# aspnet/AspNetWebStack 2106565: source path (relative to repo root)	destination (relative to fork root)
+test/System.Web.WebPages.Razor.Test/PreApplicationStartCodeTest.cs	test/webForCore.System.Web.WebPages.Razor.Test/PreApplicationStartCodeTest.cs
+test/System.Web.WebPages.Razor.Test/RazorBuildProviderTest.cs	test/webForCore.System.Web.WebPages.Razor.Test/RazorBuildProviderTest.cs
+test/System.Web.WebPages.Razor.Test/WebCodeRazorEngineHostTest.cs	test/webForCore.System.Web.WebPages.Razor.Test/WebCodeRazorEngineHostTest.cs
+test/System.Web.WebPages.Razor.Test/WebPageRazorEngineHostTest.cs	test/webForCore.System.Web.WebPages.Razor.Test/WebPageRazorEngineHostTest.cs
+test/System.Web.WebPages.Razor.Test/WebRazorHostFactoryTest.cs	test/webForCore.System.Web.WebPages.Razor.Test/WebRazorHostFactoryTest.cs
+test/System.Web.WebPages.Razor.Test/app.config	test/webForCore.System.Web.WebPages.Razor.Test/app.config

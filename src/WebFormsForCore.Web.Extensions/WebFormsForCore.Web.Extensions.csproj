@@ -51,7 +51,7 @@
         <PackageReference Include="System.Configuration.ConfigurationManager" Version="11.0.0-rc.3.26522.148">
             <Aliases>NET</Aliases>
         </PackageReference>
-        <PackageReference Include="Microsoft.Data.SqlClient" Version="7.1.1" />
+        <PackageReference Include="System.Data.SqlClient" Version="4.9.1" /> <!-- webForCore: as .NET Framework (was Microsoft.Data.SqlClient 7.1.0) -->
         <!--<PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
         <PackageReference Include="System.Text.Json" Version="10.0.0" />
         <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />-->

@@ -1,0 +1,72 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Lifted from aspnet/AspNetKatana 096e225 (tests/Microsoft.Owin.Security.Tests/Microsoft.Owin.Security.Tests.csproj) by tools/lift/lift_project.py.
+       Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <AssemblyName>Microsoft.Owin.Security.Tests</AssemblyName>
+    <RootNamespace>Microsoft.Owin.Security.Tests</RootNamespace>
+    <PackageId>webForCore.Microsoft.Owin.Security.Tests</PackageId>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- Microsoft's builds use C# 9 (Web Stack, tools/WebStack.settings.targets) and Latest (Katana). -->
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;SYSLIB0003;SYSLIB0011;SYSLIB0051</NoWarn>
+    <DefineConstants>$(DefineConstants);</DefineConstants>
+    <!-- Delay signed with Microsoft's public key, as Microsoft's build does: PublicKeyToken=31bf3856ad364e35. -->
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>../../src/SigningKey/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <AssemblyVersion>4.2.3.0</AssemblyVersion>
+    <FileVersion>4.200.325.35202</FileVersion>
+    <InformationalVersion>4.2.3</InformationalVersion>
+    <Company>Microsoft Corporation</Company>
+    <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
+    <Product>Microsoft.Owin.Security.Tests</Product>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <Import Project="../../src/webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="CertificateSubjectKeyIdentifierValidatorTests.cs" />
+    <Compile Include="CertificateSubjectPublicKeyInfoValidatorTests.cs" />
+    <Compile Include="CertificateThumbprintValidatorTests.cs" />
+    <Compile Include="Cookies/CookieMiddlewareTests.cs" />
+    <Compile Include="DataHandler/Base64UrlTextEncoderTests.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="OAuth/OAuth2AuthorizationClientCredentialsGrantTests.cs" />
+    <Compile Include="OAuth/OAuth2AuthorizationCustomGrantTests.cs" />
+    <Compile Include="OAuth/OAuth2AuthorizationServerAuthorizationCodeGrantTests.cs" />
+    <Compile Include="OAuth/OAuth2AuthorizationServerImplicitGrantTests.cs" />
+    <Compile Include="OAuth/OAuth2AuthorizationServerResourceOwnerCredentialsGrantTests.cs" />
+    <Compile Include="OAuth/OAuth2BearerTokenTests.cs" />
+    <Compile Include="OAuth/OAuth2TestServer.cs" />
+    <Compile Include="Properties/Resources.Designer.cs" />
+    <Compile Include="SecurityHelperTests.cs" />
+    <Compile Include="TestClock.cs" />
+    <Compile Include="TestDataProtectionProvider.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Properties/Resources.resx" LogicalName="Microsoft.Owin.Security.Tests.Properties.Resources.resources" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security.Cookies/webForCore.Microsoft.Owin.Security.Cookies.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security.OAuth/webForCore.Microsoft.Owin.Security.OAuth.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security.WsFederation/webForCore.Microsoft.Owin.Security.WsFederation.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security/webForCore.Microsoft.Owin.Security.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Testing/webForCore.Microsoft.Owin.Testing.csproj" />
+    <PackageReference Include="Shouldly" Version="1.1.1.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+  </ItemGroup>
+</Project>

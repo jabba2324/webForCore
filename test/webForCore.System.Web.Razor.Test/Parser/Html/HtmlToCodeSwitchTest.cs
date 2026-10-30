@@ -81,7 +81,7 @@ namespace System.Web.Razor.Test.Parser.Html
         [Fact]
         public void ParseBlockParsesCodeWithinSingleLineMarkup()
         {
-            ParseBlockTest("@:<li>Foo @Bar Baz" + Environment.NewLine
+            ParseBlockTest("@:<li>Foo @Bar Baz" + "\r\n"
                          + "bork",
                 new MarkupBlock(
                     Factory.MarkupTransition(),
@@ -175,10 +175,10 @@ namespace System.Web.Razor.Test.Parser.Html
         [Fact]
         public void ParseBlockGivesWhitespacePreceedingAtToCodeIfThereIsNoMarkupOnThatLine()
         {
-            ParseBlockTest("   <ul>" + Environment.NewLine
-                         + "    @foreach(var p in Products) {" + Environment.NewLine
-                         + "        <li>Product: @p.Name</li>" + Environment.NewLine
-                         + "    }" + Environment.NewLine
+            ParseBlockTest("   <ul>" + "\r\n"
+                         + "    @foreach(var p in Products) {" + "\r\n"
+                         + "        <li>Product: @p.Name</li>" + "\r\n"
+                         + "    }" + "\r\n"
                          + "    </ul>",
                 new MarkupBlock(
                     Factory.Markup("   <ul>\r\n"),
@@ -201,10 +201,10 @@ namespace System.Web.Razor.Test.Parser.Html
         [Fact]
         public void ParseDocumentGivesWhitespacePreceedingAtToCodeIfThereIsNoMarkupOnThatLine()
         {
-            ParseDocumentTest("   <ul>" + Environment.NewLine
-                            + "    @foreach(var p in Products) {" + Environment.NewLine
-                            + "        <li>Product: @p.Name</li>" + Environment.NewLine
-                            + "    }" + Environment.NewLine
+            ParseDocumentTest("   <ul>" + "\r\n"
+                            + "    @foreach(var p in Products) {" + "\r\n"
+                            + "        <li>Product: @p.Name</li>" + "\r\n"
+                            + "    }" + "\r\n"
                             + "    </ul>",
                 new MarkupBlock(
                     Factory.Markup("   <ul>\r\n"),
@@ -227,12 +227,12 @@ namespace System.Web.Razor.Test.Parser.Html
         [Fact]
         public void SectionContextGivesWhitespacePreceedingAtToCodeIfThereIsNoMarkupOnThatLine()
         {
-            ParseDocumentTest("@section foo {" + Environment.NewLine
-                            + "    <ul>" + Environment.NewLine
-                            + "        @foreach(var p in Products) {" + Environment.NewLine
-                            + "            <li>Product: @p.Name</li>" + Environment.NewLine
-                            + "        }" + Environment.NewLine
-                            + "    </ul>" + Environment.NewLine
+            ParseDocumentTest("@section foo {" + "\r\n"
+                            + "    <ul>" + "\r\n"
+                            + "        @foreach(var p in Products) {" + "\r\n"
+                            + "            <li>Product: @p.Name</li>" + "\r\n"
+                            + "        }" + "\r\n"
+                            + "    </ul>" + "\r\n"
                             + "}",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -262,10 +262,10 @@ namespace System.Web.Razor.Test.Parser.Html
         [Fact]
         public void CSharpCodeParserDoesNotAcceptLeadingOrTrailingWhitespaceInDesignMode()
         {
-            ParseBlockTest("   <ul>" + Environment.NewLine
-                         + "    @foreach(var p in Products) {" + Environment.NewLine
-                         + "        <li>Product: @p.Name</li>" + Environment.NewLine
-                         + "    }" + Environment.NewLine
+            ParseBlockTest("   <ul>" + "\r\n"
+                         + "    @foreach(var p in Products) {" + "\r\n"
+                         + "        <li>Product: @p.Name</li>" + "\r\n"
+                         + "    }" + "\r\n"
                          + "    </ul>",
                 new MarkupBlock(
                     Factory.Markup("   <ul>\r\n    "),

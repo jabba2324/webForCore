@@ -482,7 +482,7 @@ namespace System.Web.Http.Services
             Assert.ThrowsArgumentOutOfRange(
                 () => defaultServices.InsertRange(typeof(ValueProviderFactory), -1, new[] { new Mock<ValueProviderFactory>().Object }),
                 "index",
-                "Index was out of range. Must be non-negative and less than the size of the collection.");
+                "Index was out of range. Must be non-negative and less than or equal to the size of the collection."); // webForCore: .NET's List<T>.InsertRange message
         }
 
         [Fact]

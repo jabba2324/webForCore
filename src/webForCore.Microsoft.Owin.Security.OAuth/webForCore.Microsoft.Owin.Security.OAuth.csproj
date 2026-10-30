@@ -1,0 +1,91 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Lifted from aspnet/AspNetKatana 096e225 (src/Microsoft.Owin.Security.OAuth/Microsoft.Owin.Security.OAuth.csproj) by tools/lift/lift_project.py.
+       Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <AssemblyName>Microsoft.Owin.Security.OAuth</AssemblyName>
+    <RootNamespace>Microsoft.Owin.Security.OAuth</RootNamespace>
+    <PackageId>webForCore.Microsoft.Owin.Security.OAuth</PackageId>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- Microsoft's builds use C# 9 (Web Stack, tools/WebStack.settings.targets) and Latest (Katana). -->
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;SYSLIB0003;SYSLIB0011;SYSLIB0051</NoWarn>
+    <DefineConstants>$(DefineConstants);</DefineConstants>
+    <!-- Delay signed with Microsoft's public key, as Microsoft's build does: PublicKeyToken=31bf3856ad364e35. -->
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>../SigningKey/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <AssemblyVersion>4.2.3.0</AssemblyVersion>
+    <FileVersion>4.200.325.35202</FileVersion>
+    <InformationalVersion>4.2.3</InformationalVersion>
+    <Company>Microsoft Corporation</Company>
+    <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
+    <Product>Microsoft.Owin.Security.OAuth</Product>
+    <Description>Middleware that enables an application to support any standard OAuth 2.0 authentication workflow.</Description>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+  </PropertyGroup>
+
+  <Import Project="../webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="Messages/AuthorizeEndpointRequest.cs" />
+    <Compile Include="Messages/TokenEndpointRequest.cs" />
+    <Compile Include="Messages/TokenEndpointRequestAuthorizationCode.cs" />
+    <Compile Include="Messages/TokenEndpointRequestClientCredentials.cs" />
+    <Compile Include="Messages/TokenEndpointRequestCustomExtension.cs" />
+    <Compile Include="Messages/TokenEndpointRequestRefreshToken.cs" />
+    <Compile Include="Messages/TokenEndpointRequestResourceOwnerPasswordCredentials.cs" />
+    <Compile Include="OAuthAuthorizationServerExtensions.cs" />
+    <Compile Include="OAuthAuthorizationServerHandler.cs" />
+    <Compile Include="OAuthAuthorizationServerMiddleware.cs" />
+    <Compile Include="OAuthAuthorizationServerOptions.cs" />
+    <Compile Include="OAuthBearerAuthenticationExtensions.cs" />
+    <Compile Include="OAuthBearerAuthenticationHandler.cs" />
+    <Compile Include="OAuthBearerAuthenticationMiddleware.cs" />
+    <Compile Include="OAuthBearerAuthenticationOptions.cs" />
+    <Compile Include="OAuthConstants.cs" />
+    <Compile Include="OAuthDefaults.cs" />
+    <Compile Include="Properties/AssemblyInfo.cs" />
+    <Compile Include="Provider/BaseValidatingClientContext.cs" />
+    <Compile Include="Provider/BaseValidatingContext.cs" />
+    <Compile Include="Provider/BaseValidatingTicketContext.cs" />
+    <Compile Include="Provider/DefaultBehavior.cs" />
+    <Compile Include="Provider/IOAuthAuthorizationServerProvider.cs" />
+    <Compile Include="Provider/IOAuthBearerAuthenticationProvider.cs" />
+    <Compile Include="Provider/OAuthAuthorizationServerProvider.cs" />
+    <Compile Include="Provider/OAuthAuthorizeEndpointContext.cs" />
+    <Compile Include="Provider/OAuthAuthorizeEndpointResponseContext.cs" />
+    <Compile Include="Provider/OAuthBearerAuthenticationProvider.cs" />
+    <Compile Include="Provider/OAuthChallengeContext.cs" />
+    <Compile Include="Provider/OAuthGrantAuthorizationCodeContext.cs" />
+    <Compile Include="Provider/OAuthGrantClientCredentialsContext.cs" />
+    <Compile Include="Provider/OAuthGrantCustomExtensionContext.cs" />
+    <Compile Include="Provider/OAuthGrantRefreshTokenContext.cs" />
+    <Compile Include="Provider/OAuthGrantResourceOwnerCredentialsContext.cs" />
+    <Compile Include="Provider/OAuthMatchEndpointContext.cs" />
+    <Compile Include="Provider/OAuthRequestTokenContext.cs" />
+    <Compile Include="Provider/OAuthTokenEndpointContext.cs" />
+    <Compile Include="Provider/OAuthTokenEndpointResponseContext.cs" />
+    <Compile Include="Provider/OAuthValidateAuthorizeRequestContext.cs" />
+    <Compile Include="Provider/OAuthValidateClientAuthenticationContext.cs" />
+    <Compile Include="Provider/OAuthValidateClientRedirectUriContext.cs" />
+    <Compile Include="Provider/OAuthValidateIdentityContext.cs" />
+    <Compile Include="Provider/OAuthValidateTokenRequestContext.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../webForCore.Microsoft.Owin.Security/webForCore.Microsoft.Owin.Security.csproj" />
+    <ProjectReference Include="../webForCore.Microsoft.Owin/webForCore.Microsoft.Owin.csproj" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Owin" Version="1.0.0" />
+  </ItemGroup>
+</Project>

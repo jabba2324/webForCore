@@ -2514,7 +2514,7 @@ namespace System.Web.UI
 #if NETFRAMEWORK
 					_scrollPositionX = HttpUtility.TryParseCoordinates(xpos, out doubleValue) ? (int)doubleValue : 0;
 #else
-					_scrollPositionX = HttpUtilityInternal.TryParseCoordinates(xpos, out doubleValue) ? (int)doubleValue : 0;
+					_scrollPositionX = HttpUtility.TryParseCoordinates(xpos, out doubleValue) ? (int)doubleValue : 0;
 #endif
 				}
 				string ypos = _requestValueCollection[_scrollPositionYID];
@@ -2523,7 +2523,7 @@ namespace System.Web.UI
 #if NETFRAMEWORK
 					_scrollPositionY = HttpUtility.TryParseCoordinates(ypos, out doubleValue) ? (int)doubleValue : 0;
 #else
-					_scrollPositionY = HttpUtilityInternal.TryParseCoordinates(ypos, out doubleValue) ? (int)doubleValue : 0;
+					_scrollPositionY = HttpUtility.TryParseCoordinates(ypos, out doubleValue) ? (int)doubleValue : 0;
 #endif
 				}
 			}

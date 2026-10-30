@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Phase 4 gate: test/webForCore.Mvc.Sample (the MVC 5 template) on Kestrel with the fork's System.Web.
+       Routes, controllers, filters and model binding, checked against MVC 5.3's documented results. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+  </PropertyGroup>
+
+  <Import Project="..\..\src\webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <ProjectReference Include="..\webForCore.Mvc.Sample\webForCore.Mvc.Sample.csproj" />
+    <!-- Built and run, not referenced: its pages compile at run time. -->
+    <ProjectReference Include="..\webForCore.WebPages.Sample\webForCore.WebPages.Sample.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+</Project>

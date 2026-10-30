@@ -18,7 +18,7 @@ namespace System.Web.ClientServices.Providers
     using System.Windows.Forms;
     using System.Data.SqlClient;
 #else
-	using Microsoft.Data.SqlClient;
+	using System.Data.SqlClient; // webForCore: System.Data.SqlClient, as .NET Framework (upstream used Microsoft.Data.SqlClient)
 #endif
     using System.Reflection;
     using System.Diagnostics.CodeAnalysis;

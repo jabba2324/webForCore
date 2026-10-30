@@ -1,0 +1,20 @@
+# aspnet/AspNetWebStack 2106565: source path (relative to repo root)	destination (relative to fork root)
+test/System.Web.Http.WebHost.Test/BatchingTest.cs	test/webForCore.System.Web.Http.WebHost.Test/BatchingTest.cs
+test/System.Web.Http.WebHost.Test/GlobalConfigurationTest.cs	test/webForCore.System.Web.Http.WebHost.Test/GlobalConfigurationTest.cs
+test/System.Web.Http.WebHost.Test/HttpControllerHandlerTest.cs	test/webForCore.System.Web.Http.WebHost.Test/HttpControllerHandlerTest.cs
+test/System.Web.Http.WebHost.Test/HttpRequestMessageExtensions.cs	test/webForCore.System.Web.Http.WebHost.Test/HttpRequestMessageExtensions.cs
+test/System.Web.Http.WebHost.Test/Properties/AssemblyInfo.cs	test/webForCore.System.Web.Http.WebHost.Test/Properties/AssemblyInfo.cs
+test/System.Web.Http.WebHost.Test/RouteCollectionExtensionsTest.cs	test/webForCore.System.Web.Http.WebHost.Test/RouteCollectionExtensionsTest.cs
+test/System.Web.Http.WebHost.Test/Routing/HostedHttpRouteCollectionTest.cs	test/webForCore.System.Web.Http.WebHost.Test/Routing/HostedHttpRouteCollectionTest.cs
+test/System.Web.Http.WebHost.Test/Routing/HostedUrlHelperTest.cs	test/webForCore.System.Web.Http.WebHost.Test/Routing/HostedUrlHelperTest.cs
+test/System.Web.Http.WebHost.Test/Routing/HttpContextBaseExtensionsTest.cs	test/webForCore.System.Web.Http.WebHost.Test/Routing/HttpContextBaseExtensionsTest.cs
+test/System.Web.Http.WebHost.Test/Routing/HttpRequestMessageWrapperTest.cs	test/webForCore.System.Web.Http.WebHost.Test/Routing/HttpRequestMessageWrapperTest.cs
+test/System.Web.Http.WebHost.Test/Routing/HttpRouteExceptionHandlerTests.cs	test/webForCore.System.Web.Http.WebHost.Test/Routing/HttpRouteExceptionHandlerTests.cs
+test/System.Web.Http.WebHost.Test/Routing/HttpRouteExceptionRouteHandlerTests.cs	test/webForCore.System.Web.Http.WebHost.Test/Routing/HttpRouteExceptionRouteHandlerTests.cs
+test/System.Web.Http.WebHost.Test/Routing/HttpWebRouteTests.cs	test/webForCore.System.Web.Http.WebHost.Test/Routing/HttpWebRouteTests.cs
+test/System.Web.Http.WebHost.Test/SeekableBufferedRequestStreamTest.cs	test/webForCore.System.Web.Http.WebHost.Test/SeekableBufferedRequestStreamTest.cs
+test/System.Web.Http.WebHost.Test/SuppressFormsAuthRedirectHelperTest.cs	test/webForCore.System.Web.Http.WebHost.Test/SuppressFormsAuthRedirectHelperTest.cs
+test/System.Web.Http.WebHost.Test/WebHostBufferPolicySelectorTest.cs	test/webForCore.System.Web.Http.WebHost.Test/WebHostBufferPolicySelectorTest.cs
+test/System.Web.Http.WebHost.Test/WebHostExceptionCatchBlocksTests.cs	test/webForCore.System.Web.Http.WebHost.Test/WebHostExceptionCatchBlocksTests.cs
+test/System.Web.Http.WebHost.Test/WebHostExceptionHandlerTests.cs	test/webForCore.System.Web.Http.WebHost.Test/WebHostExceptionHandlerTests.cs
+test/System.Web.Http.WebHost.Test/WebHostHttpRequestContextTests.cs	test/webForCore.System.Web.Http.WebHost.Test/WebHostHttpRequestContextTests.cs

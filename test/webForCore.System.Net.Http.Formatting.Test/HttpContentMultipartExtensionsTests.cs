@@ -97,7 +97,7 @@ namespace System.Net.Http
                 Assert.Equal(DefaultContentType, content.Headers.ContentType.MediaType);
 
                 Assert.Equal(DefaultContentDisposition, content.Headers.ContentDisposition.DispositionType);
-                Assert.Equal(String.Format("\"N{0}\"", cnt), content.Headers.ContentDisposition.FileName);
+                Assert.Equal(String.Format("N{0}", cnt), content.Headers.ContentDisposition.FileName); // webForCore: .NET's ContentDisposition.FileName is unquoted
 
                 await AssertContentLengthHeaderValueAsync(content);
 

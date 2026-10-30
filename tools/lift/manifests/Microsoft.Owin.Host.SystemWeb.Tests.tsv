@@ -1,0 +1,15 @@
+# aspnet/AspNetKatana 096e225: source path (relative to repo root)	destination (relative to fork root)
+tests/Microsoft.Owin.Host.SystemWeb.Tests/CallEnvironment/AspNetEnvironmentTests.cs	test/webForCore.Microsoft.Owin.Host.SystemWeb.Tests/CallEnvironment/AspNetEnvironmentTests.cs
+tests/Microsoft.Owin.Host.SystemWeb.Tests/CallHeaders/AspNetRequestHeadersTests.cs	test/webForCore.Microsoft.Owin.Host.SystemWeb.Tests/CallHeaders/AspNetRequestHeadersTests.cs
+tests/Microsoft.Owin.Host.SystemWeb.Tests/DictionaryExtensions.cs	test/webForCore.Microsoft.Owin.Host.SystemWeb.Tests/DictionaryExtensions.cs
+tests/Microsoft.Owin.Host.SystemWeb.Tests/EnvironmentContentTests.cs	test/webForCore.Microsoft.Owin.Host.SystemWeb.Tests/EnvironmentContentTests.cs
+tests/Microsoft.Owin.Host.SystemWeb.Tests/FakeN/FakeHttpContext.cs	test/webForCore.Microsoft.Owin.Host.SystemWeb.Tests/FakeN/FakeHttpContext.cs
+tests/Microsoft.Owin.Host.SystemWeb.Tests/FakeN/FakeHttpContextEx.cs	test/webForCore.Microsoft.Owin.Host.SystemWeb.Tests/FakeN/FakeHttpContextEx.cs
+tests/Microsoft.Owin.Host.SystemWeb.Tests/FakeN/FakeHttpRequest.cs	test/webForCore.Microsoft.Owin.Host.SystemWeb.Tests/FakeN/FakeHttpRequest.cs
+tests/Microsoft.Owin.Host.SystemWeb.Tests/FakeN/FakeHttpRequestEx.cs	test/webForCore.Microsoft.Owin.Host.SystemWeb.Tests/FakeN/FakeHttpRequestEx.cs
+tests/Microsoft.Owin.Host.SystemWeb.Tests/FakeN/FakeHttpResponse.cs	test/webForCore.Microsoft.Owin.Host.SystemWeb.Tests/FakeN/FakeHttpResponse.cs
+tests/Microsoft.Owin.Host.SystemWeb.Tests/FakeN/FakeHttpResponseEx.cs	test/webForCore.Microsoft.Owin.Host.SystemWeb.Tests/FakeN/FakeHttpResponseEx.cs
+tests/Microsoft.Owin.Host.SystemWeb.Tests/OwinHttpHandlerTests.cs	test/webForCore.Microsoft.Owin.Host.SystemWeb.Tests/OwinHttpHandlerTests.cs
+tests/Microsoft.Owin.Host.SystemWeb.Tests/OwinRouteHandlerTests.cs	test/webForCore.Microsoft.Owin.Host.SystemWeb.Tests/OwinRouteHandlerTests.cs
+tests/Microsoft.Owin.Host.SystemWeb.Tests/OwinRouteTests.cs	test/webForCore.Microsoft.Owin.Host.SystemWeb.Tests/OwinRouteTests.cs
+tests/Microsoft.Owin.Host.SystemWeb.Tests/TestsBase.cs	test/webForCore.Microsoft.Owin.Host.SystemWeb.Tests/TestsBase.cs

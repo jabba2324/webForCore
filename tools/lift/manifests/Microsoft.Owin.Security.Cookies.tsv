@@ -1,0 +1,18 @@
+# aspnet/AspNetKatana 096e225: source path (relative to repo root)	destination (relative to fork root)
+src/Microsoft.Owin.Security.Cookies/CookieAuthenticationDefaults.cs	src/webForCore.Microsoft.Owin.Security.Cookies/CookieAuthenticationDefaults.cs
+src/Microsoft.Owin.Security.Cookies/CookieAuthenticationExtensions.cs	src/webForCore.Microsoft.Owin.Security.Cookies/CookieAuthenticationExtensions.cs
+src/Microsoft.Owin.Security.Cookies/CookieAuthenticationHandler.cs	src/webForCore.Microsoft.Owin.Security.Cookies/CookieAuthenticationHandler.cs
+src/Microsoft.Owin.Security.Cookies/CookieAuthenticationMiddleware.cs	src/webForCore.Microsoft.Owin.Security.Cookies/CookieAuthenticationMiddleware.cs
+src/Microsoft.Owin.Security.Cookies/CookieAuthenticationOptions.cs	src/webForCore.Microsoft.Owin.Security.Cookies/CookieAuthenticationOptions.cs
+src/Microsoft.Owin.Security.Cookies/CookieSecureOption.cs	src/webForCore.Microsoft.Owin.Security.Cookies/CookieSecureOption.cs
+src/Microsoft.Owin.Security.Cookies/IAuthenticationSessionStore.cs	src/webForCore.Microsoft.Owin.Security.Cookies/IAuthenticationSessionStore.cs
+src/Microsoft.Owin.Security.Cookies/Properties/AssemblyInfo.cs	src/webForCore.Microsoft.Owin.Security.Cookies/Properties/AssemblyInfo.cs
+src/Microsoft.Owin.Security.Cookies/Provider/CookieApplyRedirectContext.cs	src/webForCore.Microsoft.Owin.Security.Cookies/Provider/CookieApplyRedirectContext.cs
+src/Microsoft.Owin.Security.Cookies/Provider/CookieAuthenticationProvider.cs	src/webForCore.Microsoft.Owin.Security.Cookies/Provider/CookieAuthenticationProvider.cs
+src/Microsoft.Owin.Security.Cookies/Provider/CookieExceptionContext.cs	src/webForCore.Microsoft.Owin.Security.Cookies/Provider/CookieExceptionContext.cs
+src/Microsoft.Owin.Security.Cookies/Provider/CookieResponseSignInContext.cs	src/webForCore.Microsoft.Owin.Security.Cookies/Provider/CookieResponseSignInContext.cs
+src/Microsoft.Owin.Security.Cookies/Provider/CookieResponseSignOutContext.cs	src/webForCore.Microsoft.Owin.Security.Cookies/Provider/CookieResponseSignOutContext.cs
+src/Microsoft.Owin.Security.Cookies/Provider/CookieResponseSignedInContext.cs	src/webForCore.Microsoft.Owin.Security.Cookies/Provider/CookieResponseSignedInContext.cs
+src/Microsoft.Owin.Security.Cookies/Provider/CookieValidateIdentityContext.cs	src/webForCore.Microsoft.Owin.Security.Cookies/Provider/CookieValidateIdentityContext.cs
+src/Microsoft.Owin.Security.Cookies/Provider/DefaultBehavior.cs	src/webForCore.Microsoft.Owin.Security.Cookies/Provider/DefaultBehavior.cs
+src/Microsoft.Owin.Security.Cookies/Provider/ICookieAuthenticationProvider.cs	src/webForCore.Microsoft.Owin.Security.Cookies/Provider/ICookieAuthenticationProvider.cs

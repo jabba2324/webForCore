@@ -217,6 +217,13 @@ namespace System.Web.Hosting
 		public override int GetRemotePort() => Context.Connection.RemotePort;
 		public override string GetServerName()
 		{
+			// webForCore: IIS sets SERVER_NAME from the request's Host header (the name the client used), and HttpRequest.Url
+			// is built from it. Fall back to the local address only when there is no Host header (HTTP/1.0).
+			string host = Context.Request.Host.Host;
+			if (!string.IsNullOrEmpty(host))
+			{
+				return host;
+			}
 			string localAddress = GetLocalAddress();
 			if (localAddress.Equals("127.0.0.1") || localAddress.Equals("::1"))
 			{
@@ -544,8 +551,15 @@ namespace System.Web.Hosting
 
 		public override void SendStatus(int statusCode, string statusDescription)
 		{
-			// TODO description
 			Context.Response.StatusCode = statusCode;
+			// webForCore: IIS sends HttpResponse.StatusDescription as the reason phrase (HttpStatusCodeResult(code, description),
+			// Response.StatusDescription). Kestrel sends its own unless the response feature carries one (HTTP/1.x only).
+			var feature = Context.Features.Get<Microsoft.AspNetCore.Http.Features.IHttpResponseFeature>();
+			if (feature != null && !string.IsNullOrEmpty(statusDescription)
+				&& statusDescription != HttpWorkerRequest.GetStatusDescription(statusCode))
+			{
+				feature.ReasonPhrase = statusDescription;
+			}
 		}
 
 		public override void SendUnknownResponseHeader(string name, string value)

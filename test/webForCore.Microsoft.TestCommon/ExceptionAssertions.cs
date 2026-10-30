@@ -469,7 +469,8 @@ namespace Microsoft.TestCommon
                         String.Format(CultureReplacer.DefaultCulture, "Value must be less than or equal to {0}.", maxValue), false, actualValue);
         }
 
-#if !NETCOREAPP
+// webForCore: the fork provides System.Web on .NET, so ThrowsHttpException is built here too.
+#if true
         /// <summary>
         /// Verifies that the code throws an HttpException (or optionally any exception which derives from it).
         /// </summary>
@@ -639,13 +640,17 @@ namespace Microsoft.TestCommon
         {
             if (expectedMessage != null)
             {
+                // webForCore: .NET builds messages with Environment.NewLine (\n on Linux) where the expected messages were
+                // written for Windows (\r\n); compare newline-agnostically.
+                expectedMessage = expectedMessage.Replace("\r\n", "\n");
+                string actualMessage = exception.Message?.Replace("\r\n", "\n");
                 if (!partialMatch)
                 {
-                    Equal(expectedMessage, exception.Message);
+                    Equal(expectedMessage, actualMessage);
                 }
                 else
                 {
-                    Contains(expectedMessage, exception.Message);
+                    Contains(expectedMessage, actualMessage);
                 }
             }
         }

@@ -78,8 +78,8 @@ namespace System.Web.Razor.Test.Parser.Html
         [Fact]
         public void ParseDocumentWithinSectionDoesNotCreateDocumentLevelSpan()
         {
-            ParseDocumentTest("@section Foo {" + Environment.NewLine
-                            + "    <html></html>" + Environment.NewLine
+            ParseDocumentTest("@section Foo {" + "\r\n"
+                            + "    <html></html>" + "\r\n"
                             + "}",
                 new MarkupBlock(
                     Factory.EmptyHtml(),

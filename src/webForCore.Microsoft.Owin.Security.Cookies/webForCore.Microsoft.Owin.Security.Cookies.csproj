@@ -1,0 +1,64 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Lifted from aspnet/AspNetKatana 096e225 (src/Microsoft.Owin.Security.Cookies/Microsoft.Owin.Security.Cookies.csproj) by tools/lift/lift_project.py.
+       Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <AssemblyName>Microsoft.Owin.Security.Cookies</AssemblyName>
+    <RootNamespace>Microsoft.Owin.Security.Cookies</RootNamespace>
+    <PackageId>webForCore.Microsoft.Owin.Security.Cookies</PackageId>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- Microsoft's builds use C# 9 (Web Stack, tools/WebStack.settings.targets) and Latest (Katana). -->
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;SYSLIB0003;SYSLIB0011;SYSLIB0051</NoWarn>
+    <DefineConstants>$(DefineConstants);</DefineConstants>
+    <!-- Delay signed with Microsoft's public key, as Microsoft's build does: PublicKeyToken=31bf3856ad364e35. -->
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>../SigningKey/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <AssemblyVersion>4.2.3.0</AssemblyVersion>
+    <FileVersion>4.200.325.35202</FileVersion>
+    <InformationalVersion>4.2.3</InformationalVersion>
+    <Company>Microsoft Corporation</Company>
+    <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
+    <Product>Microsoft.Owin.Security.Cookies</Product>
+    <Description>Middleware that enables an application to use cookie based authentication, similar to ASP.NET's forms authentication.</Description>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+  </PropertyGroup>
+
+  <Import Project="../webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="CookieAuthenticationDefaults.cs" />
+    <Compile Include="CookieAuthenticationExtensions.cs" />
+    <Compile Include="CookieAuthenticationHandler.cs" />
+    <Compile Include="CookieAuthenticationMiddleware.cs" />
+    <Compile Include="CookieAuthenticationOptions.cs" />
+    <Compile Include="CookieSecureOption.cs" />
+    <Compile Include="IAuthenticationSessionStore.cs" />
+    <Compile Include="Properties/AssemblyInfo.cs" />
+    <Compile Include="Provider/CookieApplyRedirectContext.cs" />
+    <Compile Include="Provider/CookieAuthenticationProvider.cs" />
+    <Compile Include="Provider/CookieExceptionContext.cs" />
+    <Compile Include="Provider/CookieResponseSignInContext.cs" />
+    <Compile Include="Provider/CookieResponseSignOutContext.cs" />
+    <Compile Include="Provider/CookieResponseSignedInContext.cs" />
+    <Compile Include="Provider/CookieValidateIdentityContext.cs" />
+    <Compile Include="Provider/DefaultBehavior.cs" />
+    <Compile Include="Provider/ICookieAuthenticationProvider.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../webForCore.Microsoft.Owin.Security/webForCore.Microsoft.Owin.Security.csproj" />
+    <ProjectReference Include="../webForCore.Microsoft.Owin/webForCore.Microsoft.Owin.csproj" />
+    <PackageReference Include="Owin" Version="1.0.0" />
+  </ItemGroup>
+</Project>

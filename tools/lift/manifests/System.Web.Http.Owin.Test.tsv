@@ -1,0 +1,19 @@
+# aspnet/AspNetWebStack 2106565: source path (relative to repo root)	destination (relative to fork root)
+test/System.Web.Http.Owin.Test/ExceptionHandling/DefaultExceptionHandlerTests.cs	test/webForCore.System.Web.Http.Owin.Test/ExceptionHandling/DefaultExceptionHandlerTests.cs
+test/System.Web.Http.Owin.Test/ExceptionHandling/EmptyExceptionLoggerTests.cs	test/webForCore.System.Web.Http.Owin.Test/ExceptionHandling/EmptyExceptionLoggerTests.cs
+test/System.Web.Http.Owin.Test/HostAuthenticationAttributeTest.cs	test/webForCore.System.Web.Http.Owin.Test/HostAuthenticationAttributeTest.cs
+test/System.Web.Http.Owin.Test/HostAuthenticationFilterTest.cs	test/webForCore.System.Web.Http.Owin.Test/HostAuthenticationFilterTest.cs
+test/System.Web.Http.Owin.Test/HttpMessageHandlerAdapterTest.cs	test/webForCore.System.Web.Http.Owin.Test/HttpMessageHandlerAdapterTest.cs
+test/System.Web.Http.Owin.Test/HttpMessageHandlerExtensions.cs	test/webForCore.System.Web.Http.Owin.Test/HttpMessageHandlerExtensions.cs
+test/System.Web.Http.Owin.Test/HttpMessageHandlerOptionsTests.cs	test/webForCore.System.Web.Http.Owin.Test/HttpMessageHandlerOptionsTests.cs
+test/System.Web.Http.Owin.Test/NonOwnedStreamTests.cs	test/webForCore.System.Web.Http.Owin.Test/NonOwnedStreamTests.cs
+test/System.Web.Http.Owin.Test/OwinBufferPolicySelectorTest.cs	test/webForCore.System.Web.Http.Owin.Test/OwinBufferPolicySelectorTest.cs
+test/System.Web.Http.Owin.Test/OwinExceptionCatchBlocksTests.cs	test/webForCore.System.Web.Http.Owin.Test/OwinExceptionCatchBlocksTests.cs
+test/System.Web.Http.Owin.Test/OwinHostIntegrationTest.cs	test/webForCore.System.Web.Http.Owin.Test/OwinHostIntegrationTest.cs
+test/System.Web.Http.Owin.Test/OwinHttpConfigurationExtensionsTest.cs	test/webForCore.System.Web.Http.Owin.Test/OwinHttpConfigurationExtensionsTest.cs
+test/System.Web.Http.Owin.Test/OwinHttpRequestContextTests.cs	test/webForCore.System.Web.Http.Owin.Test/OwinHttpRequestContextTests.cs
+test/System.Web.Http.Owin.Test/OwinHttpRequestMessageExtensionsTest.cs	test/webForCore.System.Web.Http.Owin.Test/OwinHttpRequestMessageExtensionsTest.cs
+test/System.Web.Http.Owin.Test/OwinRequestExtensionsTests.cs	test/webForCore.System.Web.Http.Owin.Test/OwinRequestExtensionsTests.cs
+test/System.Web.Http.Owin.Test/OwinResponseExtensionsTests.cs	test/webForCore.System.Web.Http.Owin.Test/OwinResponseExtensionsTests.cs
+test/System.Web.Http.Owin.Test/PassiveAuthenticationMessageHandlerTest.cs	test/webForCore.System.Web.Http.Owin.Test/PassiveAuthenticationMessageHandlerTest.cs
+test/System.Web.Http.Owin.Test/WebApiAppBuilderExtensionsTest.cs	test/webForCore.System.Web.Http.Owin.Test/WebApiAppBuilderExtensionsTest.cs

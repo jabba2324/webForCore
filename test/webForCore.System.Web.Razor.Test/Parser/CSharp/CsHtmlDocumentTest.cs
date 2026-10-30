@@ -31,7 +31,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void BlockCommentInMarkupDocumentIsHandledCorrectly()
         {
-            ParseDocumentTest("<ul>" + Environment.NewLine
+            ParseDocumentTest("<ul>" + "\r\n"
                             + "                @* This is a block comment </ul> *@ foo",
                               new MarkupBlock(
                                   Factory.Markup("<ul>\r\n                "),
@@ -49,7 +49,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void BlockCommentInMarkupBlockIsHandledCorrectly()
         {
-            ParseBlockTest("<ul>" + Environment.NewLine
+            ParseBlockTest("<ul>" + "\r\n"
                          + "                @* This is a block comment </ul> *@ foo </ul>",
                            new MarkupBlock(
                                Factory.Markup("<ul>\r\n                "),
@@ -67,9 +67,9 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void BlockCommentAtStatementStartInCodeBlockIsHandledCorrectly()
         {
-            ParseDocumentTest("@if(Request.IsAuthenticated) {" + Environment.NewLine
-                            + "    @* User is logged in! } *@" + Environment.NewLine
-                            + "    Write(\"Hello friend!\");" + Environment.NewLine
+            ParseDocumentTest("@if(Request.IsAuthenticated) {" + "\r\n"
+                            + "    @* User is logged in! } *@" + "\r\n"
+                            + "    Write(\"Hello friend!\");" + "\r\n"
                             + "}",
                               new MarkupBlock(
                                   Factory.EmptyHtml(),
@@ -89,9 +89,9 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void BlockCommentInStatementInCodeBlockIsHandledCorrectly()
         {
-            ParseDocumentTest("@if(Request.IsAuthenticated) {" + Environment.NewLine
-                            + "    var foo = @* User is logged in! ; *@;" + Environment.NewLine
-                            + "    Write(\"Hello friend!\");" + Environment.NewLine
+            ParseDocumentTest("@if(Request.IsAuthenticated) {" + "\r\n"
+                            + "    var foo = @* User is logged in! ; *@;" + "\r\n"
+                            + "    Write(\"Hello friend!\");" + "\r\n"
                             + "}",
                               new MarkupBlock(
                                   Factory.EmptyHtml(),
@@ -111,51 +111,51 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void BlockCommentInStringIsIgnored()
         {
-            ParseDocumentTest("@if(Request.IsAuthenticated) {" + Environment.NewLine
-                            + "    var foo = \"@* User is logged in! ; *\";" + Environment.NewLine
-                            + "    Write(\"Hello friend!\");" + Environment.NewLine
+            ParseDocumentTest("@if(Request.IsAuthenticated) {" + "\r\n"
+                            + "    var foo = \"@* User is logged in! ; *\";" + "\r\n"
+                            + "    Write(\"Hello friend!\");" + "\r\n"
                             + "}",
                               new MarkupBlock(
                                   Factory.EmptyHtml(),
                                   new StatementBlock(
                                       Factory.CodeTransition(),
-                                      Factory.Code("if(Request.IsAuthenticated) {" + Environment.NewLine
-                                                 + "    var foo = \"@* User is logged in! ; *\";" + Environment.NewLine
-                                                 + "    Write(\"Hello friend!\");" + Environment.NewLine
+                                      Factory.Code("if(Request.IsAuthenticated) {" + "\r\n"
+                                                 + "    var foo = \"@* User is logged in! ; *\";" + "\r\n"
+                                                 + "    Write(\"Hello friend!\");" + "\r\n"
                                                  + "}").AsStatement())));
         }
 
         [Fact]
         public void BlockCommentInCSharpBlockCommentIsIgnored()
         {
-            ParseDocumentTest("@if(Request.IsAuthenticated) {" + Environment.NewLine
-                            + "    var foo = /*@* User is logged in! */ *@ */;" + Environment.NewLine
-                            + "    Write(\"Hello friend!\");" + Environment.NewLine
+            ParseDocumentTest("@if(Request.IsAuthenticated) {" + "\r\n"
+                            + "    var foo = /*@* User is logged in! */ *@ */;" + "\r\n"
+                            + "    Write(\"Hello friend!\");" + "\r\n"
                             + "}",
                               new MarkupBlock(
                                   Factory.EmptyHtml(),
                                   new StatementBlock(
                                       Factory.CodeTransition(),
-                                      Factory.Code("if(Request.IsAuthenticated) {" + Environment.NewLine
-                                                 + "    var foo = /*@* User is logged in! */ *@ */;" + Environment.NewLine
-                                                 + "    Write(\"Hello friend!\");" + Environment.NewLine
+                                      Factory.Code("if(Request.IsAuthenticated) {" + "\r\n"
+                                                 + "    var foo = /*@* User is logged in! */ *@ */;" + "\r\n"
+                                                 + "    Write(\"Hello friend!\");" + "\r\n"
                                                  + "}").AsStatement())));
         }
 
         [Fact]
         public void BlockCommentInCSharpLineCommentIsIgnored()
         {
-            ParseDocumentTest("@if(Request.IsAuthenticated) {" + Environment.NewLine
-                            + "    var foo = //@* User is logged in! */ *@;" + Environment.NewLine
-                            + "    Write(\"Hello friend!\");" + Environment.NewLine
+            ParseDocumentTest("@if(Request.IsAuthenticated) {" + "\r\n"
+                            + "    var foo = //@* User is logged in! */ *@;" + "\r\n"
+                            + "    Write(\"Hello friend!\");" + "\r\n"
                             + "}",
                               new MarkupBlock(
                                   Factory.EmptyHtml(),
                                   new StatementBlock(
                                       Factory.CodeTransition(),
-                                      Factory.Code("if(Request.IsAuthenticated) {" + Environment.NewLine
-                                                 + "    var foo = //@* User is logged in! */ *@;" + Environment.NewLine
-                                                 + "    Write(\"Hello friend!\");" + Environment.NewLine
+                                      Factory.Code("if(Request.IsAuthenticated) {" + "\r\n"
+                                                 + "    var foo = //@* User is logged in! */ *@;" + "\r\n"
+                                                 + "    Write(\"Hello friend!\");" + "\r\n"
                                                  + "}").AsStatement())));
         }
 

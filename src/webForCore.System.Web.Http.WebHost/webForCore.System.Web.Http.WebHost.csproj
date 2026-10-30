@@ -1,0 +1,86 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Lifted from aspnet/AspNetWebStack 2106565 (System.Web.Http.WebHost) by tools/lift/lift_project.py.
+       Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <AssemblyName>System.Web.Http.WebHost</AssemblyName>
+    <RootNamespace>System.Web.Http.WebHost</RootNamespace>
+    <PackageId>webForCore.Web.Http.WebHost</PackageId>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- Microsoft's builds use C# 9 (Web Stack, tools/WebStack.settings.targets) and Latest (Katana). -->
+    <LangVersion>9.0</LangVersion>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;SYSLIB0003;SYSLIB0011;SYSLIB0051</NoWarn>
+    <DefineConstants>$(DefineConstants);ASPNETMVC</DefineConstants>
+    <!-- Delay signed with Microsoft's public key, as Microsoft's build does: PublicKeyToken=31bf3856ad364e35. -->
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>../SigningKey/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <Import Project="../webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="Common/DictionaryExtensions.cs" />
+    <Compile Include="Common/Error.cs" />
+    <Compile Include="Common/HttpMethodHelper.cs" />
+    <Compile Include="Common/NonOwnedStream.cs" />
+    <Compile Include="Common/TaskHelpers.cs" />
+    <Compile Include="Common/TaskHelpersExtensions.cs" />
+    <Compile Include="GlobalConfiguration.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="HttpBatchContextWrapper.cs" />
+    <Compile Include="HttpControllerHandler.cs" />
+    <Compile Include="HttpControllerRouteHandler.cs" />
+    <Compile Include="HttpControllerTypeCacheSerializer.cs" />
+    <Compile Include="HttpRequestMessageExtensions.cs" />
+    <Compile Include="HttpResponseBaseExtensions.cs" />
+    <Compile Include="PreApplicationStartCode.cs" />
+    <Compile Include="Properties/AssemblyInfo.cs" />
+    <Compile Include="Properties/CommonAssemblyInfo.cs" />
+    <Compile Include="Properties/CommonWebApiResources.Designer.cs" />
+    <Compile Include="Properties/SRResources.Designer.cs" />
+    <Compile Include="ResponseContent.cs" />
+    <Compile Include="RouteCollectionExtensions.cs" />
+    <Compile Include="Routing/HostedHttpRoute.cs" />
+    <Compile Include="Routing/HostedHttpRouteCollection.cs" />
+    <Compile Include="Routing/HostedHttpRouteData.cs" />
+    <Compile Include="Routing/HostedHttpVirtualPathData.cs" />
+    <Compile Include="Routing/HttpContextBaseExtensions.cs" />
+    <Compile Include="Routing/HttpRequestMessageContextWrapper.cs" />
+    <Compile Include="Routing/HttpRequestMessageWrapper.cs" />
+    <Compile Include="Routing/HttpRouteDataExtensions.cs" />
+    <Compile Include="Routing/HttpRouteExceptionHandler.cs" />
+    <Compile Include="Routing/HttpRouteExceptionRouteHandler.cs" />
+    <Compile Include="Routing/HttpRouteExtensions.cs" />
+    <Compile Include="Routing/HttpWebRoute.cs" />
+    <Compile Include="SeekableBufferedRequestStream.cs" />
+    <Compile Include="SuppressFormsAuthRedirectHelper.cs" />
+    <Compile Include="TaskWrapperAsyncResult.cs" />
+    <Compile Include="WebHostAssembliesResolver.cs" />
+    <Compile Include="WebHostBufferPolicySelector.cs" />
+    <Compile Include="WebHostExceptionCatchBlocks.cs" />
+    <Compile Include="WebHostExceptionHandler.cs" />
+    <Compile Include="WebHostHttpControllerTypeResolver.cs" />
+    <Compile Include="WebHostHttpRequestContext.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Properties/CommonWebApiResources.resx" LogicalName="System.Web.Http.WebHost.Properties.CommonWebApiResources.resources" />
+    <EmbeddedResource Include="Properties/SRResources.resx" LogicalName="System.Web.Http.WebHost.Properties.SRResources.resources" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../WebFormsForCore.Configuration/WebFormsForCore.Configuration.csproj" />
+    <ProjectReference Include="../WebFormsForCore.Web/WebFormsForCore.Web.csproj" />
+    <ProjectReference Include="../webForCore.System.Net.Http.Formatting/webForCore.System.Net.Http.Formatting.csproj" />
+    <ProjectReference Include="../webForCore.System.Web.Http/webForCore.System.Web.Http.csproj" />
+    <PackageReference Include="System.CodeDom" Version="11.0.0-rc.3.26522.148" />
+  </ItemGroup>
+</Project>

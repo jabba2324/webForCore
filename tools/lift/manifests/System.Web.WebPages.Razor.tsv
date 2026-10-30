@@ -1,0 +1,22 @@
+# aspnet/AspNetWebStack 2106565: source path (relative to repo root)	destination (relative to fork root)
+src/CommonAssemblyInfo.cs	src/webForCore.System.Web.WebPages.Razor/Properties/CommonAssemblyInfo.cs
+src/CommonResources.Designer.cs	src/webForCore.System.Web.WebPages.Razor/Common/CommonResources.Designer.cs
+src/CommonResources.resx	src/webForCore.System.Web.WebPages.Razor/Common/CommonResources.resx
+src/GlobalSuppressions.cs	src/webForCore.System.Web.WebPages.Razor/Common/GlobalSuppressions.cs
+src/System.Web.WebPages.Razor/AssemblyBuilderWrapper.cs	src/webForCore.System.Web.WebPages.Razor/AssemblyBuilderWrapper.cs
+src/System.Web.WebPages.Razor/CompilingPathEventArgs.cs	src/webForCore.System.Web.WebPages.Razor/CompilingPathEventArgs.cs
+src/System.Web.WebPages.Razor/Configuration/HostSection.cs	src/webForCore.System.Web.WebPages.Razor/Configuration/HostSection.cs
+src/System.Web.WebPages.Razor/Configuration/RazorPagesSection.cs	src/webForCore.System.Web.WebPages.Razor/Configuration/RazorPagesSection.cs
+src/System.Web.WebPages.Razor/Configuration/RazorWebSectionGroup.cs	src/webForCore.System.Web.WebPages.Razor/Configuration/RazorWebSectionGroup.cs
+src/System.Web.WebPages.Razor/GlobalSuppressions.cs	src/webForCore.System.Web.WebPages.Razor/GlobalSuppressions.cs
+src/System.Web.WebPages.Razor/HostingEnvironmentWrapper.cs	src/webForCore.System.Web.WebPages.Razor/HostingEnvironmentWrapper.cs
+src/System.Web.WebPages.Razor/IAssemblyBuilder.cs	src/webForCore.System.Web.WebPages.Razor/IAssemblyBuilder.cs
+src/System.Web.WebPages.Razor/IHostingEnvironment.cs	src/webForCore.System.Web.WebPages.Razor/IHostingEnvironment.cs
+src/System.Web.WebPages.Razor/PreApplicationStartCode.cs	src/webForCore.System.Web.WebPages.Razor/PreApplicationStartCode.cs
+src/System.Web.WebPages.Razor/Properties/AssemblyInfo.cs	src/webForCore.System.Web.WebPages.Razor/Properties/AssemblyInfo.cs
+src/System.Web.WebPages.Razor/RazorBuildProvider.cs	src/webForCore.System.Web.WebPages.Razor/RazorBuildProvider.cs
+src/System.Web.WebPages.Razor/Resources/RazorWebResources.Designer.cs	src/webForCore.System.Web.WebPages.Razor/Resources/RazorWebResources.Designer.cs
+src/System.Web.WebPages.Razor/Resources/RazorWebResources.resx	src/webForCore.System.Web.WebPages.Razor/Resources/RazorWebResources.resx
+src/System.Web.WebPages.Razor/WebCodeRazorHost.cs	src/webForCore.System.Web.WebPages.Razor/WebCodeRazorHost.cs
+src/System.Web.WebPages.Razor/WebPageRazorHost.cs	src/webForCore.System.Web.WebPages.Razor/WebPageRazorHost.cs
+src/System.Web.WebPages.Razor/WebRazorHostFactory.cs	src/webForCore.System.Web.WebPages.Razor/WebRazorHostFactory.cs

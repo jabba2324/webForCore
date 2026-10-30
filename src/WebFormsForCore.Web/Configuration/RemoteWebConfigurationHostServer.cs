@@ -260,7 +260,7 @@ namespace System.Web.Configuration
             var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
             Type t = Type.GetType(protectionProviderType,
                 assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                (asm, typeName, ignoreCase) => asm?.GetType(typeName, true, ignoreCase),
+                (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, true, ignoreCase) : global::System.Type.GetType(typeName, true, ignoreCase)),
                 true);
             if (!typeof(ProtectedConfigurationProvider).IsAssignableFrom(t))
             {

@@ -306,7 +306,7 @@ namespace System.Resources
                         var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
                         System.Type type1 = System.Type.GetType(type,
                             assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                            (asm, typeName, ignoreCase) => asm?.GetType(typeName, false, ignoreCase));
+                            (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)));
                         if (type1 == typeof(string))
                             type = (string)null;
                         else if (type1 != (System.Type)null)

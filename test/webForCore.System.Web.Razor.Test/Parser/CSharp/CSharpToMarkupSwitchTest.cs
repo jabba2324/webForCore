@@ -46,8 +46,8 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockGivesSpacesToCodeOnAtColonTemplateTransitionInDesignTimeMode()
         {
-            ParseBlockTest("Foo(    " + Environment.NewLine
-                         + "@:<p>Foo</p>    " + Environment.NewLine
+            ParseBlockTest("Foo(    " + "\r\n"
+                         + "@:<p>Foo</p>    " + "\r\n"
                          + ")",
                            new ExpressionBlock(
                                Factory.Code("Foo(    \r\n").AsImplicitExpression(CSharpCodeParser.DefaultKeywords),
@@ -68,8 +68,8 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockGivesSpacesToCodeOnTagTransitionInDesignTimeMode()
         {
-            ParseBlockTest("{" + Environment.NewLine
-                         + "    <p>Foo</p>    " + Environment.NewLine
+            ParseBlockTest("{" + "\r\n"
+                         + "    <p>Foo</p>    " + "\r\n"
                          + "}",
                            new StatementBlock(
                                Factory.MetaCode("{").Accepts(AcceptedCharacters.None),
@@ -85,8 +85,8 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockGivesSpacesToCodeOnInvalidAtTagTransitionInDesignTimeMode()
         {
-            ParseBlockTest("{" + Environment.NewLine
-                         + "    @<p>Foo</p>    " + Environment.NewLine
+            ParseBlockTest("{" + "\r\n"
+                         + "    @<p>Foo</p>    " + "\r\n"
                          + "}",
                            new StatementBlock(
                                Factory.MetaCode("{").Accepts(AcceptedCharacters.None),
@@ -104,8 +104,8 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockGivesSpacesToCodeOnAtColonTransitionInDesignTimeMode()
         {
-            ParseBlockTest("{" + Environment.NewLine
-                         + "    @:<p>Foo</p>    " + Environment.NewLine
+            ParseBlockTest("{" + "\r\n"
+                         + "    @:<p>Foo</p>    " + "\r\n"
                          + "}",
                            new StatementBlock(
                                Factory.MetaCode("{").Accepts(AcceptedCharacters.None),
@@ -124,8 +124,8 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockShouldSupportSingleLineMarkupContainingStatementBlock()
         {
-            ParseBlockTest("Repeat(10," + Environment.NewLine
-                         + "    @: @{}" + Environment.NewLine
+            ParseBlockTest("Repeat(10," + "\r\n"
+                         + "    @: @{}" + "\r\n"
                          + ")",
                            new ExpressionBlock(
                                Factory.Code("Repeat(10,\r\n    ")
@@ -155,13 +155,13 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockShouldSupportMarkupWithoutPreceedingWhitespace()
         {
-            ParseBlockTest("foreach(var file in files){" + Environment.NewLine
-                         + Environment.NewLine
-                         + Environment.NewLine
-                         + "@:Baz" + Environment.NewLine
-                         + "<br/>" + Environment.NewLine
-                         + "<a>Foo</a>" + Environment.NewLine
-                         + "@:Bar" + Environment.NewLine
+            ParseBlockTest("foreach(var file in files){" + "\r\n"
+                         + "\r\n"
+                         + "\r\n"
+                         + "@:Baz" + "\r\n"
+                         + "<br/>" + "\r\n"
+                         + "<a>Foo</a>" + "\r\n"
+                         + "@:Bar" + "\r\n"
                          + "}",
                            new StatementBlock(
                                Factory.Code("foreach(var file in files){\r\n\r\n\r\n").AsStatement(),
@@ -192,14 +192,14 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockGivesAllWhitespaceOnSameLineExcludingPreceedingNewlineButIncludingTrailingNewLineToMarkup()
         {
-            ParseBlockTest("if(foo) {" + Environment.NewLine
-                         + "    var foo = \"After this statement there are 10 spaces\";          " + Environment.NewLine
-                         + "    <p>" + Environment.NewLine
-                         + "        Foo" + Environment.NewLine
-                         + "        @bar" + Environment.NewLine
-                         + "    </p>" + Environment.NewLine
-                         + "    @:Hello!" + Environment.NewLine
-                         + "    var biz = boz;" + Environment.NewLine
+            ParseBlockTest("if(foo) {" + "\r\n"
+                         + "    var foo = \"After this statement there are 10 spaces\";          " + "\r\n"
+                         + "    <p>" + "\r\n"
+                         + "        Foo" + "\r\n"
+                         + "        @bar" + "\r\n"
+                         + "    </p>" + "\r\n"
+                         + "    @:Hello!" + "\r\n"
+                         + "    var biz = boz;" + "\r\n"
                          + "}",
                            new StatementBlock(
                                Factory.Code("if(foo) {\r\n    var foo = \"After this statement there are 10 spaces\";          \r\n").AsStatement(),
@@ -269,20 +269,20 @@ namespace System.Web.Razor.Test.Parser.CSharp
         public void ParseBlockSupportsMarkupInCaseAndDefaultBranchesOfSwitch()
         {
             // Arrange
-            ParseBlockTest("switch(foo) {" + Environment.NewLine
-                         + "    case 0:" + Environment.NewLine
-                         + "        <p>Foo</p>" + Environment.NewLine
-                         + "        break;" + Environment.NewLine
-                         + "    case 1:" + Environment.NewLine
-                         + "        <p>Bar</p>" + Environment.NewLine
-                         + "        return;" + Environment.NewLine
-                         + "    case 2:" + Environment.NewLine
-                         + "        {" + Environment.NewLine
-                         + "            <p>Baz</p>" + Environment.NewLine
-                         + "            <p>Boz</p>" + Environment.NewLine
-                         + "        }" + Environment.NewLine
-                         + "    default:" + Environment.NewLine
-                         + "        <p>Biz</p>" + Environment.NewLine
+            ParseBlockTest("switch(foo) {" + "\r\n"
+                         + "    case 0:" + "\r\n"
+                         + "        <p>Foo</p>" + "\r\n"
+                         + "        break;" + "\r\n"
+                         + "    case 1:" + "\r\n"
+                         + "        <p>Bar</p>" + "\r\n"
+                         + "        return;" + "\r\n"
+                         + "    case 2:" + "\r\n"
+                         + "        {" + "\r\n"
+                         + "            <p>Baz</p>" + "\r\n"
+                         + "            <p>Boz</p>" + "\r\n"
+                         + "        }" + "\r\n"
+                         + "    default:" + "\r\n"
+                         + "        <p>Biz</p>" + "\r\n"
                          + "}",
                            new StatementBlock(
                                Factory.Code("switch(foo) {\r\n    case 0:\r\n").AsStatement(),
@@ -311,20 +311,20 @@ namespace System.Web.Razor.Test.Parser.CSharp
         public void ParseBlockSupportsMarkupInCaseAndDefaultBranchesOfSwitchInCodeBlock()
         {
             // Arrange
-            ParseBlockTest("{ switch(foo) {" + Environment.NewLine
-                         + "    case 0:" + Environment.NewLine
-                         + "        <p>Foo</p>" + Environment.NewLine
-                         + "        break;" + Environment.NewLine
-                         + "    case 1:" + Environment.NewLine
-                         + "        <p>Bar</p>" + Environment.NewLine
-                         + "        return;" + Environment.NewLine
-                         + "    case 2:" + Environment.NewLine
-                         + "        {" + Environment.NewLine
-                         + "            <p>Baz</p>" + Environment.NewLine
-                         + "            <p>Boz</p>" + Environment.NewLine
-                         + "        }" + Environment.NewLine
-                         + "    default:" + Environment.NewLine
-                         + "        <p>Biz</p>" + Environment.NewLine
+            ParseBlockTest("{ switch(foo) {" + "\r\n"
+                         + "    case 0:" + "\r\n"
+                         + "        <p>Foo</p>" + "\r\n"
+                         + "        break;" + "\r\n"
+                         + "    case 1:" + "\r\n"
+                         + "        <p>Bar</p>" + "\r\n"
+                         + "        return;" + "\r\n"
+                         + "    case 2:" + "\r\n"
+                         + "        {" + "\r\n"
+                         + "            <p>Baz</p>" + "\r\n"
+                         + "            <p>Boz</p>" + "\r\n"
+                         + "        }" + "\r\n"
+                         + "    default:" + "\r\n"
+                         + "        <p>Biz</p>" + "\r\n"
                          + "} }",
                            new StatementBlock(
                                Factory.MetaCode("{").Accepts(AcceptedCharacters.None),
@@ -382,7 +382,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         public void ParseBlockParsesMarkupStatementOnSwitchCharacterFollowedByColon()
         {
             // Arrange
-            ParseBlockTest("if(foo) { @:Bar" + Environment.NewLine
+            ParseBlockTest("if(foo) { @:Bar" + "\r\n"
                          + "} zoop",
                            new StatementBlock(
                                Factory.Code("if(foo) {").AsStatement(),
@@ -399,7 +399,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         public void ParseBlockParsesMarkupStatementOnSwitchCharacterFollowedByColonInCodeBlock()
         {
             // Arrange
-            ParseBlockTest("{ if(foo) { @:Bar" + Environment.NewLine
+            ParseBlockTest("{ if(foo) { @:Bar" + "\r\n"
                          + "} } zoop",
                            new StatementBlock(
                                Factory.MetaCode("{").Accepts(AcceptedCharacters.None),
@@ -451,16 +451,16 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockSupportsAllKindsOfImplicitMarkupInCodeBlock()
         {
-            ParseBlockTest("{" + Environment.NewLine
-                         + "    if(true) {" + Environment.NewLine
-                         + "        @:Single Line Markup" + Environment.NewLine
-                         + "    }" + Environment.NewLine
-                         + "    foreach (var p in Enumerable.Range(1, 10)) {" + Environment.NewLine
-                         + "        <text>The number is @p</text>" + Environment.NewLine
-                         + "    }" + Environment.NewLine
-                         + "    if(!false) {" + Environment.NewLine
-                         + "        <p>A real tag!</p>" + Environment.NewLine
-                         + "    }" + Environment.NewLine
+            ParseBlockTest("{" + "\r\n"
+                         + "    if(true) {" + "\r\n"
+                         + "        @:Single Line Markup" + "\r\n"
+                         + "    }" + "\r\n"
+                         + "    foreach (var p in Enumerable.Range(1, 10)) {" + "\r\n"
+                         + "        <text>The number is @p</text>" + "\r\n"
+                         + "    }" + "\r\n"
+                         + "    if(!false) {" + "\r\n"
+                         + "        <p>A real tag!</p>" + "\r\n"
+                         + "    }" + "\r\n"
                          + "}",
                            new StatementBlock(
                                Factory.MetaCode("{").Accepts(AcceptedCharacters.None),

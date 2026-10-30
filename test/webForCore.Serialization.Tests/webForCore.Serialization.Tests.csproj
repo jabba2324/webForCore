@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- webForCore: tests for the fork's BinaryFormatter port (src/WebFormsForCore.Serialization.Formatters). -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <NoWarn>$(NoWarn);CS0618;SYSLIB0011;SYSLIB0050;SYSLIB0051</NoWarn>
+  </PropertyGroup>
+
+  <Import Project="..\..\src\webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\WebFormsForCore.Serialization.Formatters\WebFormsForCore.Serialization.Formatters.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web\WebFormsForCore.Web.csproj" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+  </ItemGroup>
+</Project>

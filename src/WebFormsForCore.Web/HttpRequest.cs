@@ -2880,7 +2880,7 @@ namespace System.Web {
 #if NETFRAMEWORK
                     HttpUtility.TryParseCoordinates(x, out xVal) && HttpUtility.TryParseCoordinates(y, out yVal)) {
 #else
-					HttpUtilityInternal.TryParseCoordinates(x, out xVal) && HttpUtilityInternal.TryParseCoordinates(y, out yVal))
+					HttpUtility.TryParseCoordinates(x, out xVal) && HttpUtility.TryParseCoordinates(y, out yVal))
 				{
 #endif
 					ret = new[] { xVal, yVal };

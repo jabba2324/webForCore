@@ -171,7 +171,7 @@ public static class StronglyTypedResourceBuilder
 				var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
 				Type type = Type.GetType(valueTypeName,
 	                assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                    (asm, typeName, ignoreCase) => asm?.GetType(typeName, false, ignoreCase));
+                    (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)));
 				string valueAsString = resXDataNode.GetValue((AssemblyName[])null).ToString();
 				value = new ResourceData(type, valueAsString);
 			}

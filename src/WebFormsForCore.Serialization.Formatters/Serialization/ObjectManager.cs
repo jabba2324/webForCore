@@ -688,7 +688,12 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
             }
 
             //The object is interested in DeserializationEvents so lets register it.
-            if (obj is IDeserializationCallback)
+            // webForCore: a built-in surrogate completes objects whose .NET OnDeserialization throws (FrameworkSurrogates.cs).
+            if (surrogate is IDeserializationCallbackSurrogate callbackSurrogate)
+            {
+                AddOnDeserialization(sender => callbackSurrogate.OnDeserialization(obj, sender));
+            }
+            else if (obj is IDeserializationCallback && !FrameworkSurrogates.IsUnsupportedDeserializationCallback(obj))
             {
                 DeserializationEventHandler d = new DeserializationEventHandler(((IDeserializationCallback)obj).OnDeserialization);
                 AddOnDeserialization(d);

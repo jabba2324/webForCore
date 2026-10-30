@@ -73,7 +73,7 @@ namespace System.Web.Http.Internal
         [InlineData(typeof(Guid))]
         [InlineData(typeof(HttpStatusCode))]
         [InlineData(typeof(string))]
-        [InlineData(typeof(Uri))]
+        [InlineData(typeof(StringContent))] // webForCore: .NET's Uri has a private parameterless constructor
         [InlineData(typeof(IDictionary<object, object>))]
         [InlineData(typeof(List<>))]
         public void CreateTypeInvalidThrowsInvalidArgument(Type type)
@@ -114,8 +114,8 @@ namespace System.Web.Http.Internal
             // string doesn't have a default ctor
             Assert.ThrowsArgument(() => TypeActivator.Create<string>(), paramName: null);
 
-            // Uri doesn't have a default ctor
-            Assert.ThrowsArgument(() => TypeActivator.Create<Uri>(), paramName: null);
+            // StringContent doesn't have a default ctor (webForCore: .NET's Uri has a private one, which Expression.New uses)
+            Assert.ThrowsArgument(() => TypeActivator.Create<StringContent>(), paramName: null);
 
             // HttpContent is abstract
             Assert.Throws<InvalidOperationException>(() => TypeActivator.Create<HttpContent>());

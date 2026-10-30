@@ -94,7 +94,7 @@ namespace System.Web.Configuration {
                         var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
                         Type typeConfigSystem = Type.GetType(ConfigSystemTypeString,
                             assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                            (asm, typeName, ignoreCase) => asm?.GetType(typeName, true, ignoreCase),
+                            (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, true, ignoreCase) : global::System.Type.GetType(typeName, true, ignoreCase)),
                             true);
                         s_configSystem = (IConfigSystem) Activator.CreateInstance(typeConfigSystem, true);
                         s_configSystem.Init(
@@ -125,7 +125,7 @@ namespace System.Web.Configuration {
                         //Type typeFactory = Type.GetType(InternalConfigSettingsFactoryTypeString, true);
                         Type typeFactory = Type.GetType(InternalConfigSettingsFactoryTypeString,
                             assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                            (asm, typeName, ignoreCase) => asm?.GetType(typeName, true, ignoreCase),
+                            (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, true, ignoreCase) : global::System.Type.GetType(typeName, true, ignoreCase)),
                             true);
                         s_configSettingsFactory = (IInternalConfigSettingsFactory) Activator.CreateInstance(typeFactory, true);
                         s_configSettingsFactory.SetConfigurationSystem(configSystem, initComplete);
@@ -303,7 +303,11 @@ namespace System.Web.Configuration {
 #if NETFRAMEWORK
                     s_MachineConfigurationDirectory = Path.Combine(MsCorLibDirectory, MachineConfigSubdirectory);
 #else
-					s_MachineConfigurationDirectory = Path.Combine(HttpRuntime.AppDomainAppPath, MachineConfigSubdirectory);
+					// webForCore: was Path.Combine(HttpRuntime.AppDomainAppPath, "App_Data"), which threw outside hosting
+					// (AppDomainAppPath is null) when the cache or WebConfigurationManager opened web configuration. Under
+					// hosting ApplicationManager sets ClientConfigurationHost.MachineConfigFilePath to that same App_Data
+					// path; outside it, the getter extracts the embedded machine.config next to the binaries.
+					s_MachineConfigurationDirectory = Path.GetDirectoryName(System.Configuration.ClientConfigurationHost.MachineConfigFilePath);
 #endif
 #else // !FEATURE_PAL
                     System.UInt32 length = 0;

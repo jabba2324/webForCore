@@ -468,7 +468,7 @@ namespace System.Web {
 #if NETFRAMEWORK
                 s.Append(HttpUtility.FormatHttpCookieDateTime(_expires));
 #else
-				s.Append(HttpUtilityInternal.FormatHttpCookieDateTime(_expires));
+				s.Append(HttpUtility.FormatHttpCookieDateTime(_expires));
 #endif
 			}
 

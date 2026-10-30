@@ -236,10 +236,10 @@ namespace System.Web {
                     return HttpUtility.FormatHttpDateTime(ValidUntil);
 #else
 				case "validfrom":
-					return HttpUtilityInternal.FormatHttpDateTime(ValidFrom);
+					return HttpUtility.FormatHttpDateTime(ValidFrom);
 
 				case "validuntil":
-					return HttpUtilityInternal.FormatHttpDateTime(ValidUntil);
+					return HttpUtility.FormatHttpDateTime(ValidUntil);
 #endif
 			}
 

@@ -1,0 +1,63 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Lifted from aspnet/AspNetWebStack 2106565 (System.Web.WebPages.Razor) by tools/lift/lift_project.py.
+       Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <AssemblyName>System.Web.WebPages.Razor</AssemblyName>
+    <RootNamespace>System.Web.WebPages.Razor</RootNamespace>
+    <PackageId>webForCore.Web.WebPages.Razor</PackageId>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- Microsoft's builds use C# 9 (Web Stack, tools/WebStack.settings.targets) and Latest (Katana). -->
+    <LangVersion>9.0</LangVersion>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;SYSLIB0003;SYSLIB0011;SYSLIB0051</NoWarn>
+    <DefineConstants>$(DefineConstants);ASPNETWEBPAGES</DefineConstants>
+    <!-- Delay signed with Microsoft's public key, as Microsoft's build does: PublicKeyToken=31bf3856ad364e35. -->
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>../SigningKey/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <Import Project="../webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="AssemblyBuilderWrapper.cs" />
+    <Compile Include="Common/CommonResources.Designer.cs" />
+    <Compile Include="Common/GlobalSuppressions.cs" />
+    <Compile Include="CompilingPathEventArgs.cs" />
+    <Compile Include="Configuration/HostSection.cs" />
+    <Compile Include="Configuration/RazorPagesSection.cs" />
+    <Compile Include="Configuration/RazorWebSectionGroup.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="HostingEnvironmentWrapper.cs" />
+    <Compile Include="IAssemblyBuilder.cs" />
+    <Compile Include="IHostingEnvironment.cs" />
+    <Compile Include="PreApplicationStartCode.cs" />
+    <Compile Include="Properties/AssemblyInfo.cs" />
+    <Compile Include="Properties/CommonAssemblyInfo.cs" />
+    <Compile Include="RazorBuildProvider.cs" />
+    <Compile Include="Resources/RazorWebResources.Designer.cs" />
+    <Compile Include="WebCodeRazorHost.cs" />
+    <Compile Include="WebPageRazorHost.cs" />
+    <Compile Include="WebRazorHostFactory.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Common/CommonResources.resx" LogicalName="System.Web.WebPages.Razor.Common.CommonResources.resources" />
+    <EmbeddedResource Include="Resources/RazorWebResources.resx" LogicalName="System.Web.WebPages.Razor.Resources.RazorWebResources.resources" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../WebFormsForCore.Configuration/WebFormsForCore.Configuration.csproj" />
+    <ProjectReference Include="../WebFormsForCore.Web/WebFormsForCore.Web.csproj" />
+    <ProjectReference Include="../webForCore.System.Web.WebPages/webForCore.System.Web.WebPages.csproj" />
+    <ProjectReference Include="../webForCore.System.Web.Razor/webForCore.System.Web.Razor.csproj" />
+    <PackageReference Include="System.CodeDom" Version="11.0.0-rc.3.26522.148" />
+  </ItemGroup>
+</Project>

@@ -59,4 +59,5 @@ test/Microsoft.TestCommon/TheoryDiscoverer.cs	test/webForCore.Microsoft.TestComm
 test/Microsoft.TestCommon/ThreadPoolSyncContext.cs	test/webForCore.Microsoft.TestCommon/ThreadPoolSyncContext.cs
 test/Microsoft.TestCommon/TraitAttribute.cs	test/webForCore.Microsoft.TestCommon/TraitAttribute.cs
 test/Microsoft.TestCommon/VersionTestHelper.cs	test/webForCore.Microsoft.TestCommon/VersionTestHelper.cs
+test/Microsoft.TestCommon/WebUtils.cs	test/webForCore.Microsoft.TestCommon/WebUtils.cs
 test/Microsoft.TestCommon/xunit.runner.json	test/webForCore.Microsoft.TestCommon/xunit.runner.json

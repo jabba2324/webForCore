@@ -1,0 +1,79 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Lifted from aspnet/AspNetWebStack 2106565 (System.Web.Helpers) by tools/lift/lift_project.py.
+       Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <AssemblyName>System.Web.Helpers</AssemblyName>
+    <RootNamespace>System.Web.Helpers</RootNamespace>
+    <PackageId>webForCore.Web.Helpers</PackageId>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- Microsoft's builds use C# 9 (Web Stack, tools/WebStack.settings.targets) and Latest (Katana). -->
+    <LangVersion>9.0</LangVersion>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;SYSLIB0003;SYSLIB0011;SYSLIB0051</NoWarn>
+    <DefineConstants>$(DefineConstants);ASPNETWEBPAGES</DefineConstants>
+    <!-- Delay signed with Microsoft's public key, as Microsoft's build does: PublicKeyToken=31bf3856ad364e35. -->
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>../SigningKey/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <Import Project="../webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="Chart/Chart.cs" />
+    <Compile Include="Chart/ChartTheme.cs" />
+    <Compile Include="Common/GlobalSuppressions.cs" />
+    <Compile Include="Common/VirtualPathUtil.cs" />
+    <Compile Include="ConversionUtil.cs" />
+    <Compile Include="Crypto.cs" />
+    <Compile Include="DynamicHelper.cs" />
+    <Compile Include="DynamicJavaScriptConverter.cs" />
+    <Compile Include="DynamicJsonArray.cs" />
+    <Compile Include="DynamicJsonObject.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="HtmlElement.cs" />
+    <Compile Include="HtmlObjectPrinter.cs" />
+    <Compile Include="Json.cs" />
+    <Compile Include="ObjectInfo.cs" />
+    <Compile Include="ObjectVisitor.cs" />
+    <Compile Include="Properties/AssemblyInfo.cs" />
+    <Compile Include="Properties/CommonAssemblyInfo.cs" />
+    <Compile Include="Resources/HelpersResources.Designer.cs" />
+    <Compile Include="ServerInfo.cs" />
+    <Compile Include="SortDirection.cs" />
+    <Compile Include="WebCache.cs" />
+    <Compile Include="WebGrid/IWebGridDataSource.cs" />
+    <Compile Include="WebGrid/PreComputedGridDataSource.cs" />
+    <Compile Include="WebGrid/SortInfo.cs" />
+    <Compile Include="WebGrid/WebGrid.cs" />
+    <Compile Include="WebGrid/WebGridColumn.cs" />
+    <Compile Include="WebGrid/WebGridDataSource.cs" />
+    <Compile Include="WebGrid/WebGridPagerModes.cs" />
+    <Compile Include="WebGrid/WebGridRow.cs" />
+    <Compile Include="WebGrid/_WebGridRenderer.generated.cs" />
+    <Compile Include="WebImage.cs" />
+    <Compile Include="WebMail.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources/HelpersResources.resx" LogicalName="System.Web.Helpers.Resources.HelpersResources.resources" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../WebFormsForCore.Configuration/WebFormsForCore.Configuration.csproj" />
+    <ProjectReference Include="../WebFormsForCore.Drawing/WebFormsForCore.Drawing.csproj" />
+    <ProjectReference Include="../WebFormsForCore.Web/WebFormsForCore.Web.csproj" />
+    <ProjectReference Include="../WebFormsForCore.Web.DataVisualization/WebFormsForCore.Web.DataVisualization.csproj" />
+    <ProjectReference Include="../WebFormsForCore.Web.Extensions/WebFormsForCore.Web.Extensions.csproj" />
+    <ProjectReference Include="../webForCore.System.Web.WebPages/webForCore.System.Web.WebPages.csproj" />
+    <PackageReference Include="System.CodeDom" Version="11.0.0-rc.3.26522.148" />
+    <PackageReference Include="System.Runtime.Caching" Version="11.0.0-rc.3.26522.148" />
+  </ItemGroup>
+</Project>

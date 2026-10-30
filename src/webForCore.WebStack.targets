@@ -1,5 +1,6 @@
 <Project>
-  <!-- Imported by every project lifted from the ASP.NET Web Stack (src/webForCore.*, test/webForCore.*). -->
+  <!-- Imported by every project lifted from the ASP.NET Web Stack (src/webForCore.*, test/webForCore.*) and by the
+       lifted Mono tests. -->
   <Target Name="WebForCoreFixReferences" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences" AfterTargets="ResolveAssemblyReferences">
     <ItemGroup>
       <!-- The shared framework ships a System.Web.dll facade (HttpUtility forwards); next to the fork's System.Web
@@ -8,5 +9,49 @@
       <!-- The fork ships its own System.Configuration.ConfigurationManager; drop the NuGet one that arrives transitively. -->
       <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Configuration.ConfigurationManager' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'(?i)[\\/]system\.configuration\.configurationmanager[\\/]'))" />
     </ItemGroup>
+  </Target>
+
+  <!-- The shared framework also has System.Web, System.Drawing and System.Configuration facades. At startup the host
+       keeps whichever copy has the higher assemblyVersion in deps.json, but the SDK writes no assemblyVersion for
+       project references, so the framework facade won and the fork's System.Web failed to load ("conflicts with what
+       is already bound"). The TestApp works around it with a hand-maintained deps.json; this sets the real versions
+       for every app-local assembly that the shared frameworks also contain. -->
+  <UsingTask TaskName="WebForCoreSetDepsAssemblyVersions" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <DepsFile ParameterType="System.String" Required="true" />
+      <AppDirectory ParameterType="System.String" Required="true" />
+      <FrameworkDirectories ParameterType="System.String[]" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Reflection" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        if (!File.Exists(DepsFile)) return true;
+        string json = File.ReadAllText(DepsFile);
+        string patched = Regex.Replace(json, "\"([^\"/]+\\.dll)\": \\{([^{}]*)\\}", m =>
+        {
+            string file = m.Groups[1].Value;
+            bool inFramework = false;
+            foreach (string dir in FrameworkDirectories)
+                if (File.Exists(Path.Combine(dir, file))) { inFramework = true; break; }
+            string local = Path.Combine(AppDirectory, file);
+            if (!inFramework || !File.Exists(local)) return m.Value;
+            string version = AssemblyName.GetAssemblyName(local).Version.ToString();
+            string body = Regex.Replace(m.Groups[2].Value, "\\s*\"assemblyVersion\": \"[^\"]*\",?", "").Trim().TrimEnd(',');
+            Log.LogMessage(MessageImportance.Low, "deps.json: " + file + " assemblyVersion " + version);
+            return "\"" + file + "\": { \"assemblyVersion\": \"" + version + "\"" + (body.Length > 0 ? ", " + body : "") + " }";
+        });
+        if (patched != json) File.WriteAllText(DepsFile, patched);
+      ]]></Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="WebForCoreFixDepsAssemblyVersions" AfterTargets="GenerateBuildDependencyFile" Condition="'$(GenerateDependencyFile)' == 'true' AND '$(TargetFrameworkIdentifier)' == '.NETCoreApp'">
+    <ItemGroup>
+      <_WebForCoreFrameworkRefDir Include="$(NetCoreTargetingPackRoot)/Microsoft.NETCore.App.Ref/$(BundledNETCoreAppPackageVersion)/ref/$(TargetFramework)" />
+      <_WebForCoreFrameworkRefDir Include="$(NetCoreTargetingPackRoot)/Microsoft.AspNetCore.App.Ref/$(BundledNETCoreAppPackageVersion)/ref/$(TargetFramework)" />
+    </ItemGroup>
+    <WebForCoreSetDepsAssemblyVersions DepsFile="$(ProjectDepsFilePath)" AppDirectory="$(OutDir)" FrameworkDirectories="@(_WebForCoreFrameworkRefDir)" />
   </Target>
 </Project>

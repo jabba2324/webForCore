@@ -1,0 +1,7 @@
+@model IEnumerable<string>
+<ul class="menu">
+@foreach (var item in Model)
+{
+    <li>@Html.ActionLink(item, item == "Home" ? "Index" : item, "Home")</li>
+}
+</ul>

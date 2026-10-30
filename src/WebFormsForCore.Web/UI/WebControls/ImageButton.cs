@@ -407,7 +407,7 @@ namespace System.Web.UI.WebControls {
 #if NETFRAMEWORK
             if (HttpUtility.TryParseCoordinates(requestValue, out doubleValue)) {
 #else
-            if (HttpUtilityInternal.TryParseCoordinates(requestValue, out doubleValue)) {
+            if (HttpUtility.TryParseCoordinates(requestValue, out doubleValue)) {
 #endif
 				return doubleValue;
             }

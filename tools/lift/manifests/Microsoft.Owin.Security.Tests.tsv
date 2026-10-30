@@ -1,0 +1,20 @@
+# aspnet/AspNetKatana 096e225: source path (relative to repo root)	destination (relative to fork root)
+tests/Microsoft.Owin.Security.Tests/CertificateSubjectKeyIdentifierValidatorTests.cs	test/webForCore.Microsoft.Owin.Security.Tests/CertificateSubjectKeyIdentifierValidatorTests.cs
+tests/Microsoft.Owin.Security.Tests/CertificateSubjectPublicKeyInfoValidatorTests.cs	test/webForCore.Microsoft.Owin.Security.Tests/CertificateSubjectPublicKeyInfoValidatorTests.cs
+tests/Microsoft.Owin.Security.Tests/CertificateThumbprintValidatorTests.cs	test/webForCore.Microsoft.Owin.Security.Tests/CertificateThumbprintValidatorTests.cs
+tests/Microsoft.Owin.Security.Tests/Cookies/CookieMiddlewareTests.cs	test/webForCore.Microsoft.Owin.Security.Tests/Cookies/CookieMiddlewareTests.cs
+tests/Microsoft.Owin.Security.Tests/DataHandler/Base64UrlTextEncoderTests.cs	test/webForCore.Microsoft.Owin.Security.Tests/DataHandler/Base64UrlTextEncoderTests.cs
+tests/Microsoft.Owin.Security.Tests/GlobalSuppressions.cs	test/webForCore.Microsoft.Owin.Security.Tests/GlobalSuppressions.cs
+tests/Microsoft.Owin.Security.Tests/OAuth/OAuth2AuthorizationClientCredentialsGrantTests.cs	test/webForCore.Microsoft.Owin.Security.Tests/OAuth/OAuth2AuthorizationClientCredentialsGrantTests.cs
+tests/Microsoft.Owin.Security.Tests/OAuth/OAuth2AuthorizationCustomGrantTests.cs	test/webForCore.Microsoft.Owin.Security.Tests/OAuth/OAuth2AuthorizationCustomGrantTests.cs
+tests/Microsoft.Owin.Security.Tests/OAuth/OAuth2AuthorizationServerAuthorizationCodeGrantTests.cs	test/webForCore.Microsoft.Owin.Security.Tests/OAuth/OAuth2AuthorizationServerAuthorizationCodeGrantTests.cs
+tests/Microsoft.Owin.Security.Tests/OAuth/OAuth2AuthorizationServerImplicitGrantTests.cs	test/webForCore.Microsoft.Owin.Security.Tests/OAuth/OAuth2AuthorizationServerImplicitGrantTests.cs
+tests/Microsoft.Owin.Security.Tests/OAuth/OAuth2AuthorizationServerResourceOwnerCredentialsGrantTests.cs	test/webForCore.Microsoft.Owin.Security.Tests/OAuth/OAuth2AuthorizationServerResourceOwnerCredentialsGrantTests.cs
+tests/Microsoft.Owin.Security.Tests/OAuth/OAuth2BearerTokenTests.cs	test/webForCore.Microsoft.Owin.Security.Tests/OAuth/OAuth2BearerTokenTests.cs
+tests/Microsoft.Owin.Security.Tests/OAuth/OAuth2TestServer.cs	test/webForCore.Microsoft.Owin.Security.Tests/OAuth/OAuth2TestServer.cs
+tests/Microsoft.Owin.Security.Tests/Properties/Resources.Designer.cs	test/webForCore.Microsoft.Owin.Security.Tests/Properties/Resources.Designer.cs
+tests/Microsoft.Owin.Security.Tests/Properties/Resources.resx	test/webForCore.Microsoft.Owin.Security.Tests/Properties/Resources.resx
+tests/Microsoft.Owin.Security.Tests/SecurityHelperTests.cs	test/webForCore.Microsoft.Owin.Security.Tests/SecurityHelperTests.cs
+tests/Microsoft.Owin.Security.Tests/TestClock.cs	test/webForCore.Microsoft.Owin.Security.Tests/TestClock.cs
+tests/Microsoft.Owin.Security.Tests/katanatest.redmond.corp.microsoft.com.cer	test/webForCore.Microsoft.Owin.Security.Tests/katanatest.redmond.corp.microsoft.com.cer
+tests/Microsoft.Owin.Security.Tests/selfSigned.cer	test/webForCore.Microsoft.Owin.Security.Tests/selfSigned.cer

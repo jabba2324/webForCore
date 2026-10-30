@@ -883,7 +883,7 @@ namespace System.Web {
 #if NETFRAMEWORK
                     return HttpUtility.FormatPlainTextAsHtml(msg);
 #else
-					return HttpUtilityInternal.FormatPlainTextAsHtml(msg);
+					return HttpUtility.FormatPlainTextAsHtml(msg);
 #endif
 				// Otherwise, use some default string
 				return SR.GetString(SR.Unhandled_Err_Error);
@@ -915,7 +915,7 @@ namespace System.Web {
 #if NETFRAMEWORK
                     string errorMessage = HttpUtility.FormatPlainTextAsHtml(_initialException.Message);
 #else
-					string errorMessage = HttpUtilityInternal.FormatPlainTextAsHtml(_initialException.Message);
+					string errorMessage = HttpUtility.FormatPlainTextAsHtml(_initialException.Message);
 #endif
 					msg.Append(": ");
                     msg.Append(errorMessage);
@@ -998,7 +998,7 @@ namespace System.Web {
 #if NETFRAMEWORK
                     msg = HttpUtility.FormatPlainTextAsHtml(msg);
 #else
-					msg = HttpUtilityInternal.FormatPlainTextAsHtml(msg);
+					msg = HttpUtility.FormatPlainTextAsHtml(msg);
 #endif
 					if (setLeftToRightMarker) {
                         // If only <div dir=ltr> was used to wrap around the left-to-right code text,
@@ -1202,7 +1202,7 @@ namespace System.Web {
 #if NETFRAMEWORK
                 return HttpUtility.FormatPlainTextAsHtml(SR.GetString(SR.Security_Err_Desc));
 #else
-				return HttpUtilityInternal.FormatPlainTextAsHtml(SR.GetString(SR.Security_Err_Desc));
+				return HttpUtility.FormatPlainTextAsHtml(SR.GetString(SR.Security_Err_Desc));
 #endif
 			}
 		}
@@ -1228,7 +1228,7 @@ namespace System.Web {
 #if NETFRAMEWORK
             get { return HttpUtility.FormatPlainTextAsHtml(SR.GetString(SR.NotFound_Http_404));}
 #else
-			get { return HttpUtilityInternal.FormatPlainTextAsHtml(SR.GetString(SR.NotFound_Http_404)); }
+			get { return HttpUtility.FormatPlainTextAsHtml(SR.GetString(SR.NotFound_Http_404)); }
 #endif
 		}
 
@@ -1289,7 +1289,7 @@ namespace System.Web {
 #if NETFRAMEWORK
                 return HttpUtility.FormatPlainTextAsHtml(SR.GetString(SR.Forbidden_Extension_Desc, extMessage));
 #else
-				return HttpUtilityInternal.FormatPlainTextAsHtml(SR.GetString(SR.Forbidden_Extension_Desc, extMessage));
+				return HttpUtility.FormatPlainTextAsHtml(SR.GetString(SR.Forbidden_Extension_Desc, extMessage));
 #endif
 			}
 		}
@@ -1432,7 +1432,7 @@ namespace System.Web {
 #if NETFRAMEWORK
             get { return HttpUtility.FormatPlainTextAsHtml(SR.GetString(SR.CustomErrorFailed_Err_Desc)); }
 #else
-			get { return HttpUtilityInternal.FormatPlainTextAsHtml(SR.GetString(SR.CustomErrorFailed_Err_Desc)); }
+			get { return HttpUtility.FormatPlainTextAsHtml(SR.GetString(SR.CustomErrorFailed_Err_Desc)); }
 #endif
 		}
 
@@ -1844,7 +1844,7 @@ namespace System.Web {
 #if NETFRAMEWORK
             _message = HttpUtility.FormatPlainTextAsHtml(message);
 #else
-			_message = HttpUtilityInternal.FormatPlainTextAsHtml(message);
+			_message = HttpUtility.FormatPlainTextAsHtml(message);
 #endif     
             _adaptiveMiscContent.Add(_message);
 		}
@@ -1895,7 +1895,7 @@ namespace System.Web {
 #if NETFRAMEWORK
             _message = HttpUtility.FormatPlainTextAsHtml(e.BareMessage);
 #else
-			_message = HttpUtilityInternal.FormatPlainTextAsHtml(e.BareMessage);
+			_message = HttpUtility.FormatPlainTextAsHtml(e.BareMessage);
 #endif
 			_adaptiveMiscContent.Add(_message);
         }

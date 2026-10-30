@@ -38,7 +38,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseHelperCorrectlyParsesIncompleteHelperPreceedingCodeBlock()
         {
-            ParseDocumentTest("@helper" + Environment.NewLine
+            ParseDocumentTest("@helper" + "\r\n"
                             + "@{}",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -138,7 +138,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseHelperStatementCapturesWhitespaceToEndOfLineIfHelperStatementMissingName()
         {
-            ParseDocumentTest("@helper                       " + Environment.NewLine
+            ParseDocumentTest("@helper                       " + "\r\n"
                             + "    ",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -157,7 +157,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseHelperStatementCapturesWhitespaceToEndOfLineIfHelperStatementMissingOpenParen()
         {
-            ParseDocumentTest("@helper Foo    " + Environment.NewLine
+            ParseDocumentTest("@helper Foo    " + "\r\n"
                             + "    ",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -174,8 +174,8 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseHelperStatementCapturesAllContentToEndOfFileIfHelperStatementMissingCloseParenInParameterList()
         {
-            ParseDocumentTest("@helper Foo(Foo Bar" + Environment.NewLine
-                            + "Biz" + Environment.NewLine
+            ParseDocumentTest("@helper Foo(Foo Bar" + "\r\n"
+                            + "Biz" + "\r\n"
                             + "Boz",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -191,7 +191,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseHelperStatementCapturesWhitespaceToEndOfLineIfHelperStatementMissingOpenBraceAfterParameterList()
         {
-            ParseDocumentTest("@helper Foo(string foo)    " + Environment.NewLine,
+            ParseDocumentTest("@helper Foo(string foo)    " + "\r\n",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
                     new HelperBlock(new HelperCodeGenerator(new LocationTagged<string>("Foo(string foo)    ", 8, 0, 8), headerComplete: false),
@@ -206,7 +206,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseHelperStatementContinuesParsingHelperUntilEOF()
         {
-            ParseDocumentTest("@helper Foo(string foo) {    " + Environment.NewLine
+            ParseDocumentTest("@helper Foo(string foo) {    " + "\r\n"
                             + "    <p>Foo</p>",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -231,8 +231,8 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseHelperStatementCorrectlyParsesHelperWithEmbeddedCode()
         {
-            ParseDocumentTest("@helper Foo(string foo) {    " + Environment.NewLine
-                            + "    <p>@foo</p>" + Environment.NewLine
+            ParseDocumentTest("@helper Foo(string foo) {    " + "\r\n"
+                            + "    <p>@foo</p>" + "\r\n"
                             + "}",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -258,12 +258,12 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseHelperStatementCorrectlyParsesHelperWithNewlinesBetweenCloseParenAndOpenBrace()
         {
-            ParseDocumentTest("@helper Foo(string foo)" + Environment.NewLine
-                            + Environment.NewLine
-                            + Environment.NewLine
-                            + Environment.NewLine
-                            + "{    " + Environment.NewLine
-                            + "    <p>@foo</p>" + Environment.NewLine
+            ParseDocumentTest("@helper Foo(string foo)" + "\r\n"
+                            + "\r\n"
+                            + "\r\n"
+                            + "\r\n"
+                            + "{    " + "\r\n"
+                            + "    <p>@foo</p>" + "\r\n"
                             + "}",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -289,7 +289,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseHelperStatementGivesWhitespaceAfterOpenBraceToMarkupInDesignMode()
         {
-            ParseDocumentTest("@helper Foo(string foo) {    " + Environment.NewLine
+            ParseDocumentTest("@helper Foo(string foo) {    " + "\r\n"
                             + "    ",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -315,9 +315,9 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseHelperAcceptsNestedHelpersButOutputsError()
         {
-            ParseDocumentTest(@"@helper Foo(string foo) {" + Environment.NewLine
-                            + "    @helper Bar(string baz) {" + Environment.NewLine
-                            + "    }" + Environment.NewLine
+            ParseDocumentTest(@"@helper Foo(string foo) {" + "\r\n"
+                            + "    @helper Bar(string baz) {" + "\r\n"
+                            + "    }" + "\r\n"
                             + "}",
                 new MarkupBlock(
                     Factory.EmptyHtml(),

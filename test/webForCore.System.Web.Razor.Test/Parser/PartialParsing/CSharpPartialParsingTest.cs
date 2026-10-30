@@ -17,11 +17,11 @@ namespace System.Web.Razor.Test.Parser.PartialParsing
         {
             // Arrange
             SpanFactory factory = SpanFactory.CreateCsHtml();
-            StringTextBuffer changed = new StringTextBuffer("@{" + Environment.NewLine
-                                                          + "    @DateTime..Now" + Environment.NewLine
+            StringTextBuffer changed = new StringTextBuffer("@{" + "\r\n"
+                                                          + "    @DateTime..Now" + "\r\n"
                                                           + "}");
-            StringTextBuffer old = new StringTextBuffer("@{" + Environment.NewLine
-                                                      + "    @DateTime.Now" + Environment.NewLine
+            StringTextBuffer old = new StringTextBuffer("@{" + "\r\n"
+                                                      + "    @DateTime.Now" + "\r\n"
                                                       + "}");
 
             // Act and Assert
@@ -218,11 +218,11 @@ namespace System.Web.Razor.Test.Parser.PartialParsing
         public void ImplicitExpressionAcceptsDotlessCommitInsertionsInStatementBlockAfterIdentifiers()
         {
             SpanFactory factory = SpanFactory.CreateCsHtml();
-            StringTextBuffer changed = new StringTextBuffer("@{" + Environment.NewLine
-                                                          + "    @DateTime." + Environment.NewLine
+            StringTextBuffer changed = new StringTextBuffer("@{" + "\r\n"
+                                                          + "    @DateTime." + "\r\n"
                                                           + "}");
-            StringTextBuffer old = new StringTextBuffer("@{" + Environment.NewLine
-                                                      + "    @DateTime" + Environment.NewLine
+            StringTextBuffer old = new StringTextBuffer("@{" + "\r\n"
+                                                      + "    @DateTime" + "\r\n"
                                                       + "}");
 
             var textChange = new TextChange(17, 0, old, 1, changed);
@@ -257,16 +257,16 @@ namespace System.Web.Razor.Test.Parser.PartialParsing
                 applyAndVerifyPartialChange(textChange, PartialParseResult.Accepted, "DateTime.");
 
                 old = changed;
-                changed = new StringTextBuffer("@{" + Environment.NewLine
-                                            + "    @DateTime.." + Environment.NewLine
+                changed = new StringTextBuffer("@{" + "\r\n"
+                                            + "    @DateTime.." + "\r\n"
                                             + "}");
                 textChange = new TextChange(18, 0, old, 1, changed);
 
                 applyAndVerifyPartialChange(textChange, PartialParseResult.Accepted, "DateTime..");
 
                 old = changed;
-                changed = new StringTextBuffer("@{" + Environment.NewLine
-                                            + "    @DateTime.Now." + Environment.NewLine
+                changed = new StringTextBuffer("@{" + "\r\n"
+                                            + "    @DateTime.Now." + "\r\n"
                                             + "}");
                 textChange = new TextChange(18, 0, old, 3, changed);
 
@@ -278,11 +278,11 @@ namespace System.Web.Razor.Test.Parser.PartialParsing
         public void ImplicitExpressionAcceptsDotlessCommitInsertionsInStatementBlock()
         {
             SpanFactory factory = SpanFactory.CreateCsHtml();
-            StringTextBuffer changed = new StringTextBuffer("@{" + Environment.NewLine
-                                                          + "    @DateT." + Environment.NewLine
+            StringTextBuffer changed = new StringTextBuffer("@{" + "\r\n"
+                                                          + "    @DateT." + "\r\n"
                                                           + "}");
-            StringTextBuffer old = new StringTextBuffer("@{" + Environment.NewLine
-                                                      + "    @DateT" + Environment.NewLine
+            StringTextBuffer old = new StringTextBuffer("@{" + "\r\n"
+                                                      + "    @DateT" + "\r\n"
                                                       + "}");
 
             var textChange = new TextChange(14, 0, old, 1, changed);
@@ -317,8 +317,8 @@ namespace System.Web.Razor.Test.Parser.PartialParsing
                 applyAndVerifyPartialChange(textChange, PartialParseResult.Accepted, "DateT.");
 
                 old = changed;
-                changed = new StringTextBuffer("@{" + Environment.NewLine
-                                            + "    @DateTime." + Environment.NewLine
+                changed = new StringTextBuffer("@{" + "\r\n"
+                                            + "    @DateTime." + "\r\n"
                                             + "}");
                 textChange = new TextChange(14, 0, old, 3, changed);
 
@@ -529,11 +529,11 @@ namespace System.Web.Razor.Test.Parser.PartialParsing
         public void ImplicitExpressionAcceptsIdentifierExpansionAtEndOfNonWhitespaceCharacters()
         {
             var factory = SpanFactory.CreateCsHtml();
-            StringTextBuffer changed = new StringTextBuffer("@{" + Environment.NewLine
-                                                          + "    @food" + Environment.NewLine
+            StringTextBuffer changed = new StringTextBuffer("@{" + "\r\n"
+                                                          + "    @food" + "\r\n"
                                                           + "}");
-            StringTextBuffer old = new StringTextBuffer("@{" + Environment.NewLine
-                                                      + "    @foo" + Environment.NewLine
+            StringTextBuffer old = new StringTextBuffer("@{" + "\r\n"
+                                                      + "    @foo" + "\r\n"
                                                       + "}");
             RunPartialParseTest(new TextChange(12, 0, old, 1, changed),
                 new MarkupBlock(
@@ -556,11 +556,11 @@ namespace System.Web.Razor.Test.Parser.PartialParsing
         public void ImplicitExpressionAcceptsIdentifierAfterDotAtEndOfNonWhitespaceCharacters()
         {
             var factory = SpanFactory.CreateCsHtml();
-            StringTextBuffer changed = new StringTextBuffer("@{" + Environment.NewLine
-                                                          + "    @foo.d" + Environment.NewLine
+            StringTextBuffer changed = new StringTextBuffer("@{" + "\r\n"
+                                                          + "    @foo.d" + "\r\n"
                                                           + "}");
-            StringTextBuffer old = new StringTextBuffer("@{" + Environment.NewLine
-                                                      + "    @foo." + Environment.NewLine
+            StringTextBuffer old = new StringTextBuffer("@{" + "\r\n"
+                                                      + "    @foo." + "\r\n"
                                                       + "}");
             RunPartialParseTest(new TextChange(13, 0, old, 1, changed),
                 new MarkupBlock(
@@ -583,11 +583,11 @@ namespace System.Web.Razor.Test.Parser.PartialParsing
         public void ImplicitExpressionAcceptsDotAtEndOfNonWhitespaceCharacters()
         {
             var factory = SpanFactory.CreateCsHtml();
-            StringTextBuffer changed = new StringTextBuffer("@{" + Environment.NewLine
-                                                          + "    @foo." + Environment.NewLine
+            StringTextBuffer changed = new StringTextBuffer("@{" + "\r\n"
+                                                          + "    @foo." + "\r\n"
                                                           + "}");
-            StringTextBuffer old = new StringTextBuffer("@{" + Environment.NewLine
-                                                      + "    @foo" + Environment.NewLine
+            StringTextBuffer old = new StringTextBuffer("@{" + "\r\n"
+                                                      + "    @foo" + "\r\n"
                                                       + "}");
             RunPartialParseTest(new TextChange(12, 0, old, 1, changed),
                 new MarkupBlock(

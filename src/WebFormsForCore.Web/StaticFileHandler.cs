@@ -470,7 +470,7 @@ namespace System.Web {
 #if NETFRAMEWORK
                 HttpUtility.FormatHttpDateTime(lastModified));
 #else
-                HttpUtilityInternal.FormatHttpDateTime(lastModified));
+                HttpUtility.FormatHttpDateTime(lastModified));
 #endif
 			response.AppendHeader("Accept-Ranges", "bytes");
             response.AppendHeader("ETag", etag);

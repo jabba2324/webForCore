@@ -503,7 +503,7 @@ namespace System.Net.Http.Formatting
             string serializedString = new StreamReader(memoryStream).ReadToEnd();
             //Assert.True(serializedString.Contains("DataContractSampleType"),
             //    "SampleType should be serialized with data contract name DataContractSampleType because UseDataContractJsonSerializer is set to true.");
-            Assert.False(serializedString.Contains("\r\n"), "Using JsonSerializer should emit data without indentation by default.");
+            Assert.False(serializedString.Contains("\n") /* webForCore: indentation uses the platform newline */, "Using JsonSerializer should emit data without indentation by default.");
         }
 
         [Fact]
@@ -519,7 +519,7 @@ namespace System.Net.Http.Formatting
             await Assert.Task.SucceedsAsync(formatter.WriteToStreamAsync(typeof(SampleType), new SampleType(), memoryStream, content, transportContext: null));
             memoryStream.Position = 0;
             string serializedString = new StreamReader(memoryStream).ReadToEnd();
-            Assert.True(serializedString.Contains("\r\n"), "Using JsonSerializer with Indent set to true should emit data with indentation.");
+            Assert.True(serializedString.Contains("\n") /* webForCore: indentation uses the platform newline */, "Using JsonSerializer with Indent set to true should emit data with indentation.");
         }
 
         [Theory]

@@ -402,7 +402,7 @@ namespace System.Web.Hosting
                 var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
                 handlerType = Type.GetType(typeName,
                     assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                    (asm, typeName, ignoreCase) => asm?.GetType(typeName, true, ignoreCase),
+                    (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, true, ignoreCase) : global::System.Type.GetType(typeName, true, ignoreCase)),
                     true /*throwOnError*/);
             }
             catch (Exception e)

@@ -90,6 +90,24 @@
     <Project Path="src/webForCore.System.Web.Http/webForCore.System.Web.Http.csproj" />
     <Project Path="src/webForCore.System.Web.Cors/webForCore.System.Web.Cors.csproj" />
     <Project Path="src/webForCore.System.Web.Http.Cors/webForCore.System.Web.Http.Cors.csproj" />
+    <Project Path="src/webForCore.System.Web.Http.WebHost/webForCore.System.Web.Http.WebHost.csproj" />
+    <Project Path="src/webForCore.System.Web.Http.Owin/webForCore.System.Web.Http.Owin.csproj" />
+    <Project Path="src/webForCore.System.Web.WebPages.Deployment/webForCore.System.Web.WebPages.Deployment.csproj" />
+    <Project Path="src/webForCore.System.Web.WebPages/webForCore.System.Web.WebPages.csproj" />
+    <Project Path="src/webForCore.System.Web.WebPages.Razor/webForCore.System.Web.WebPages.Razor.csproj" />
+    <Project Path="src/webForCore.System.Web.Mvc/webForCore.System.Web.Mvc.csproj" />
+    <Project Path="src/webForCore.System.Web.Helpers/webForCore.System.Web.Helpers.csproj" />
+    <Project Path="src/webForCore.Microsoft.Web.Mvc/webForCore.Microsoft.Web.Mvc.csproj" />
+  </Folder>
+  <Folder Name="/Katana/">
+    <Project Path="src/webForCore.Microsoft.Owin/webForCore.Microsoft.Owin.csproj" />
+    <Project Path="src/webForCore.Microsoft.Owin.Security/webForCore.Microsoft.Owin.Security.csproj" />
+    <Project Path="src/webForCore.Microsoft.Owin.Security.Cookies/webForCore.Microsoft.Owin.Security.Cookies.csproj" />
+    <Project Path="src/webForCore.Microsoft.Owin.Security.OAuth/webForCore.Microsoft.Owin.Security.OAuth.csproj" />
+    <Project Path="src/webForCore.Microsoft.Owin.Host.SystemWeb/webForCore.Microsoft.Owin.Host.SystemWeb.csproj" />
+    <Project Path="src/webForCore.Microsoft.Owin.Hosting/webForCore.Microsoft.Owin.Hosting.csproj" />
+    <Project Path="src/webForCore.Microsoft.Owin.Host.HttpListener/webForCore.Microsoft.Owin.Host.HttpListener.csproj" />
+    <Project Path="src/webForCore.Microsoft.Owin.Testing/webForCore.Microsoft.Owin.Testing.csproj" />
   </Folder>
   <Folder Name="/WebStack.Tests/">
     <Project Path="test/webForCore.Microsoft.TestCommon/webForCore.Microsoft.TestCommon.csproj" />
@@ -98,5 +116,23 @@
     <Project Path="test/webForCore.System.Web.Http.Test/webForCore.System.Web.Http.Test.csproj" />
     <Project Path="test/webForCore.System.Web.Cors.Test/webForCore.System.Web.Cors.Test.csproj" />
     <Project Path="test/webForCore.System.Web.Http.Cors.Test/webForCore.System.Web.Http.Cors.Test.csproj" />
+    <Project Path="test/webForCore.System.Web.MonoTests/webForCore.System.Web.MonoTests.csproj" />
+    <Project Path="test/webForCore.Serialization.Tests/webForCore.Serialization.Tests.csproj" />
+    <Project Path="test/webForCore.System.Web.Http.WebHost.Test/webForCore.System.Web.Http.WebHost.Test.csproj" />
+    <Project Path="test/webForCore.System.Web.Http.Owin.Test/webForCore.System.Web.Http.Owin.Test.csproj" />
+    <Project Path="test/webForCore.Microsoft.Owin.Tests/webForCore.Microsoft.Owin.Tests.csproj" />
+    <Project Path="test/webForCore.Microsoft.Owin.Security.Tests/webForCore.Microsoft.Owin.Security.Tests.csproj" />
+    <Project Path="test/webForCore.Microsoft.Owin.Host.SystemWeb.Tests/webForCore.Microsoft.Owin.Host.SystemWeb.Tests.csproj" />
+    <Project Path="test/webForCore.WebApi.Sample/webForCore.WebApi.Sample.csproj" />
+    <Project Path="test/webForCore.WebApi.Gate.Tests/webForCore.WebApi.Gate.Tests.csproj" />
+    <Project Path="test/webForCore.System.Web.Mvc.Test/webForCore.System.Web.Mvc.Test.csproj" />
+    <Project Path="test/webForCore.Mvc.Sample/webForCore.Mvc.Sample.csproj" />
+    <Project Path="test/webForCore.Mvc.Gate.Tests/webForCore.Mvc.Gate.Tests.csproj" />
+    <Project Path="test/webForCore.WebPages.Sample/webForCore.WebPages.Sample.csproj" />
+    <Project Path="test/webForCore.System.Web.WebPages.Test/webForCore.System.Web.WebPages.Test.csproj" />
+    <Project Path="test/webForCore.System.Web.WebPages.Razor.Test/webForCore.System.Web.WebPages.Razor.Test.csproj" />
+    <Project Path="test/webForCore.System.Web.WebPages.Deployment.Test/webForCore.System.Web.WebPages.Deployment.Test.csproj" />
+    <Project Path="test/webForCore.System.Web.Helpers.Test/webForCore.System.Web.Helpers.Test.csproj" />
+    <Project Path="test/webForCore.Microsoft.Web.Mvc.Test/webForCore.Microsoft.Web.Mvc.Test.csproj" />
   </Folder>
 </Solution>

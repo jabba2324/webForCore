@@ -112,9 +112,9 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void RazorCommentInVerbatimBlock()
         {
-            ParseDocumentTest("@Code" + Environment.NewLine
-                            + "    @<text" + Environment.NewLine
-                            + "    @**@" + Environment.NewLine
+            ParseDocumentTest("@Code" + "\r\n"
+                            + "    @<text" + "\r\n"
+                            + "    @**@" + "\r\n"
                             + "End Code",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -150,7 +150,7 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void UnterminatedRazorCommentInVerbatimBlock()
         {
-            ParseDocumentTest("@Code" + Environment.NewLine
+            ParseDocumentTest("@Code" + "\r\n"
                             + "@*",
                 new MarkupBlock(
                     Factory.EmptyHtml(),

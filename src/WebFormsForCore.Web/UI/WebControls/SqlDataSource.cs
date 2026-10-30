@@ -13,7 +13,7 @@ namespace System.Web.UI.WebControls {
 #if !WebFormsForCore
     using System.Data.SqlClient;
 #else
-    using Microsoft.Data.SqlClient;
+    using System.Data.SqlClient; // webForCore: System.Data.SqlClient, as .NET Framework (upstream used Microsoft.Data.SqlClient)
 #endif
     using System.Diagnostics.CodeAnalysis;
     using System.Drawing;

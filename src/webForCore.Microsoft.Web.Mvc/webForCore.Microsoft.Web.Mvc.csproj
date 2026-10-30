@@ -1,0 +1,191 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Lifted from aspnet/AspNetWebStack 2106565 (Microsoft.Web.Mvc) by tools/lift/lift_project.py.
+       Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <AssemblyName>Microsoft.Web.Mvc</AssemblyName>
+    <RootNamespace>Microsoft.Web.Mvc</RootNamespace>
+    <PackageId>webForCore.Microsoft.Web.Mvc</PackageId>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- Microsoft's builds use C# 9 (Web Stack, tools/WebStack.settings.targets) and Latest (Katana). -->
+    <LangVersion>9.0</LangVersion>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;SYSLIB0003;SYSLIB0011;SYSLIB0051</NoWarn>
+    <DefineConstants>$(DefineConstants);ASPNETMVC</DefineConstants>
+    <!-- Not signed, as in Microsoft's build. -->
+    <SignAssembly>false</SignAssembly>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <Import Project="../webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="AcceptAttribute.cs" />
+    <Compile Include="ActionLinkAreaAttribute.cs" />
+    <Compile Include="AjaxOnlyAttribute.cs" />
+    <Compile Include="AreaHelpers.cs" />
+    <Compile Include="AsyncManagerExtensions.cs" />
+    <Compile Include="ButtonBuilder.cs" />
+    <Compile Include="ButtonsAndLinkExtensions.cs" />
+    <Compile Include="CachedExpressionCompiler.cs" />
+    <Compile Include="ContentTypeAttribute.cs" />
+    <Compile Include="ControllerExtensions.cs" />
+    <Compile Include="Controls/ActionLink.cs" />
+    <Compile Include="Controls/DropDownList.cs" />
+    <Compile Include="Controls/EncodeType.cs" />
+    <Compile Include="Controls/Hidden.cs" />
+    <Compile Include="Controls/Label.cs" />
+    <Compile Include="Controls/MvcControl.cs" />
+    <Compile Include="Controls/MvcInputControl.cs" />
+    <Compile Include="Controls/Password.cs" />
+    <Compile Include="Controls/Repeater.cs" />
+    <Compile Include="Controls/RepeaterItem.cs" />
+    <Compile Include="Controls/RouteValues.cs" />
+    <Compile Include="Controls/TextBox.cs" />
+    <Compile Include="CookieValueProviderFactory.cs" />
+    <Compile Include="CopyAsyncParametersAttribute.cs" />
+    <Compile Include="CreditCardAttribute.cs" />
+    <Compile Include="CssExtensions.cs" />
+    <Compile Include="DeserializeAttribute.cs" />
+    <Compile Include="DynamicReflectionObject.cs" />
+    <Compile Include="DynamicViewDataDictionary.cs" />
+    <Compile Include="DynamicViewPage.cs" />
+    <Compile Include="DynamicViewPageOfTModel.cs" />
+    <Compile Include="ElementalValueProvider.cs" />
+    <Compile Include="EmailAddressAttribute.cs" />
+    <Compile Include="Error.cs" />
+    <Compile Include="ExpressionUtil/BinaryExpressionFingerprint.cs" />
+    <Compile Include="ExpressionUtil/CachedExpressionCompiler.cs" />
+    <Compile Include="ExpressionUtil/ConditionalExpressionFingerprint.cs" />
+    <Compile Include="ExpressionUtil/ConstantExpressionFingerprint.cs" />
+    <Compile Include="ExpressionUtil/DefaultExpressionFingerprint.cs" />
+    <Compile Include="ExpressionUtil/ExpressionFingerprint.cs" />
+    <Compile Include="ExpressionUtil/ExpressionFingerprintChain.cs" />
+    <Compile Include="ExpressionUtil/FingerprintingExpressionVisitor.cs" />
+    <Compile Include="ExpressionUtil/HashCodeCombiner.cs" />
+    <Compile Include="ExpressionUtil/Hoisted.cs" />
+    <Compile Include="ExpressionUtil/HoistingExpressionVisitor.cs" />
+    <Compile Include="ExpressionUtil/IndexExpressionFingerprint.cs" />
+    <Compile Include="ExpressionUtil/LambdaExpressionFingerprint.cs" />
+    <Compile Include="ExpressionUtil/MemberExpressionFingerprint.cs" />
+    <Compile Include="ExpressionUtil/MethodCallExpressionFingerprint.cs" />
+    <Compile Include="ExpressionUtil/ParameterExpressionFingerprint.cs" />
+    <Compile Include="ExpressionUtil/TypeBinaryExpressionFingerprint.cs" />
+    <Compile Include="ExpressionUtil/UnaryExpressionFingerprint.cs" />
+    <Compile Include="FileExtensionsAttribute.cs" />
+    <Compile Include="FormExtensions.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Html/HtmlHelperExtensions.cs" />
+    <Compile Include="HtmlButtonType.cs" />
+    <Compile Include="IMachineKey.cs" />
+    <Compile Include="ImageExtensions.cs" />
+    <Compile Include="Internal/ExpressionHelper.cs" />
+    <Compile Include="LinkBuilder.cs" />
+    <Compile Include="LinkExtensions.cs" />
+    <Compile Include="MachineKeyWrapper.cs" />
+    <Compile Include="MailToExtensions.cs" />
+    <Compile Include="ModelBinding/ArrayModelBinder.cs" />
+    <Compile Include="ModelBinding/ArrayModelBinderProvider.cs" />
+    <Compile Include="ModelBinding/BinaryDataModelBinderProvider.cs" />
+    <Compile Include="ModelBinding/BindNeverAttribute.cs" />
+    <Compile Include="ModelBinding/BindRequiredAttribute.cs" />
+    <Compile Include="ModelBinding/BindingBehavior.cs" />
+    <Compile Include="ModelBinding/BindingBehaviorAttribute.cs" />
+    <Compile Include="ModelBinding/CollectionModelBinder.cs" />
+    <Compile Include="ModelBinding/CollectionModelBinderProvider.cs" />
+    <Compile Include="ModelBinding/CollectionModelBinderUtil.cs" />
+    <Compile Include="ModelBinding/ComplexModelDto.cs" />
+    <Compile Include="ModelBinding/ComplexModelDtoModelBinder.cs" />
+    <Compile Include="ModelBinding/ComplexModelDtoModelBinderProvider.cs" />
+    <Compile Include="ModelBinding/ComplexModelDtoResult.cs" />
+    <Compile Include="ModelBinding/DictionaryModelBinder.cs" />
+    <Compile Include="ModelBinding/DictionaryModelBinderProvider.cs" />
+    <Compile Include="ModelBinding/ExtensibleModelBinderAdapter.cs" />
+    <Compile Include="ModelBinding/ExtensibleModelBinderAttribute.cs" />
+    <Compile Include="ModelBinding/ExtensibleModelBindingContext.cs" />
+    <Compile Include="ModelBinding/GenericModelBinderProvider.cs" />
+    <Compile Include="ModelBinding/IExtensibleModelBinder.cs" />
+    <Compile Include="ModelBinding/KeyValuePairModelBinder.cs" />
+    <Compile Include="ModelBinding/KeyValuePairModelBinderProvider.cs" />
+    <Compile Include="ModelBinding/KeyValuePairModelBinderUtil.cs" />
+    <Compile Include="ModelBinding/ModelBinderConfig.cs" />
+    <Compile Include="ModelBinding/ModelBinderErrorMessageProvider.cs" />
+    <Compile Include="ModelBinding/ModelBinderProvider.cs" />
+    <Compile Include="ModelBinding/ModelBinderProviderCollection.cs" />
+    <Compile Include="ModelBinding/ModelBinderProviderOptionsAttribute.cs" />
+    <Compile Include="ModelBinding/ModelBinderProviders.cs" />
+    <Compile Include="ModelBinding/ModelBinderUtil.cs" />
+    <Compile Include="ModelBinding/ModelValidatedEventArgs.cs" />
+    <Compile Include="ModelBinding/ModelValidatingEventArgs.cs" />
+    <Compile Include="ModelBinding/ModelValidationNode.cs" />
+    <Compile Include="ModelBinding/MutableObjectModelBinder.cs" />
+    <Compile Include="ModelBinding/MutableObjectModelBinderProvider.cs" />
+    <Compile Include="ModelBinding/SimpleModelBinderProvider.cs" />
+    <Compile Include="ModelBinding/TypeConverterModelBinder.cs" />
+    <Compile Include="ModelBinding/TypeConverterModelBinderProvider.cs" />
+    <Compile Include="ModelBinding/TypeMatchModelBinder.cs" />
+    <Compile Include="ModelBinding/TypeMatchModelBinderProvider.cs" />
+    <Compile Include="ModelCopier.cs" />
+    <Compile Include="MvcSerializer.cs" />
+    <Compile Include="Properties/AssemblyInfo.cs" />
+    <Compile Include="Properties/CommonAssemblyInfo.cs" />
+    <Compile Include="Properties/MvcResources.Designer.cs" />
+    <Compile Include="RadioExtensions.cs" />
+    <Compile Include="ReaderWriterCache.cs" />
+    <Compile Include="Resources/ActionType.cs" />
+    <Compile Include="Resources/AjaxHelperExtensions.cs" />
+    <Compile Include="Resources/AtomEntryActionResult.cs" />
+    <Compile Include="Resources/AtomFeedActionResult.cs" />
+    <Compile Include="Resources/AtomServiceDocumentActionResult.cs" />
+    <Compile Include="Resources/DataContractJsonActionResult.cs" />
+    <Compile Include="Resources/DataContractXmlActionResult.cs" />
+    <Compile Include="Resources/DefaultFormatHelper.cs" />
+    <Compile Include="Resources/DefaultFormatManager.cs" />
+    <Compile Include="Resources/FormatHelper.cs" />
+    <Compile Include="Resources/FormatManager.cs" />
+    <Compile Include="Resources/HtmlHelperExtensions.cs" />
+    <Compile Include="Resources/HttpRequestBaseExtensions.cs" />
+    <Compile Include="Resources/IEnumerableExtensions.cs" />
+    <Compile Include="Resources/IRequestFormatHandler.cs" />
+    <Compile Include="Resources/IResponseFormatHandler.cs" />
+    <Compile Include="Resources/JsonFormatHandler.cs" />
+    <Compile Include="Resources/MultiFormatActionResult.cs" />
+    <Compile Include="Resources/RequestContextExtensions.cs" />
+    <Compile Include="Resources/ResourceControllerFactory.cs" />
+    <Compile Include="Resources/ResourceErrorActionResult.cs" />
+    <Compile Include="Resources/ResourceModelBinder.cs" />
+    <Compile Include="Resources/ResourceRedirectToRouteResult.cs" />
+    <Compile Include="Resources/RouteCollectionExtensions.cs" />
+    <Compile Include="Resources/UriHelperExtensions.cs" />
+    <Compile Include="Resources/WebApiEnabledAttribute.cs" />
+    <Compile Include="Resources/XmlFormatHandler.cs" />
+    <Compile Include="ScriptExtensions.cs" />
+    <Compile Include="SerializationExtensions.cs" />
+    <Compile Include="ServerVariablesValueProviderFactory.cs" />
+    <Compile Include="SessionValueProviderFactory.cs" />
+    <Compile Include="SkipBindingAttribute.cs" />
+    <Compile Include="TempDataValueProviderFactory.cs" />
+    <Compile Include="TypeDescriptorHelper.cs" />
+    <Compile Include="TypeHelpers.cs" />
+    <Compile Include="UrlAttribute.cs" />
+    <Compile Include="ValueProviderUtil.cs" />
+    <Compile Include="ViewExtensions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Properties/MvcResources.resx" LogicalName="Microsoft.Web.Mvc.Properties.MvcResources.resources" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../WebFormsForCore.Web/WebFormsForCore.Web.csproj" />
+    <ProjectReference Include="../webForCore.System.Web.Mvc/webForCore.System.Web.Mvc.csproj" />
+    <ProjectReference Include="../webForCore.System.Web.WebPages/webForCore.System.Web.WebPages.csproj" />
+    <PackageReference Include="System.CodeDom" Version="11.0.0-rc.3.26522.148" />
+    <PackageReference Include="System.ServiceModel.Syndication" Version="11.0.0-rc.3.26522.148" />
+  </ItemGroup>
+</Project>

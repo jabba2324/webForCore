@@ -629,15 +629,15 @@ catch(bar) { baz(); }", BlockType.Statement, SpanKind.Code);
         public void ParsersCanNestRecursively()
         {
             // Arrange
-            ParseBlockTest("foreach(var c in db.Categories) {" + Environment.NewLine
-                         + "            <div>" + Environment.NewLine
-                         + "                <h1>@c.Name</h1>" + Environment.NewLine
-                         + "                <ul>" + Environment.NewLine
-                         + "                    @foreach(var p in c.Products) {" + Environment.NewLine
-                         + "                        <li><a href=\"@Html.ActionUrl(\"Products\", \"Detail\", new { id = p.Id })\">@p.Name</a></li>" + Environment.NewLine
-                         + "                    }" + Environment.NewLine
-                         + "                </ul>" + Environment.NewLine
-                         + "            </div>" + Environment.NewLine
+            ParseBlockTest("foreach(var c in db.Categories) {" + "\r\n"
+                         + "            <div>" + "\r\n"
+                         + "                <h1>@c.Name</h1>" + "\r\n"
+                         + "                <ul>" + "\r\n"
+                         + "                    @foreach(var p in c.Products) {" + "\r\n"
+                         + "                        <li><a href=\"@Html.ActionUrl(\"Products\", \"Detail\", new { id = p.Id })\">@p.Name</a></li>" + "\r\n"
+                         + "                    }" + "\r\n"
+                         + "                </ul>" + "\r\n"
+                         + "            </div>" + "\r\n"
                          + "        }",
                 new StatementBlock(
                     Factory.Code("foreach(var c in db.Categories) {\r\n").AsStatement(),

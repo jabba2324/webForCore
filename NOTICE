@@ -21,7 +21,8 @@ This product includes software from the ASP.NET Web Stack
     CONDITIONS OF ANY KIND, either express or implied. See the License for the
     specific language governing permissions and limitations under the License.
 
-Code taken from the ASP.NET Web Stack lives in src/webForCore.* and test/webForCore.*. Each file
+Code taken from the ASP.NET Web Stack lives in src/webForCore.* and test/webForCore.* (except
+test/webForCore.System.Web.MonoTests, see below). Each file
 keeps its original copyright header. Files were copied from aspnet/AspNetWebStack commit 2106565
 with line endings normalised to CRLF; every other change is listed in LIFT.md, and the per-file
 source of each copy is recorded in tools/lift/manifests/.
@@ -29,3 +30,18 @@ source of each copy is recorded in tools/lift/manifests/.
 The assemblies built from that code are delay signed with Microsoft's public key
 (src/SigningKey/35MSSharedLib1024.snk, from the ASP.NET Web Stack repository), so that their
 identity matches the assemblies Microsoft ships. They are not signed by Microsoft.
+
+This product includes software from Katana (https://github.com/aspnet/AspNetKatana, commit 096e225), licensed
+under the Apache License, Version 2.0 (see LICENSE-APACHE-2.0.txt), with the same notice as above. It lives in
+src/webForCore.Microsoft.Owin* and test/webForCore.Microsoft.Owin*; each file keeps its original copyright header
+and was copied unchanged (Katana's files are LF). Every change is listed in LIFT.md, and the per-file source is
+recorded in tools/lift/manifests/. Those assemblies are delay signed with the same Microsoft public key and carry
+Microsoft.Owin's version 4.2.3.0. Files under tools/lift/additions/ are webForCore's own and say so in their header.
+
+This product includes tests from Mono (https://github.com/mono/mono, mcs/class/System.Web/Test and
+mcs/class/test-helpers, commit 0f53e9e), licensed under the MIT License. Each file keeps its original copyright
+header (for example "Copyright (C) 2005 Novell, Inc (http://www.novell.com)") and MIT permission notice. They live in
+test/webForCore.System.Web.MonoTests; changes are listed in LIFT.md and tools/lift/lift_mono_tests.py, and the
+per-file source is recorded in tools/lift/manifests/System.Web.MonoTests.tsv.
+Files without their own header (test-helpers/NunitHelpers.cs) are covered by Mono's repository LICENSE, which
+places the class libraries under the MIT License.

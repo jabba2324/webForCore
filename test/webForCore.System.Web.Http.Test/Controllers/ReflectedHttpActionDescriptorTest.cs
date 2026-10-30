@@ -319,9 +319,10 @@ namespace System.Web.Http
             Func<Task> method = _controller.WrappedTaskReturningMethod;
             ReflectedHttpActionDescriptor actionDescriptor = new ReflectedHttpActionDescriptor { MethodInfo = method.Method };
 
+            // webForCore: the type's assembly-qualified name names System.Private.CoreLib on .NET, mscorlib on .NET Framework.
             await Assert.ThrowsAsync<InvalidOperationException>(
                  () => actionDescriptor.ExecuteAsync(_context, _arguments, CancellationToken.None),
-                 "The method 'WrappedTaskReturningMethod' on type 'UsersRpcController' returned an instance of 'System.Threading.Tasks.Task`1[[System.Threading.Tasks.Task, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]'. Make sure to call Unwrap on the returned value to avoid unobserved faulted Task.");
+                 "The method 'WrappedTaskReturningMethod' on type 'UsersRpcController' returned an instance of '" + typeof(Task<Task>).FullName + "'. Make sure to call Unwrap on the returned value to avoid unobserved faulted Task.");
         }
 
         [Fact]

@@ -907,7 +907,7 @@ namespace System.Web {
 #if NETFRAMEWORK
                     expirationDate = HttpUtility.FormatHttpDateTimeUtc(_utcExpires);
 #else
-					expirationDate = HttpUtilityInternal.FormatHttpDateTimeUtc(_utcExpires);
+					expirationDate = HttpUtility.FormatHttpDateTimeUtc(_utcExpires);
 #endif
 					_headerExpires = new HttpResponseHeader(HttpWorkerRequest.HeaderExpires, expirationDate);
                 }
@@ -919,7 +919,7 @@ namespace System.Web {
 #if NETFRAMEWORK
                     lastModifiedDate = HttpUtility.FormatHttpDateTimeUtc(_utcLastModified);
 #else
-					lastModifiedDate = HttpUtilityInternal.FormatHttpDateTimeUtc(_utcLastModified);
+					lastModifiedDate = HttpUtility.FormatHttpDateTimeUtc(_utcLastModified);
 #endif
 					_headerLastModified = new HttpResponseHeader(HttpWorkerRequest.HeaderLastModified, lastModifiedDate);
                 }
@@ -1005,7 +1005,7 @@ namespace System.Web {
 #if NETFRAMEWORK
                         expirationDate = HttpUtility.FormatHttpDateTimeUtc(utcExpires);
 #else
-						expirationDate = HttpUtilityInternal.FormatHttpDateTimeUtc(utcExpires);
+						expirationDate = HttpUtility.FormatHttpDateTimeUtc(utcExpires);
 #endif
 						headerExpires = new HttpResponseHeader(HttpWorkerRequest.HeaderExpires, expirationDate);
                     }

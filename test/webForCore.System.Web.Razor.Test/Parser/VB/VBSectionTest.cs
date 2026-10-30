@@ -15,7 +15,7 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseSectionBlockCapturesNewlineImmediatelyFollowing()
         {
-            ParseDocumentTest("@Section" + Environment.NewLine,
+            ParseDocumentTest("@Section" + "\r\n",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
                     new SectionBlock(new SectionCodeGenerator(String.Empty),
@@ -37,9 +37,9 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseSectionRequiresNameBeOnSameLineAsSectionKeyword()
         {
-            ParseDocumentTest("@Section " + Environment.NewLine
-                            + "Foo" + Environment.NewLine
-                            + "    <p>Body</p>" + Environment.NewLine
+            ParseDocumentTest("@Section " + "\r\n"
+                            + "Foo" + "\r\n"
+                            + "    <p>Body</p>" + "\r\n"
                             + "End Section",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -60,10 +60,10 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseSectionAllowsNameToBeOnDifferentLineAsSectionKeywordIfUnderscoresUsed()
         {
-            ParseDocumentTest("@Section _" + Environment.NewLine
-                            + "_" + Environment.NewLine
-                            + "Foo" + Environment.NewLine
-                            + "    <p>Body</p>" + Environment.NewLine
+            ParseDocumentTest("@Section _" + "\r\n"
+                            + "_" + "\r\n"
+                            + "Foo" + "\r\n"
+                            + "    <p>Body</p>" + "\r\n"
                             + "End Section",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -79,8 +79,8 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseSectionReportsErrorAndTerminatesSectionBlockIfKeywordNotFollowedByIdentifierStartCharacter()
         {
-            ParseDocumentTest("@Section 9" + Environment.NewLine
-                            + "    <p>Foo</p>" + Environment.NewLine
+            ParseDocumentTest("@Section 9" + "\r\n"
+                            + "    <p>Foo</p>" + "\r\n"
                             + "End Section",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -101,10 +101,10 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParserOutputsErrorOnNestedSections()
         {
-            ParseDocumentTest("@Section foo" + Environment.NewLine
-                            + "    @Section bar" + Environment.NewLine
-                            + "        <p>Foo</p>" + Environment.NewLine
-                            + "    End Section" + Environment.NewLine
+            ParseDocumentTest("@Section foo" + "\r\n"
+                            + "    @Section bar" + "\r\n"
+                            + "        <p>Foo</p>" + "\r\n"
+                            + "    End Section" + "\r\n"
                             + "End Section",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -151,7 +151,7 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseSectionHandlesUnterminatedSection()
         {
-            ParseDocumentTest("@Section foo" + Environment.NewLine
+            ParseDocumentTest("@Section foo" + "\r\n"
                             + "    <p>Foo</p>",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -171,8 +171,8 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseDocumentParsesNamedSectionCorrectly()
         {
-            ParseDocumentTest("@Section foo" + Environment.NewLine
-                            + "    <p>Foo</p>" + Environment.NewLine
+            ParseDocumentTest("@Section foo" + "\r\n"
+                            + "    <p>Foo</p>" + "\r\n"
                             + "End Section",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -188,7 +188,7 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseSectionTerminatesOnFirstEndSection()
         {
-            ParseDocumentTest("@Section foo" + Environment.NewLine
+            ParseDocumentTest("@Section foo" + "\r\n"
                             + "    <p>End Section</p>",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -204,8 +204,8 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void ParseSectionAllowsEndSectionInVBExpression()
         {
-            ParseDocumentTest("@Section foo" + Environment.NewLine
-                            + "    I really want to render the word @(\"End Section\"), so this is how I do it" + Environment.NewLine
+            ParseDocumentTest("@Section foo" + "\r\n"
+                            + "    I really want to render the word @(\"End Section\"), so this is how I do it" + "\r\n"
                             + "End Section",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -231,8 +231,8 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void SectionBodyTreatsTwoAtSignsAsEscapeSequence()
         {
-            ParseDocumentTest("@Section Foo" + Environment.NewLine
-                            + "    <foo>@@bar</foo>" + Environment.NewLine
+            ParseDocumentTest("@Section Foo" + "\r\n"
+                            + "    <foo>@@bar</foo>" + "\r\n"
                             + "End Section",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -250,8 +250,8 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void SectionBodyTreatsPairsOfAtSignsAsEscapeSequence()
         {
-            ParseDocumentTest("@Section Foo" + Environment.NewLine
-                            + "    <foo>@@@@@bar</foo>" + Environment.NewLine
+            ParseDocumentTest("@Section Foo" + "\r\n"
+                            + "    <foo>@@@@@bar</foo>" + "\r\n"
                             + "End Section",
                 new MarkupBlock(
                     Factory.EmptyHtml(),

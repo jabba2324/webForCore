@@ -102,42 +102,26 @@ namespace System.Configuration {
 
 					if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
+                    // webForCore: compare contents instead of timestamps. The timestamp check used BuildDateAttribute, which
+                    // the assembly never carries (AssemblyInfo.cs has no BuildDate for the ReplaceBuildDate target to update),
+                    // so an extracted machine.config was never refreshed after the fork changed.
                     var assembly = Assembly.GetExecutingAssembly();
-                    var linkerTimeStamp = assembly.GetCustomAttribute<BuildDateAttribute>()?.DateTime ?? DateTime.MinValue;
-
-
-                    if (!File.Exists(s_machineConfigFilePath) ||
-                        File.GetLastWriteTimeUtc(s_machineConfigFilePath) < linkerTimeStamp)
+                    var configName = UseNetFXMachineConfig ? MachineConfigNetFXFilename : MachineConfigFilename;
+                    using (var machineConfig = assembly
+                        .GetManifestResourceNames()
+                        .Where(name => name == configName || name.EndsWith($".{configName}"))
+                        .Select(name => assembly.GetManifestResourceStream(name))
+                        .FirstOrDefault())
+                    using (var reader = new StreamReader(machineConfig))
                     {
-                         var configName = UseNetFXMachineConfig ? MachineConfigNetFXFilename : MachineConfigFilename;
-                        using (var machineConfig = assembly
-                            .GetManifestResourceNames()
-                            .Where(name => name == configName || name.EndsWith($".{configName}"))
-                            .Select(name => assembly.GetManifestResourceStream(name))
-                            .FirstOrDefault())
-                        {
-                            var path = Path.GetDirectoryName(assembly.Location);
-                            if (File.Exists(Path.Combine(path, "System.Web.Mobile.dll")))
-                            {
-                                using (var reader = new StreamReader(machineConfig))
-                                {
-                                    var txt = reader.ReadToEnd();
-                                    // Uncomment Mobile sections
-                                    txt = Regex.Replace(txt, @"<!--@Mobile\s*(.*?)\s*-->", "$1", RegexOptions.Singleline);
-                                    File.WriteAllText(s_machineConfigFilePath, txt);
-                                }
-                            }
-                            else
-                            {
-                                using (var reader = new StreamReader(machineConfig))
-                                {
-                                    var txt = reader.ReadToEnd();
-                                    // Uncomment Mobile sections
-                                    txt = Regex.Replace(txt, @"<!--@!Mobile\s*(.*?)\s*-->", "$1", RegexOptions.Singleline);
-                                    File.WriteAllText(s_machineConfigFilePath, txt);
-                                }
-                            }
-                        }
+                        var txt = reader.ReadToEnd();
+                        var path = Path.GetDirectoryName(assembly.Location);
+                        // Uncomment the Mobile sections when System.Web.Mobile is present, the non-Mobile ones otherwise
+                        txt = File.Exists(Path.Combine(path, "System.Web.Mobile.dll"))
+                            ? Regex.Replace(txt, @"<!--@Mobile\s*(.*?)\s*-->", "$1", RegexOptions.Singleline)
+                            : Regex.Replace(txt, @"<!--@!Mobile\s*(.*?)\s*-->", "$1", RegexOptions.Singleline);
+                        if (!File.Exists(s_machineConfigFilePath) || File.ReadAllText(s_machineConfigFilePath) != txt)
+                            File.WriteAllText(s_machineConfigFilePath, txt);
                     }
                 }
 			}

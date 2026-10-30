@@ -1,0 +1,18 @@
+@{
+    ViewBag.Title = "Features";
+}
+@helper Badge(string text, int count)
+{
+    <span class="badge">@text (@count)</span>
+}
+<h2>@ViewBag.Title</h2>
+<p id="inline-helper">@Badge("items", 3)</p>
+<p id="app-code-helper">@Formatting.Money(1234.5m)</p>
+<p id="encoded">@ViewBag.Untrusted</p>
+<p id="raw">@Html.Raw("<b>bold</b>")</p>
+<p id="partial">@Html.Partial("_Greeting", "partial world")</p>
+<p id="url">@Url.Action("Details", "Products", new { id = 2 })</p>
+<p id="area-link">@Html.ActionLink("Admin", "Index", "Dashboard", new { area = "Admin" }, null)</p>
+@section scripts {
+    <script id="section-script">var fromSection = true;</script>
+}

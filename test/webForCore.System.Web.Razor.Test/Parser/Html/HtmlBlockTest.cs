@@ -28,7 +28,7 @@ namespace System.Web.Razor.Test.Parser.Html
         [Fact]
         public void ParseBlockHandlesOpenAngleAtEof()
         {
-            ParseDocumentTest("@{" + Environment.NewLine
+            ParseDocumentTest("@{" + "\r\n"
                             + "<",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -46,8 +46,8 @@ namespace System.Web.Razor.Test.Parser.Html
         [Fact]
         public void ParseBlockHandlesOpenAngleWithProperTagFollowingIt()
         {
-            ParseDocumentTest("@{" + Environment.NewLine
-                            + "<" + Environment.NewLine
+            ParseDocumentTest("@{" + "\r\n"
+                            + "<" + "\r\n"
                             + "</html>",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -75,7 +75,7 @@ namespace System.Web.Razor.Test.Parser.Html
         [Fact]
         public void TagWithoutCloseAngleDoesNotTerminateBlock()
         {
-            ParseBlockTest("<                      " + Environment.NewLine
+            ParseBlockTest("<                      " + "\r\n"
                          + "   ",
                 new MarkupBlock(
                     Factory.Markup("<                      \r\n   ")),
@@ -92,7 +92,7 @@ namespace System.Web.Razor.Test.Parser.Html
         [Fact]
         public void ParseBlockReadsToEndOfLineIfFirstCharacterAfterTransitionIsColon()
         {
-            ParseBlockTest("@:<li>Foo Bar Baz" + Environment.NewLine
+            ParseBlockTest("@:<li>Foo Bar Baz" + "\r\n"
                          + "bork",
                 new MarkupBlock(
                     Factory.MarkupTransition(),

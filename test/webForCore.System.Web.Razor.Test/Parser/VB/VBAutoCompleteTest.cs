@@ -84,7 +84,7 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void FunctionsDirective_AutoComplete_At_StartOfFile()
         {
-            ParseBlockTest("@Functions" + Environment.NewLine
+            ParseBlockTest("@Functions" + "\r\n"
                          + "foo",
                 new FunctionsBlock(
                     Factory.CodeTransition("@").Accepts(AcceptedCharacters.None),
@@ -103,7 +103,7 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void HelperDirective_AutoComplete_At_StartOfFile()
         {
-            ParseBlockTest("@Helper Strong(value As String)" + Environment.NewLine
+            ParseBlockTest("@Helper Strong(value As String)" + "\r\n"
                          + "Foo",
                 new HelperBlock(new HelperCodeGenerator(new LocationTagged<string>("Strong(value As String)", 8, 0, 8), headerComplete: true),
                     Factory.CodeTransition(),
@@ -123,7 +123,7 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void SectionDirective_AutoComplete_At_StartOfFile()
         {
-            ParseBlockTest("@Section Header" + Environment.NewLine
+            ParseBlockTest("@Section Header" + "\r\n"
                          + "Foo",
                 new SectionBlock(new SectionCodeGenerator("Header"),
                     Factory.CodeTransition(),
@@ -140,7 +140,7 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void VerbatimBlock_AutoComplete_At_StartOfFile()
         {
-            ParseBlockTest("@Code" + Environment.NewLine
+            ParseBlockTest("@Code" + "\r\n"
                          + "Foo",
                 new StatementBlock(
                     Factory.CodeTransition(),

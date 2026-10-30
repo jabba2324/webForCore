@@ -13,7 +13,7 @@ namespace System.Web.Razor.Test
         public static string GenerateCode<T>(this CodeCompileUnit ccu) where T : CodeDomProvider, new()
         {
             StringBuilder output = new StringBuilder();
-            using (StringWriter writer = new StringWriter(output))
+            using (StringWriter writer = new StringWriter(output) { NewLine = "\r\n" }) // webForCore: the platform newline is \n on Linux; CodeDom writes as on Windows
             {
                 T provider = new T();
                 provider.GenerateCodeFromCompileUnit(ccu, writer, new CodeGeneratorOptions() { IndentString = "    " });

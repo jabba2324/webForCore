@@ -24,6 +24,8 @@ namespace System.Web {
         private HttpRequest _request;
         private HttpResponse _response;
         private IIS7WorkerRequest _iis7WorkerRequest;
+        // webForCore: response headers on the fork's Kestrel host (see the constructor below).
+        private bool _managedResponse;
         
 
         // This constructor creates the header collection for request headers.
@@ -50,6 +52,14 @@ namespace System.Web {
             _response = response;
         }
 
+        // webForCore: response headers on the fork's Kestrel host (AspNetCoreWorkerRequest). Response.Headers is
+        // integrated-mode API on IIS (OWIN's System.Web host is built on it); writes go to the response's own header
+        // store, as AppendHeader does, and the response keeps this managed copy current.
+        internal HttpHeaderCollection(HttpResponse response, int capacity) : base(capacity) {
+            _response = response;
+            _managedResponse = true;
+        }
+
         // This copy constructor is used by the granular request validation feature. Since these collections are immutable
         // once created, it's ok for us to have two collections containing the same data.
         internal HttpHeaderCollection(HttpHeaderCollection col)
@@ -58,6 +68,7 @@ namespace System.Web {
             _request = col._request;
             _response = col._response;
             _iis7WorkerRequest = col._iis7WorkerRequest;
+            _managedResponse = col._managedResponse;
         }
 
         [SecurityPermissionAttribute(SecurityAction.LinkDemand, Flags=SecurityPermissionFlag.SerializationFormatter)]
@@ -69,6 +80,11 @@ namespace System.Web {
         }
 
         public override void Add(String name, String value) {
+            if (_managedResponse) {
+                CheckNameAndValue(name, value);
+                _response.AppendHeader(name, value);
+                return;
+            }
             if (_iis7WorkerRequest == null) {
                 throw new PlatformNotSupportedException();
             }
@@ -89,6 +105,16 @@ namespace System.Web {
         }
 
         public override void Set(String name, String value) {
+            if (_managedResponse) {
+                CheckNameAndValue(name, value);
+                if (_response.HeadersWritten) {
+                    throw new HttpException(SR.GetString(SR.Cannot_append_header_after_headers_sent));
+                }
+                _response.RemoveManagedHeader(name);
+                base.Remove(name);
+                _response.AppendHeader(name, value);
+                return;
+            }
             if (_iis7WorkerRequest == null) {
                 throw new PlatformNotSupportedException();
             }
@@ -154,6 +180,21 @@ namespace System.Web {
             }
         }
 
+        // webForCore: keeps the managed response copy current when the response stores a header (AppendHeader).
+        internal void AddManagedResponseHeader(String name, String value) {
+            Debug.Assert(_managedResponse, "_managedResponse");
+            base.Add(name, value);
+        }
+
+        private static void CheckNameAndValue(String name, String value) {
+            if (name == null) {
+                throw new ArgumentNullException("name");
+            }
+            if (value == null) {
+                throw new ArgumentNullException("value");
+            }
+        }
+
         // updates managed copy of header with current value from native header block
         internal void SynchronizeHeader(String name, String value) {
             if (name == null) {
@@ -173,6 +214,17 @@ namespace System.Web {
         }
 
         public override void Remove(String name) {
+            if (_managedResponse) {
+                if (name == null) {
+                    throw new ArgumentNullException("name");
+                }
+                if (_response.HeadersWritten) {
+                    throw new HttpException(SR.GetString(SR.Cannot_append_header_after_headers_sent));
+                }
+                _response.RemoveManagedHeader(name);
+                base.Remove(name);
+                return;
+            }
             if (_iis7WorkerRequest == null) {
                 throw new PlatformNotSupportedException();
             }

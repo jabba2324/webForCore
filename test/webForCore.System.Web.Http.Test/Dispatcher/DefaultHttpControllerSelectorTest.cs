@@ -422,7 +422,7 @@ namespace System.Web.Http.Dispatcher
             // Assert
             string message = ex.Message;
             Assert.Contains(
-                "Multiple types were found that match the controller named 'Sample'. This can happen if the route that services this request ('') found multiple controllers defined with the same name but differing namespaces, which is not supported.\r\n\r\nThe request for 'Sample' has found the following matching controllers:",
+                "Multiple types were found that match the controller named 'Sample'. This can happen if the route that services this request ('') found multiple controllers defined with the same name but differing namespaces, which is not supported." + Environment.NewLine + Environment.NewLine + "The request for 'Sample' has found the following matching controllers:", // webForCore: the message is built with Environment.NewLine
                 message);
 
             var duplicateControllers = message.Split(':')[1].Split('\n').Select(str => str.Trim());

@@ -20,7 +20,7 @@ namespace System.Configuration
 #if NETFRAMEWORK
 					ConfigurationManagerInternalFactory.s_instance = (IConfigurationManagerInternal)TypeUtil.CreateInstanceWithReflectionPermission("System.Configuration.Internal.ConfigurationManagerInternal, System.Configuration, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a");
 #else
-					ConfigurationManagerInternalFactory.s_instance = (IConfigurationManagerInternal)TypeUtil.CreateInstanceWithReflectionPermission("System.Configuration.Internal.ConfigurationManagerInternal, WebFormsForCore.Configuration");
+					ConfigurationManagerInternalFactory.s_instance = (IConfigurationManagerInternal)TypeUtil.CreateInstanceWithReflectionPermission("System.Configuration.Internal.ConfigurationManagerInternal, System.Configuration.ConfigurationManager"); // webForCore: was "WebFormsForCore.Configuration", which no assembly is named
 #endif
 				return ConfigurationManagerInternalFactory.s_instance;
 			}

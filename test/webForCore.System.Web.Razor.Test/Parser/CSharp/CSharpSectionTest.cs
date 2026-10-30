@@ -15,7 +15,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseSectionBlockCapturesNewlineImmediatelyFollowing()
         {
-            ParseDocumentTest("@section" + Environment.NewLine,
+            ParseDocumentTest("@section" + "\r\n",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
                     new SectionBlock(new SectionCodeGenerator(String.Empty),
@@ -31,7 +31,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseSectionBlockCapturesWhitespaceToEndOfLineInSectionStatementMissingOpenBrace()
         {
-            ParseDocumentTest("@section Foo         " + Environment.NewLine
+            ParseDocumentTest("@section Foo         " + "\r\n"
                             + "    ",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -45,7 +45,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseSectionBlockCapturesWhitespaceToEndOfLineInSectionStatementMissingName()
         {
-            ParseDocumentTest("@section         " + Environment.NewLine
+            ParseDocumentTest("@section         " + "\r\n"
                             + "    ",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -170,7 +170,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseSectionBlockReportsErrorAndAcceptsWhitespaceToEndOfLineIfSectionNotFollowedByOpenBrace()
         {
-            ParseDocumentTest("@section foo      " + Environment.NewLine,
+            ParseDocumentTest("@section foo      " + "\r\n",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
                     new SectionBlock(new SectionCodeGenerator("foo"),
@@ -182,14 +182,14 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseSectionBlockAcceptsOpenBraceMultipleLinesBelowSectionName()
         {
-            ParseDocumentTest("@section foo      " + Environment.NewLine
-                            + Environment.NewLine
-                            + Environment.NewLine
-                            + Environment.NewLine
-                            + Environment.NewLine
-                            + Environment.NewLine
-                            + "{" + Environment.NewLine
-                            + "<p>Foo</p>" + Environment.NewLine
+            ParseDocumentTest("@section foo      " + "\r\n"
+                            + "\r\n"
+                            + "\r\n"
+                            + "\r\n"
+                            + "\r\n"
+                            + "\r\n"
+                            + "{" + "\r\n"
+                            + "<p>Foo</p>" + "\r\n"
                             + "}",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -276,9 +276,9 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void SectionIsCorrectlyTerminatedWhenCloseBraceImmediatelyFollowsCodeBlock()
         {
-            ParseDocumentTest("@section Foo {" + Environment.NewLine
-                            + "@if(true) {" + Environment.NewLine
-                            + "}" + Environment.NewLine
+            ParseDocumentTest("@section Foo {" + "\r\n"
+                            + "@if(true) {" + "\r\n"
+                            + "}" + "\r\n"
                             + "}",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -299,8 +299,8 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void SectionIsCorrectlyTerminatedWhenCloseBraceImmediatelyFollowsCodeBlockNoWhitespace()
         {
-            ParseDocumentTest("@section Foo {" + Environment.NewLine
-                            + "@if(true) {" + Environment.NewLine
+            ParseDocumentTest("@section Foo {" + "\r\n"
+                            + "@if(true) {" + "\r\n"
                             + "}}",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
@@ -372,7 +372,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         public void ParseSectionBlockCommentRecoversFromUnclosedTag()
         {
             ParseDocumentTest(
-                "@section s {" + Environment.NewLine + "<a" + Environment.NewLine + "<!--  > \" '-->}",
+                "@section s {" + "\r\n" + "<a" + "\r\n" + "<!--  > \" '-->}",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
                     new SectionBlock(new SectionCodeGenerator("s"),
@@ -380,7 +380,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
                         Factory.MetaCode("section s {")
                             .AutoCompleteWith(null, atEndOfSpan: true),
                         new MarkupBlock(
-                            Factory.Markup(Environment.NewLine + "<a" + Environment.NewLine + "<!--  > \" '-->")),
+                            Factory.Markup("\r\n" + "<a" + "\r\n" + "<!--  > \" '-->")),
                         Factory.MetaCode("}").Accepts(AcceptedCharacters.None)),
                     Factory.EmptyHtml()));
         }

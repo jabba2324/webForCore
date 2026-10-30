@@ -110,7 +110,7 @@ namespace System.Net.Http.Formatting
                 "SampleType should not be serialized with data contract name DataContractSampleType because UseXmlSerializer is set to true.");
             Assert.False(serializedString.Contains("version=\"1.0\" encoding=\"utf-8\""),
               "Using XmlSerializer should not emit the xml declaration by default.");
-            Assert.False(serializedString.Contains("\r\n"), "Using default XmlSerializer should emit data without indentation.");
+            Assert.False(serializedString.Contains("\n") /* webForCore: indentation uses the platform newline */, "Using default XmlSerializer should emit data without indentation.");
         }
 
         [Fact]
@@ -122,7 +122,7 @@ namespace System.Net.Http.Formatting
             await Assert.Task.SucceedsAsync(xmlFormatter.WriteToStreamAsync(typeof(SampleType), new SampleType(), memoryStream, content, transportContext: null));
             memoryStream.Position = 0;
             string serializedString = new StreamReader(memoryStream).ReadToEnd();
-            Assert.True(serializedString.Contains("\r\n"), "Using default XmlSerializer with Indent set to true should emit data with indentation.");
+            Assert.True(serializedString.Contains("\n") /* webForCore: indentation uses the platform newline */, "Using default XmlSerializer with Indent set to true should emit data with indentation.");
         }
 
         [Theory]

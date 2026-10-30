@@ -70,7 +70,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockHandlesSingleLineTemplate()
         {
-            ParseBlockTest("{ var foo = @: bar" + Environment.NewLine
+            ParseBlockTest("{ var foo = @: bar" + "\r\n"
                          + "; }",
                            new StatementBlock(
                                Factory.MetaCode("{").Accepts(AcceptedCharacters.None),
@@ -92,7 +92,7 @@ namespace System.Web.Razor.Test.Parser.CSharp
         [Fact]
         public void ParseBlockHandlesSingleLineImmediatelyFollowingStatementChar()
         {
-            ParseBlockTest("{i@: bar" + Environment.NewLine
+            ParseBlockTest("{i@: bar" + "\r\n"
                          + "}",
                            new StatementBlock(
                                Factory.MetaCode("{").Accepts(AcceptedCharacters.None),

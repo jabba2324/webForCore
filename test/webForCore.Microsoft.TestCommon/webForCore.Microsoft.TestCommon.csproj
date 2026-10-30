@@ -12,7 +12,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
-    <!-- Microsoft's build uses C# 9 (tools/WebStack.settings.targets). -->
+    <!-- Microsoft's builds use C# 9 (Web Stack, tools/WebStack.settings.targets) and Latest (Katana). -->
     <LangVersion>9.0</LangVersion>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;SYSLIB0003;SYSLIB0011;SYSLIB0051</NoWarn>
@@ -27,6 +27,7 @@
   <Import Project="../../src/webForCore.WebStack.targets" />
 
   <ItemGroup>
+    <Compile Include="AppDomainUtils.cs" />
     <Compile Include="Assert.cs" />
     <Compile Include="CultureReplacer.cs" />
     <Compile Include="DataAttribute.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="ReflectionAssert.cs" />
     <Compile Include="ReplaceCultureAttribute.cs" />
     <Compile Include="RestoreThreadPrincipalAttribute.cs" />
+    <Compile Include="RuntimeEnvironment.cs" />
     <Compile Include="SkippedXunitTestCase.cs" />
     <Compile Include="TestFile.cs" />
     <Compile Include="TestHelper.cs" />
@@ -87,6 +89,7 @@
     <Compile Include="ThreadPoolSyncContext.cs" />
     <Compile Include="TraitAttribute.cs" />
     <Compile Include="VersionTestHelper.cs" />
+    <Compile Include="WebUtils.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -94,6 +97,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="../../src/WebFormsForCore.Web/WebFormsForCore.Web.csproj" />
     <PackageReference Include="Moq" Version="4.21.0" />
     <PackageReference Include="xunit.abstractions" Version="2.0.3" />
     <PackageReference Include="xunit.assert" Version="2.9.3" />

@@ -1,0 +1,58 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- Phase 4 gate app: the Visual Studio "MVC" template (RouteConfig, FilterConfig, Global.asax, HomeController) with
+       controllers for routing, model binding, validation, filters, TempData and anti-forgery, an area, and Razor views
+       (layouts, sections, partials, child actions, @helper, App_Code helpers, display and editor templates) compiled at
+       run time by the fork's BuildManager. Hosted on Kestrel by the fork's System.Web; test/webForCore.Mvc.Gate.Tests
+       drives it. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <!-- The fork serves the parent of the output folder (WebFormsMiddleware: PhysicalPath), as in the TestApp. -->
+    <OutputPath>bin_dotnet</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <GenerateDependencyFile>true</GenerateDependencyFile>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+    <!-- Unknown culture names throw, as on .NET Framework (ICU would create them): Culture="auto" with a bad Accept-Language. -->
+    <PredefinedCulturesOnly>true</PredefinedCulturesOnly>
+    <!-- The Web SDK would compile .cshtml files as ASP.NET Core Razor views; these are ASP.NET MVC 5 views, which the fork's
+         BuildManager compiles at run time from the app folder, as on IIS. -->
+    <EnableDefaultRazorGenerateItems>false</EnableDefaultRazorGenerateItems>
+    <RazorCompileOnBuild>false</RazorCompileOnBuild>
+    <RazorCompileOnPublish>false</RazorCompileOnPublish>
+  </PropertyGroup>
+
+  <Import Project="..\..\src\webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <!-- Views and App_Code are compiled at run time from the app folder, as on IIS. -->
+    <Compile Remove="App_Code\**" />
+    <Content Remove="bin_dotnet\**" />
+    <None Remove="bin_dotnet\**" />
+    <Compile Remove="bin_dotnet\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\WebFormsForCore.Configuration\WebFormsForCore.Configuration.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Drawing\WebFormsForCore.Drawing.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Serialization.Formatters\WebFormsForCore.Serialization.Formatters.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web\WebFormsForCore.Web.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.ApplicationServices\WebFormsForCore.Web.ApplicationServices.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.RegularExpressions\WebFormsForCore.Web.RegularExpressions.csproj" />
+    <!-- The fork's machine.config is .NET Framework's root configuration: <compilation><assemblies> lists System.Web.Services
+         and <httpModules> has System.Web.Extensions' ScriptModule. On .NET Framework they are in the GAC; here the app
+         deploys them. -->
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Services\WebFormsForCore.Web.Services.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Extensions\WebFormsForCore.Web.Extensions.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Infrastructure\WebFormsForCore.Web.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Compilers\WebFormsForCore.Compilers.csproj" />
+    <ProjectReference Include="..\..\src\webForCore.System.Web.Mvc\webForCore.System.Web.Mvc.csproj" />
+    <!-- MVC Futures, lifted (src/webForCore.Microsoft.Web.Mvc). FuturesController uses it. Microsoft's original binary from
+         nuget.org (Microsoft.AspNet.Mvc.Futures 5.0.0, built for .NET Framework 4.0) passed the same tests: see LIFT.md. -->
+    <ProjectReference Include="..\..\src\webForCore.Microsoft.Web.Mvc\webForCore.Microsoft.Web.Mvc.csproj" />
+  </ItemGroup>
+</Project>

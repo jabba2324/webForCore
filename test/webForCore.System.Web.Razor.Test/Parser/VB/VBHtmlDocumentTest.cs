@@ -13,10 +13,10 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void BlockCommentInMarkupDocumentIsHandledCorrectly()
         {
-            ParseDocumentTest(@"<ul>" + Environment.NewLine
+            ParseDocumentTest(@"<ul>" + "\r\n"
                             + @"                @* This is a block comment </ul> *@ foo",
                 new MarkupBlock(
-                    Factory.Markup("<ul>" + Environment.NewLine + "                "),
+                    Factory.Markup("<ul>" + "\r\n" + "                "),
                     new CommentBlock(
                         Factory.MarkupTransition(HtmlSymbolType.RazorCommentTransition),
                         Factory.MetaMarkup("*", HtmlSymbolType.RazorCommentStar).Accepts(AcceptedCharacters.None),
@@ -29,10 +29,10 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void BlockCommentInMarkupBlockIsHandledCorrectly()
         {
-            ParseBlockTest(@"<ul>" + Environment.NewLine
+            ParseBlockTest(@"<ul>" + "\r\n"
                          + @"                @* This is a block comment </ul> *@ foo </ul>",
                 new MarkupBlock(
-                    Factory.Markup("<ul>" + Environment.NewLine + "                "),
+                    Factory.Markup("<ul>" + "\r\n" + "                "),
                     new CommentBlock(
                         Factory.MarkupTransition(HtmlSymbolType.RazorCommentTransition),
                         Factory.MetaMarkup("*", HtmlSymbolType.RazorCommentStar).Accepts(AcceptedCharacters.None),
@@ -45,22 +45,22 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void BlockCommentAtStatementStartInCodeBlockIsHandledCorrectly()
         {
-            ParseDocumentTest(@"@If Request.IsAuthenticated Then" + Environment.NewLine
-                            + @"    @* User is logged in! End If *@" + Environment.NewLine
-                            + @"    Write(""Hello friend!"")" + Environment.NewLine
+            ParseDocumentTest(@"@If Request.IsAuthenticated Then" + "\r\n"
+                            + @"    @* User is logged in! End If *@" + "\r\n"
+                            + @"    Write(""Hello friend!"")" + "\r\n"
                             + @"End If",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
                     new StatementBlock(
                         Factory.CodeTransition(),
-                        Factory.Code("If Request.IsAuthenticated Then" + Environment.NewLine + "    ").AsStatement(),
+                        Factory.Code("If Request.IsAuthenticated Then" + "\r\n" + "    ").AsStatement(),
                         new CommentBlock(
                             Factory.CodeTransition(VBSymbolType.RazorCommentTransition),
                             Factory.MetaCode("*", VBSymbolType.RazorCommentStar).Accepts(AcceptedCharacters.None),
                             Factory.Comment(" User is logged in! End If ", VBSymbolType.RazorComment),
                             Factory.MetaCode("*", VBSymbolType.RazorCommentStar).Accepts(AcceptedCharacters.None),
                             Factory.CodeTransition(VBSymbolType.RazorCommentTransition)),
-                        Factory.Code("" + Environment.NewLine + "    Write(\"Hello friend!\")" + Environment.NewLine + "End If")
+                        Factory.Code("" + "\r\n" + "    Write(\"Hello friend!\")" + "\r\n" + "End If")
                                .AsStatement()
                                .Accepts(AcceptedCharacters.None)),
                     Factory.EmptyHtml()));
@@ -69,22 +69,22 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void BlockCommentInStatementInCodeBlockIsHandledCorrectly()
         {
-            ParseDocumentTest(@"@If Request.IsAuthenticated Then" + Environment.NewLine
-                            + @"    Dim foo = @* User is logged in! End If *@ bar" + Environment.NewLine
-                            + @"    Write(""Hello friend!"")" + Environment.NewLine
+            ParseDocumentTest(@"@If Request.IsAuthenticated Then" + "\r\n"
+                            + @"    Dim foo = @* User is logged in! End If *@ bar" + "\r\n"
+                            + @"    Write(""Hello friend!"")" + "\r\n"
                             + @"End If",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
                     new StatementBlock(
                         Factory.CodeTransition(),
-                        Factory.Code("If Request.IsAuthenticated Then" + Environment.NewLine + "    Dim foo = ").AsStatement(),
+                        Factory.Code("If Request.IsAuthenticated Then" + "\r\n" + "    Dim foo = ").AsStatement(),
                         new CommentBlock(
                             Factory.CodeTransition(VBSymbolType.RazorCommentTransition),
                             Factory.MetaCode("*", VBSymbolType.RazorCommentStar).Accepts(AcceptedCharacters.None),
                             Factory.Comment(" User is logged in! End If ", VBSymbolType.RazorComment),
                             Factory.MetaCode("*", VBSymbolType.RazorCommentStar).Accepts(AcceptedCharacters.None),
                             Factory.CodeTransition(VBSymbolType.RazorCommentTransition)),
-                        Factory.Code(" bar" + Environment.NewLine + "    Write(\"Hello friend!\")" + Environment.NewLine + "End If")
+                        Factory.Code(" bar" + "\r\n" + "    Write(\"Hello friend!\")" + "\r\n" + "End If")
                                .AsStatement()
                                .Accepts(AcceptedCharacters.None)),
                     Factory.EmptyHtml()));
@@ -93,15 +93,15 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void BlockCommentInStringInCodeBlockIsIgnored()
         {
-            ParseDocumentTest(@"@If Request.IsAuthenticated Then" + Environment.NewLine
-                            + @"    Dim foo = ""@* User is logged in! End If *@ bar""" + Environment.NewLine
-                            + @"    Write(""Hello friend!"")" + Environment.NewLine
+            ParseDocumentTest(@"@If Request.IsAuthenticated Then" + "\r\n"
+                            + @"    Dim foo = ""@* User is logged in! End If *@ bar""" + "\r\n"
+                            + @"    Write(""Hello friend!"")" + "\r\n"
                             + @"End If",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
                     new StatementBlock(
                         Factory.CodeTransition(),
-                        Factory.Code("If Request.IsAuthenticated Then" + Environment.NewLine + "    Dim foo = \"@* User is logged in! End If *@ bar\"" + Environment.NewLine + "    Write(\"Hello friend!\")" + Environment.NewLine + "End If")
+                        Factory.Code("If Request.IsAuthenticated Then" + "\r\n" + "    Dim foo = \"@* User is logged in! End If *@ bar\"" + "\r\n" + "    Write(\"Hello friend!\")" + "\r\n" + "End If")
                                .AsStatement()
                                .Accepts(AcceptedCharacters.None)),
                     Factory.EmptyHtml()));
@@ -110,15 +110,15 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void BlockCommentInTickCommentInCodeBlockIsIgnored()
         {
-            ParseDocumentTest(@"@If Request.IsAuthenticated Then" + Environment.NewLine
-                            + @"    Dim foo = '@* User is logged in! End If *@ bar" + Environment.NewLine
-                            + @"    Write(""Hello friend!"")" + Environment.NewLine
+            ParseDocumentTest(@"@If Request.IsAuthenticated Then" + "\r\n"
+                            + @"    Dim foo = '@* User is logged in! End If *@ bar" + "\r\n"
+                            + @"    Write(""Hello friend!"")" + "\r\n"
                             + @"End If",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
                     new StatementBlock(
                         Factory.CodeTransition(),
-                        Factory.Code("If Request.IsAuthenticated Then" + Environment.NewLine + "    Dim foo = '@* User is logged in! End If *@ bar" + Environment.NewLine + "    Write(\"Hello friend!\")" + Environment.NewLine + "End If")
+                        Factory.Code("If Request.IsAuthenticated Then" + "\r\n" + "    Dim foo = '@* User is logged in! End If *@ bar" + "\r\n" + "    Write(\"Hello friend!\")" + "\r\n" + "End If")
                                .AsStatement()
                                .Accepts(AcceptedCharacters.None)),
                     Factory.EmptyHtml()));
@@ -127,15 +127,15 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void BlockCommentInRemCommentInCodeBlockIsIgnored()
         {
-            ParseDocumentTest(@"@If Request.IsAuthenticated Then" + Environment.NewLine
-                            + @"    Dim foo = REM @* User is logged in! End If *@ bar" + Environment.NewLine
-                            + @"    Write(""Hello friend!"")" + Environment.NewLine
+            ParseDocumentTest(@"@If Request.IsAuthenticated Then" + "\r\n"
+                            + @"    Dim foo = REM @* User is logged in! End If *@ bar" + "\r\n"
+                            + @"    Write(""Hello friend!"")" + "\r\n"
                             + @"End If",
                 new MarkupBlock(
                     Factory.EmptyHtml(),
                     new StatementBlock(
                         Factory.CodeTransition(),
-                        Factory.Code("If Request.IsAuthenticated Then" + Environment.NewLine + "    Dim foo = REM @* User is logged in! End If *@ bar" + Environment.NewLine + "    Write(\"Hello friend!\")" + Environment.NewLine + "End If")
+                        Factory.Code("If Request.IsAuthenticated Then" + "\r\n" + "    Dim foo = REM @* User is logged in! End If *@ bar" + "\r\n" + "    Write(\"Hello friend!\")" + "\r\n" + "End If")
                                .AsStatement()
                                .Accepts(AcceptedCharacters.None)),
                     Factory.EmptyHtml()));

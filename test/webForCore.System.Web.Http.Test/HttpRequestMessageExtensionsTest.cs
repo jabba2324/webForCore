@@ -628,7 +628,8 @@ namespace System.Net.Http
         {
             HttpRequestMessage request = CreateRequest();
 
-            Assert.ThrowsArgument(() => request.CreateResponse(HttpStatusCode.OK, CreateValue(), (string)null), "mediaType");
+            // webForCore: .NET's MediaTypeHeaderValue(string) throws ArgumentNullException for null (.NET Framework: ArgumentException).
+            Assert.ThrowsArgumentNull(() => request.CreateResponse(HttpStatusCode.OK, CreateValue(), (string)null), "mediaType");
         }
 
         [Fact]

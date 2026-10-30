@@ -72,7 +72,7 @@ namespace System.Web.Razor.Test.Parser.VB
         [Fact]
         public void LayoutDirectiveAcceptsTrailingNewlineButDoesNotIncludeItInLayoutPath()
         {
-            ParseBlockTest("@Layout Foo" + Environment.NewLine,
+            ParseBlockTest("@Layout Foo" + "\r\n",
                 new DirectiveBlock(
                     Factory.CodeTransition(),
                     Factory.MetaCode("Layout ").Accepts(AcceptedCharacters.None),

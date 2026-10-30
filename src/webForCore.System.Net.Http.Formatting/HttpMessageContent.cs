@@ -91,7 +91,8 @@ namespace System.Net.Http
 
         private HttpContent Content
         {
-            get { return HttpRequestMessage != null ? HttpRequestMessage.Content : HttpResponseMessage.Content; }
+            // webForCore: ResponseContent.Get treats .NET's EmptyContent as no content, as null was on .NET Framework.
+            get { return HttpRequestMessage != null ? HttpRequestMessage.Content : System.Net.Http.Internal.ResponseContent.Get(HttpResponseMessage); }
         }
 
         /// <summary>
@@ -344,7 +345,8 @@ namespace System.Net.Http
             {
                 SerializeStatusLine(message, HttpResponseMessage);
                 headers = HttpResponseMessage.Headers;
-                content = HttpResponseMessage.Content;
+                // webForCore: ResponseContent.Get treats .NET's EmptyContent as no content, as null was on .NET Framework.
+                content = System.Net.Http.Internal.ResponseContent.Get(HttpResponseMessage);
             }
 
             SerializeHeaderFields(message, headers);

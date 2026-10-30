@@ -81,7 +81,7 @@ namespace System.Resources
                 var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
                 type = System.Type.GetType(name,
                     assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                    (asm, typeName, ignoreCase) => asm?.GetType(typeName, false, ignoreCase),
+                    (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)),
                     false, ignoreCase);
             }
             if (type == (System.Type)null && this.names != null)

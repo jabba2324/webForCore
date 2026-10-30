@@ -257,7 +257,7 @@ namespace System.Net.Http.Formatting
             await Assert.Task.SucceedsAsync(jsonFormatter.WriteToStreamAsync(typeof(SampleType), new SampleType(), memoryStream, content, transportContext: null));
             memoryStream.Position = 0;
             string serializedString = new StreamReader(memoryStream).ReadToEnd();
-            Assert.False(serializedString.Contains("\r\n"), "Using DCJS should emit data without indentation by default.");
+            Assert.False(serializedString.Contains("\n") /* webForCore: indentation uses the platform newline */, "Using DCJS should emit data without indentation by default.");
         }
 #endif
 

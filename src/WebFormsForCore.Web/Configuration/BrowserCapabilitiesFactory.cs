@@ -1513,7 +1513,9 @@ namespace System.Web.Configuration {
             browserCaps.Adapters["System.Web.UI.WebControls.Menu, System.Web, Version=4.0.0.0, Culture=neutral, Pub" +
                 "licKeyToken=b03f5f7f11d50a3a"] = "System.Web.UI.WebControls.Adapters.MenuAdapter";
 #else
-			browserCaps.Adapters["System.Web.UI.WebControls.Menu, WebFormsForCore.Web"] = "System.Web.UI.WebControls.Adapters.MenuAdapter";
+			// webForCore: keyed by the fork's own assembly-qualified name, as Microsoft's key ("..., System.Web, Version=4.0.0.0,
+			// ...") matches its own System.Web; "..., WebFormsForCore.Web" matched no assembly, so the adapter was never used.
+			browserCaps.Adapters[typeof(System.Web.UI.WebControls.Menu).AssemblyQualifiedName] = "System.Web.UI.WebControls.Adapters.MenuAdapter";
 #endif
 			browserCaps.AddBrowser("GenericDownlevel");
             this.GenericdownlevelProcessGateways(headers, browserCaps);

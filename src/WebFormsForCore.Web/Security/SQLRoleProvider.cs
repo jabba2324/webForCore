@@ -18,8 +18,8 @@ namespace System.Web.Security {
     using  System.Data.SqlClient;
     using  System.Data.SqlTypes;
 #else
-	using Microsoft.Data.SqlClient;
-	using Microsoft.Data.SqlTypes;
+	using System.Data.SqlClient; // webForCore: System.Data.SqlClient, as .NET Framework (upstream used Microsoft.Data.SqlClient)
+	using System.Data.SqlTypes; // webForCore: as .NET Framework
 #endif
 	using System.Text;
     using  System.Configuration.Provider;

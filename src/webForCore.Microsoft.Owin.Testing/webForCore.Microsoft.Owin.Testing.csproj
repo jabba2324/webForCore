@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Lifted from aspnet/AspNetKatana 096e225 (src/Microsoft.Owin.Testing/Microsoft.Owin.Testing.csproj) by tools/lift/lift_project.py.
+       Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <AssemblyName>Microsoft.Owin.Testing</AssemblyName>
+    <RootNamespace>Microsoft.Owin.Testing</RootNamespace>
+    <PackageId>webForCore.Microsoft.Owin.Testing</PackageId>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- Microsoft's builds use C# 9 (Web Stack, tools/WebStack.settings.targets) and Latest (Katana). -->
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;SYSLIB0003;SYSLIB0011;SYSLIB0051</NoWarn>
+    <DefineConstants>$(DefineConstants);</DefineConstants>
+    <!-- Delay signed with Microsoft's public key, as Microsoft's build does: PublicKeyToken=31bf3856ad364e35. -->
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>../SigningKey/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <AssemblyVersion>4.2.3.0</AssemblyVersion>
+    <FileVersion>4.200.325.35202</FileVersion>
+    <InformationalVersion>4.2.3</InformationalVersion>
+    <Company>Microsoft Corporation</Company>
+    <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
+    <Product>Microsoft.Owin.Testing</Product>
+    <Description>Provides helper classes for unit testing OWIN components.</Description>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+  </PropertyGroup>
+
+  <Import Project="../webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="OwinClientHandler.cs" />
+    <Compile Include="Properties/AssemblyInfo.cs" />
+    <Compile Include="RequestBuilder.cs" />
+    <Compile Include="Resources.Designer.cs" />
+    <Compile Include="ResponseStream.cs" />
+    <Compile Include="TestServer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.resx" LogicalName="Microsoft.Owin.Testing.Resources.resources" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../webForCore.Microsoft.Owin.Hosting/webForCore.Microsoft.Owin.Hosting.csproj" />
+    <ProjectReference Include="../webForCore.Microsoft.Owin/webForCore.Microsoft.Owin.csproj" />
+    <PackageReference Include="Owin" Version="1.0.0" />
+  </ItemGroup>
+</Project>

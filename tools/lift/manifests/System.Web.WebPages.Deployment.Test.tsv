@@ -1,0 +1,21 @@
+# aspnet/AspNetWebStack 2106565: source path (relative to repo root)	destination (relative to fork root)
+test/System.Web.WebPages.Deployment.Test/AssemblyUtilsTest.cs	test/webForCore.System.Web.WebPages.Deployment.Test/AssemblyUtilsTest.cs
+test/System.Web.WebPages.Deployment.Test/DeploymentUtil.cs	test/webForCore.System.Web.WebPages.Deployment.Test/DeploymentUtil.cs
+test/System.Web.WebPages.Deployment.Test/LatestRazorVersion.cs	test/webForCore.System.Web.WebPages.Deployment.Test/LatestRazorVersion.cs
+test/System.Web.WebPages.Deployment.Test/PreApplicationStartCodeTest.cs	test/webForCore.System.Web.WebPages.Deployment.Test/PreApplicationStartCodeTest.cs
+test/System.Web.WebPages.Deployment.Test/TestFileSystem.cs	test/webForCore.System.Web.WebPages.Deployment.Test/TestFileSystem.cs
+test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestAssemblies/V2_Signed/System.Web.WebPages.Deployment.dll	test/webForCore.System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestAssemblies/V2_Signed/System.Web.WebPages.Deployment.dll
+test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestAssemblies/V2_Unsigned/System.Web.WebPages.Deployment.dll	test/webForCore.System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestAssemblies/V2_Unsigned/System.Web.WebPages.Deployment.dll
+test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/CshtmlFileConfigV1/Default.cshtml	test/webForCore.System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/CshtmlFileConfigV1/Default.cshtml
+test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/CshtmlFileConfigV1/web.config	test/webForCore.System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/CshtmlFileConfigV1/web.config
+test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/CshtmlFileNoVersion/Default.cshtml	test/webForCore.System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/CshtmlFileNoVersion/Default.cshtml
+test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtml/Default.htm	test/webForCore.System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtml/Default.htm
+test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtmlConfigV1/Default.htm	test/webForCore.System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtmlConfigV1/Default.htm
+test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtmlConfigV1/web.config	test/webForCore.System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtmlConfigV1/web.config
+test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtmlNoConfigSetting/Default.htm	test/webForCore.System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtmlNoConfigSetting/Default.htm
+test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtmlNoConfigSetting/web.config	test/webForCore.System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtmlNoConfigSetting/web.config
+test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtmlWithEnabledSetting/Default.htm	test/webForCore.System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtmlWithEnabledSetting/Default.htm
+test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtmlWithEnabledSetting/web.config	test/webForCore.System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtmlWithEnabledSetting/web.config
+test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtmlWithEnabledSettingFalse/Default.htm	test/webForCore.System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtmlWithEnabledSettingFalse/Default.htm
+test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtmlWithEnabledSettingFalse/web.config	test/webForCore.System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtmlWithEnabledSettingFalse/web.config
+test/System.Web.WebPages.Deployment.Test/WebPagesDeploymentTest.cs	test/webForCore.System.Web.WebPages.Deployment.Test/WebPagesDeploymentTest.cs
