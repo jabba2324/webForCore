@@ -957,3 +957,84 @@ app's `*.deps.json` / `*.runtimeconfig.json` (200). IIS's request filtering hide
 answers 404 for any path with one of those segments (ignoring case), the app's output folder (`bin_dotnet`) or `obj`,
 and for `.deps.json` / `.runtimeconfig.json` files. `App_Data/*.config` was already 403 (`*.config`), now 404 as on IIS.
 Gate: 6 more cases in Mvc.Gate.Tests (63/63). TestApp: pages, CSS and ScriptResource.axd unchanged.
+
+## AppDomains and IIS on Kestrel (30 Oct 2026)
+
+### PseudoAppDomain: in-process AppDomain emulation
+
+.NET has no AppDomains. `System.Web.Hosting.PseudoAppDomain` (`AspNetCoreHosting/PseudoAppDomain.cs`) is a collectible
+AssemblyLoadContext that stands in for the worker AppDomain:
+- **What is per domain:** System.Web, the application's assemblies and everything else it deploys are loaded again into the domain, so all their static state is fresh. Also per domain: `Microsoft.CSharp` and the VB runtime, because their caches would otherwise hold every domain's types.
+- **What is shared:** the shared framework (as the GAC was domain-neutral) and test frameworks.
+- **How it resolves:** the deps.json resolution (TPA) first, then the app's output folder, then `bin`, then the app root.
+- **Calls across the boundary:** the middleware and the domain exchange only shared-framework types (strings, arrays, delegates); there is no remoting. `AspNetCoreHost.CreateForMiddleware` builds the host inside the domain and returns `IsLegacyRequest`, `ProcessRequest` and `Shutdown` as delegates. Requests run under the domain's contextual reflection scope.
+- **`ApplicationHost.CreateApplicationHost`:** creates its host in a new PseudoAppDomain. The result is the domain's own type, so callers use reflection or `dynamic`. The Windows-only check is now .NET Framework only.
+- **Default for `UseWebForms`:** isolation is on (`IsolateApplication(false)` to opt out). A web.config, bin or App_Code change, `HttpRuntime.UnloadAppDomain` or a recycling policy shuts the domain down. The next domain starts right away (overlapped recycle) while the old one drains. Without isolation, a restart stops the process for the service manager to start it again; it used to spin in `ReleaseResourcesAndUnloadAppDomain`.
+- **Recycling (`Recycling(...)`):** IIS's `periodicRestart` time (1740 minutes), requests, and private memory (KB).
+
+Fork fixes the restart needed:
+- `AspNetCoreHost.Stop` called `HttpRuntime.Close()`, which marked the runtime as shutting down, so the hosting environment's own shutdown never released the runtime or unloaded. It now only unregisters.
+- `ProcessRequest` decrements its pending count in a `finally`.
+- The in-process compiler loads `csc.dll` into the caller's context, not the default one.
+- Domain creation runs on a clean ExecutionContext.
+
+Releasing an unloading domain is what AppDomain.Unload used to do. These all run when the domain starts unloading, each action isolated:
+- **Timers:** the domain's timers are disposed (by reflection over the runtime's timer queues). Shared-framework timers that captured the domain's ExecutionContext lose that context.
+- **Event handlers:** handlers the domain's code added to process-wide events (AppContext and AssemblyLoadContext statics: `AssemblyLoad`, `AssemblyResolve`, `UnhandledException`, `ProcessExit`/`DomainUnload`, ...) are removed.
+- **GC handles:** System.Web's strong GC handles (`GCUtil.Alloc`) are cleared.
+- **Other references:** the `Resolving` handler is removed. The inotify watcher no longer captures a request's ExecutionContext. The domain's `ApplicationManager` context data lives in a static of its own copy, not in a table keyed by the domain.
+
+**Open issue: old domains are not collected.** After all of the above, gcroot finds no strong root for an old domain's `LoaderAllocator` or for instances of its types, and the finalizer queue is empty. Yet the runtime keeps the domains: one of 9 old domains across three runs was collected. The holder is not visible to SOS (a native or thread-static reference is likely). Tiered compilation off made no difference. The middleware checks every 30 seconds and logs "unloaded" or "has not unloaded". After `Recycling.MaxStuckDomains` (3) stuck domains it stops the process gracefully, so memory stays bounded and the service manager restarts it, as WAS recycled a worker. Each domain costs its own copy of System.Web, the app and Roslyn (tens of MB).
+
+Tests: the 9 AppDomain tests that were skipped now run:
+- Mono's `SimpleWorkerRequestTest` (5), using `dynamic`. `SimpleWorkerRequest.MapPath` of a path outside the app throws `ArgumentNullException` again; .NET's `FileIOPermission` stub accepts null, so `InternalSecurityPermissions.PathDiscovery` now checks.
+- Web API `ValidateSetsMemberNameProperty_*` (2) and MVC (2), through TestCommon's ALC-based `RunInSeparateAppDomain`. TestCommon's `SetAppData` also sets the load-context data the fork reads.
+
+### IIS's modules from `<system.webServer>`
+
+`WebServerConfiguration` (`AspNetCoreHosting/IIS/`) builds the effective section for a URL as IIS does:
+- the applicationHost.config defaults (IIS 10), then the app's web.config, its `<location>`s and subdirectory web.configs;
+- attributes override, and collections follow `add`/`remove`/`clear`;
+- files are re-read when they change.
+
+`IISModules` runs these in front of the application, on by default (`IIS(o => o.Enabled = false)` to opt out):
+
+| IIS feature | Behaviour |
+| --- | --- |
+| serverRuntime `appConcurrentRequestLimit` (5000) | 503.2 |
+| requestFiltering | fileExtensions 404.7 (IIS's default deny list: .cs, .config, .asax, ...), hiddenSegments 404.8 (plus the output folder and obj), verbs 404.6, double escaping and '+' 404.11, high-bit 404.12, denyUrlSequences 404.5, denyQueryStringSequences 404.18, maxAllowedContentLength 404.13, maxUrl 404.14, maxQueryString 404.15, headerLimits 404.10, alwaysAllowedUrls |
+| httpProtocol | customHeaders on every response (IIS's default `X-Powered-By: ASP.NET`), redirectHeaders on 3xx, `removeServerHeader` |
+| httpRedirect | destination with the rest of the URL below the configuring level, exactDestination, childOnly, wildcards, status Permanent/Found/Temporary/PermRedirect |
+| URL Rewrite | the app's `<rewrite><rules>` through ASP.NET Core's IIS rule parser. Not supported: rules in subdirectory web.configs, outbound rules |
+| defaultDocument | IIS's list or the configured one, case-insensitive; 301 courtesy redirect of a directory URL without its trailing slash |
+| staticContent | mimeMap over IIS's default map (ASP.NET Core's provider, derived from it); an unmapped static file is 404.3; clientCache (UseMaxAge, UseExpires, DisableCache, cacheControlCustom) |
+| httpErrors | errorMode (DetailedLocalOnly by default), existingResponse Auto/Replace/PassThrough, error entries by status and substatus, File/ExecuteURL/Redirect. ASP.NET sets `TrySkipIisCustomErrors` on its error pages, so Auto passes them through, as on IIS |
+| modules | entries with a managed type are added after system.web's modules; `<remove>`/`<clear>` apply to the merged list (integrated mode's single list) |
+| handlers | managed entries are mapped before system.web/httpHandlers; TransferRequestHandler (integrated only) is skipped |
+| security/authorization | IIS URL Authorization at AuthorizeRequest: any matching Deny denies, otherwise Allow, otherwise 401 (no 401.2 substatus: `SubStatusCode` is integrated only) |
+
+`services.AddWebForms()` adds the parts ASP.NET Core has middleware for:
+- **Compression:** urlCompression static on, dynamic off; httpCompression static/dynamic types and `minFileSizeForComp` (2700); gzip.
+- **W3C logging:** IIS's fields, daily files. Differences: ASP.NET Core's field order, `cs-uri-query` with its `?`, and no substatus or win32 status.
+- **systemd:** notify readiness, plus a watchdog in place of WAS's ping.
+
+`tools/deploy/webforcore@.service` maps the app pool settings: rapid-fail protection, ping, shutdown limit, identity, memory and CPU limits.
+
+Not done:
+- Windows authentication (needs Kerberos and the Negotiate package);
+- IP restrictions, dynamic content caching and directory browsing (P2/P3);
+- configuration errors as 500.19 (a malformed web.config's section is ignored);
+- `cs-username` in the W3C log.
+
+Gate: `test/webForCore.IIS.Sample` and `test/webForCore.IIS.Gate.Tests`: one test or more per feature above, and the in-process restart (new static state, Application_Start again, every request answered during the restart).
+
+### System.Drawing on libgdiplus: tried and rejected (30 Oct 2026)
+
+System.Drawing.Common 6.0 (the last version with a Unix implementation) over libgdiplus 6.2 (Fedora) on .NET 11, with
+`System.Drawing.EnableUnixSupport`. Drawing, text, PNG/JPEG/GIF and resizing work, and 79 of the 137 WebImage and Chart
+tests that ran passed. But **libgdiplus corrupts the heap and aborts the process** (`double free or corruption`) when a
+24bpp or 32bppRgb bitmap that has been drawn on is rotated by 90 or 270 degrees. A JPEG loads as 24bpp, so WebImage's
+resize-then-rotate takes down the whole server (2 tests). It reproduces in a 6-line program. A native crash can't be
+contained by a PseudoAppDomain, and the library parses untrusted images. Not adopted. The other failures were the fork's
+DataVisualization resources (19), Windows paths in the tests (9), missing Windows fonts (6) and save-path errors.
+Next: a SkiaSharp-based System.Drawing, measured by the same 136 tests.

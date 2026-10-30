@@ -31,7 +31,9 @@ namespace WebFormsForCore.Compilers
 				Assembly assembly = null;
 				if (!Dlls.TryGetValue(cmd, out assembly))
 				{
-					assembly = Assembly.LoadFrom(cmd);
+					// webForCore: into this assembly's context, where the code below creates the compiler's arguments (an
+					// application's PseudoAppDomain; Assembly.LoadFrom loaded it into the default context).
+					assembly = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly()).LoadFromAssemblyPath(cmd);
 					Interlocked.Exchange(ref Dlls, Dlls.Add(cmd, assembly));
 				}
 

@@ -125,6 +125,12 @@ namespace System.Web {
 
         internal static IStackWalk PathDiscovery(String path) {
             Debug.Trace("Permissions", "PathDiscovery(" + path + ")");
+#if NETCOREAPP
+            // webForCore: .NET's FileIOPermission is a stub that accepts any path; .NET Framework's rejected a null one with
+            // ArgumentNullException, which callers relied on (SimpleWorkerRequest.MapPath of a path outside the app).
+            if (path == null)
+                throw new ArgumentNullException("path");
+#endif
             return new FileIOPermission(FileIOPermissionAccess.PathDiscovery, path);
         }
 

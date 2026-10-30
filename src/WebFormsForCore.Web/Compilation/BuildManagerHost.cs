@@ -83,6 +83,8 @@ namespace System.Web.Compilation
 		{
 			HostingEnvironment.RegisterObject(this);
 			AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(this.ResolveAssembly);
+			// webForCore: see BuildManager (the event is process-wide).
+			PseudoAppDomain.OnUnload(typeof(BuildManagerHost).Assembly, () => AppDomain.CurrentDomain.AssemblyResolve -= this.ResolveAssembly);
 		}
 
 		void IRegisteredObject.Stop(bool immediate)

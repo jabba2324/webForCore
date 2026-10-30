@@ -1497,6 +1497,10 @@ namespace System.Web
 				HttpHandlersSection map = useAppConfig ? RuntimeConfig.GetAppConfig().HttpHandlers
 													   : RuntimeConfig.GetConfig(context).HttpHandlers;
 				mapping = map.FindMapping(requestType, path);
+#if NETCOREAPP
+				// webForCore: <system.webServer><handlers> first, as IIS maps them (WebServerModules).
+				mapping = WebFormsForCore.Hosting.IIS.WebServerModules.FindHandler(requestType, path.VirtualPathString) ?? mapping;
+#endif
 
 				// Add cache entry
 				if (!useAppConfig)
@@ -2817,6 +2821,10 @@ namespace System.Web
 			HttpModuleCollection dynamicModules = CreateDynamicModules();
 
 			moduleCollection.AppendCollection(dynamicModules);
+#if NETCOREAPP
+			// webForCore: <system.webServer><modules>, when the hosting layer runs IIS's modules (WebServerModules).
+			WebFormsForCore.Hosting.IIS.WebServerModules.Apply(moduleCollection);
+#endif
 			_moduleCollection = moduleCollection; // don't assign until all ops have succeeded
 
 			InitModulesCommon();

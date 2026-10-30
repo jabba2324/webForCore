@@ -55,6 +55,23 @@ namespace System.Web {
             BaseAdd(name, m);
         }
 
+#if NETCOREAPP
+        // webForCore: for <system.webServer><modules> <remove> and <clear> (WebServerModules).
+        internal void RemoveModule(String name) {
+            _all = null;
+            _allKeys = null;
+
+            BaseRemove(name);
+        }
+
+        internal void ClearModules() {
+            _all = null;
+            _allKeys = null;
+
+            BaseClear();
+        }
+#endif
+
         internal void AppendCollection(HttpModuleCollection other) {
             // appends another collection to this instance (mutates this instance)
             for (int i = 0; i < other.Count; i++) {

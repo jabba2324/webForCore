@@ -26,6 +26,9 @@ namespace System.Web.Hosting
 				exepath = binpath ?? exepath;
                 var alc = context ?? AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
                 alc.Resolving += Resolve;
+                // webForCore: an unloading context keeps its handlers until it is collected, and this one (in the
+                // context's own assembly) would keep it from being collected.
+                if (alc.IsCollectible) alc.Unloading += unloading => unloading.Resolving -= Resolve;
             }
         }
 

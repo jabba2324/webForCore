@@ -118,6 +118,14 @@ namespace System.Web.Hosting
 			Context = context;
 		}
 
+		// webForCore: IIS's fTrySkipCustomErrors, for the httpErrors module (IIS/IISModules.cs) in the hosting layer.
+		public const string TrySkipIisCustomErrorsKey = "webForCore.TrySkipIisCustomErrors";
+		internal override bool TrySkipIisCustomErrors
+		{
+			get { return Context.Items.TryGetValue(TrySkipIisCustomErrorsKey, out var value) && value is true; }
+			set { Context.Items[TrySkipIisCustomErrorsKey] = value; }
+		}
+
 		public override void CloseConnection()
 		{
 			Context.Connection.RequestClose();

@@ -254,59 +254,55 @@ namespace MonoTests.System.Web.Hosting {
 			}
 		}
 
-		Host MakeHost (string virtualDir)
+		// webForCore: the host is the PseudoAppDomain's Host type (no remoting proxy); reached through dynamic.
+		dynamic MakeHost (string virtualDir)
 		{
-			return (Host) ApplicationHost.CreateApplicationHost (typeof (Host), virtualDir, cwd);
+			return ApplicationHost.CreateApplicationHost (typeof (Host), virtualDir, cwd);
 		}
 
-		Host MakeHost ()
+		dynamic MakeHost ()
 		{
 			return MakeHost ("/appVirtualDir");
 		}
 		
-		[Test] [Ignore ("webForCore: needs ApplicationHost.CreateApplicationHost, i.e. a new AppDomain; not available on .NET 11")]
-		public void AppDomainTests ()
+		[Test] public void AppDomainTests ()
 		{
-			Host h = MakeHost ();
+			dynamic h = MakeHost ();
 
 			h.Demo ();
 		}
 
 		[Test]
 		[ExpectedException(typeof(ArgumentNullException))]
-		[Ignore ("webForCore: needs ApplicationHost.CreateApplicationHost, i.e. a new AppDomain; not available on .NET 11")]
 		public void AppDomain_MapPath1 ()
 		{
-			Host h = MakeHost ();
+			dynamic h = MakeHost ();
 			
 			h.Exception1 ();
 		}
 
 		[Test]
 		[ExpectedException(typeof(ArgumentNullException))]
-		[Ignore ("webForCore: needs ApplicationHost.CreateApplicationHost, i.e. a new AppDomain; not available on .NET 11")]
 		public void AppDomain_MapPath2 ()
 		{
-			Host h = MakeHost ();
+			dynamic h = MakeHost ();
 			
 			h.Exception2 ();
 		}
 
 		[Test]
 		[ExpectedException(typeof(ArgumentNullException))]
-		[Ignore ("webForCore: needs ApplicationHost.CreateApplicationHost, i.e. a new AppDomain; not available on .NET 11")]
 		public void AppDomain_MapPath3 ()
 		{
-			Host h = MakeHost ();
+			dynamic h = MakeHost ();
 			
 			h.Exception3 ();
 		}
 
 		[Test]
-		[Ignore ("webForCore: needs ApplicationHost.CreateApplicationHost, i.e. a new AppDomain; not available on .NET 11")]
 		public void AppDomain_MapPath4 ()
 		{
-			Host h = MakeHost ("/");
+			dynamic h = MakeHost ("/");
 			
 			h.MapPathOnEmptyVirtualDir ();
 		}

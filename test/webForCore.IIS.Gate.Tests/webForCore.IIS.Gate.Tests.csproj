@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The IIS hosting gate: test/webForCore.IIS.Sample on Kestrel with the fork's System.Web. Each <system.webServer>
+       feature the hosting layer implements, checked against IIS 10's documented behaviour, and the PseudoAppDomain's
+       in-process restart. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <!-- Built and run, not referenced: its pages compile at run time. -->
+    <ProjectReference Include="..\webForCore.IIS.Sample\webForCore.IIS.Sample.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+</Project>

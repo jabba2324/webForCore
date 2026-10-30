@@ -179,12 +179,10 @@ namespace System.Web.Http.Validation.Validators
             attribute.VerifyAll();
         }
 
-        [Fact(Skip = "webForCore: needs AppDomainUtils.RunInSeparateAppDomain to isolate a static switch; no AppDomains on .NET 11 (Microsoft runs this test on .NET Framework only)")]
+        [Fact]
         public void ValidateSetsMemberNameProperty_UsingDisplayName()
         {
-#if NETFRAMEWORK
             AppDomainUtils.RunInSeparateAppDomain(ValidateSetsMemberNameProperty_UsingDisplayName_Inner);
-#endif
         }
 
         private static void ValidateSetsMemberNameProperty_UsingDisplayName_Inner()
@@ -214,12 +212,10 @@ namespace System.Web.Http.Validation.Validators
         }
 
         // Confirm explicit false setting does not change Validate(...)'s behavior from its default.
-        [Fact(Skip = "webForCore: needs AppDomainUtils.RunInSeparateAppDomain to isolate a static switch; no AppDomains on .NET 11 (Microsoft runs this test on .NET Framework only)")]
+        [Fact]
         public void ValidateSetsMemberNameProperty_NotUsingDisplayName()
         {
-#if NETFRAMEWORK
             AppDomainUtils.RunInSeparateAppDomain(ValidateSetsMemberNameProperty_NotUsingDisplayName_Inner);
-#endif
         }
 
         private static void ValidateSetsMemberNameProperty_NotUsingDisplayName_Inner()

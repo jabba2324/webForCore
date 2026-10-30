@@ -108,6 +108,12 @@ namespace System.Web.WebPages.TestUtils
             appdomain.SetData(".appPath", "appPath");
             appdomain.SetData(".appVPath", "/WebSite1");
             appdomain.SetData(".domainId", "1");
+            // The fork's System.Web reads these per load context (ApplicationManager.GetLoadContextData: on .NET a
+            // load context stands in for the AppDomain); set them for the context this code runs in.
+            foreach (var key in AppDomainDataKeys)
+            {
+                ApplicationManager.SetLoadContextData(key, appdomain.GetData(key), AssemblyLoadContext.GetLoadContext(typeof(AppDomainUtils).Assembly));
+            }
         }
 
         private sealed class IsolatedLoadContext : AssemblyLoadContext

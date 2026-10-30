@@ -34,7 +34,8 @@ namespace System.Web.Hosting {
     using System.Web.Compilation;
     using System.Web.Configuration;
     using System.Web.Util;
-    using System.Runtime.Loader;
+    using System.Runtime.CompilerServices;
+using System.Runtime.Loader;
 
     public enum HostSecurityPolicyResults {
         DefaultPolicy = 0,
@@ -107,6 +108,8 @@ namespace System.Web.Hosting {
             // WOS 1983175: (weird) only the handler in the default domain is notified when there is an AV in a native module
             // while we're in a call to MgdIndicateCompletion.
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(OnUnhandledException);
+            // webForCore: see BuildManager (the event is process-wide).
+            PseudoAppDomain.OnUnload(typeof(ApplicationManager).Assembly, () => AppDomain.CurrentDomain.UnhandledException -= OnUnhandledException);
         }
 
         internal bool ShutdownInProgress {
@@ -139,7 +142,21 @@ namespace System.Web.Hosting {
             }
         }
 
-		public static ConcurrentDictionary<AssemblyLoadContext, ConcurrentDictionary<string, object>> ContextData = new ConcurrentDictionary<AssemblyLoadContext, ConcurrentDictionary<string, object>>();
+		// webForCore: the data of the context this copy of System.Web is loaded in (the usual case) is a static of this copy,
+		// so that it goes with a PseudoAppDomain. Other contexts' data is in ContextData, weakly keyed; an unloading
+		// context is held strongly by the runtime until it is collected, so its entry is removed when it starts unloading.
+		static readonly ConcurrentDictionary<string, object> OwnContextData = new ConcurrentDictionary<string, object>();
+		static readonly AssemblyLoadContext OwnContext = AssemblyLoadContext.GetLoadContext(typeof(ApplicationManager).Assembly);
+		public static readonly ConditionalWeakTable<AssemblyLoadContext, ConcurrentDictionary<string, object>> ContextData = new ConditionalWeakTable<AssemblyLoadContext, ConcurrentDictionary<string, object>>();
+
+		static ConcurrentDictionary<string, object> DataFor(AssemblyLoadContext context) =>
+			context == OwnContext ? OwnContextData : ContextData.GetValue(context, NewContextData);
+
+		static ConcurrentDictionary<string, object> NewContextData(AssemblyLoadContext context)
+		{
+			if (context.IsCollectible) context.Unloading += unloading => ContextData.Remove(unloading);
+			return new ConcurrentDictionary<string, object>();
+		}
 
 		public static void SetLoadContextData(string key, object data, AssemblyLoadContext context = null)
 		{
@@ -147,7 +164,7 @@ namespace System.Web.Hosting {
 			//var context = AssemblyLoadContext.GetLoadContext(assembly);
 			if (context == null) context = AssemblyLoadContext.GetLoadContext(Assembly.GetCallingAssembly());
 			ConcurrentDictionary<string, object> dataContainer;
-			dataContainer = ContextData.GetOrAdd(context, context => new ConcurrentDictionary<string, object>());
+			dataContainer = DataFor(context);
 			dataContainer[key] = data;
 		}
 		public static void SetLoadContextData(string key, object data, Assembly assembly) =>
@@ -159,7 +176,7 @@ namespace System.Web.Hosting {
 			//var context = AssemblyLoadContext.GetLoadContext(assembly);
 			if (context == null) context = AssemblyLoadContext.GetLoadContext(Assembly.GetCallingAssembly());
 			ConcurrentDictionary<string, object> dataContainer;
-			dataContainer = ContextData.GetOrAdd(context, context => new ConcurrentDictionary<string, object>());
+			dataContainer = DataFor(context);
 			object data;
 			dataContainer.TryGetValue(key, out data);
 			return data;

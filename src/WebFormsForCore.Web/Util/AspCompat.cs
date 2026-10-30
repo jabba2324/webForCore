@@ -347,7 +347,7 @@ internal delegate void AspCompatCallback();
         else {
             _ar = new HttpAsyncResult(cb, extraData);
             _syncCaller = (cb == null);
-            _rootedThis = GCHandle.Alloc(this);
+            _rootedThis = System.Web.Util.GCUtil.Alloc(this);
 
             // send requests from the same session to the same STA thread
             bool sharedActivity = (_sessionId != null);
@@ -355,7 +355,7 @@ internal delegate void AspCompatCallback();
 
             if (UnsafeNativeMethods.AspCompatProcessRequest(_execCallback, this, sharedActivity, activityHash) != 1) {
                 // failed to queue up the execution in ASP compat mode
-                _rootedThis.Free();
+                System.Web.Util.GCUtil.Free(_rootedThis);
                 _ar.Complete(true, null, new HttpException(SR.GetString(SR.Cannot_access_AspCompat)));
             }
         }
@@ -451,7 +451,7 @@ internal delegate void AspCompatCallback();
     }
 
     private void OnAspCompatCompletion() {
-        _rootedThis.Free();
+        System.Web.Util.GCUtil.Free(_rootedThis);
         _ar.Complete(false, null, _error); // resume the application execution
     }
 

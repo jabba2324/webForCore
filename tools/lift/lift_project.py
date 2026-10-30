@@ -147,14 +147,9 @@ FIXUPS = {
     "System.Web.Http.Test": [
         ("Controllers/AuthenticationFilterResultTests.cs", "CancellationToken cancellationToken;\n",
          "CancellationToken cancellationToken = default; // webForCore: .NET reference assemblies expose the struct's private field (CS0165)\n", 3),
-    ] + [
-        ("Validation/Validators/DataAnnotationsModelValidatorTest.cs",
-         f"[Fact]\n        public void {m}()\n        {{\n            AppDomainUtils.RunInSeparateAppDomain({m}_Inner);\n        }}",
-         f'[Fact(Skip = "webForCore: needs AppDomainUtils.RunInSeparateAppDomain to isolate a static switch; no AppDomains on .NET 11 '
-         f'(Microsoft runs this test on .NET Framework only)")]\n        public void {m}()\n        {{\n#if NETFRAMEWORK\n'
-         f"            AppDomainUtils.RunInSeparateAppDomain({m}_Inner);\n#endif\n        }}", 1)
-        for m in ("ValidateSetsMemberNameProperty_UsingDisplayName", "ValidateSetsMemberNameProperty_NotUsingDisplayName")
     ],
+    # webForCore: ValidateSetsMemberNameProperty_* run in AppDomainUtils.RunInSeparateAppDomain (a PseudoAppDomain-style
+    # collectible load context on .NET, tools/lift/additions/Microsoft.TestCommon/AppDomainUtils.cs), unchanged.
 }
 
 # .NET Framework 4.8 behaviour (decided 30 Oct 2026) where .NET 11 differs inside Web API's own code paths.
@@ -513,11 +508,8 @@ MEMBERS_OUT["System.Web.Mvc.Test"] = [
     ("Html/Test/DefaultEditorTemplatesTest.cs", "private class MyEntityObject : EntityObject", NO_EF1),
 ]
 USING = lambda ns: ("using " + ns + ";\n", "#if NETFRAMEWORK // webForCore: not on .NET\nusing " + ns + ";\n#endif\n", 1)
-NO_APPDOMAIN = "needs AppDomainUtils.RunInSeparateAppDomain (it changes process-wide state); no AppDomains on .NET 11"
-MEMBER_EDITS["System.Web.Mvc.Test"] = [
-    ("Test/BuildManagerViewEngineTest.cs", "public void FileExistsReturnsTrueForExistingPath_VPPRegistrationChanging()", "skip", NO_APPDOMAIN),
-    ("Test/ViewContextTest.cs", "public void ViewContextGlobalValidationMessageElementAffectsLocalOne()", "skip", NO_APPDOMAIN),
-]
+# webForCore: the tests that use AppDomainUtils.RunInSeparateAppDomain run unchanged (see System.Web.Http.Test).
+MEMBER_EDITS["System.Web.Mvc.Test"] = []
 # Newlines (tests only, decided 30 Oct 2026). DefaultEditorTemplates.ObjectTemplate writes "\r\n" (on every platform,
 # as on .NET Framework); its tests spell it Environment.NewLine.
 MEMBER_EDITS["System.Web.Mvc.Test"] += [
@@ -643,9 +635,11 @@ MEMBERS_OUT["System.Web.WebPages.Test"] = [
 ]
 FIXUPS["System.Web.WebPages.Test"] = [("Html/InputHelperTest.cs",) + USING("System.Data.Linq")]
 
-NO_GDI = "System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp)."
 NO_SXS = ("side-by-side Web Pages versions (another System.Web.WebPages.Deployment loaded next to this one, as from the GAC): .NET has no "
           "GAC and an AssemblyLoadContext holds one version of a name.")
+NO_GDI = ("System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) "
+          "was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based "
+          "System.Drawing is the plan.")
 TRANSFORMS["System.Web.Helpers.Test"] = [
     ("WebImageTest.cs", "[Fact]", f'[Fact(Skip = "webForCore: {NO_GDI}")]', 83),
     ("WebImageTest.cs", "[Theory]", f'[Theory(Skip = "webForCore: {NO_GDI}")]', 1),

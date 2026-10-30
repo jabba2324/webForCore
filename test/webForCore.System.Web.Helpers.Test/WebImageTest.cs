@@ -18,28 +18,28 @@ namespace System.Web.Helpers.Test
         private static readonly byte[] _PngImageBytes = TestFile.Create("NETLogo.png").ReadAllBytes();
         private static readonly byte[] _IcoImageBytes = TestFile.Create("Test.ico").ReadAllBytes();
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void ConstructorThrowsWhenFilePathIsNull()
         {
             Assert.ThrowsArgument(() =>
                                                     new WebImage(GetContext(), s => new byte[] { }, filePath: null), "filePath", "Value cannot be null or an empty string.");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void ConstructorThrowsWhenFilePathIsEmpty()
         {
             Assert.ThrowsArgument(() =>
                                                     new WebImage(GetContext(), s => new byte[] { }, filePath: String.Empty), "filePath", "Value cannot be null or an empty string.");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void ConstructorThrowsWhenFilePathIsInvalid()
         {
             Assert.Throws<DirectoryNotFoundException>(() =>
                                                                new WebImage(GetContext(), s => { throw new DirectoryNotFoundException(); }, @"x:\this\does\not\exist.jpg"));
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void ConstructorThrowsWhenFileContentIsInvalid()
         {
             byte[] imageContent = new byte[] { 32, 111, 209, 138, 76, 32 };
@@ -47,7 +47,7 @@ namespace System.Web.Helpers.Test
                                                     "An image could not be constructed from the content provided.");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void FilePathReturnsCorrectPath()
         {
             // Arrange
@@ -60,7 +60,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(imageName, image.FileName);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void FilePathCanBeSet()
         {
             // Arrange
@@ -75,7 +75,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(newPath, image.FileName);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void SimpleGetBytesClonesArray()
         {
             WebImage image = new WebImage(_PngImageBytes);
@@ -86,7 +86,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(_PngImageBytes, returnedContent);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void WebImagePreservesOriginalFormatFromFile()
         {
             WebImage image = new WebImage(_PngImageBytes);
@@ -97,7 +97,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(_PngImageBytes, returnedContent);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void WebImagePreservesOriginalFormatFromStream()
         {
             WebImage image = null;
@@ -113,7 +113,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(originalContent, returnedContent);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void WebImageCorrectlyReadsFromNoSeekStream()
         {
             WebImage image = null;
@@ -132,7 +132,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal("png", image.ImageFormat);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void GetBytesWithNullReturnsClonesArray()
         {
             byte[] originalContent = _BmpImageBytes;
@@ -144,7 +144,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(originalContent, returnedContent);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void GetBytesWithSameFormatReturnsSameFormat()
         {
             byte[] originalContent = _JpgImageBytes;
@@ -156,7 +156,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(originalContent, returnedContent);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void GetBytesWithDifferentFormatReturnsExpectedFormat()
         {
             byte[] originalContent = _BmpImageBytes;
@@ -175,7 +175,7 @@ namespace System.Web.Helpers.Test
             }
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void GetBytesWithSameFormatReturnsSameFormatWhenCreatedFromFile()
         {
             byte[] originalContent = _BmpImageBytes;
@@ -188,7 +188,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(originalContent, returnedContent);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void GetBytesWithNoFormatReturnsInitialFormatEvenAfterTransformations()
         {
             byte[] originalContent = _BmpImageBytes;
@@ -208,7 +208,7 @@ namespace System.Web.Helpers.Test
             }
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void GetBytesThrowsOnIncorrectFormat()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -218,7 +218,7 @@ namespace System.Web.Helpers.Test
                 "\"bmpx\" is invalid image format. Valid values are image format names like: \"JPEG\", \"BMP\", \"GIF\", \"PNG\", etc.");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void GetBytesWithDifferentFormatReturnsExpectedFormatWhenCreatedFromFile()
         {
             // Format is not set during construction.
@@ -232,7 +232,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal("jpeg", newImage.ImageFormat);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void GetImageFromRequestReturnsNullForIncorrectMimeType()
         {
             // Arrange
@@ -260,7 +260,7 @@ namespace System.Web.Helpers.Test
             }
         }
 
-        [Theory(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Theory(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         [PropertyData("GetImageFromRequestDeterminesMimeTypeFromExtensionData")]
         public void GetImageFromRequestDeterminesMimeTypeFromExtension(string fileName,
                                                                        byte[] content,
@@ -287,7 +287,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(expectedExtension, image.ImageFormat);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void GetImageFromRequestIsCaseInsensitive()
         {
             // Arrange
@@ -311,7 +311,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal("jpeg", image.ImageFormat);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void ImagePropertiesAreCorrectForBmpImage()
         {
             WebImage image = new WebImage(_BmpImageBytes);
@@ -321,7 +321,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(44, image.Height);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void ImagePropertiesAreCorrectForPngImage()
         {
             WebImage image = new WebImage(_PngImageBytes);
@@ -331,7 +331,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(152, image.Height);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void ImagePropertiesAreCorrectForJpgImage()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -341,7 +341,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(489, image.Height);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void ResizePreservesRatio()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -352,7 +352,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(100, image.Height);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void ResizePreservesResolution()
         {
             MemoryStream output = null;
@@ -373,7 +373,7 @@ namespace System.Web.Helpers.Test
             }
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void ResizePreservesFormat()
         {
             // Arrange
@@ -394,7 +394,7 @@ namespace System.Web.Helpers.Test
             }
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void SaveUpdatesFileNameOfWebImageWhenForcingWellKnownExtension()
         {
             // Arrange
@@ -409,7 +409,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(@"x:\1.exe.jpeg", image.FileName);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void SaveUpdatesFileNameOfWebImageWhenFormatChanges()
         {
             // Arrange
@@ -425,7 +425,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(@"x:\images\foo.jpg.png", image.FileName);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void SaveKeepsNameIfFormatIsUnchanged()
         {
             // Arrange
@@ -441,7 +441,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(@"x:\images\foo.jpg", image.FileName);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void ResizeThrowsOnIncorrectWidthOrHeight()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -457,7 +457,7 @@ namespace System.Web.Helpers.Test
                 "0");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void ResizeAndRotateDoesOperationsInRightOrder()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -467,7 +467,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(130, image.Height);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void ClonePreservesAllInformation()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -480,7 +480,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(130, cloned.Height);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void ResizePreventsEnlarge()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -493,7 +493,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(height, image.Height);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void CropCreatesCroppedImage()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -503,7 +503,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(449, image.Height);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void CropThrowsOnIncorrectArguments()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -529,7 +529,7 @@ namespace System.Web.Helpers.Test
                 "0");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void RotateLeftReturnsRotatedImage()
         {
             WebImage image = new WebImage(_PngImageBytes);
@@ -539,7 +539,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(160, image.Height);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void RotateRightReturnsRotatedImage()
         {
             WebImage image = new WebImage(_PngImageBytes);
@@ -549,7 +549,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(160, image.Height);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void FlipVerticalReturnsFlippedImage()
         {
             WebImage image = new WebImage(_PngImageBytes);
@@ -559,7 +559,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(152, image.Height);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void FlipHorizontalReturnsFlippedImage()
         {
             WebImage image = new WebImage(_PngImageBytes);
@@ -569,7 +569,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(152, image.Height);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void MultipleCombinedOperationsExecuteInRightOrder()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -580,7 +580,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(120, image.Height);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddTextWatermarkPreservesImageDimension()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -590,7 +590,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(489, image.Height);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddTextWatermarkParsesHexColorCorrectly()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -600,7 +600,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(489, image.Height);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddTextWatermarkParsesShortHexColorCorrectly()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -610,7 +610,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(489, image.Height);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddTextWatermarkDoesNotChangeImageIfPaddingIsTooBig()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -620,7 +620,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(489, image.Height);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddTextWatermarkThrowsOnNegativeOpacity()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -628,7 +628,7 @@ namespace System.Web.Helpers.Test
             Assert.ThrowsArgumentOutOfRange(() => image.AddTextWatermark("Plan9", opacity: -1), "opacity", "Value must be between 0 and 100.");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddTextWatermarkThrowsOnTooBigOpacity()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -636,7 +636,7 @@ namespace System.Web.Helpers.Test
             Assert.ThrowsArgumentOutOfRange(() => image.AddTextWatermark("Plan9", opacity: 155), "opacity", "Value must be between 0 and 100.");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddTextWatermarkThrowsOnEmptyText()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -645,7 +645,7 @@ namespace System.Web.Helpers.Test
                 "text");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddTextWatermarkThrowsOnIncorrectColorName()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -654,7 +654,7 @@ namespace System.Web.Helpers.Test
                 "The \"fontColor\" value is invalid. Valid values are names like \"White\", \"Black\", or \"DarkBlue\", or hexadecimal values in the form \"#RRGGBB\" or \"#RGB\".");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddTextWatermarkThrowsOnIncorrectHexColorValue()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -663,7 +663,7 @@ namespace System.Web.Helpers.Test
                 "The \"fontColor\" value is invalid. Valid values are names like \"White\", \"Black\", or \"DarkBlue\", or hexadecimal values in the form \"#RRGGBB\" or \"#RGB\".");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddTextWatermarkThrowsOnIncorrectHexColorLength()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -672,7 +672,7 @@ namespace System.Web.Helpers.Test
                 "The \"fontColor\" value is invalid. Valid values are names like \"White\", \"Black\", or \"DarkBlue\", or hexadecimal values in the form \"#RRGGBB\" or \"#RGB\".");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddTextWatermarkThrowsOnIncorrectHorizontalAlignment()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -681,7 +681,7 @@ namespace System.Web.Helpers.Test
                 "The \"horizontalAlign\" value is invalid. Valid values are: \"Right\", \"Left\", and \"Center\".");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddTextWatermarkThrowsOnIncorrectVerticalAlignment()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -690,7 +690,7 @@ namespace System.Web.Helpers.Test
                 "The \"verticalAlign\" value is invalid. Valid values are: \"Top\", \"Bottom\", and \"Middle\".");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddTextWatermarkThrowsOnNegativePadding()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -700,7 +700,7 @@ namespace System.Web.Helpers.Test
                 "0");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddTextWatermarkThrowsOnIncorrectFontSize()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -715,7 +715,7 @@ namespace System.Web.Helpers.Test
                 "0");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddTextWatermarkThrowsOnIncorrectFontStyle()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -725,7 +725,7 @@ namespace System.Web.Helpers.Test
                 "The \"fontStyle\" value is invalid. Valid values are: \"Regular\", \"Bold\", \"Italic\", \"Underline\", and \"Strikeout\".");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddTextWatermarkThrowsOnIncorrectFontFamily()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -735,7 +735,7 @@ namespace System.Web.Helpers.Test
                 "The \"fontFamily\" value is invalid. Valid values are font family names like: \"Arial\", \"Times New Roman\", etc. Make sure that the font family you are trying to use is installed on the server.");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddImageWatermarkPreservesImageDimension()
         {
             WebImage watermark = new WebImage(_BmpImageBytes);
@@ -746,7 +746,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(489, image.Height);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void CanAddTextAndImageWatermarks()
         {
             WebImage watermark = new WebImage(_BmpImageBytes);
@@ -758,7 +758,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(489, image.Height);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddImageWatermarkDoesNotChangeWatermarkImage()
         {
             WebImage watermark = new WebImage(_BmpImageBytes);
@@ -769,7 +769,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(44, watermark.Height);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddImageWatermarkThrowsOnNullImage()
         {
             WebImage image = new WebImage(_JpgImageBytes);
@@ -779,7 +779,7 @@ namespace System.Web.Helpers.Test
                 "watermarkImage");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddImageWatermarkThrowsWhenJustOneDimensionIsZero()
         {
             WebImage watermark = new WebImage(_BmpImageBytes);
@@ -793,7 +793,7 @@ namespace System.Web.Helpers.Test
                 () => image.AddImageWatermark(watermark, width: 100, height: 0), message);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddImageWatermarkThrowsWhenOpacityIsIncorrect()
         {
             WebImage watermark = new WebImage(_BmpImageBytes);
@@ -804,7 +804,7 @@ namespace System.Web.Helpers.Test
             Assert.ThrowsArgumentOutOfRange(() => image.AddImageWatermark(watermark, opacity: 120), "opacity", "Value must be between 0 and 100.");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddImageWatermarkThrowsOnNegativeDimensions()
         {
             WebImage watermark = new WebImage(_BmpImageBytes);
@@ -821,7 +821,7 @@ namespace System.Web.Helpers.Test
                 "0");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddImageWatermarkThrowsOnIncorrectHorizontalAlignment()
         {
             WebImage watermark = new WebImage(_BmpImageBytes);
@@ -832,7 +832,7 @@ namespace System.Web.Helpers.Test
                 "The \"horizontalAlign\" value is invalid. Valid values are: \"Right\", \"Left\", and \"Center\".");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddImageWatermarkThrowsOnIncorrectVerticalAlignment()
         {
             WebImage watermark = new WebImage(_BmpImageBytes);
@@ -843,7 +843,7 @@ namespace System.Web.Helpers.Test
                 "The \"verticalAlign\" value is invalid. Valid values are: \"Top\", \"Bottom\", and \"Middle\".");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddImageWatermarkThrowsOnNegativePadding()
         {
             WebImage watermark = new WebImage(_BmpImageBytes);
@@ -855,7 +855,7 @@ namespace System.Web.Helpers.Test
                 "0");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddImageWatermarkDoesNotChangeImageIfWatermarkIsTooBig()
         {
             WebImage watermark = new WebImage(_JpgImageBytes);
@@ -869,7 +869,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(originalBytes, watermarkedBytes);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddImageWatermarkWithFileNameThrowsExceptionWhenWatermarkDirectoryDoesNotExist()
         {
             var context = GetContext();
@@ -879,7 +879,7 @@ namespace System.Web.Helpers.Test
                 () => image.AddImageWatermark(context, s => { throw new DirectoryNotFoundException(); }, @"x:\path\does\not\exist", width: 0, height: 0, horizontalAlign: "Right", verticalAlign: "Bottom", opacity: 100, padding: 5));
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddImageWatermarkWithFileNameThrowsExceptionWhenWatermarkFileDoesNotExist()
         {
             var context = GetContext();
@@ -888,7 +888,7 @@ namespace System.Web.Helpers.Test
                 () => image.AddImageWatermark(context, s => { throw new FileNotFoundException(); }, @"x:\there-is-no-file.jpg", width: 0, height: 0, horizontalAlign: "Right", verticalAlign: "Bottom", opacity: 100, padding: 5));
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddImageWatermarkWithFileNameThrowsExceptionWhenWatermarkFilePathIsNull()
         {
             var context = GetContext();
@@ -900,7 +900,7 @@ namespace System.Web.Helpers.Test
                 "Value cannot be null or an empty string.");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void AddImageWatermarkWithFileNameThrowsExceptionWhenWatermarkFilePathIsEmpty()
         {
             var context = GetContext();
@@ -911,7 +911,7 @@ namespace System.Web.Helpers.Test
                 "Value cannot be null or an empty string.");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void CanAddImageWatermarkWithFileName()
         {
             // Arrange
@@ -926,7 +926,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(watermarkedWithImageArgument, watermarkedWithFilePathArgument);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void SaveOverwritesExistingFile()
         {
             Action<string, byte[]> saveAction = (path, content) => { };
@@ -941,7 +941,7 @@ namespace System.Web.Helpers.Test
             image.Save(GetContext(), saveAction, newFileName, imageFormat: null, forceWellKnownExtension: true);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void SaveThrowsWhenPathIsNull()
         {
             Action<string, byte[]> saveAction = (path, content) => { };
@@ -955,7 +955,7 @@ namespace System.Web.Helpers.Test
                 "filePath");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void SaveThrowsWhenPathIsEmpty()
         {
             Action<string, byte[]> saveAction = (path, content) => { };
@@ -966,7 +966,7 @@ namespace System.Web.Helpers.Test
                 "filePath");
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void SaveUsesOriginalFormatWhenNoFormatIsSpecified()
         {
             // Arrange
@@ -983,7 +983,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(".png", Path.GetExtension(actualOutputFile));
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void SaveUsesOriginalFormatForStreamsWhenNoFormatIsSpecified()
         {
             // Arrange
@@ -1000,7 +1000,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(".png", Path.GetExtension(actualOutputFile));
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void SaveSetsExtensionBasedOnFormatWhenForceExtensionIsSet()
         {
             // Arrange
@@ -1018,7 +1018,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(specifiedOutputFile + ".jpeg", actualOutputFile);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void SaveAppendsExtensionBasedOnFormatWhenForceExtensionIsSet()
         {
             // Arrange
@@ -1035,7 +1035,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(".jpeg", Path.GetExtension(actualOutputFile));
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void SaveDoesNotModifyExtensionWhenExtensionIsCorrect()
         {
             // Arrange
@@ -1052,7 +1052,7 @@ namespace System.Web.Helpers.Test
             Assert.Equal(specifiedOutputFile, actualOutputFile);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void SaveDoesNotModifyExtensionWhenForceCorrectExtensionRenameIsCleared()
         {
             // Arrange
@@ -1069,14 +1069,14 @@ namespace System.Web.Helpers.Test
             Assert.Equal(specifiedOutputFile, actualOutputFile);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void ImageFormatIsSavedCorrectly()
         {
             WebImage image = new WebImage(_BmpImageBytes);
             Assert.Equal("bmp", image.ImageFormat);
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void SaveUsesInitialFormatWhenNoFormatIsSpecified()
         {
             // Arrange
@@ -1097,7 +1097,7 @@ namespace System.Web.Helpers.Test
             }
         }
 
-        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it (handoff section 9: SkiaSharp or ImageSharp).")]
+        [Fact(Skip = "webForCore: System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based System.Drawing is the plan.")]
         public void ImageFormatIsParsedCorrectly()
         {
             WebImage image = new WebImage(_BmpImageBytes);

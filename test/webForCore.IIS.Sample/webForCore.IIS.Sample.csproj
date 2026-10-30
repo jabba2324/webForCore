@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- The IIS hosting gate: a Web Forms site whose web.config uses the <system.webServer> sections the hosting layer
+       implements (request filtering, custom headers, HTTP redirection, URL Rewrite, default documents, the static
+       content MIME map and client cache, custom errors, managed modules and handlers, URL authorization, compression)
+       and pages for the PseudoAppDomain (in-process restart). Hosted on Kestrel by the fork's System.Web;
+       test/webForCore.IIS.Gate.Tests drives it. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <!-- The fork serves the parent of the output folder (WebFormsMiddleware: PhysicalPath), as in the TestApp. -->
+    <OutputPath>bin_dotnet</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <GenerateDependencyFile>true</GenerateDependencyFile>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+  </PropertyGroup>
+
+  <Import Project="..\..\src\webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <!-- App_Code and the pages are compiled at run time from the app folder, as on IIS. -->
+    <Compile Remove="App_Code\**" />
+    <Content Remove="bin_dotnet\**" />
+    <None Remove="bin_dotnet\**" />
+    <Compile Remove="bin_dotnet\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\WebFormsForCore.Configuration\WebFormsForCore.Configuration.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Drawing\WebFormsForCore.Drawing.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Serialization.Formatters\WebFormsForCore.Serialization.Formatters.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web\WebFormsForCore.Web.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.ApplicationServices\WebFormsForCore.Web.ApplicationServices.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.RegularExpressions\WebFormsForCore.Web.RegularExpressions.csproj" />
+    <!-- machine.config lists System.Web.Services and System.Web.Extensions (ScriptModule); the app deploys them. -->
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Services\WebFormsForCore.Web.Services.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Extensions\WebFormsForCore.Web.Extensions.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Infrastructure\WebFormsForCore.Web.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Compilers\WebFormsForCore.Compilers.csproj" />
+  </ItemGroup>
+</Project>

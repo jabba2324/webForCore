@@ -336,6 +336,18 @@ namespace System.Web.SessionState {
         // When set, it takes precedence over whatever <sessionState> config specifies.
         public static Func<SessionStateStoreProviderBase> ProviderOverride { get; set; }
 
+#if NETCOREAPP
+        // webForCore: <sessionState mode="Custom" customProvider="AspNetCoreSession"> with
+        // System.Web.SessionState.AspNetCoreSessionProvider, set in code (WebFormsOptions.UseAspNetCoreSessionProvider).
+        public static void UseAspNetCoreSessionProvider() {
+            ProviderOverride = () => {
+                var provider = new AspNetCoreSessionProvider();
+                provider.Initialize("AspNetCoreSession", new System.Collections.Specialized.NameValueCollection());
+                return provider;
+            };
+        }
+#endif
+
         void InitModuleFromConfig(HttpApplication app, SessionStateSection config) {
             if (ProviderOverride == null && config.Mode == SessionStateMode.Off)
             {

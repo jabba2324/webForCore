@@ -173,10 +173,9 @@ namespace System.Web.Mvc.Test
             Assert.Equal("div", scope[ViewContext.ValidationMessageElementKeyName]);
         }
 
-        [Fact(Skip = "webForCore: needs AppDomainUtils.RunInSeparateAppDomain (it changes process-wide state); no AppDomains on .NET 11")]
+        [Fact]
         public void ViewContextGlobalValidationMessageElementAffectsLocalOne()
         {
-#if NETFRAMEWORK
             // Arrange
             AppDomainUtils.RunInSeparateAppDomain(() =>
             {
@@ -219,7 +218,6 @@ namespace System.Web.Mvc.Test
                 localScope.TryGetValue("ValidationMessageElement", out value);
                 Assert.Equal("label", value);
             });
-#endif
         }
 
         [Fact]

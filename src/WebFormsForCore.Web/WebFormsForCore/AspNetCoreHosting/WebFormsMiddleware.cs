@@ -15,13 +15,17 @@ using System.Web;
 using System.Web.Hosting;
 using System.Web.SessionState;
 using System.Runtime.Loader;
+using System.Threading;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.AspNetCore.Hosting;
+using WebFormsForCore.Hosting.IIS;
 
 namespace Microsoft.AspNetCore.Builder
 {
 	public class WebFormsMiddleware
 	{
-		const bool UseSeparateAssemblyLoadContext = false;
-
 		public string VirtualPath { get; set; }
 		public string PhysicalPath { get; set; }
 		public string AppId { get; set; }
@@ -31,77 +35,243 @@ namespace Microsoft.AspNetCore.Builder
 		public IEnumerable<string> AddHandleExtensions = Array.Empty<string>();
 		public IEnumerable<string> DefaultDocuments = null;
 		public IEnumerable<string> AddDefaultDocuments = Array.Empty<string>();
-
+		public bool UseAspNetCoreSession = false;
+		// webForCore: run the application in a PseudoAppDomain, as IIS ran it in a worker AppDomain: the application
+		// restarts in-process (web.config, bin or App_Code changes, HttpRuntime.UnloadAppDomain, recycling) with fresh
+		// static state. Without it, a restart stops the process, for the service manager to start it again.
+		public bool IsolateApplication = PseudoAppDomain.IsSupported;
+		public readonly RecyclingOptions Recycling = new RecyclingOptions();
+		// webForCore: IIS's modules in front of the application, from <system.webServer> (IIS/IISModules.cs).
+		public readonly IISModules.Options IIS = new IISModules.Options();
+		IISModules iisModules;
 
 		private readonly Core.RequestDelegate next;
+		private readonly IHostApplicationLifetime lifetime;
+		private readonly ILogger logger;
+		private readonly object sync = new object();
+		private readonly Timer recycleTimer;
+		private volatile Application current;
+		private volatile bool stopping;
+		private int generation;
+		// Domains shutting down, until they are collected: (start, domain, checks so far).
+		private readonly List<(int Generation, WeakReference Domain, int Checks)> unloading = new List<(int, WeakReference, int)>();
+		private int stuckDomains;
 
-		public readonly ApplicationManager ApplicationManager = new ApplicationManager();
-
-		AspNetCoreHost host = null;
-		public AspNetCoreHost Host
+		// One start of the application: its domain (null without isolation) and the host's entry points in it.
+		sealed class Application
 		{
-			get
-			{
-				if (host == null)
-				{
-					//AppId = ApplicationManager.CreateApplicationId(VirtualPath, PhysicalPath);
-					//host = ApplicationManager.CreateInstanceInNewWorkerLoadContext(typeof(AspNetCoreHost), AppId, System.Web.VirtualPath.Create(VirtualPath), PhysicalPath, UseSeparateAssemblyLoadContext) as AspNetCoreHost;
-					host = CreateWorkerLoadContextWithHost(VirtualPath, PhysicalPath, typeof(AspNetCoreHost)) as AspNetCoreHost;
-					if (HandleExtensions != null) host.HandleExtensions = HandleExtensions.ToArray();
-					if (AddHandleExtensions.Any()) host.HandleExtensions = host.HandleExtensions.Concat(AddHandleExtensions).ToArray();
-					if (DefaultDocuments != null) host.DefaultDocuments = DefaultDocuments.ToArray();
-					if (AddDefaultDocuments.Any()) host.DefaultDocuments = host.DefaultDocuments.Concat(AddDefaultDocuments).ToArray();
-					host.HandleAllRequestsWithWebForms = HandleAllRequestsWithWebForms;
-					host.UseClassicMode = UseClassicMode;
-				}
-				return host;
-			}
+			public AssemblyLoadContext Domain;
+			public Func<Core.HttpContext, bool> IsLegacyRequest;
+			public Func<Core.HttpContext, Task> ProcessRequest;
+			public Action Shutdown;
+			public DateTime Started = DateTime.UtcNow;
+			public long Requests;
+			public int Generation;
+			public int Retired;
 		}
 
-		private object CreateWorkerLoadContextWithHost(string virtualPath, string physicalPath, Type hostType)
+		// IIS application pool recycling (applicationHost.config <recycling><periodicRestart>), with IIS's defaults.
+		public class RecyclingOptions
 		{
-			// create BuildManagerHost in the worker app domain
-			//ApplicationManager appManager = ApplicationManager.GetApplicationManager();
-			Type buildManagerHostType = typeof(HttpRuntime).Assembly.GetType("System.Web.Compilation.BuildManagerHost");
-			AppId = ApplicationManager.CreateApplicationId(VirtualPath, PhysicalPath);
-			var vpath = System.Web.VirtualPath.Create(virtualPath);
-			IRegisteredObject buildManagerHost = ApplicationManager.CreateInstanceInNewWorkerLoadContext(buildManagerHostType, AppId, vpath, physicalPath, false) as IRegisteredObject;
-
-			// call BuildManagerHost.RegisterAssembly to make Host type loadable in the worker app domain
-			buildManagerHostType.InvokeMember("RegisterAssembly",
-											  BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.NonPublic,
-											  null,
-											  buildManagerHost,
-											  new object[] { hostType.Assembly.FullName, hostType.Assembly.Location });
-			// create Host in the worker app domain
-			return ApplicationManager.CreateObject(AppId, hostType, virtualPath, physicalPath, false);
+			// <periodicRestart time="1.05:00:00"/>; TimeSpan.Zero disables.
+			public TimeSpan Time { get; set; } = TimeSpan.FromMinutes(1740);
+			// <periodicRestart requests="0"/>; 0 disables.
+			public long Requests { get; set; }
+			// <periodicRestart privateMemory="0"/> in KB, the process's private bytes; 0 disables.
+			public long PrivateMemory { get; set; }
+			// webForCore: earlier starts that could not be unloaded (still referenced 5 minutes after their shutdown) before
+			// the process itself is stopped, for the service manager to start it again (tools/deploy/webforcore@.service);
+			// 0 never stops it.
+			public int MaxStuckDomains { get; set; } = 3;
 		}
 
-		public void RestartApplication()
-		{
-			AssemblyLoadContext context;
-			lock (ApplicationManager)
-			{
-				context = ApplicationManager.GetAssemblyLoadContext(AppId);
-				host = null;
-				AppId = Guid.NewGuid().ToString();
-			}
-			if (context != AssemblyLoadContext.Default) context.Unload();
-		}
-
-		public WebFormsMiddleware(Core.RequestDelegate next, Action<WebFormsOptions> optionsBuilder)
+		public WebFormsMiddleware(Core.RequestDelegate next, Action<WebFormsOptions> optionsBuilder,
+			IHostApplicationLifetime lifetime = null, ILoggerFactory loggerFactory = null, IWebHostEnvironment environment = null,
+			WebServerConfigurationAccessor webServerAccessor = null)
 		{
 			this.next = next;
+			this.lifetime = lifetime;
+			logger = (ILogger)loggerFactory?.CreateLogger<WebFormsMiddleware>() ?? NullLogger.Instance;
 			var path = AppDomain.CurrentDomain.BaseDirectory;
 			if (path.EndsWith(Path.DirectorySeparatorChar.ToString())) path = path.Substring(0, path.Length - 1);
 			PhysicalPath = Path.GetDirectoryName(path);
-			//PhysicalPath = Path.GetDirectoryName(Path.GetDirectoryName(new Uri(Assembly.GetEntryAssembly().CodeBase).AbsolutePath));
 			VirtualPath = "/";
+			// app.UseAspNetCoreSessionProvider() sets the provider before UseWebForms.
+			UseAspNetCoreSession = SessionStateModule.ProviderOverride != null;
 
 			optionsBuilder?.Invoke(new WebFormsOptions(this));
 
-			Host.Configure(VirtualPath, PhysicalPath);
+			AppId = ApplicationManager.CreateApplicationId(VirtualPath, PhysicalPath);
+			if (IIS.Enabled)
+			{
+				var webServer = new WebServerConfiguration(PhysicalPath);
+				// The application's output folder (bin_dotnet) and .NET's build folder are not part of the site.
+				webServer.ExcludedDirectories.Add(Path.GetFileName(path));
+				webServer.ExcludedDirectories.Add("obj");
+				iisModules = new IISModules(webServer, IIS, loggerFactory, environment);
+				if (webServerAccessor != null) webServerAccessor.Configuration = webServer;
+			}
+			lifetime?.ApplicationStopping.Register(() =>
+			{
+				stopping = true;
+				var app = current;
+				if (app != null) InDomain(app, app.Shutdown);
+			});
+			GetApplication();
+			recycleTimer = new Timer(_ => CheckRecycling(), null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
 		}
+
+		Application GetApplication()
+		{
+			var app = current;
+			if (app != null) return app;
+			lock (sync)
+			{
+				return current ??= StartApplication();
+			}
+		}
+
+		Application StartApplication()
+		{
+			var app = new Application { Generation = ++generation };
+			if (IsolateApplication)
+			{
+				app.Domain = new PseudoAppDomain($"{AppId}-{app.Generation}", PhysicalPath);
+				app.Domain.Unloading += _ => logger.LogInformation("Application {AppId} (start {Generation}) is unloading.", AppId, app.Generation);
+			}
+			Action onShutdown = () => OnApplicationShutdown(app);
+			var args = new object[] { VirtualPath, PhysicalPath, HandleExtensions?.ToArray(), AddHandleExtensions.ToArray(),
+				DefaultDocuments?.ToArray(), AddDefaultDocuments.ToArray(), HandleAllRequestsWithWebForms, UseClassicMode,
+				UseAspNetCoreSession, IIS.Enabled, onShutdown };
+			object[] host;
+			try
+			{
+				// On a clean ExecutionContext: the timers and threads the application creates capture it, and the caller's
+				// (an old domain's shutdown, a request) would keep that domain or request alive.
+				Task<object[]> create;
+				using (ExecutionContext.SuppressFlow())
+				{
+					create = Task.Run(() => app.Domain is PseudoAppDomain domain
+						? (object[])domain.InvokeStatic(typeof(AspNetCoreHost), nameof(AspNetCoreHost.CreateForMiddleware), args)
+						: AspNetCoreHost.CreateForMiddleware((string)args[0], (string)args[1], (string[])args[2], (string[])args[3],
+							(string[])args[4], (string[])args[5], HandleAllRequestsWithWebForms, UseClassicMode, UseAspNetCoreSession, IIS.Enabled, onShutdown));
+				}
+				host = create.GetAwaiter().GetResult();
+			}
+			catch
+			{
+				app.Domain?.Unload();
+				throw;
+			}
+			app.IsLegacyRequest = (Func<Core.HttpContext, bool>)host[0];
+			app.ProcessRequest = (Func<Core.HttpContext, Task>)host[1];
+			app.Shutdown = (Action)host[2];
+			logger.LogInformation("Started application {AppId} (start {Generation}{Domain}).", AppId, app.Generation,
+				app.Domain != null ? ", in a PseudoAppDomain" : "");
+			return app;
+		}
+
+		// The application's hosting environment is shutting down (file change, UnloadAppDomain, recycling, idle).
+		void OnApplicationShutdown(Application app)
+		{
+			if (Interlocked.Exchange(ref app.Retired, 1) != 0) return;
+			lock (sync)
+			{
+				if (current == app) current = null;
+			}
+			logger.LogInformation("Application {AppId} (start {Generation}) is shutting down.", AppId, app.Generation);
+			if (stopping) return;
+			if (app.Domain != null)
+				lock (unloading) unloading.Add((app.Generation, new WeakReference(app.Domain), 0));
+			if (app.Domain == null)
+			{
+				// No domain to replace it with: the process is the unit of restart, as a worker process is for IIS.
+				logger.LogWarning("Application {AppId} restarted without IsolateApplication: stopping the process.", AppId);
+				lifetime?.StopApplication();
+				return;
+			}
+			// Overlapped recycle: the next start is ready while the old domain drains its requests.
+			Task.Run(() =>
+			{
+				try { GetApplication(); }
+				catch (Exception e) { logger.LogError(e, "Restarting application {AppId} failed.", AppId); }
+			});
+		}
+
+		void Recycle(Application app, string reason)
+		{
+			if (app == null || app.Retired != 0) return;
+			logger.LogInformation("Recycling application {AppId} (start {Generation}): {Reason}.", AppId, app.Generation, reason);
+			InDomain(app, app.Shutdown);
+		}
+
+		// The number of earlier starts whose domain is not collected yet.
+		public int UnloadingDomains { get { lock (unloading) return unloading.Count; } }
+
+		// A domain unloads once nothing references it; one still referenced after 10 checks (5 minutes) is reported.
+		void CheckUnloading()
+		{
+			lock (unloading)
+			{
+				if (unloading.Count == 0) return;
+				GC.Collect();
+				GC.WaitForPendingFinalizers();
+				GC.Collect();
+				for (int i = unloading.Count - 1; i >= 0; i--)
+				{
+					var (start, domain, checks) = unloading[i];
+					if (domain.Target is PseudoAppDomain pseudo)
+					{
+						int timers = pseudo.ReleaseTimers(), handlers = pseudo.ReleaseProcessEventHandlers(), handles = pseudo.ReleaseSystemWebHandles();
+						if (timers + handlers + handles > 0)
+							logger.LogDebug("Application {AppId} (start {Generation}): released {Timers} timers, {Handlers} event handlers, {Handles} GC handles.",
+								AppId, start, timers, handlers, handles);
+						if (checks == 0)
+							foreach (var error in pseudo.UnloadErrors)
+								logger.LogWarning(error, "Application {AppId} (start {Generation}): releasing its resources failed.", AppId, start);
+					}
+					if (!domain.IsAlive)
+					{
+						logger.LogInformation("Application {AppId} (start {Generation}) unloaded.", AppId, start);
+						unloading.RemoveAt(i);
+					}
+					else if (++checks == 10)
+					{
+						logger.LogWarning("Application {AppId} (start {Generation}) has not unloaded: objects outside its domain still reference it.", AppId, start);
+						unloading.RemoveAt(i);
+						if (Recycling.MaxStuckDomains > 0 && ++stuckDomains >= Recycling.MaxStuckDomains && !stopping)
+						{
+							logger.LogWarning("{Count} earlier starts of application {AppId} are still in memory: stopping the process.", stuckDomains, AppId);
+							lifetime?.StopApplication();
+						}
+					}
+					else unloading[i] = (start, domain, checks);
+				}
+			}
+		}
+
+		void CheckRecycling()
+		{
+			CheckUnloading();
+			var app = current;
+			if (app == null || stopping) return;
+			if (Recycling.Time > TimeSpan.Zero && DateTime.UtcNow - app.Started >= Recycling.Time)
+				Recycle(app, $"periodic restart after {Recycling.Time}");
+			else if (Recycling.PrivateMemory > 0)
+			{
+				using var process = System.Diagnostics.Process.GetCurrentProcess();
+				if (process.PrivateMemorySize64 / 1024 >= Recycling.PrivateMemory)
+					Recycle(app, $"private memory {process.PrivateMemorySize64 / 1024} KB over the limit of {Recycling.PrivateMemory} KB");
+			}
+		}
+
+		static void InDomain(Application app, Action action)
+		{
+			if (app.Domain == null) { action(); return; }
+			using (app.Domain.EnterContextualReflection()) action();
+		}
+
+		public void RestartApplication() => Recycle(current, "restart requested");
 
 		public void AllowSynchronousIO(Core.HttpContext context)
 		{
@@ -112,19 +282,38 @@ namespace Microsoft.AspNetCore.Builder
 			}
 		}
 
-		public async Task Invoke(Core.HttpContext context)
-		{
-			if (IsLegacyRequest(context))
-			{
-				AllowSynchronousIO(context);
+		public Task Invoke(Core.HttpContext context) =>
+			iisModules != null ? iisModules.Invoke(context, InvokeApplication) : InvokeApplication(context);
 
-				await host.ProcessRequest(context);
-			} else {
-				await next.Invoke(context);
+		async Task InvokeApplication(Core.HttpContext context)
+		{
+			var app = GetApplication();
+			// Code that resolves types by name (Type.GetType, Assembly.Load) finds the domain's assemblies.
+			var scope = app.Domain != null ? app.Domain.EnterContextualReflection() : default;
+			try
+			{
+				if (app.IsLegacyRequest(context))
+				{
+					AllowSynchronousIO(context);
+					var requests = Interlocked.Increment(ref app.Requests);
+					await app.ProcessRequest(context);
+					if (Recycling.Requests > 0 && requests == Recycling.Requests)
+						Recycle(app, $"{requests} requests");
+				}
+				else
+				{
+					scope.Dispose();
+					scope = default;
+					await next.Invoke(context);
+				}
+			}
+			finally
+			{
+				scope.Dispose();
 			}
 		}
 
-		public virtual bool IsLegacyRequest(Core.HttpContext context) => host.IsLegacyRequest(context);
+		public virtual bool IsLegacyRequest(Core.HttpContext context) => GetApplication().IsLegacyRequest(context);
 	}
 
 	public class WebFormsOptions
@@ -154,15 +343,15 @@ namespace Microsoft.AspNetCore.Builder
             //         <add name="AspNetCoreSession" type="System.Web.SessionState.AspNetCoreSessionProvider, System.Web" />
             //     </providers>
             // </sessionState>
-            SessionStateModule.ProviderOverride = () =>
-            {
-                var provider = new AspNetCoreSessionProvider();
-                provider.Initialize("AspNetCoreSession", new NameValueCollection());
-                return provider;
-            };
-
+            // Set in the application's domain when it starts (AspNetCoreHost.CreateForMiddleware).
+            Instance.UseAspNetCoreSession = true;
             return this;
         }
+        // webForCore: see WebFormsMiddleware.IsolateApplication.
+        public WebFormsOptions IsolateApplication(bool isolate = true) { Instance.IsolateApplication = isolate; return this; }
+        public WebFormsOptions Recycling(Action<WebFormsMiddleware.RecyclingOptions> configure) { configure(Instance.Recycling); return this; }
+        // webForCore: see WebFormsMiddleware.IIS; IIS(o => o.Enabled = false) leaves <system.webServer> to the host.
+        public WebFormsOptions IIS(Action<IISModules.Options> configure) { configure(Instance.IIS); return this; }
     }
 
     public static class WebFormsMiddlewareExtensions
@@ -171,6 +360,8 @@ namespace Microsoft.AspNetCore.Builder
 		{
 			AssemblyLoaderNetCore.Init();
 			if (optionsBuilder == null) optionsBuilder = options => { };
+			// webForCore: W3C logging and compression, when services.AddWebForms() registered them (IIS/IISServices.cs).
+			WebFormsServiceCollectionExtensions.UseWebFormsServices(builder);
 			return builder.UseMiddleware<WebFormsMiddleware>(optionsBuilder);
         }
         public static IApplicationBuilder UseAspNetCoreSessionProvider(this IApplicationBuilder builder)
@@ -183,12 +374,7 @@ namespace Microsoft.AspNetCore.Builder
             //         <add name="AspNetCoreSession" type="System.Web.SessionState.AspNetCoreSessionProvider, System.Web" />
             //     </providers>
             // </sessionState>
-            SessionStateModule.ProviderOverride = () =>
-            {
-                var provider = new AspNetCoreSessionProvider();
-                provider.Initialize("AspNetCoreSession", new NameValueCollection());
-                return provider;
-            };
+            SessionStateModule.UseAspNetCoreSessionProvider();
 
 			return builder;
         }

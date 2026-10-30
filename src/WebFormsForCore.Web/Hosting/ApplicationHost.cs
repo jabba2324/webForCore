@@ -37,16 +37,32 @@ namespace System.Web.Hosting {
         /// </devdoc>
         [SecurityPermission(SecurityAction.Demand, Unrestricted=true)]
         public static Object CreateApplicationHost(Type hostType, String virtualDir, String physicalDir) {
+#if NETFRAMEWORK
 #if !FEATURE_PAL // FEATURE_PAL does not require PlatformID.Win32NT
             if (Environment.OSVersion.Platform != PlatformID.Win32NT)
                 throw new PlatformNotSupportedException(SR.GetString(SR.RequiresNT));
 #else // !FEATURE_PAL
             // FEATURE_PAL
 #endif // !FEATURE_PAL
+#endif
 
             if (!StringUtil.StringEndsWith(physicalDir, Path.DirectorySeparatorChar))
                 physicalDir = physicalDir + Path.DirectorySeparatorChar;
 
+#if NETCOREAPP
+            // webForCore: the new AppDomain is a PseudoAppDomain (AspNetCoreHosting/PseudoAppDomain.cs) with the
+            // application directory as its base; the host is created there by that domain's copy of System.Web. The
+            // result is the domain's object (no remoting proxy): callers reach it through reflection or dynamic.
+            if (PseudoAppDomain.IsSupported) {
+                var domain = new PseudoAppDomain(ApplicationManager.CreateApplicationId(virtualDir, physicalDir), physicalDir);
+                return domain.InvokeStatic(typeof(ApplicationHost), nameof(CreateApplicationHostInCurrentDomain),
+                    domain.GetDomainType(hostType), virtualDir, physicalDir);
+            }
+            return CreateApplicationHostInCurrentDomain(hostType, virtualDir, physicalDir);
+        }
+
+        internal static Object CreateApplicationHostInCurrentDomain(Type hostType, String virtualDir, String physicalDir) {
+#endif
             ApplicationManager appManager = ApplicationManager.GetApplicationManager();
 
             String appId = ApplicationManager.CreateApplicationId(virtualDir, physicalDir);

@@ -38,13 +38,13 @@ namespace MvcGate
         }
 
         [Theory]
-        // As on IIS: .NET Framework's root mappings (HttpForbiddenHandler: 403) and Web Pages' own rules.
+        // As on IIS: request filtering (web.config 404.8, .cs/.csproj 404.7) and Web Pages' own rules.
         [InlineData("/Default.cshtml", 200)]
         [InlineData("/_PageStart.cshtml", 404)]
         [InlineData("/Shared/_Layout.cshtml", 404)]
-        [InlineData("/Web.config", 403)]
-        [InlineData("/Program.cs", 403)]
-        [InlineData("/webForCore.WebPages.Sample.csproj", 403)]
+        [InlineData("/Web.config", 404)]
+        [InlineData("/Program.cs", 404)]
+        [InlineData("/webForCore.WebPages.Sample.csproj", 404)]
         // ASP.NET Core's settings files are blocked by the fork's middleware.
         [InlineData("/appsettings.json", 404)]
         [InlineData("/appsettings.Production.json", 404)]

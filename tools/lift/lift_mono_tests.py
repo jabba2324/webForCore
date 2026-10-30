@@ -60,12 +60,15 @@ FIXUPS = {
     **{f: [("using System.Runtime.Serialization.Formatters.Binary;",
             "using BinaryFormatter = WebFormsForCore.Serialization.Formatters.Binary.BinaryFormatter; // webForCore: the fork's port, as its System.Web uses", 1)]
        for f in ("System.Web/HttpCookieTest.cs", "System.Web.Caching/OutputCacheTest.cs")},
-    # ApplicationHost.CreateApplicationHost creates an AppDomain and Microsoft's code requires Windows NT; .NET has no
-    # AppDomains, so these tests cannot run. Skipped visibly, like the Web Stack's AppDomain tests.
+    # ApplicationHost.CreateApplicationHost creates the host in a PseudoAppDomain (the fork's stand-in for an AppDomain);
+    # there is no remoting, so the host is the new domain's own Host type, which the test's Host type cannot be cast
+    # from. The tests reach it through dynamic, as a caller does without a transparent proxy.
     "System.Web.Hosting/SimpleWorkerRequestTest.cs": [
-        (f"public void {m} ()",
-         f'[Ignore ("webForCore: needs ApplicationHost.CreateApplicationHost, i.e. a new AppDomain; not available on .NET 11")]\n\t\tpublic void {m} ()', 1)
-        for m in ("AppDomainTests", "AppDomain_MapPath1", "AppDomain_MapPath2", "AppDomain_MapPath3", "AppDomain_MapPath4")
+        ("\t\tHost MakeHost (string virtualDir)\n\t\t{\n\t\t\treturn (Host) ApplicationHost.CreateApplicationHost (typeof (Host), virtualDir, cwd);",
+         "\t\t// webForCore: the host is the PseudoAppDomain's Host type (no remoting proxy); reached through dynamic.\n"
+         "\t\tdynamic MakeHost (string virtualDir)\n\t\t{\n\t\t\treturn ApplicationHost.CreateApplicationHost (typeof (Host), virtualDir, cwd);", 1),
+        ("\t\tHost MakeHost ()\n", "\t\tdynamic MakeHost ()\n", 1),
+        ("\t\t\tHost h = MakeHost (", "\t\t\tdynamic h = MakeHost (", 5),
     ],
     # HtmlInputRadioButton.RenderAttributes writes the value with HtmlTextWriter.WriteAttribute(name, value), which
     # calls WriteAttribute(name, value, false /*encode*/) (referencesource HtmlInputRadioButton.cs, HTMLTextWriter.cs:1147);

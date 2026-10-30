@@ -81,16 +81,16 @@ internal class WrappedWorkItemCallback {
     }
 
     internal void Post() {
-        _rootedThis = GCHandle.Alloc(this);
+        _rootedThis = System.Web.Util.GCUtil.Alloc(this);
 
         if (UnsafeNativeMethods.PostThreadPoolWorkItem(_wrapperCallback) != 1) {
-            _rootedThis.Free();
+            System.Web.Util.GCUtil.Free(_rootedThis);
             throw new HttpException(SR.GetString(SR.Cannot_post_workitem));
         }
     }
 
     private void OnCallback() {
-        _rootedThis.Free();
+        System.Web.Util.GCUtil.Free(_rootedThis);
         _originalCallback();
     }
 }

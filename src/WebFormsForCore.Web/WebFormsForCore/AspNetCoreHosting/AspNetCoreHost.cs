@@ -119,18 +119,63 @@ namespace System.Web.Hosting
 
         public HostingEnvironment HostingEnvironment { get; set; }
 
+        // webForCore: called once when the hosting environment starts shutting the application down.
+        public Action OnShutdown;
+
+        // webForCore: creates the host for WebFormsMiddleware in the domain this copy of System.Web is loaded in (a
+        // PseudoAppDomain, or the middleware's own context). Parameters and results are shared-framework types, so that
+        // the middleware's copy of System.Web can call it in another domain: the host is returned as delegates.
+        internal static object[] CreateForMiddleware(string virtualPath, string physicalPath, string[] handleExtensions,
+            string[] addHandleExtensions, string[] defaultDocuments, string[] addDefaultDocuments, bool handleAllRequestsWithWebForms,
+            bool useClassicMode, bool useAspNetCoreSession, bool iisModules, Action onShutdown)
+        {
+            AssemblyLoaderNetCore.Init();
+            if (iisModules) WebFormsForCore.Hosting.IIS.WebServerModules.Configuration = new WebFormsForCore.Hosting.IIS.WebServerConfiguration(physicalPath);
+            if (useAspNetCoreSession) SessionState.SessionStateModule.UseAspNetCoreSessionProvider();
+
+            var applicationManager = new ApplicationManager();
+            // create BuildManagerHost in the worker app domain
+            Type buildManagerHostType = typeof(HttpRuntime).Assembly.GetType("System.Web.Compilation.BuildManagerHost");
+            var appId = ApplicationManager.CreateApplicationId(virtualPath, physicalPath);
+            var vpath = System.Web.VirtualPath.Create(virtualPath);
+            IRegisteredObject buildManagerHost = applicationManager.CreateInstanceInNewWorkerLoadContext(buildManagerHostType, appId, vpath, physicalPath, false) as IRegisteredObject;
+            // call BuildManagerHost.RegisterAssembly to make Host type loadable in the worker app domain
+            var hostType = typeof(AspNetCoreHost);
+            buildManagerHostType.InvokeMember("RegisterAssembly", BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.NonPublic,
+                null, buildManagerHost, new object[] { hostType.Assembly.FullName, hostType.Assembly.Location });
+            // create Host in the worker app domain
+            var host = (AspNetCoreHost)applicationManager.CreateObject(appId, hostType, virtualPath, physicalPath, false);
+
+            if (handleExtensions != null) host.HandleExtensions = handleExtensions;
+            if (addHandleExtensions.Length > 0) host.HandleExtensions = host.HandleExtensions.Concat(addHandleExtensions).ToArray();
+            if (defaultDocuments != null) host.DefaultDocuments = defaultDocuments;
+            if (addDefaultDocuments.Length > 0) host.DefaultDocuments = host.DefaultDocuments.Concat(addDefaultDocuments).ToArray();
+            host.HandleAllRequestsWithWebForms = handleAllRequestsWithWebForms;
+            host.UseClassicMode = useClassicMode;
+            host.OnShutdown = onShutdown;
+            host.Configure(virtualPath, physicalPath);
+
+            return new object[] {
+                new Func<Core.HttpContext, bool>(host.IsLegacyRequest),
+                new Func<Core.HttpContext, Task>(host.ProcessRequest),
+                new Action(host.Shutdown),
+            };
+        }
+
         #region IRegisteredObject Members
 
         void IRegisteredObject.Stop(bool immediate)
         {
+            // webForCore: tell the middleware first, so that new requests go to a new domain while this one drains.
+            Interlocked.Exchange(ref OnShutdown, null)?.Invoke();
+
             // Make sure all the pending calls complete before this Object is unregistered.
             WaitForPendingCallsToFinish();
 
+            // webForCore: only unregister, as a registered object does (Cassini's Host). This called HttpRuntime.Close(),
+            // which marked the runtime as shutting down, so that the hosting environment's shutdown, which called Stop,
+            // then skipped releasing the runtime and unloading the domain (HttpRuntime.ShutdownAppDomain).
             HostingEnvironment.UnregisterObject(this);
-
-            Thread.Sleep(100);
-            HttpRuntime.Close();
-            Thread.Sleep(100);
         }
 
         #endregion
@@ -308,12 +353,17 @@ namespace System.Web.Hosting
         public async Task ProcessRequest(Core.HttpContext context)
         {
             AddPendingCall();
+            try
+            {
+                if (UseClassicMode) HttpRuntime.SetClassicPipeline();
 
-            if (UseClassicMode) HttpRuntime.SetClassicPipeline();
-
-            await new AspNetCoreWorkerRequest(this, context).Process();
-
-            RemovePendingCall();
+                await new AspNetCoreWorkerRequest(this, context).Process();
+            }
+            finally
+            {
+                // webForCore: also when the request throws; Stop waits for the count to reach 0.
+                RemovePendingCall();
+            }
         }
 
         [SecurityPermission(SecurityAction.Assert, Unrestricted = true)]

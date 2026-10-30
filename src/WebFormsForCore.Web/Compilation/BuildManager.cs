@@ -447,6 +447,10 @@ public sealed class BuildManager
 
         // Register an AssemblyResolve event
         AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(this.ResolveAssembly);
+#if NETCOREAPP
+        // webForCore: the event is process-wide; in a PseudoAppDomain the handler would keep the unloaded domain alive.
+        PseudoAppDomain.OnUnload(typeof(BuildManager).Assembly, () => AppDomain.CurrentDomain.AssemblyResolve -= this.ResolveAssembly);
+#endif
 
         _globalAsaxVirtualPath = HttpRuntime.AppDomainAppVirtualPathObject.SimpleCombine(
             HttpApplicationFactory.applicationFileName);

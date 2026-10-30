@@ -88,10 +88,9 @@ namespace System.Web.Mvc.Test
             Assert.False(result);
         }
 
-        [Fact(Skip = "webForCore: needs AppDomainUtils.RunInSeparateAppDomain (it changes process-wide state); no AppDomains on .NET 11")]
+        [Fact]
         public void FileExistsReturnsTrueForExistingPath_VPPRegistrationChanging()
         {
-#if NETFRAMEWORK
             AppDomainUtils.RunInSeparateAppDomain(() =>
             {
                 // Arrange
@@ -121,7 +120,6 @@ namespace System.Web.Mvc.Test
                 mockProvider.Verify();
                 mockProvider.Verify(c => c.FileExists(It.IsAny<String>()), Times.Once());
             });
-#endif
         }
 
         [Fact]

@@ -1,0 +1,44 @@
+# webForCore: a systemd unit for one application, standing in for an IIS application pool (one process per app).
+# Install as /etc/systemd/system/webforcore@.service, put the site in /srv/webforcore/<app> (web.config at the top,
+# the build output in bin_dotnet/, as on IIS) and start it with: systemctl enable --now webforcore@<app>
+#
+#   IIS application pool                      here
+#   ----------------------------------------  ---------------------------------------------------------------
+#   start mode, auto start                    WantedBy=multi-user.target (systemctl enable)
+#   identity (ApplicationPoolIdentity)        User=/Group= (DynamicUser=yes gives a per-app identity)
+#   rapid-fail protection (5 in 5 min)        StartLimitBurst=5, StartLimitIntervalSec=300
+#   ping (30 s, 90 s timeout)                 WatchdogSec=90: the app pings systemd (services.AddWebForms())
+#   shutdown time limit (90 s)                TimeoutStopSec=90 (SIGTERM, then the app drains its requests)
+#   recycling (time, requests, memory)        in-process: WebFormsOptions.Recycling (PseudoAppDomain)
+#   private memory limit                      MemoryMax= (the kernel stops the process; systemd restarts it)
+#   CPU limit                                 CPUQuota=
+#   orphan / restart on crash                 Restart=always
+#   bindings                                  ASPNETCORE_URLS (or a reverse proxy in front)
+[Unit]
+Description=webForCore application %i
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=notify
+WorkingDirectory=/srv/webforcore/%i
+ExecStart=/usr/bin/dotnet /srv/webforcore/%i/bin_dotnet/%i.dll
+Restart=always
+RestartSec=1
+WatchdogSec=90
+TimeoutStopSec=90
+KillSignal=SIGTERM
+User=webforcore
+Group=webforcore
+Environment=ASPNETCORE_URLS=http://127.0.0.1:5000
+Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+# The compilation output (Temporary ASP.NET Files) and App_Data must be writable.
+ReadWritePaths=/srv/webforcore/%i/App_Data /tmp
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

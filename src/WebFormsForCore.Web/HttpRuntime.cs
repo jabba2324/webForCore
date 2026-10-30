@@ -2020,13 +2020,25 @@ namespace System.Web
 
             AddAppDomainTraceMessage("before Unload");
 
+#if NETCOREAPP
+            // webForCore: the application's domain is a PseudoAppDomain (collectible AssemblyLoadContext): its unload is
+            // started once and completes when nothing references it. Outside one (the default context) there is nothing
+            // to unload; the host decides what follows (WebFormsMiddleware stops the process). The loop below unloaded
+            // the AppDomain again until the thread was aborted by the unload; here it spun or threw.
+            try {
+                var context = PseudoAppDomain.GetDomain(typeof(HttpRuntime).Assembly);
+                if (context != null) context.Unload();
+            }
+            catch (InvalidOperationException) {
+                // already unloading
+            }
+            return;
+#endif
+#pragma warning disable CS0162 // unreachable on .NET
             for (; ; ) {
                 try {
 #if NETFRAMEWORK
                     AppDomain.Unload(Thread.GetDomain());
-#else
-                    var context = ApplicationManager.GetLoadContext(Assembly.GetCallingAssembly());
-					if (context != AssemblyLoadContext.Default) context.Unload();
 #endif
                 }
                 catch (CannotUnloadAppDomainException) {
@@ -2041,6 +2053,7 @@ namespace System.Web
                     throw;
                 }
             }
+#pragma warning restore CS0162
         }
 
         private static void SetExecutionTimePerformanceCounter(HttpContext context) {

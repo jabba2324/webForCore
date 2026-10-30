@@ -43,14 +43,14 @@ namespace MvcGate
         }
 
         [Theory]
-        // Views, source and configuration are not served. IIS (integrated mode) answers 404 for /Views through
-        // Views/web.config's BlockViewHandler (system.webServer, which the fork does not read); here the classic
-        // mappings answer 403 (HttpForbiddenHandler for *.cshtml, *.config, *.cs, *.asax).
-        [InlineData("/Views/Home/Index.cshtml", 403)]
-        [InlineData("/Views/web.config", 403)]
-        [InlineData("/Web.config", 403)]
-        [InlineData("/Global.asax", 403)]
-        [InlineData("/Controllers/HomeController.cs", 403)]
+        // Views, source and configuration are not served, as on IIS: Views/web.config's BlockViewHandler
+        // (<system.webServer><handlers>, HttpNotFoundHandler) answers 404 for /Views, request filtering 404.7 for
+        // *.config, *.cs and *.asax and 404.8 for web.config.
+        [InlineData("/Views/Home/Index.cshtml", 404)]
+        [InlineData("/Views/web.config", 404)]
+        [InlineData("/Web.config", 404)]
+        [InlineData("/Global.asax", 404)]
+        [InlineData("/Controllers/HomeController.cs", 404)]
         // IIS request filtering's hidden segments (404), and .NET's output and build folders and files.
         [InlineData("/App_Data/machine.config", 404)]
         [InlineData("/bin_dotnet/System.Web.dll", 404)]
