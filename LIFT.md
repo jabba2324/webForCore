@@ -1037,4 +1037,59 @@ tests that ran passed. But **libgdiplus corrupts the heap and aborts the process
 resize-then-rotate takes down the whole server (2 tests). It reproduces in a 6-line program. A native crash can't be
 contained by a PseudoAppDomain, and the library parses untrusted images. Not adopted. The other failures were the fork's
 DataVisualization resources (19), Windows paths in the tests (9), missing Windows fonts (6) and save-path errors.
-Next: a SkiaSharp-based System.Drawing, measured by the same 136 tests.
+Next: a SkiaSharp-based System.Drawing, measured by the same 136 tests (below).
+
+### System.Drawing on SkiaSharp (30 Oct 2026)
+
+`src/webForCore.System.Drawing.Common` replaces the System.Drawing.Common package (Windows only since .NET 7) for the
+whole fork (System.Web, System.Drawing, DataVisualization, AjaxControlToolkit and everything built on them). It is
+built by `tools/lift/lift_drawing.py`:
+- **Microsoft's code, unchanged except as listed:** System.Drawing.Common 6.0 (dotnet/runtime release/6.0), the
+  csproj's own file list for a Unix build (199 files). That keeps the public API, argument validation, exceptions and
+  .NET Framework-compatible behaviour of `Bitmap`, `Graphics`, `Image`, `Font`, `Icon`, ... The assembly keeps
+  System.Drawing.Common's name and public key token, so references (and the shared framework's System.Drawing facade)
+  resolve to it.
+- **GDI+ in managed code on SkiaSharp** instead of libgdiplus: every `[DllImport("libgdiplus")]` (556 GDI+ flat API
+  functions) becomes a call to `SkiaGdiPlus` (`tools/lift/additions/System.Drawing.Common/`), which implements 516 of
+  them; the rest return GDI+'s NotImplemented status (generated stubs).
+- **Lift fixups:** LibraryResolver no longer requires `System.Drawing.EnableUnixSupport` (it still loads libcups for
+  printing); `ImageFormatConverter` throws NotSupportedException for an unknown name, as .NET Framework did (.NET Core
+  3.0+ throws FormatException; Microsoft's System.Web.Helpers relies on the 4.8 behaviour).
+
+The engine:
+- **Images:** pixels as premultiplied BGRA (what Skia draws into), with the GDI+ pixel format kept apart and applied at
+  the edges (LockBits, GetPixel, saving), so drawing never depends on it. GDI+'s reported formats (24bpp for JPEG,
+  8bpp indexed for GIF, 32bppRgb for 32-bit BMP...), palettes, resolution, EXIF property items (read and written),
+  GIF frames, delays and loop count, multi-page TIFF.
+- **Codecs:** Skia decodes BMP, GIF, ICO, JPEG and PNG and encodes JPEG and PNG; webForCore's own code does what Skia
+  cannot: BMP, GIF (halftone palette, LZW) and TIFF encoders, a baseline TIFF reader (none/LZW/PackBits; grey, palette,
+  RGB, RGBA), EXIF and the GDI+ codec list. Formats GDI+ cannot read (WebP...) are rejected as on Windows.
+- **Graphics:** an SKCanvas with GDI+'s state: world, page (unit and scale) and container transforms, device-space
+  clipping, Save/Restore, smoothing, compositing and interpolation modes, and GDI+'s pixel-centre convention
+  (PixelOffsetMode None puts pixel centres on integer coordinates; Skia's are at +0.5). DrawImage at physical size
+  (resolution), source units, parallelograms, ImageAttributes.
+- **Brushes, pens, paths, regions:** solid, hatch (8x8 patterns, the common styles exact), linear gradients
+  (blends, preset colours, sigma/linear shapes, wrap modes, transforms), path gradients (drawn as GDI+ defines them,
+  centre to boundary colours, as a vertex mesh), textures; pen widths, units, dash styles and caps, joins, anchor caps;
+  GDI+ path data (arcs, ellipses and cardinal curves as GDI+'s Béziers), flatten, widen, warp, iterators; regions on
+  Skia path operations.
+- **Text:** families resolve through fontconfig; the Windows core fonts map to installed metric-compatible ones
+  (Arial, Times New Roman, Courier New to Liberation; Calibri, Cambria to Carlito, Caladea) and keep their names, as
+  libgdiplus did; GDI+-style layout: 1/6 em padding (not for GenericTypographic), word wrap, alignment, trimming,
+  hotkey prefixes, character ranges, AddString.
+- **ImageAttributes:** remap tables, colour keys, colour matrices (with grey modes), threshold, gamma, output channel,
+  per adjust type, applied exactly on the CPU.
+
+Not implemented: metafiles (EMF/WMF), Windows handles (HBITMAP, HICON, HRGN, HDC), X11/macOS surfaces, region data,
+SaveAdd (multi-frame saving), the encoder parameter list, pen compound arrays and alignment, path-gradient blends and
+focus scales, ICC profiles, JPEG-compressed or tiled TIFF. Text: no font fallback for characters a font lacks, no
+bidirectional or vertical layout, tabs as four spaces.
+
+Also: `src/WebFormsForCore.Web.DataVisualization/Common/SR.resx`, the chart strings, from dotnet/winforms-datavisualization
+(MIT; 1,288 of the 1,290 keys, the others are Windows Forms accessibility switches). Without them every Chart threw
+MissingManifestResourceException.
+
+Tests: System.Web.Helpers.Test's 136 WebImage and Chart tests run (they were skipped). WebImageTest's Windows paths
+(`x:\file.jpg`, rooted on Windows only) become Linux-rooted, and ChartTest strips a drive letter only if there is one
+(test data, `RE_TRANSFORMS`). **Result: 418/418** (was 279 passed, 136 skipped). With libgdiplus: 79 of 137 passed and
+the process crashed.

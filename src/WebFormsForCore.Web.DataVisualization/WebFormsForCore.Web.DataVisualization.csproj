@@ -34,6 +34,12 @@
         <None Include="..\..\README.md" Pack=" True" PackagePath ="\" />
     </ItemGroup>
 
+    <!-- webForCore: the chart's strings (Common/SR.cs reads System.Web.UI.DataVisualization.Charting.SR.resources). -->
+    <ItemGroup>
+        <EmbeddedResource Remove="Common\SR.resx" />
+        <EmbeddedResource Include="Common\SR.resx" LogicalName="System.Web.UI.DataVisualization.Charting.SR.resources" />
+    </ItemGroup>
+
     <!-- webForCore: the project had no System.Web/System.Drawing references, so WebForm\ could not compile. -->
     <ItemGroup>
         <ProjectReference Include="..\WebFormsForCore.Web\WebFormsForCore.Web.csproj" />

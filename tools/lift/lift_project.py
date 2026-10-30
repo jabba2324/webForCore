@@ -637,13 +637,16 @@ FIXUPS["System.Web.WebPages.Test"] = [("Html/InputHelperTest.cs",) + USING("Syst
 
 NO_SXS = ("side-by-side Web Pages versions (another System.Web.WebPages.Deployment loaded next to this one, as from the GAC): .NET has no "
           "GAC and an AssemblyLoadContext holds one version of a name.")
-NO_GDI = ("System.Drawing (GDI+) is Windows only on .NET; WebImage and Chart draw with it. libgdiplus (System.Drawing.Common 6.0) "
-          "was tried and rejected: it corrupts the heap on a common path (draw on a 24bpp bitmap, then rotate 90/270). A SkiaSharp-based "
-          "System.Drawing is the plan.")
-TRANSFORMS["System.Web.Helpers.Test"] = [
-    ("WebImageTest.cs", "[Fact]", f'[Fact(Skip = "webForCore: {NO_GDI}")]', 83),
-    ("WebImageTest.cs", "[Theory]", f'[Theory(Skip = "webForCore: {NO_GDI}")]', 1),
-    ("ChartTest.cs", "[Fact]", f'[Fact(Skip = "webForCore: {NO_GDI} The fork\'s System.Web.DataVisualization also has no string resources.")]', 52),
+# WebImage and Chart run on System.Drawing.Common with GDI+ on SkiaSharp (src/webForCore.System.Drawing.Common,
+# tools/lift/lift_drawing.py). libgdiplus was tried first and rejected (LIFT.md).
+TRANSFORMS["System.Web.Helpers.Test"] = []
+# Windows paths in the test data (tests only): a drive-rooted path is rooted on Windows, so WebImage takes it as a file
+# path; on Linux it is not. "x:\dir\file.jpg" becomes "/x/dir/file.jpg", rooted on both. ChartTest strips the drive
+# letter from the current directory; it strips one only if there is one.
+RE_TRANSFORMS["System.Web.Helpers.Test"] = [
+    ("WebImageTest.cs", r'@"([a-zA-Z]):\\([^"]*)"', lambda m: '"/' + m.group(1) + '/' + m.group(2).replace("\\", "/") + '"', 24),
+    ("ChartTest.cs", re.escape("Directory.GetCurrentDirectory().Substring(2)"),
+     lambda m: 'System.Text.RegularExpressions.Regex.Replace(Directory.GetCurrentDirectory(), "^[A-Za-z]:", "") /* webForCore: no drive letter on Linux */', 1),
 ]
 MEMBER_EDITS["System.Web.Helpers.Test"] = [
     ("ObjectInfoTest.cs", "public void PrintDateTime()", ("replace", '"11/20/2001 10:30:01 AM"', "dt.ToString()"),

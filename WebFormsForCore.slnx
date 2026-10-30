@@ -97,6 +97,7 @@
     <Project Path="src/webForCore.System.Web.WebPages.Razor/webForCore.System.Web.WebPages.Razor.csproj" />
     <Project Path="src/webForCore.System.Web.Mvc/webForCore.System.Web.Mvc.csproj" />
     <Project Path="src/webForCore.System.Web.Helpers/webForCore.System.Web.Helpers.csproj" />
+    <Project Path="src/webForCore.System.Drawing.Common/webForCore.System.Drawing.Common.csproj" />
     <Project Path="src/webForCore.Microsoft.Web.Mvc/webForCore.Microsoft.Web.Mvc.csproj" />
   </Folder>
   <Folder Name="/Katana/">

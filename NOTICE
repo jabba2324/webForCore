@@ -45,3 +45,23 @@ test/webForCore.System.Web.MonoTests; changes are listed in LIFT.md and tools/li
 per-file source is recorded in tools/lift/manifests/System.Web.MonoTests.tsv.
 Files without their own header (test-helpers/NunitHelpers.cs) are covered by Mono's repository LICENSE, which
 places the class libraries under the MIT License.
+
+This product includes software from .NET (https://github.com/dotnet/runtime, branch release/6.0, commit 76b9680):
+System.Drawing.Common 6.0 (src/libraries/System.Drawing.Common/src and the two Common/src interop files it uses),
+licensed under the MIT License:
+
+    Licensed to the .NET Foundation under one or more agreements.
+    The .NET Foundation licenses this file to you under the MIT license.
+
+It lives in src/webForCore.System.Drawing.Common; each file keeps its original header. The copy is made by
+tools/lift/lift_drawing.py, which lists every change, and the per-file source is recorded in
+tools/lift/manifests/System.Drawing.Common.tsv. The GDI+ engine in SkiaGdiPlus/ (from
+tools/lift/additions/System.Drawing.Common/) is webForCore's own, under the MIT License. The assembly carries
+System.Drawing.Common's public key token (cc7b13ffcd2ddd51) so that references to it resolve; it is not signed by
+Microsoft. It uses SkiaSharp (https://github.com/mono/SkiaSharp, MIT License, Copyright (c) 2015-2016 Xamarin, Inc.,
+Copyright (c) 2017-2018 Microsoft Corporation) and the Skia native library it ships (BSD 3-Clause, Copyright (c)
+2011 Google Inc.).
+
+src/WebFormsForCore.Web.DataVisualization/Common/SR.resx comes from Data Visualization for .NET
+(https://github.com/dotnet/winforms-datavisualization, commit 022f396), licensed under the MIT License,
+Copyright (c) .NET Foundation and Contributors.
