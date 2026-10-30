@@ -43,15 +43,9 @@ namespace WebFormsForCore.Compilers
 
                 var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
 
-#if NET8_0
-                var loader = Activator.CreateInstance(Type.GetType("Microsoft.CodeAnalysis.DefaultAnalyzerAssemblyLoader, Microsoft.CodeAnalysis",
-					assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                    (asm, typeName, ignoreCase) => asm?.GetType(typeName, true, ignoreCase)), true);
-#else
                 var loader = Activator.CreateInstance(Type.GetType("Microsoft.CodeAnalysis.AnalyzerAssemblyLoader, Microsoft.CodeAnalysis",
 					assemblyName => alc.LoadFromAssemblyName(assemblyName),
                     (asm, typeName, ignoreCase) => asm?.GetType(typeName, true, ignoreCase)), true);
-#endif
                 var buildPaths = Activator.CreateInstance(Type.GetType("Microsoft.CodeAnalysis.BuildPaths, Microsoft.CodeAnalysis",
                    assemblyName => alc.LoadFromAssemblyName(assemblyName),
                    (asm, typeName, ignoreCase) => asm?.GetType(typeName, false, ignoreCase), false),

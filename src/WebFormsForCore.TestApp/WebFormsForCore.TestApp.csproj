@@ -14,6 +14,8 @@
         <CopyDebugSymbolFilesFromPackages>true</CopyDebugSymbolFilesFromPackages>
         <RestoreSources>$(RestoreSources);../../nupkg;https://api.nuget.org/v3/index.json</RestoreSources>
         <UserSecretsId>a4676597-1b2b-4181-854f-0651a19d119b</UserSecretsId>
+        <!-- webForCore: build against this tree by default; -p:UseLocalBuild=false uses the nuget.org packages -->
+        <UseLocalBuild Condition="'$(UseLocalBuild)' == ''">true</UseLocalBuild>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -52,6 +54,29 @@
         <ProjectReference Include="..\WebFormsForCore.Web.Optimization\WebFormsForCore.Web.Optimization.csproj" />
         <ProjectReference Include="..\WebFormsForCore.WebGrease\WebFormsForCore.WebGrease.csproj" />
         <ProjectReference Include="..\WebFormsForCore.AjaxControlToolkit\AjaxControlToolkit\AjaxControlToolkit.csproj" />-->
+        <PackageReference Include="WebFormsForCore.Build" Version="1.7.0-rc3" ExcludeAssets="runtime" />
+    </ItemGroup>
+
+    <!-- webForCore: UseLocalBuild (default true) builds the TestApp against this tree instead of the nuget.org packages. -->
+    <ItemGroup Condition="'$(TargetFramework)' != 'net48' AND '$(UseLocalBuild)' == 'true'">
+        <ProjectReference Include="..\WebFormsForCore.Drawing\WebFormsForCore.Drawing.csproj" />
+        <ProjectReference Include="..\WebFormsForCore.Configuration\WebFormsForCore.Configuration.csproj" />
+        <ProjectReference Include="..\WebFormsForCore.Serialization.Formatters\WebFormsForCore.Serialization.Formatters.csproj" />
+        <ProjectReference Include="..\WebFormsForCore.Web.ApplicationServices\WebFormsForCore.Web.ApplicationServices.csproj" />
+        <ProjectReference Include="..\WebFormsForCore.Web.RegularExpressions\WebFormsForCore.Web.RegularExpressions.csproj" />
+        <ProjectReference Include="..\WebFormsForCore.Web\WebFormsForCore.Web.csproj" />
+        <ProjectReference Include="..\WebFormsForCore.Compilers\WebFormsForCore.Compilers.csproj" />
+        <ProjectReference Include="..\WebFormsForCore.Web.Services\WebFormsForCore.Web.Services.csproj" />
+        <ProjectReference Include="..\WebFormsForCore.Web.Infrastructure\WebFormsForCore.Web.Infrastructure.csproj" />
+        <ProjectReference Include="..\WebFormsForCore.Web.Extensions\WebFormsForCore.Web.Extensions.csproj" />
+        <ProjectReference Include="..\WebFormsForCore.Web.Optimization.WebForms\WebFormsForCore.Web.Optimization.WebForms.csproj" />
+        <ProjectReference Include="..\WebFormsForCore.Web.Optimization\WebFormsForCore.Web.Optimization.csproj" />
+        <ProjectReference Include="..\WebFormsForCore.WebGrease\WebFormsForCore.WebGrease.csproj" />
+        <ProjectReference Include="..\WebFormsForCore.AjaxControlToolkit\AjaxControlToolkit\AjaxControlToolkit.csproj" />
+        <ProjectReference Include="..\WebFormsForCore.AjaxControlToolkit\AjaxControlToolkit.StaticResources\AjaxControlToolkit.StaticResources.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' != 'net48' AND '$(UseLocalBuild)' != 'true'">
         <PackageReference Include="WebFormsForCore.Web" Version="1.7.0-rc3" />
         <PackageReference Include="WebFormsForCore.Compilers" Version="1.7.0-rc3" />
         <PackageReference Include="WebFormsForCore.Web.Services" Version="1.7.0-rc3" />
@@ -62,7 +87,6 @@
         <PackageReference Include="WebFormsForCore.WebGrease" Version="1.7.0-rc3" />
         <PackageReference Include="WebFormsForCore.AjaxControlToolkit" Version="1.7.0-rc3" />
         <PackageReference Include="WebFormsForCore.AjaxControlToolkit.StaticResources" Version="1.7.0-rc3" />
-        <PackageReference Include="WebFormsForCore.Build" Version="1.7.0-rc3" ExcludeAssets="runtime" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
@@ -149,12 +173,22 @@
                 <Aliases>Core</Aliases>
             </ReferencePath>
             <!-- Do not import System.Web -->
-            <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Web' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'(?i)system\.configuration\.configurationmanager\\'))" />
+            <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Web' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'(?i)system\.configuration\.configurationmanager[\\/]'))" />
+            <!-- webForCore: drop the framework's System.Web facade so the local System.Web wins (as the library projects do) -->
+            <ReferencePath Remove="%(Identity)" Condition="'$(UseLocalBuild)' == 'true' AND '%(FileName)' == 'System.Web' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'[\\/]\.?dotnet[\\/]'))" />
         </ItemGroup>
     </Target>
 
     <Target Name="CopyWebConfig" AfterTargets="Build">
         <Copy SourceFiles="Core.Web.config" DestinationFiles="bin_dotnet\Web.config" />
+    </Target>
+
+    <!-- webForCore: the Compilers project copies Roslyn into its own bin only, so a ProjectReference does not bring csc.dll along. -->
+    <Target Name="CopyLocalRoslyn" AfterTargets="Build" Condition="'$(UseLocalBuild)' == 'true' AND '$(TargetFramework)' != 'net48'">
+        <ItemGroup>
+            <LocalRoslynFiles Include="..\WebFormsForCore.Compilers\Roslyn.$(TargetFramework)\**\*.*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(LocalRoslynFiles)" DestinationFiles="@(LocalRoslynFiles->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
     </Target>
 
     <Target Name="CopyjQuery" AfterTargets="Build">

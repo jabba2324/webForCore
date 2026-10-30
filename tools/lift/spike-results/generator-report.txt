@@ -1,0 +1,20 @@
+System.Web.Razor: 147 Compile, 2 EmbeddedResource, 0 ProjectReference, 1 PackageReference
+System.Web.Http: package Newtonsoft.Json 13.0.4 copied from packages.config (check it supports net11.0)
+System.Web.Http: UNMAPPED reference 'System.Data.Linq' (no .NET 11 equivalent mapped; expect compile errors)
+System.Web.Http: 388 Compile, 2 EmbeddedResource, 2 ProjectReference, 2 PackageReference
+System.Web.Cors: 9 Compile, 1 EmbeddedResource, 0 ProjectReference, 1 PackageReference
+System.Web.Http.Cors: 16 Compile, 1 EmbeddedResource, 3 ProjectReference, 1 PackageReference
+System.Web.Http.Owin: 28 Compile, 2 EmbeddedResource, 2 ProjectReference, 3 PackageReference
+System.Web.WebPages.Deployment: 14 Compile, 2 EmbeddedResource, 3 ProjectReference, 1 PackageReference
+System.Web.Helpers: 33 Compile, 1 EmbeddedResource, 6 ProjectReference, 2 PackageReference
+System.Web.WebPages: UNMAPPED reference 'System.Data.Linq' (no .NET 11 equivalent mapped; expect compile errors)
+System.Web.WebPages: 151 Compile, 2 EmbeddedResource, 5 ProjectReference, 1 PackageReference
+System.Web.WebPages.Razor: 19 Compile, 2 EmbeddedResource, 4 ProjectReference, 1 PackageReference
+System.Web.Http.WebHost: 41 Compile, 2 EmbeddedResource, 4 ProjectReference, 1 PackageReference
+System.Web.Mvc: UNMAPPED reference 'System.Data.Entity' (no .NET 11 equivalent mapped; expect compile errors)
+System.Web.Mvc: UNMAPPED reference 'System.Data.Linq' (no .NET 11 equivalent mapped; expect compile errors)
+System.Web.Mvc: 438 Compile, 1 EmbeddedResource, 8 ProjectReference, 2 PackageReference
+Microsoft.Web.Mvc: UNMAPPED reference 'System.Data.Linq' (no .NET 11 equivalent mapped; expect compile errors)
+Microsoft.Web.Mvc: UNMAPPED reference 'System.ServiceModel' (no .NET 11 equivalent mapped; expect compile errors)
+Microsoft.Web.Mvc: UNMAPPED reference 'System.ServiceModel.Web' (no .NET 11 equivalent mapped; expect compile errors)
+Microsoft.Web.Mvc: 150 Compile, 1 EmbeddedResource, 3 ProjectReference, 1 PackageReference

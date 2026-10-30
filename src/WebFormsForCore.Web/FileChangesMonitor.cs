@@ -1797,13 +1797,6 @@ namespace System.Web {
                     break;
             }
 
-#if NET8_0 || NET9_0
-            // .NET 8/9's FileSystemWatcher on Linux and macOS is heavy on non-Windows runtimes; avoid starting watchers.
-            if (!OSInfo.IsWindows) {
-                _FCNMode = 1;
-            }
-#endif
-
             if (IsFCNDisabled) {
                 return;
             }

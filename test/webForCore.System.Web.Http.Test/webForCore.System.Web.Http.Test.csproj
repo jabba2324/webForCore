@@ -1,0 +1,298 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Lifted from aspnet/AspNetWebStack 2106565 (System.Web.Http.Test) by tools/lift/lift_project.py.
+       Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <AssemblyName>System.Web.Http.Test</AssemblyName>
+    <RootNamespace>System.Web.Http</RootNamespace>
+    <PackageId>webForCore.Web.Http.Test</PackageId>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- Microsoft's build uses C# 9 (tools/WebStack.settings.targets). -->
+    <LangVersion>9.0</LangVersion>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;SYSLIB0003;SYSLIB0011;SYSLIB0051</NoWarn>
+    <DefineConstants>$(DefineConstants);ASPNETWEBAPI</DefineConstants>
+    <!-- Delay signed with Microsoft's public key, as Microsoft's build does: PublicKeyToken=31bf3856ad364e35. -->
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>../../src/SigningKey/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <Import Project="../../src/webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="AuthorizeAttributeTest.cs" />
+    <Compile Include="Batch/BatchHttpRequestContextTests.cs" />
+    <Compile Include="Batch/BatchHttpRequestMessageExtensionsTest.cs" />
+    <Compile Include="Batch/BatchLearningTests.cs" />
+    <Compile Include="Batch/DefaultHttpBatchHandlerTest.cs" />
+    <Compile Include="Batch/HttpBatchHandlerTest.cs" />
+    <Compile Include="Common/CollectionExtensionsTest.cs" />
+    <Compile Include="Common/DictionaryExtensionsTest.cs" />
+    <Compile Include="Common/ErrorTest.cs" />
+    <Compile Include="Common/ListWrapperCollectionTests.cs" />
+    <Compile Include="Common/PrefixContainerTest.cs" />
+    <Compile Include="Common/TaskHelpersExtensionsTest.cs" />
+    <Compile Include="Common/TaskHelpersTest.cs" />
+    <Compile Include="Common/TraceWriterExceptionMapperTest.cs" />
+    <Compile Include="Common/TypeExtensionsTest.cs" />
+    <Compile Include="Common/UriQueryUtilityTest.cs" />
+    <Compile Include="Controllers/ActionFilterResultTests.cs" />
+    <Compile Include="Controllers/ApiControllerActionInvokerTest.cs" />
+    <Compile Include="Controllers/ApiControllerActionSelectorTest.cs" />
+    <Compile Include="Controllers/ApiControllerTest.cs" />
+    <Compile Include="Controllers/ApiControllerTestabilityTest.cs" />
+    <Compile Include="Controllers/Apis/User.cs" />
+    <Compile Include="Controllers/Apis/UsersController.cs" />
+    <Compile Include="Controllers/Apis/UsersRpcController.cs" />
+    <Compile Include="Controllers/AuthenticationFilterResultTests.cs" />
+    <Compile Include="Controllers/AuthorizationFilterResultTests.cs" />
+    <Compile Include="Controllers/ExceptionFilterResultTests.cs" />
+    <Compile Include="Controllers/FilterGroupingTests.cs" />
+    <Compile Include="Controllers/HttpActionContextTest.cs" />
+    <Compile Include="Controllers/HttpActionDescriptorTest.cs" />
+    <Compile Include="Controllers/HttpConfigurationTest.cs" />
+    <Compile Include="Controllers/HttpControllerContextTest.cs" />
+    <Compile Include="Controllers/HttpControllerDescriptorTest.cs" />
+    <Compile Include="Controllers/HttpParameterBindingTest.cs" />
+    <Compile Include="Controllers/HttpParameterDescriptorTest.cs" />
+    <Compile Include="Controllers/ParameterBindingExtensionsTest.cs" />
+    <Compile Include="Controllers/ReflectedHttpActionDescriptorTest.cs" />
+    <Compile Include="Controllers/ReflectedHttpParameterDescriptorTest.cs" />
+    <Compile Include="Controllers/RequestBackedHttpRequestContextTests.cs" />
+    <Compile Include="Controllers/ResponseMessageResultConverterTest.cs" />
+    <Compile Include="Controllers/ValueResultConverterTest.cs" />
+    <Compile Include="Controllers/VoidResultConverterTest.cs" />
+    <Compile Include="Description/ApiExplorerTest.cs" />
+    <Compile Include="Description/ApiParameterDescriptionTest.cs" />
+    <Compile Include="Dispatcher/DefaultAssembliesResolverTest.cs" />
+    <Compile Include="Dispatcher/DefaultHttpControllerActivatorTest.cs" />
+    <Compile Include="Dispatcher/DefaultHttpControllerSelectorTest.cs" />
+    <Compile Include="Dispatcher/DefaultHttpControllerTypeResolverTest.cs" />
+    <Compile Include="Dispatcher/HttpControllerDispatcherTest.cs" />
+    <Compile Include="Dispatcher/HttpErrorTest.cs" />
+    <Compile Include="Dispatcher/HttpRoutingDispatcherTest.cs" />
+    <Compile Include="ExceptionHandling/CompositeExceptionLoggerTests.cs" />
+    <Compile Include="ExceptionHandling/DefaultExceptionHandlerTests.cs" />
+    <Compile Include="ExceptionHandling/EmptyExceptionHandlerTests.cs" />
+    <Compile Include="ExceptionHandling/ExceptionCatchBlocksTests.cs" />
+    <Compile Include="ExceptionHandling/ExceptionContextCatchBlockTests.cs" />
+    <Compile Include="ExceptionHandling/ExceptionContextTests.cs" />
+    <Compile Include="ExceptionHandling/ExceptionHandlerContextTests.cs" />
+    <Compile Include="ExceptionHandling/ExceptionHandlerExtensionsTests.cs" />
+    <Compile Include="ExceptionHandling/ExceptionHandlerTests.cs" />
+    <Compile Include="ExceptionHandling/ExceptionLoggerContextTests.cs" />
+    <Compile Include="ExceptionHandling/ExceptionLoggerExtensionsTests.cs" />
+    <Compile Include="ExceptionHandling/ExceptionLoggerTests.cs" />
+    <Compile Include="ExceptionHandling/ExceptionServicesTests.cs" />
+    <Compile Include="ExceptionHandling/LastChanceExceptionHandlerTests.cs" />
+    <Compile Include="Filters/ActionDescriptorFilterProviderTest.cs" />
+    <Compile Include="Filters/ActionFilterAttributeTest.cs" />
+    <Compile Include="Filters/AuthorizationFilterAttributeTest.cs" />
+    <Compile Include="Filters/ConfigurationFilterProviderTest.cs" />
+    <Compile Include="Filters/ExceptionFilterAttributeTest.cs" />
+    <Compile Include="Filters/FilterAttributeTest.cs" />
+    <Compile Include="Filters/FilterInfoComparerTest.cs" />
+    <Compile Include="Filters/FilterInfoTest.cs" />
+    <Compile Include="Filters/HttpActionExecutedContextTest.cs" />
+    <Compile Include="Filters/HttpAuthenticationChallengeContextTests.cs" />
+    <Compile Include="Filters/HttpAuthenticationContextTests.cs" />
+    <Compile Include="Filters/HttpFilterCollectionTest.cs" />
+    <Compile Include="Hosting/HttpMessageHandlerExtensions.cs" />
+    <Compile Include="Hosting/HttpRouteTest.cs" />
+    <Compile Include="Hosting/SuppressHostPrincipalMessageHandlerTest.cs" />
+    <Compile Include="HttpConfigurationExtensionsTest.cs" />
+    <Compile Include="HttpErrorKeysTest.cs" />
+    <Compile Include="HttpMessageHandlerExtensions.cs" />
+    <Compile Include="HttpRequestMessageExtensionsTest.cs" />
+    <Compile Include="HttpResponseExceptionTest.cs" />
+    <Compile Include="HttpResponseMessageExtensionsTest.cs" />
+    <Compile Include="HttpRouteCollectionExtensionsTest.cs" />
+    <Compile Include="HttpRouteCollectionTest.cs" />
+    <Compile Include="HttpServerTest.cs" />
+    <Compile Include="Internal/CollectionModelBinderUtilTest.cs" />
+    <Compile Include="Internal/TypeActivatorTest.cs" />
+    <Compile Include="Metadata/ModelMetadataTest.cs" />
+    <Compile Include="Metadata/Providers/AssociatedMetadataProviderTest.cs" />
+    <Compile Include="Metadata/Providers/DataAnnotationsModelMetadataProviderTest.cs" />
+    <Compile Include="ModelBinding/Binders/ArrayModelBinderProviderTest.cs" />
+    <Compile Include="ModelBinding/Binders/ArrayModelBinderTest.cs" />
+    <Compile Include="ModelBinding/Binders/CollectionModelBinderProviderTest.cs" />
+    <Compile Include="ModelBinding/Binders/CollectionModelBinderTest.cs" />
+    <Compile Include="ModelBinding/Binders/ComplexModelDtoModelBinderProviderTest.cs" />
+    <Compile Include="ModelBinding/Binders/ComplexModelDtoModelBinderTest.cs" />
+    <Compile Include="ModelBinding/Binders/ComplexModelDtoResultTest.cs" />
+    <Compile Include="ModelBinding/Binders/ComplexModelDtoTest.cs" />
+    <Compile Include="ModelBinding/Binders/DictionaryModelBinderProviderTest.cs" />
+    <Compile Include="ModelBinding/Binders/DictionaryModelBinderTest.cs" />
+    <Compile Include="ModelBinding/Binders/KeyValuePairModelBinderProviderTest.cs" />
+    <Compile Include="ModelBinding/Binders/KeyValuePairModelBinderTest.cs" />
+    <Compile Include="ModelBinding/Binders/KeyValuePairModelBinderUtilTest.cs" />
+    <Compile Include="ModelBinding/Binders/MutableObjectModelBinderProviderTest.cs" />
+    <Compile Include="ModelBinding/Binders/MutableObjectModelBinderTest.cs" />
+    <Compile Include="ModelBinding/Binders/SimpleModelBinderProviderTest.cs" />
+    <Compile Include="ModelBinding/Binders/TypeConverterModelBinderProviderTest.cs" />
+    <Compile Include="ModelBinding/Binders/TypeConverterModelBinderTest.cs" />
+    <Compile Include="ModelBinding/Binders/TypeMatchModelBinderProviderTest.cs" />
+    <Compile Include="ModelBinding/Binders/TypeMatchModelBinderTest.cs" />
+    <Compile Include="ModelBinding/CompositeModelBinderTest.cs" />
+    <Compile Include="ModelBinding/DefaultActionValueBinderTest.cs" />
+    <Compile Include="ModelBinding/FormDataCollectionExtensionsTest.cs" />
+    <Compile Include="ModelBinding/FormatterParameterBindingTest.cs" />
+    <Compile Include="ModelBinding/HttpBindingBehaviorAttributeTest.cs" />
+    <Compile Include="ModelBinding/HttpParameterBindingExtensionsTest.cs" />
+    <Compile Include="ModelBinding/ModelBinderAttributeTest.cs" />
+    <Compile Include="ModelBinding/ModelBinderConfigTest.cs" />
+    <Compile Include="ModelBinding/ModelBindingContextTest.cs" />
+    <Compile Include="ModelBinding/ModelBindingEndToEndTests.cs" />
+    <Compile Include="ModelBinding/ModelBindingUtilTest.cs" />
+    <Compile Include="ModelBinding/ParameterBindingProvidersTest.cs" />
+    <Compile Include="ModelBinding/SharedModels/Address.cs" />
+    <Compile Include="ModelBinding/SharedModels/PeopleModel.cs" />
+    <Compile Include="ModelBinding/SharedModels/Person.cs" />
+    <Compile Include="ModelBinding/SharedModels/StreetAddress.cs" />
+    <Compile Include="ModelBinding/SharedModels/User.cs" />
+    <Compile Include="Properties/AssemblyInfo.cs" />
+    <Compile Include="Resources.Designer.cs" />
+    <Compile Include="Results/BadRequestErrorMessageResultTests.cs" />
+    <Compile Include="Results/BadRequestResultTests.cs" />
+    <Compile Include="Results/ConflictResultTests.cs" />
+    <Compile Include="Results/CreatedAtRouteNegotiatedContentResultTests.cs" />
+    <Compile Include="Results/CreatedNegotiatedContentResultTests.cs" />
+    <Compile Include="Results/ExceptionResultTests.cs" />
+    <Compile Include="Results/FormattedContentResultTests.cs" />
+    <Compile Include="Results/InternalServerErrorResultTests.cs" />
+    <Compile Include="Results/InvalidModelStateResultTests.cs" />
+    <Compile Include="Results/JsonResultTests.cs" />
+    <Compile Include="Results/NegotiatedContentResultTests.cs" />
+    <Compile Include="Results/NotFoundResultTests.cs" />
+    <Compile Include="Results/OkNegotiatedContentResultTests.cs" />
+    <Compile Include="Results/OkResultTests.cs" />
+    <Compile Include="Results/RedirectResultTests.cs" />
+    <Compile Include="Results/RedirectToRouteResultTests.cs" />
+    <Compile Include="Results/ResponseMessageResultTests.cs" />
+    <Compile Include="Results/StatusCodeResultTests.cs" />
+    <Compile Include="Results/UnauthorizedResultTests.cs" />
+    <Compile Include="Routing/AttributeRoutingTest.cs" />
+    <Compile Include="Routing/DefaultDirectRouteProviderTests.cs" />
+    <Compile Include="Routing/DefaultInlineConstraintResolverTest.cs" />
+    <Compile Include="Routing/DirectRouteBuilderTests.cs" />
+    <Compile Include="Routing/DirectRouteProviderContextTests.cs" />
+    <Compile Include="Routing/HttpRouteTest.cs" />
+    <Compile Include="Routing/HttpRouteValueDictionaryTest.cs" />
+    <Compile Include="Routing/InlineRouteTemplateParserTests.cs" />
+    <Compile Include="Routing/LinkGenerationRouteTests.cs" />
+    <Compile Include="Routing/MediaTypeFormatterExtensionsTests.cs" />
+    <Compile Include="Routing/RouteAttributeTests.cs" />
+    <Compile Include="Routing/RouteConstraintsTests.cs" />
+    <Compile Include="Routing/RouteFactoryAttributeTests.cs" />
+    <Compile Include="Routing/RoutePrecedenceTests.cs" />
+    <Compile Include="Routing/SubRouteCollectionTest.cs" />
+    <Compile Include="Routing/UriPathExtensionMappingTests.cs" />
+    <Compile Include="Routing/UrlHelperTest.cs" />
+    <Compile Include="Services/ControllerServicesTests.cs" />
+    <Compile Include="Services/DecoratorTests.cs" />
+    <Compile Include="Services/DefaultServicesTests.cs" />
+    <Compile Include="Services/ServicesExtensionsTests.cs" />
+    <Compile Include="Tracing/FormattingUtilitiesTest.cs" />
+    <Compile Include="Tracing/HttpRequestMessageExtensionsTest.cs" />
+    <Compile Include="Tracing/ITraceWriterExtensionsTest.cs" />
+    <Compile Include="Tracing/TestTraceWriter.cs" />
+    <Compile Include="Tracing/TraceKindHelperTest.cs" />
+    <Compile Include="Tracing/TraceLevelHelperTest.cs" />
+    <Compile Include="Tracing/TraceManagerTest.cs" />
+    <Compile Include="Tracing/TraceRecordComparer.cs" />
+    <Compile Include="Tracing/TraceRecordTest.cs" />
+    <Compile Include="Tracing/TracerCorrectnessTest.cs" />
+    <Compile Include="Tracing/Tracers/ActionFilterAttributeTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/ActionFilterTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/ActionValueBinderTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/AuthenticationFilterTracerTests.cs" />
+    <Compile Include="Tracing/Tracers/AuthorizationFilterAttributeTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/AuthorizationFilterTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/BufferedMediaTypeFormatterTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/ContentNegotiatorTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/DefaultHttpControllerTypeResolverTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/ExceptionFilterAttributeTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/ExceptionFilterTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/FilterTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/FormUrlEncodedMediaTypeFormatterTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/FormatterParameterBindingTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/HttpActionBindingTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/HttpActionDescriptorTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/HttpActionInvokerTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/HttpActionSelectorTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/HttpControllerActivatorTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/HttpControllerDescriptorTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/HttpControllerSelectorTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/HttpControllerTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/HttpParameterBindingTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/JsonMediaTypeFormatterTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/MediaTypeFormatterTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/MediaTypeFormatterTracerTestBase.cs" />
+    <Compile Include="Tracing/Tracers/MessageHandlerTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/OverrideFilterTracerTests.cs" />
+    <Compile Include="Tracing/Tracers/ReadWriteMediaTypeFormatterTracerTestBase.cs" />
+    <Compile Include="Tracing/Tracers/RequestMessageHandlerTracerTest.cs" />
+    <Compile Include="Tracing/Tracers/XmlMediaTypeFormatterTracerTest.cs" />
+    <Compile Include="Util/ContextUtil.cs" />
+    <Compile Include="Util/SimpleHttpValueProvider.cs" />
+    <Compile Include="Validation/DefaultBodyModelValidatorTest.cs" />
+    <Compile Include="Validation/ModelStateFormatterLoggerTest.cs" />
+    <Compile Include="Validation/ModelValidationNodeTest.cs" />
+    <Compile Include="Validation/ModelValidationRequiredMemberSelectorTest.cs" />
+    <Compile Include="Validation/ModelValidationResultTest.cs" />
+    <Compile Include="Validation/ModelValidatorTest.cs" />
+    <Compile Include="Validation/Providers/AssociatedValidatorProviderTest.cs" />
+    <Compile Include="Validation/Providers/DataAnnotationsModelValidatorProviderTest.cs" />
+    <Compile Include="Validation/Providers/DataMemberModelValidatorProviderTest.cs" />
+    <Compile Include="Validation/Providers/InvalidModelValidatorProviderTest.cs" />
+    <Compile Include="Validation/ReferenceEqualityComparerTest.cs" />
+    <Compile Include="Validation/Validators/DataAnnotationsModelValidatorTest.cs" />
+    <Compile Include="Validation/Validators/ErrorModelValidatorTest.cs" />
+    <Compile Include="ValueProviders/Providers/ElementalValueProviderTest.cs" />
+    <Compile Include="ValueProviders/Providers/NameValuePairsValueProviderTest.cs" />
+    <Compile Include="ValueProviders/Providers/QueryStringValueProviderFactoryTest.cs" />
+    <Compile Include="ValueProviders/Providers/QueryStringValueProviderTest.cs" />
+    <Compile Include="ValueProviders/Providers/RouteDataValueProviderFactoryTest.cs" />
+    <Compile Include="ValueProviders/Providers/RouteDataValueProviderTest.cs" />
+    <Compile Include="ValueProviders/ValueProviderResultTest.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.resx" LogicalName="System.Web.Http.Resources.resources" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/WebFormsForCore.Configuration/WebFormsForCore.Configuration.csproj" />
+    <ProjectReference Include="../../src/WebFormsForCore.Web/WebFormsForCore.Web.csproj" />
+    <ProjectReference Include="../../src/webForCore.System.Net.Http.Formatting/webForCore.System.Net.Http.Formatting.csproj" />
+    <ProjectReference Include="../../src/webForCore.System.Web.Http/webForCore.System.Web.Http.csproj" />
+    <ProjectReference Include="../webForCore.Microsoft.TestCommon/webForCore.Microsoft.TestCommon.csproj" />
+    <ProjectReference Include="../webForCore.System.Net.Http.Formatting.Test/webForCore.System.Net.Http.Formatting.Test.csproj" />
+    <PackageReference Include="System.CodeDom" Version="11.0.0-rc.3.26522.148" />
+    <PackageReference Include="System.Runtime.Caching" Version="11.0.0-rc.3.26522.148" />
+    <PackageReference Include="Castle.Core" Version="5.2.1" />
+    <PackageReference Include="Moq" Version="4.21.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.3" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.abstractions" Version="2.0.3" />
+    <PackageReference Include="xunit.analyzers" Version="1.27.0" />
+    <PackageReference Include="xunit.assert" Version="2.9.3" />
+    <PackageReference Include="xunit.core" Version="2.9.3" />
+    <PackageReference Include="xunit.extensibility.core" Version="2.9.3" />
+    <PackageReference Include="xunit.extensibility.execution" Version="2.9.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+  </ItemGroup>
+</Project>

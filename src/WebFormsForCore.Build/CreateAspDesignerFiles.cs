@@ -34,8 +34,6 @@ namespace WebFormsForCore.Build
 		public bool IsTargetNetFX => TargetFramework.CompareTo("net4999") < 0;
 		public bool IsTargetNetCore => Regex.IsMatch(TargetFramework, @"net[0-9]+\.");
 		public bool IsTargetNetStandard => TargetFramework.StartsWith("netstandard");
-        public bool IsTargetNet8Or9 => TargetFramework == "net8.0" || TargetFramework == "net9.0";
-        public bool IsTargetNet10 => TargetFramework == "net10.0";
         public bool IsTargetNet11 => TargetFramework == "net11.0";
 		public bool IsTargetNet12 => TargetFramework == "net12.0";
 
@@ -206,13 +204,10 @@ namespace WebFormsForCore.Build
 				var files = string.Join(";", aspFiles);
 
 				var path = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-				string assembly;
-				if (IsTargetNet8Or9) assembly = Path.GetFullPath(Path.Combine(path, "..", "net8.0", "WebFormsForCore.Build.NetCore.dll"));
-                else if (IsTargetNet10) assembly = Path.GetFullPath(Path.Combine(path, "..", "net10.0", "WebFormsForCore.Build.NetCore.dll"));
-                else if (IsTargetNet11 || IsTargetNetCore) assembly = Path.GetFullPath(Path.Combine(path, "..", "net11.0", "WebFormsForCore.Build.NetCore.dll"));
-                else throw new NotSupportedException($"Unsupported TargetFramework {TargetFramework}");
+				var assembly = Path.GetFullPath(Path.Combine(path, "..", "net11.0", "WebFormsForCore.Build.NetCore.dll"));
+				var dotnet = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "dotnet.exe" : "dotnet";
 
-				return RunCommand("dotnet.exe", $"\"{assembly}\" createdesignerfiles \"{dll}\" \"{WebRootPath}\" \"{files}\"");
+				return RunCommand(dotnet, $"\"{assembly}\" createdesignerfiles \"{dll}\" \"{WebRootPath}\" \"{files}\"");
 
 			}
 			else if (IsTargetNetFX)
@@ -245,11 +240,7 @@ namespace WebFormsForCore.Build
 				ResolveAssembly = (sender, args) =>
 				{
 					string assemblyFile;
-					if (IsCore) {
-						if (IsTargetNet8Or9) assemblyFile = Path.GetFullPath(Path.Combine(path, $"..", "net8.0", $"{args.Name}.dll"));
-						else if (IsTargetNet10) assemblyFile = Path.GetFullPath(Path.Combine(path, $"..", "net10.0", $"{args.Name}.dll"));
-						else throw new NotSupportedException($"Unsupported TargetFramework: {TargetFramework}");
-                    }
+					if (IsCore) assemblyFile = Path.GetFullPath(Path.Combine(path, $"..", "net11.0", $"{args.Name}.dll"));
 					else assemblyFile = Path.GetFullPath(Path.Combine(path, $"..", "net48", $"{args.Name}.dll"));
 				
 					if (File.Exists(assemblyFile)) return System.Reflection.Assembly.LoadFrom(assemblyFile);
@@ -261,12 +252,7 @@ namespace WebFormsForCore.Build
 				};
 				AppDomain.CurrentDomain.AssemblyResolve += ResolveAssembly;
 				Assembly buildAssembly;
-				if (IsCore)
-				{
-                    if (IsTargetNet8Or9) buildAssembly = System.Reflection.Assembly.LoadFrom(Path.GetFullPath(Path.Combine(path, "..", "net8.0", "WebFormsForCore.Build.NetCore.dll")));
-                    if (IsTargetNet10) buildAssembly = System.Reflection.Assembly.LoadFrom(Path.GetFullPath(Path.Combine(path, "..", "net10.0", "WebFormsForCore.Build.NetCore.dll")));
-                    else throw new NotSupportedException($"Unsupported TargetFramework: {TargetFramework}");
-                }
+				if (IsCore) buildAssembly = System.Reflection.Assembly.LoadFrom(Path.GetFullPath(Path.Combine(path, "..", "net11.0", "WebFormsForCore.Build.NetCore.dll")));
                 else buildAssembly = System.Reflection.Assembly.LoadFrom(Path.GetFullPath(Path.Combine(path, "..", "net48", "WebFormsForCore.Build.NetFX.exe")));
 
 				var contextType = buildAssembly.GetType("WebFormsForCore.Build.CreateAspDesignerFiles+MSBuildCompileContext");

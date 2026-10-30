@@ -1,0 +1,12 @@
+<Project>
+  <!-- Imported by every project lifted from the ASP.NET Web Stack (src/webForCore.*, test/webForCore.*). -->
+  <Target Name="WebForCoreFixReferences" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences" AfterTargets="ResolveAssemblyReferences">
+    <ItemGroup>
+      <!-- The shared framework ships a System.Web.dll facade (HttpUtility forwards); next to the fork's System.Web
+           the compiler would see two System.Web assemblies (CS7069). The fork's own projects drop it the same way. -->
+      <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Web' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'[\\/]packs[\\/]Microsoft\.NETCore\.App\.Ref[\\/]'))" />
+      <!-- The fork ships its own System.Configuration.ConfigurationManager; drop the NuGet one that arrives transitively. -->
+      <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Configuration.ConfigurationManager' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'(?i)[\\/]system\.configuration\.configurationmanager[\\/]'))" />
+    </ItemGroup>
+  </Target>
+</Project>

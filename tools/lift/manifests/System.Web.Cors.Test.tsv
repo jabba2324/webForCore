@@ -1,0 +1,5 @@
+# aspnet/AspNetWebStack 2106565: source path (relative to repo root)	destination (relative to fork root)
+test/System.Web.Cors.Test/CorsEngineTest.cs	test/webForCore.System.Web.Cors.Test/CorsEngineTest.cs
+test/System.Web.Cors.Test/CorsPolicyTest.cs	test/webForCore.System.Web.Cors.Test/CorsPolicyTest.cs
+test/System.Web.Cors.Test/CorsRequestContextTest.cs	test/webForCore.System.Web.Cors.Test/CorsRequestContextTest.cs
+test/System.Web.Cors.Test/CorsResultTest.cs	test/webForCore.System.Web.Cors.Test/CorsResultTest.cs

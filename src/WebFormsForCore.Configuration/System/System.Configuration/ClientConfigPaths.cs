@@ -112,6 +112,12 @@ namespace System.Configuration {
                     }
 
                     if (isFile) {
+#if WebFormsForCore && NETCOREAPP
+                        // webForCore: on Unix "file:///home/x" lost its leading '/' above and '\' is not a separator,
+                        // so the path collapsed to one file name and config discovery threw (ArgumentNullException 'path1').
+                        if (!OSInfo.IsWindows) applicationUri = exeAssembly.Location;
+                        else
+#endif
                         applicationUri = applicationUri.Replace('/', '\\');
                         applicationFilename = applicationUri;
                     }
@@ -145,8 +151,9 @@ namespace System.Configuration {
                     else
                     {
 						var dir = Path.GetDirectoryName(Path.GetDirectoryName(applicationUri));
-						var webConfig = Path.Combine(dir, "web.config");
-                        if (File.Exists(webConfig)) _applicationConfigUri = webConfig;
+						var webConfig = dir == null ? null : Path.Combine(dir, "web.config");
+                        if (webConfig == null) { }
+                        else if (File.Exists(webConfig)) _applicationConfigUri = webConfig;
                         else if (!OSInfo.IsWindows)
                         {
                             webConfig = Path.Combine(dir, "Web.config");

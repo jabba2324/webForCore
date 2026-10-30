@@ -1,0 +1,4 @@
+# Code lifted from the ASP.NET Web Stack is stored byte for byte with CRLF line endings, as Microsoft's Windows
+# checkout has it (string literals and test baselines depend on it). Never convert it.
+src/webForCore.*/** -text
+test/webForCore.*/** -text

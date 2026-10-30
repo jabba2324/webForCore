@@ -1,0 +1,103 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Lifted from aspnet/AspNetWebStack 2106565 (test/Microsoft.TestCommon/Microsoft.TestCommon.csproj) by tools/lift/lift_project.py.
+       Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <AssemblyName>Microsoft.TestCommon</AssemblyName>
+    <RootNamespace>Microsoft.TestCommon</RootNamespace>
+    <PackageId>webForCore.Microsoft.TestCommon</PackageId>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- Microsoft's build uses C# 9 (tools/WebStack.settings.targets). -->
+    <LangVersion>9.0</LangVersion>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;SYSLIB0003;SYSLIB0011;SYSLIB0051</NoWarn>
+    <DefineConstants>$(DefineConstants);</DefineConstants>
+    <!-- Delay signed with Microsoft's public key, as Microsoft's build does: PublicKeyToken=31bf3856ad364e35. -->
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>../../src/SigningKey/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <Import Project="../../src/webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="Assert.cs" />
+    <Compile Include="CultureReplacer.cs" />
+    <Compile Include="DataAttribute.cs" />
+    <Compile Include="DictionaryEqualityComparer.cs" />
+    <Compile Include="EnumHelperTestBase.cs" />
+    <Compile Include="ExceptionAssertions.cs" />
+    <Compile Include="ExceptionUtility.cs" />
+    <Compile Include="FactAttribute.cs" />
+    <Compile Include="FactDiscoverer.cs" />
+    <Compile Include="ForceGCAttribute.cs" />
+    <Compile Include="InlineDataAttribute.cs" />
+    <Compile Include="MatrixTheoryDataSet.cs" />
+    <Compile Include="MemberHelper.cs" />
+    <Compile Include="Microsoft/TestCommon/DataSets/CommonUnitTestDataSets.cs" />
+    <Compile Include="Microsoft/TestCommon/DataSets/RefTypeTestData.cs" />
+    <Compile Include="Microsoft/TestCommon/DataSets/TestData.cs" />
+    <Compile Include="Microsoft/TestCommon/DataSets/TestDataHolder.cs" />
+    <Compile Include="Microsoft/TestCommon/DataSets/TestDataVariations.cs" />
+    <Compile Include="Microsoft/TestCommon/DataSets/ValueTypeTestData.cs" />
+    <Compile Include="Microsoft/TestCommon/GenericTypeAssert.cs" />
+    <Compile Include="Microsoft/TestCommon/HttpAssert.cs" />
+    <Compile Include="Microsoft/TestCommon/MediaTypeAssert.cs" />
+    <Compile Include="Microsoft/TestCommon/MediaTypeHeaderValueComparer.cs" />
+    <Compile Include="Microsoft/TestCommon/ParsedMediaTypeHeaderValue.cs" />
+    <Compile Include="Microsoft/TestCommon/RegexReplacement.cs" />
+    <Compile Include="Microsoft/TestCommon/SerializerAssert.cs" />
+    <Compile Include="Microsoft/TestCommon/StreamAssert.cs" />
+    <Compile Include="Microsoft/TestCommon/TaskAssert.cs" />
+    <Compile Include="Microsoft/TestCommon/TestDataSetAttribute.cs" />
+    <Compile Include="Microsoft/TestCommon/TimeoutConstant.cs" />
+    <Compile Include="Microsoft/TestCommon/TypeAssert.cs" />
+    <Compile Include="Microsoft/TestCommon/Types/ByteEnum.cs" />
+    <Compile Include="Microsoft/TestCommon/Types/FlagsEnum.cs" />
+    <Compile Include="Microsoft/TestCommon/Types/INameAndIdContainer.cs" />
+    <Compile Include="Microsoft/TestCommon/Types/ISerializableType.cs" />
+    <Compile Include="Microsoft/TestCommon/Types/LongEnum.cs" />
+    <Compile Include="Microsoft/TestCommon/Types/SByteEnum.cs" />
+    <Compile Include="Microsoft/TestCommon/Types/ShortEnum.cs" />
+    <Compile Include="Microsoft/TestCommon/Types/SimpleEnum.cs" />
+    <Compile Include="Microsoft/TestCommon/Types/UIntEnum.cs" />
+    <Compile Include="Microsoft/TestCommon/Types/UShortEnum.cs" />
+    <Compile Include="Microsoft/TestCommon/XmlAssert.cs" />
+    <Compile Include="Platform.cs" />
+    <Compile Include="PlatformInfo.cs" />
+    <Compile Include="PortReserver.cs" />
+    <Compile Include="PreAppStartTestHelper.cs" />
+    <Compile Include="PreserveSyncContextAttribute.cs" />
+    <Compile Include="PropertyDataAttribute.cs" />
+    <Compile Include="ReflectionAssert.cs" />
+    <Compile Include="ReplaceCultureAttribute.cs" />
+    <Compile Include="RestoreThreadPrincipalAttribute.cs" />
+    <Compile Include="SkippedXunitTestCase.cs" />
+    <Compile Include="TestFile.cs" />
+    <Compile Include="TestHelper.cs" />
+    <Compile Include="TheoryAttribute.cs" />
+    <Compile Include="TheoryDataSet.cs" />
+    <Compile Include="TheoryDiscoverer.cs" />
+    <Compile Include="ThreadPoolSyncContext.cs" />
+    <Compile Include="TraitAttribute.cs" />
+    <Compile Include="VersionTestHelper.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Moq" Version="4.21.0" />
+    <PackageReference Include="xunit.abstractions" Version="2.0.3" />
+    <PackageReference Include="xunit.assert" Version="2.9.3" />
+    <PackageReference Include="xunit.extensibility.core" Version="2.9.3" />
+    <PackageReference Include="xunit.extensibility.execution" Version="2.9.3" />
+  </ItemGroup>
+</Project>

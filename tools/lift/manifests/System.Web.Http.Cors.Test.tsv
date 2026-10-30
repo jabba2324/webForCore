@@ -1,0 +1,17 @@
+# aspnet/AspNetWebStack 2106565: source path (relative to repo root)	destination (relative to fork root)
+test/System.Web.Http.Cors.Test/AttributeBasedPolicyProviderFactoryTest.cs	test/webForCore.System.Web.Http.Cors.Test/AttributeBasedPolicyProviderFactoryTest.cs
+test/System.Web.Http.Cors.Test/Controllers/DefaultController.cs	test/webForCore.System.Web.Http.Cors.Test/Controllers/DefaultController.cs
+test/System.Web.Http.Cors.Test/Controllers/ExternalActionSelectorAttribute.cs	test/webForCore.System.Web.Http.Cors.Test/Controllers/ExternalActionSelectorAttribute.cs
+test/System.Web.Http.Cors.Test/Controllers/PerControllerConfigController.cs	test/webForCore.System.Web.Http.Cors.Test/Controllers/PerControllerConfigController.cs
+test/System.Web.Http.Cors.Test/Controllers/SampleController.cs	test/webForCore.System.Web.Http.Cors.Test/Controllers/SampleController.cs
+test/System.Web.Http.Cors.Test/Controllers/ThrowingController.cs	test/webForCore.System.Web.Http.Cors.Test/Controllers/ThrowingController.cs
+test/System.Web.Http.Cors.Test/CorsHttpConfigurationExtensionsTest.cs	test/webForCore.System.Web.Http.Cors.Test/CorsHttpConfigurationExtensionsTest.cs
+test/System.Web.Http.Cors.Test/CorsHttpRequestMessageExtensionsTest.cs	test/webForCore.System.Web.Http.Cors.Test/CorsHttpRequestMessageExtensionsTest.cs
+test/System.Web.Http.Cors.Test/CorsHttpResponseMessageExtensionsTest.cs	test/webForCore.System.Web.Http.Cors.Test/CorsHttpResponseMessageExtensionsTest.cs
+test/System.Web.Http.Cors.Test/CorsMessageHandlerTest.cs	test/webForCore.System.Web.Http.Cors.Test/CorsMessageHandlerTest.cs
+test/System.Web.Http.Cors.Test/DisableCorsAttributeTest.cs	test/webForCore.System.Web.Http.Cors.Test/DisableCorsAttributeTest.cs
+test/System.Web.Http.Cors.Test/EnableCorsAttributeTest.cs	test/webForCore.System.Web.Http.Cors.Test/EnableCorsAttributeTest.cs
+test/System.Web.Http.Cors.Test/HttpRequestMessageExtensions.cs	test/webForCore.System.Web.Http.Cors.Test/HttpRequestMessageExtensions.cs
+test/System.Web.Http.Cors.Test/Tracing/CorsEngineTracerTest.cs	test/webForCore.System.Web.Http.Cors.Test/Tracing/CorsEngineTracerTest.cs
+test/System.Web.Http.Cors.Test/Tracing/CorsPolicyProviderFactoryTracerTest.cs	test/webForCore.System.Web.Http.Cors.Test/Tracing/CorsPolicyProviderFactoryTracerTest.cs
+test/System.Web.Http.Cors.Test/Tracing/CorsPolicyProviderTracerTest.cs	test/webForCore.System.Web.Http.Cors.Test/Tracing/CorsPolicyProviderTracerTest.cs

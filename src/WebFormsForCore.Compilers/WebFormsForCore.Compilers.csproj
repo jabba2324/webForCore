@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net10.0;net11.0</TargetFrameworks>
+        <TargetFrameworks>net11.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
         <DebugType>portable</DebugType>
@@ -20,18 +20,6 @@
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     </PropertyGroup>
 
-    <ItemGroup Condition="$(TargetFramework) == 'net8.0'">
-        <PackageReference Include="Microsoft.CodeAnalysis" Version="4.13.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.13.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="4.13.0" />
-    </ItemGroup>
-    
-    <ItemGroup Condition="$(TargetFramework) == 'net10.0'">
-        <PackageReference Include="Microsoft.CodeAnalysis" Version="5.3.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.3.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="5.3.0" />
-    </ItemGroup>
-
     <ItemGroup Condition="$(TargetFramework) == 'net11.0'">
         <PackageReference Include="Microsoft.CodeAnalysis" Version="5.9.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
@@ -39,10 +27,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="Roslyn.net8.0\**\*.*">
+        <Content Include="Roslyn.net11.0\**\*.*">
             <!--<Link>Compilers\%(RecursiveDir)%(Filename)%(Extension)</Link>-->
             <Pack>True</Pack>
-            <PackagePath>lib\net8.0</PackagePath>
+            <PackagePath>lib\net11.0</PackagePath>
         </Content>
     </ItemGroup>
 
@@ -54,9 +42,6 @@
         <Compile Include="..\VersionInfo.cs" Link="Properties\VersionInfo.cs" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Roslyn.net8.0\" />    
-    </ItemGroup>
     
     <Target Name="CopyCompilersNoTools" BeforeTargets="ResolveReferences" Condition="$(TargetFramework) != 'net48'">
         <ItemGroup>

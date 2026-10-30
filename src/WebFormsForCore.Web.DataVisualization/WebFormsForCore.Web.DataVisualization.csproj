@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net10.0;net11.0</TargetFrameworks>
+        <TargetFrameworks>net11.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
 
@@ -33,4 +33,24 @@
     <ItemGroup>
         <None Include="..\..\README.md" Pack=" True" PackagePath ="\" />
     </ItemGroup>
+
+    <!-- webForCore: the project had no System.Web/System.Drawing references, so WebForm\ could not compile. -->
+    <ItemGroup>
+        <ProjectReference Include="..\WebFormsForCore.Web\WebFormsForCore.Web.csproj" />
+        <!-- The chart code needs System.Drawing.Common (Graphics, Bitmap); the fork's attribute-only System.Drawing
+             duplicates FontConverter and ToolboxBitmapAttribute, so keep it out of the global namespace. -->
+        <ProjectReference Include="..\WebFormsForCore.Drawing\WebFormsForCore.Drawing.csproj" Aliases="WfcDrawing" />
+        <Compile Include="..\WebFormsForCore.Web\WebFormsForCore\AssemblyRef.cs" Link="Properties\AssemblyRef.cs" />
+        <!-- Chart.DataBindTable/DataSource support SqlCommand/SqlDataReader/SqlDataAdapter; a separate package on modern .NET -->
+        <PackageReference Include="System.Data.SqlClient" Version="4.9.1" />
+    </ItemGroup>
+
+    <Target Name="ChangeAliasesOfNugetRefs" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">
+        <ItemGroup>
+            <!-- Do not import the NuGet System.Configuration.ConfigurationManager (the fork provides its own) -->
+            <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Configuration.ConfigurationManager' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'(?i)system\.configuration\.configurationmanager[\\/]'))" />
+            <!-- Do not import System.Web from dotnet -->
+            <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Web' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'[\\/]\.?dotnet[\\/]'))" />
+        </ItemGroup>
+    </Target>
 </Project>

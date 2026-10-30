@@ -590,7 +590,7 @@ using System.Diagnostics.CodeAnalysis;
                 _emptyPointCustomProperties.SetDefault(true);
                 _emptyPointCustomProperties.pointCustomProperties = true;
 //
-#if !SQLRS_CONTROL 
+#if false // webForCore: never compiled in Microsoft's build (stale field emptyPointAttributes; FontColor does not exist), so empty points are not forced transparent
 			    // Use transparent colors for empty points
 			    emptyPointAttributes.Color = Color.Transparent;
 			    emptyPointAttributes.BorderColor = Color.Transparent;

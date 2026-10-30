@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
-#if NET10_0_OR_GREATER
+#if NET11_0_OR_GREATER
 using System.Web.Compilation;
 #endif
 
@@ -48,7 +48,7 @@ public class AspNetCoreCompiler : Task
     public bool IsCore => !(IsNetFX || IsNetNative);
     public bool IsNetFX => RuntimeInformation.FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase);
     public bool IsNetNative => RuntimeInformation.FrameworkDescription.StartsWith(".NET Native", StringComparison.OrdinalIgnoreCase);
-    public bool IsNet10 => Environment.Version.Major >= 10;
+    public bool IsNet11 => Environment.Version.Major >= 11;
     public bool IsWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
     public bool LogToConsole { get; set; } = false;
@@ -135,7 +135,7 @@ public class AspNetCoreCompiler : Task
 
     bool ExecuteCore()
     {
-#if NET10_0_OR_GREATER
+#if NET11_0_OR_GREATER
         var par = new PrecompileParameter()
         {
             BinFolder = BinFolder?.ItemSpec,
@@ -177,23 +177,23 @@ public class AspNetCoreCompiler : Task
 
         return !Precompiler.HasErrors;
 #else
-        throw new NotSupportedException("ExecuteCore can only run on .NET 10");
+        throw new NotSupportedException("ExecuteCore can only run on .NET 11");
 #endif
     }
     public override bool Execute()
     {
-        // Only the net10.0 build contains the precompiler (see ExecuteCore), all other builds
+        // Only the net11.0 build contains the precompiler (see ExecuteCore), all other builds
         // (e.g. netstandard2.0, which MSBuild loads) have to run it in a separate dotnet process.
-#if NET10_0_OR_GREATER
+#if NET11_0_OR_GREATER
         const bool canRunInProcess = true;
 #else
         const bool canRunInProcess = false;
 #endif
-        if (!IsNet10 || !canRunInProcess)
+        if (!IsNet11 || !canRunInProcess)
         {
             //LogMessage($"Starting dotnet...");
             var dll = Assembly.GetExecutingAssembly().Location;
-            var net = "net10.0";
+            var net = "net11.0";
             dll = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(dll)!)!, net, "WebFormsForCore.Build.NetCore.dll");
             var iswin = IsWindows;
             var physicalPath = PhysicalPath?.ItemSpec;

@@ -83,17 +83,13 @@ namespace System.Configuration {
                     string directory = System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory();
 					s_machineConfigFilePath = Path.Combine(Path.Combine(directory, MachineConfigSubdirectory), MachineConfigFilename);
 #else
-                    if (UseNetFXMachineConfig)
-                    {
-                        string directory = Path.GetDirectoryName(_staticExePath ?? AppDomain.CurrentDomain.BaseDirectory);
-                        s_machineConfigFilePath = Path.Combine(Path.Combine(directory, MachineConfigSubdirectoryWebFormsForCore), MachineConfigNetFXFilename);
-                    }
-                    else
-                    {
-                        string directory = Path.GetDirectoryName(_staticExePath ?? AppDomain.CurrentDomain.BaseDirectory);
-                        s_machineConfigFilePath = Path.Combine(Path.Combine(directory, MachineConfigSubdirectoryWebFormsForCore), MachineConfigFilename);
-                    } 
-                    #endif
+                    // webForCore: only the web host (ApplicationManager) used to call the setter, which extracts the
+                    // embedded machine.config. In other processes (console apps, test hosts) no machine.config existed,
+                    // so ConfigurationManager.AppSettings threw. Go through the setter so it is extracted here too.
+                    string directory = Path.GetDirectoryName(_staticExePath ?? AppDomain.CurrentDomain.BaseDirectory);
+                    MachineConfigFilePath = Path.Combine(Path.Combine(directory, MachineConfigSubdirectoryWebFormsForCore),
+                        UseNetFXMachineConfig ? MachineConfigNetFXFilename : MachineConfigFilename);
+#endif
 				}
 
 				return s_machineConfigFilePath;

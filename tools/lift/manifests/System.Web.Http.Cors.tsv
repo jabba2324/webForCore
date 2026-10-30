@@ -1,0 +1,18 @@
+# aspnet/AspNetWebStack 2106565: source path (relative to repo root)	destination (relative to fork root)
+src/CommonAssemblyInfo.cs	src/webForCore.System.Web.Http.Cors/Properties/CommonAssemblyInfo.cs
+src/System.Web.Http.Cors/AttributeBasedPolicyProviderFactory.cs	src/webForCore.System.Web.Http.Cors/AttributeBasedPolicyProviderFactory.cs
+src/System.Web.Http.Cors/CorsHttpConfigurationExtensions.cs	src/webForCore.System.Web.Http.Cors/CorsHttpConfigurationExtensions.cs
+src/System.Web.Http.Cors/CorsHttpRequestMessageExtensions.cs	src/webForCore.System.Web.Http.Cors/CorsHttpRequestMessageExtensions.cs
+src/System.Web.Http.Cors/CorsHttpResponseMessageExtensions.cs	src/webForCore.System.Web.Http.Cors/CorsHttpResponseMessageExtensions.cs
+src/System.Web.Http.Cors/CorsMessageHandler.cs	src/webForCore.System.Web.Http.Cors/CorsMessageHandler.cs
+src/System.Web.Http.Cors/DisableCorsAttribute.cs	src/webForCore.System.Web.Http.Cors/DisableCorsAttribute.cs
+src/System.Web.Http.Cors/EnableCorsAttribute.cs	src/webForCore.System.Web.Http.Cors/EnableCorsAttribute.cs
+src/System.Web.Http.Cors/ICorsPolicyProvider.cs	src/webForCore.System.Web.Http.Cors/ICorsPolicyProvider.cs
+src/System.Web.Http.Cors/ICorsPolicyProviderFactory.cs	src/webForCore.System.Web.Http.Cors/ICorsPolicyProviderFactory.cs
+src/System.Web.Http.Cors/Properties/AssemblyInfo.cs	src/webForCore.System.Web.Http.Cors/Properties/AssemblyInfo.cs
+src/System.Web.Http.Cors/Properties/SRResources.Designer.cs	src/webForCore.System.Web.Http.Cors/Properties/SRResources.Designer.cs
+src/System.Web.Http.Cors/Properties/SRResources.resx	src/webForCore.System.Web.Http.Cors/Properties/SRResources.resx
+src/System.Web.Http.Cors/Tracing/CorsEngineTracer.cs	src/webForCore.System.Web.Http.Cors/Tracing/CorsEngineTracer.cs
+src/System.Web.Http.Cors/Tracing/CorsPolicyProviderFactoryTracer.cs	src/webForCore.System.Web.Http.Cors/Tracing/CorsPolicyProviderFactoryTracer.cs
+src/System.Web.Http.Cors/Tracing/CorsPolicyProviderTracer.cs	src/webForCore.System.Web.Http.Cors/Tracing/CorsPolicyProviderTracer.cs
+src/System.Web.Http.Cors/Tracing/TraceCategories.cs	src/webForCore.System.Web.Http.Cors/Tracing/TraceCategories.cs

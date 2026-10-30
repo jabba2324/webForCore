@@ -1,0 +1,31 @@
+webForCore
+==========
+
+webForCore is a fork of WebFormsForCore (https://github.com/webformsforcore/WebFormsForCore),
+licensed under the MIT License (see LICENSE).
+
+This product includes software from the ASP.NET Web Stack
+(https://github.com/aspnet/AspNetWebStack), licensed under the Apache License, Version 2.0
+(see LICENSE-APACHE-2.0.txt). That software carries the following notice:
+
+    Copyright (c) .NET Foundation. All rights reserved.
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+    these files except in compliance with the License. You may obtain a copy of the
+    License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software distributed
+    under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+    CONDITIONS OF ANY KIND, either express or implied. See the License for the
+    specific language governing permissions and limitations under the License.
+
+Code taken from the ASP.NET Web Stack lives in src/webForCore.* and test/webForCore.*. Each file
+keeps its original copyright header. Files were copied from aspnet/AspNetWebStack commit 2106565
+with line endings normalised to CRLF; every other change is listed in LIFT.md, and the per-file
+source of each copy is recorded in tools/lift/manifests/.
+
+The assemblies built from that code are delay signed with Microsoft's public key
+(src/SigningKey/35MSSharedLib1024.snk, from the ASP.NET Web Stack repository), so that their
+identity matches the assemblies Microsoft ships. They are not signed by Microsoft.

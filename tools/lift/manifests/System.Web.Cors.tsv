@@ -1,0 +1,11 @@
+# aspnet/AspNetWebStack 2106565: source path (relative to repo root)	destination (relative to fork root)
+src/CommonAssemblyInfo.cs	src/webForCore.System.Web.Cors/Properties/CommonAssemblyInfo.cs
+src/System.Web.Cors/CorsConstants.cs	src/webForCore.System.Web.Cors/CorsConstants.cs
+src/System.Web.Cors/CorsEngine.cs	src/webForCore.System.Web.Cors/CorsEngine.cs
+src/System.Web.Cors/CorsPolicy.cs	src/webForCore.System.Web.Cors/CorsPolicy.cs
+src/System.Web.Cors/CorsRequestContext.cs	src/webForCore.System.Web.Cors/CorsRequestContext.cs
+src/System.Web.Cors/CorsResult.cs	src/webForCore.System.Web.Cors/CorsResult.cs
+src/System.Web.Cors/ICorsEngine.cs	src/webForCore.System.Web.Cors/ICorsEngine.cs
+src/System.Web.Cors/Properties/AssemblyInfo.cs	src/webForCore.System.Web.Cors/Properties/AssemblyInfo.cs
+src/System.Web.Cors/Properties/SRResources.Designer.cs	src/webForCore.System.Web.Cors/Properties/SRResources.Designer.cs
+src/System.Web.Cors/Properties/SRResources.resx	src/webForCore.System.Web.Cors/Properties/SRResources.resx

@@ -30,9 +30,7 @@
     <BuildDependency Project="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
   </Project>
   <Project Path="src/WebFormsForCore.AspNetCompiler/WebFormsForCore.AspNetCompiler.csproj" />
-  <Project Path="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj">
-    <Build Solution="Debug|Any CPU" Project="false" />
-  </Project>
+  <Project Path="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
   <Project Path="src/WebFormsForCore.Compilers/WebFormsForCore.Compilers.csproj" />
   <Project Path="src/WebFormsForCore.Configuration/WebFormsForCore.Configuration.csproj">
     <BuildDependency Project="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
@@ -49,9 +47,7 @@
   <Project Path="src/WebFormsForCore.Web.ApplicationServices/WebFormsForCore.Web.ApplicationServices.csproj">
     <BuildDependency Project="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
   </Project>
-  <Project Path="src/WebFormsForCore.Web.DataVisualization/WebFormsForCore.Web.DataVisualization.csproj" Id="2402ef45-9934-4979-a792-75642d95f657">
-    <Build Solution="Debug|Any CPU" Project="false" />
-  </Project>
+  <Project Path="src/WebFormsForCore.Web.DataVisualization/WebFormsForCore.Web.DataVisualization.csproj" Id="2402ef45-9934-4979-a792-75642d95f657" />
   <Project Path="src/WebFormsForCore.Web.DynamicData/WebFormsForCore.Web.DynamicData.csproj">
     <Build Project="false" />
   </Project>
@@ -88,4 +84,19 @@
   <Project Path="src/WebFormsForCore.WebGrease/WebFormsForCore.WebGrease.csproj">
     <BuildDependency Project="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
   </Project>
+  <Folder Name="/WebStack/">
+    <Project Path="src/webForCore.System.Net.Http.Formatting/webForCore.System.Net.Http.Formatting.csproj" />
+    <Project Path="src/webForCore.System.Web.Razor/webForCore.System.Web.Razor.csproj" />
+    <Project Path="src/webForCore.System.Web.Http/webForCore.System.Web.Http.csproj" />
+    <Project Path="src/webForCore.System.Web.Cors/webForCore.System.Web.Cors.csproj" />
+    <Project Path="src/webForCore.System.Web.Http.Cors/webForCore.System.Web.Http.Cors.csproj" />
+  </Folder>
+  <Folder Name="/WebStack.Tests/">
+    <Project Path="test/webForCore.Microsoft.TestCommon/webForCore.Microsoft.TestCommon.csproj" />
+    <Project Path="test/webForCore.System.Net.Http.Formatting.Test/webForCore.System.Net.Http.Formatting.Test.csproj" />
+    <Project Path="test/webForCore.System.Web.Razor.Test/webForCore.System.Web.Razor.Test.csproj" />
+    <Project Path="test/webForCore.System.Web.Http.Test/webForCore.System.Web.Http.Test.csproj" />
+    <Project Path="test/webForCore.System.Web.Cors.Test/webForCore.System.Web.Cors.Test.csproj" />
+    <Project Path="test/webForCore.System.Web.Http.Cors.Test/webForCore.System.Web.Http.Cors.Test.csproj" />
+  </Folder>
 </Solution>
