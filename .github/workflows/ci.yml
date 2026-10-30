@@ -1,0 +1,77 @@
+# Linux build and every test suite (see docs/TESTING.md). Packaging to NuGet will be added as a later job.
+name: CI
+
+on:
+  push:
+    branches: [webforcore-lift, main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: "1"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  # Strong-name signing is RSA-SHA1; distributions whose OpenSSL policy rejects SHA-1 need this (harmless elsewhere).
+  OPENSSL_ENABLE_SHA1_SIGNATURES: "1"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+
+    services:
+      # Identity.Test's Entity Framework tests (LocalDB on Windows); the same server tools/lift/sqlserver.sh starts.
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: "Y"
+          MSSQL_PID: Developer
+          MSSQL_SA_PASSWORD: "webForCore-Test1!"
+        ports:
+          - 14333:1433
+        options: >-
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P 'webForCore-Test1!' -Q 'SELECT 1' -b"
+          --health-interval 10s --health-timeout 5s --health-retries 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET (global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 11.0.100-rc.3.26522.148
+
+      - name: System packages
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fontconfig fonts-dejavu-core libfontconfig1
+
+      # The other projects import lib/WebFormsForCore.Build/*/FakeStrongName.targets, this project's output, so it is
+      # built before the solution can even be restored.
+      - name: Build the build tasks
+        run: dotnet build src/WebFormsForCore.Build/WebFormsForCore.Build.csproj -c Release
+
+      - name: Build
+        run: dotnet build WebFormsForCore.slnx -c Release -nodeReuse:false
+
+      - name: Test fonts
+        run: tools/ci/fetch-test-fonts.sh
+
+      - name: Test
+        run: tools/ci/run-tests.sh "$RUNNER_TEMP/TestResults"
+
+      - name: Test summary
+        if: always()
+        run: cat "$RUNNER_TEMP/TestResults/summary.md" >> "$GITHUB_STEP_SUMMARY" || true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: ${{ runner.temp }}/TestResults/*.trx
+          if-no-files-found: warn

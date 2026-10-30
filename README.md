@@ -1,181 +1,132 @@
-# WebFormsForCore 
-## WebForms for ASP.NET Core
-WebFormsForCore is an OpenSource library to run WebForms apps on ASP.NET Core. This library provides a port
-of the System.Web libraries of .NET Framework to .NET 11. With this library,
-you can run WebForms websites directly in ASP.NET Core, also on Linux. With this
-library it becomes easy to migrate your existing WebForms application to run
-on ASP.NET Core also.
+# webForCore
 
-We successfully ported the FuseCP Control Panel, a huge WebForms code base, to ASP.NET Core & Linux
-with the aid of this library. The goal of running FuseCP on Linux without porting everything to Blazor was
-also our motivation of creating WebFormsForCore. 
+**Run ASP.NET 4.x applications on .NET 11, Kestrel and Linux, without rewriting them.**
 
-## Support
-If you need support porting your project to .NET Core & WebFormsForCore, we provide support for
-40$ per hour. Please contact us via the [LiveChat button on our webpage](https://webformsforcore.github.io/) or via [WhatsApp](https://wa.me/41775080285).
-There is also a tutorial on Youtube on [how to convert a sample WebForms application to WebFormsForCore](https://youtu.be/wgg-FziIfNg). 
+webForCore runs Web Forms, MVC 5, Web API 2, Web Pages, SignalR 2, OWIN/Katana and ASP.NET Identity 2 apps on
+.NET 11. It is built from Microsoft's own code: System.Web and System.Configuration from the .NET Framework reference
+source (through [WebFormsForCore](https://github.com/webformsforcore/WebFormsForCore), which this project forks), and
+the ASP.NET libraries Microsoft open-sourced. Those libraries are lifted file by file from Microsoft's repositories
+and tested with Microsoft's own test suites. The parts IIS used to provide (request filtering, URL Rewrite, default
+documents, custom errors, compression, logging, AppDomain recycling) run in front of the app on Kestrel and are
+configured from the app's existing `<system.webServer>` section.
 
-## Source Code
-You can find the source code of [WebFormsForCore on GitHub](https://github.com/webformsforcore/WebFormsForCore). It is 
-licensed under a MIT license. We welcome contributions, please have a look into the issues if you want to contribute.
+The reference behaviour is .NET Framework 4.8 on IIS 10. Where .NET 11 behaves differently and webForCore can't
+restore the old behaviour, the difference is documented.
 
-## Donating
-If you like WebFormsForCore, and it helped you save a lot of work, please consider to
-[sponsor us on GitHub](https://github.com/sponsors/webformsforcore)  or [donate to us with PayPal](https://www.paypal.com/donate/?hosted_button_id=KQCGG3NDJRR2S).
+| | |
+| --- | --- |
+| Target | .NET 11 (`net11.0`), Linux x64 (Windows builds too) |
+| Status | Pre-release. No production app has been migrated yet; NuGet packages aren't published yet |
+| Tests | 27,275 tests in 24 suites, almost all of them Microsoft's and Mono's; all pass except 151 known System.Drawing failures, 141 of them metafiles ([TESTING.md](docs/TESTING.md)) |
+| Licence | MIT, Apache 2.0 and BSD 3-Clause: all allow commercial use. A few files inherited from WebFormsForCore aren't cleared yet; see [docs/LICENSING.md](docs/LICENSING.md) |
 
-## Usage
-If you have a WebForms project you want to convert to NET Core, proceed as follows:
+## What works
 
-First convert your Project to a SDK Project. Please keep a backup of the old non SDK style
-project. Conversion can be done easiest by using a converter like the migrate-2019 tool. To install that
-tool, run `dotnet tool install --global Project2015To2017.Migrate2019.Tool`. Then go to the directory
-of your solution and run `dotnet migrate-2019 wizard` to convert your solution to an SDK project. If
-the converter complains about an unsupported project type, remove the `<ProjectTypeGuid>` property from
-the project first. After conversion change the target framework of your project to `net11.0`. You
-might also keep `net48`, in order to dual run your project with NET Framework & NET Core.
-Change the OutputPath for `net11.0` to `bin_dotnet`:
-```
-<PropertyGroup>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-    <IntermediateOutputPath>$(BaseIntermediateOutputPath)$(Configuration)\$(TargetFramework.ToLowerInvariant())\</IntermediateOutputPath>
-</PropertyGroup>
+| Framework | Assemblies | Notes |
+| --- | --- | --- |
+| Web Forms | System.Web, System.Web.Extensions (AJAX), System.Web.Services (ASMX), DataVisualization (Chart), DynamicData, Mobile | Pages, user controls, master pages, App_Code, Global.asax, themes; compiled at run time by Roslyn, or precompiled |
+| MVC 5 | System.Web.Mvc 5.3, Razor 3, Web Pages 3, Helpers, MVC Futures | `.cshtml` views compiled at run time as on IIS |
+| Web API 2 | System.Web.Http 5.3, WebHost, OWIN host, CORS, System.Net.Http.Formatting | |
+| OWIN | Microsoft.Owin 4.2.3, Host.SystemWeb, Security (Cookies, OAuth), Hosting, HttpListener, Testing, Cors | |
+| SignalR 2.4.3 | Core, SystemWeb, .NET client | WebSockets, Server-Sent Events, long polling |
+| ASP.NET Identity 2 | Core, EntityFramework (EF 6.5), Owin | |
+| Configuration | System.Configuration (web.config, machine.config, protected sections) | DPAPI and RSA key containers work on Linux |
+| Drawing | System.Drawing.Common 6.0 | Microsoft's managed code over a GDI+ engine written on SkiaSharp; no libgdiplus |
+| Optimization | System.Web.Optimization, WebGrease, AjaxControlToolkit | |
 
-<PropertyGroup Condition="'$(TargetFramework)' != 'net48'">
-    <OutputType>Exe</OutputType>
-    <OutputPath>bin_dotnet</OutputPath>
-    <StartupObject>Program</StartupObject>
-</PropertyGroup>
+What doesn't work, and why, is in [docs/NAMESPACES.md](docs/NAMESPACES.md). The main gaps are Windows
+authentication and impersonation, WCF service hosting, metafiles (EMF/WMF), and Windows-only APIs (registry, COM,
+Code Access Security).
 
-<PropertyGroup Condition="'$(TargetFramework)' == 'net48'">
-    <OutputType>Library</OutputType>
-    <OutputPath>bin</OutputPath>
-</PropertyGroup>
+## Documentation
 
-<ItemGroup>
-    <Content Remove="bin_dotnet\**\*.*" />
-    <Reference Remove="bin_dotnet\**\*.*" />
-    <None Remove="bin_dotnet\**\*.*" />
-    <Compile Remove="bin_dotnet\**\*.*" />
-</ItemGroup>
-``` 
+| Document | Contents |
+| --- | --- |
+| [docs/MIGRATING.md](docs/MIGRATING.md) | Step-by-step migration of an existing app |
+| [docs/AGENT-MIGRATION.md](docs/AGENT-MIGRATION.md) | The same migration as instructions for an AI coding agent |
+| [docs/NAMESPACES.md](docs/NAMESPACES.md) | Which .NET Framework namespaces are implemented, by assembly, with caveats |
+| [docs/IIS-COMPATIBILITY.md](docs/IIS-COMPATIBILITY.md) | The IIS features rebuilt on Kestrel: what's supported and what isn't |
+| [docs/TESTING.md](docs/TESTING.md) | The test suites, where they come from, results and code coverage |
+| [docs/MODIFICATIONS.md](docs/MODIFICATIONS.md) | How Microsoft's code was lifted and what had to change, with links to upstream |
+| [docs/lifted-changes.md](docs/lifted-changes.md) | Generated list of every lifted file that differs from upstream |
+| [docs/LICENSING.md](docs/LICENSING.md) | Which parts have which licence, commercial use, and the files not yet cleared |
+| [LIFT.md](LIFT.md) | The engineering log: every change, decision and test result, in order |
 
-We change the output path to `bin_dotnet` and set `AppendTargetFrameworkToOutputPath` and `AppendRuntimeIdentifierToOutputPath` to `false`, since WebFormsForCore can only work, if the OutputPath is a direct subfolder of the project, as in classic ASP.NET.
+## Migrating an app: the short version
 
-Then, for `net11.0`, import the WebFormsForCore packages like so:
-```
-<ItemGroup Condition="'$(TargetFramework)' == 'net11.0'">
-    <PackageReference Include="WebFormsForCore.Web" Version="1.7.0-rc3" />
-</ItemGroup>
-```
-Remove the old `Reference` references or put them in a condition only for `net48`.
+The full guide is [docs/MIGRATING.md](docs/MIGRATING.md). In outline:
 
-If your project also needs `System.Web.Extensions` or `System.Web.Optimization` import the
-corresponding packages also, like `WebFormsForCore.Web.Extensions` or 
-`WebFormsForCore.Web.Optimization` etc. The following packages are available:
-- `System.Configuration`: `WebFormsForCore.Configuration`
-- `System.Web`: `WebFormsForCore.Web`
-- `System.Web.Services`: `WebFormsForCore.Web.Services`
-- `System.Web.Extensions`: `WebFormsForCore.Web.Extensions`
-- `System.Web.Optimization`: `WebFormsForCore.Web.Optimization`
-- `System.Web.Mobile`: `WebFormsForCore.Web.Mobile`
-- `Microsft.AspNet.Web.Optimization`: `WebFormsForCore.Web.Optimization`
-- `Microsoft.AspNet.Web.Optimization.WebForms`: `WebFormsForCore.Web.Optimization.WebForms`
-- `WebGrease`: `WebFormsForCore.WebGrease`
-- `System.Drawing`: `WebFormsForCore.Drawing`
-- `AjaxControlToolkit`: `WebFormsForCore.AjaxControlToolkit`
-- `AjaxControlToolkit.HtmlEditor.Sanitizer`: `WebFormsForCore.AjaxControlToolkit.HtmlEditor.Sanitizer`
-- `AjaxControlToolkit.StaticResources`: `WebFormsForCore.AjaxControlToolkit.StaticResources`
-- All of the `BundleTransformer.*`packages: `WebFormsForCore.BundleTransformer.*`
+1. **Build webForCore** (until packages are published, apps reference the fork's projects):
+   ```bash
+   git clone https://github.com/jabba2324/webForCore && cd webForCore
+   dotnet build src/WebFormsForCore.Build/WebFormsForCore.Build.csproj -c Release   # build tasks the other projects import
+   dotnet build WebFormsForCore.slnx -c Release
+   ```
+2. **Make the app an SDK-style `Microsoft.NET.Sdk.Web` project** targeting `net11.0`, with its output in a direct
+   subfolder (`bin_dotnet`), as classic ASP.NET's `bin` was:
+   ```xml
+   <PropertyGroup>
+     <TargetFramework>net11.0</TargetFramework>
+     <OutputType>Exe</OutputType>
+     <OutputPath>bin_dotnet</OutputPath>
+     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+     <PredefinedCulturesOnly>true</PredefinedCulturesOnly>
+     <!-- MVC 5 / Web Pages: views are compiled at run time, not by the ASP.NET Core Razor SDK -->
+     <EnableDefaultRazorGenerateItems>false</EnableDefaultRazorGenerateItems>
+     <RazorCompileOnBuild>false</RazorCompileOnBuild>
+     <RazorCompileOnPublish>false</RazorCompileOnPublish>
+   </PropertyGroup>
+   <Import Project="path/to/webForCore/src/webForCore.WebStack.targets" />
+   <ItemGroup>
+     <Compile Remove="App_Code/**;bin_dotnet/**" />
+     <Content Remove="bin_dotnet/**" />
+     <None Remove="bin_dotnet/**" />
+   </ItemGroup>
+   ```
+   Replace the .NET Framework references (System.Web, MVC, Web API, OWIN packages) with references to the fork's
+   projects: see the table in [docs/MIGRATING.md](docs/MIGRATING.md#3-references).
+3. **Add a `Program.cs`:**
+   ```csharp
+   var builder = WebApplication.CreateBuilder(args);
+   builder.Services.AddWebForms();                 // IIS compression, W3C logging, systemd integration
+   builder.Services.AddDistributedMemoryCache();   // if the app uses session state
+   builder.Services.AddSession();
+   var app = builder.Build();
+   app.UseSession();
+   app.UseWebForms(o => o.HandleAllRequestsWithWebForms().UseAspNetCoreSessionProvider());
+   app.Run();
+   ```
+4. **Keep `web.config`**, `<system.webServer>` included. Set an explicit `<machineKey>` so cookies and view state
+   survive restarts.
+5. **Run it** from the app folder with `dotnet bin_dotnet/YourApp.dll`, and compare its responses with IIS.
 
-System.Drawing only implements Attributes, so WebFormsForCore can run on Linux, where System.Drawing.Common.dll is 
-missing.
+## Building and testing this repository
 
-If you want WebFormsForCore to automatically create the `*.designer.cs` files for you, as it was in the old non
-SDK project, you also need to import the package `WebFormsForCore.Build` like so:
-```
-<PackageReference Include="WebFormsForCore.Build" Version="1.7.0-rc3" ExcludeAssets="runtime" />
-```
-If you import this package, outdated `*.designer.cs` files will be created after build. This only works for C#,
-not for VisualBasic. Also, the visual designers in VisualStudio for web controls are not supported and won't
-work.
+Requirements: the .NET SDK in `global.json` (11.0.100-rc.3), and on Fedora/RHEL `OPENSSL_ENABLE_SHA1_SIGNATURES=1`
+(strong-name signing uses SHA-1). The Identity tests need SQL Server; `tools/lift/sqlserver.sh` starts one in a
+container.
 
-Also, the Build package will strip incompatible designer attributes from classes in legacy .NET Framework
-assemblies after build, that would otherwise cause the types load to fail. This way, when you reference the Build
-packages you can use third party libraries that reference System.Web. You might still encounter issues, since the
-third party libraries will be compiled against .NET Framework and not .NET Core.
-
-The Build package also provides an MSBuild Task `AspNetCoreCompiler` similar to the standard `AspNetCompiler`
-Task that wraps the .NET Framework `aspnet_compiler.exe`. In addition to the attributes of `AspNetCormpiler`,
-`AspNetCoreCompiler` supports the attribute `BinFolder` and `TargetFramework`. You can also specify a comma
-separated list of BinFolder's and TargetFramework's, if you project is dual running on .NET Framework and
-.NET Core with specific bin folders. You can also use this aspnetcore_compiler.exe form the command line by
-installing the dotnet tool `dotnet tool install -g WebFormsForCore.AspNetCompiler`.
-
-Finally configure ASP.NET Core to use WebForms in the initialization code Program.cs like so:
-```
-#if NETCOREAPP
-
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-
-public class Program
-{
-
-    public static void Main(string[] args)
-    {
-        var builder = WebApplication.CreateBuilder(args);
-
-        var app = builder.Build();
-        
-        app.UseWebForms();
-            
-        app.Run();
-    }
-}
-#endif
-```
-Usually this will cause WebFormsForCore to handle all WebForms requests, like aspx pages etc.
-Requests not specific to WebForms will be handled by ASP.NET Core. If you want all requests to
-be handled by WebForms, for example if your application uses routing and friendly urls, you might
-want to call 
-```
-app.UseWebForms(opt => opt.HandleAllRequestsWithWebForms())
+```bash
+dotnet build src/WebFormsForCore.Build/WebFormsForCore.Build.csproj -c Release
+dotnet build WebFormsForCore.slnx -c Release
+tools/ci/fetch-test-fonts.sh          # fonts for System.Drawing's tests (not redistributable)
+tools/lift/sqlserver.sh               # SQL Server for Identity.Test (podman or docker)
+tools/ci/run-tests.sh                 # every suite, as CI runs it
 ```
 
-### Session State
-WebFormsForCore supports a WebForms SessionStateProvider using the ASP.NET Core Session
-State. To use it, initialize the ASP.NET Core Session in your Program.cs like so:
-```
-var builder = WebApplication.CreateBuilder(args);
+CI (`.github/workflows/ci.yml`) runs the same steps on Ubuntu for every push and pull request.
 
-builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession();
+The lifted directories (`src/webForCore.*`, `test/webForCore.*`) are generated by the scripts in `tools/lift/`. To
+change one, change the script and lift again; see [docs/MODIFICATIONS.md](docs/MODIFICATIONS.md).
 
-var app = builder.Build();
+## Origins and credits
 
-app.UseSession();
+webForCore is a fork of [WebFormsForCore](https://github.com/webformsforcore/WebFormsForCore) by Simon Jakob Egli,
+which ported System.Web and its companions from the .NET Framework reference source to .NET and first ran Web Forms
+on ASP.NET Core. webForCore adds the lifted Microsoft libraries and their tests, the IIS layer, AppDomain emulation,
+System.Drawing on SkiaSharp, and the compatibility work recorded in [LIFT.md](LIFT.md).
 
-app.UseWebForms(opt => opt.UseAspNetCoreSessionProvider());
-
-app.Run();
-```
-This will store the session state in process. You can also use different ASP.NET Core session providers, like Redis, to have
-a session state server.
-
-## Conflicts with Existing Packages
-Currently there might be some conflicts with the packages System.Web.dll, System.Drawing.dll &
-System.Configuration.ConfigurationManager.dll, since WebFormsForCore replaces those dll's. In order to prevent the import of the old dll's include the following in your csproj:
-
-```
-<Target Name="ChangeAliasesOfNugetRefs" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">
-    <ItemGroup>
-        <!-- Do not import System.Configuration.ConfigurationManage -->
-        <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Configuration.ConfigurationManager' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'(?i)system\.configuration\.configurationmanager\\'))" />
-        <!-- Do not import System.Web -->
-        <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Web' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'\\dotnet\\'))" />
-        <!-- Do not import System.Drawing -->
-        <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Drawing' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'\\dotnet\\'))" />
-    </ItemGroup>
-</Target>
-```
+The lifted code is © Microsoft and the .NET Foundation (ASP.NET Web Stack, Katana, SignalR, ASP.NET Identity,
+System.Drawing.Common) and the Mono project (System.Web tests). See [NOTICE](NOTICE) for every component, its source
+and its licence.

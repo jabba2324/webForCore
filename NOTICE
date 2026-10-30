@@ -1,12 +1,78 @@
 webForCore
 ==========
 
-webForCore is a fork of WebFormsForCore (https://github.com/webformsforcore/WebFormsForCore),
-licensed under the MIT License (see LICENSE).
+webForCore is a fork of WebFormsForCore (https://github.com/webformsforcore/WebFormsForCore, commit 52f4172),
+licensed under the MIT License (see LICENSE). This file lists every third-party component in this repository, where
+it came from, its licence and its copyright holders. Licence texts: LICENSE (MIT), LICENSE-APACHE-2.0.txt (Apache
+License 2.0), LICENSE-BSD-3-CLAUSE.txt (BSD 3-Clause). Every source file keeps its original header.
 
-This product includes software from the ASP.NET Web Stack
-(https://github.com/aspnet/AspNetWebStack), licensed under the Apache License, Version 2.0
-(see LICENSE-APACHE-2.0.txt). That software carries the following notice:
+A plain-language summary, including commercial use, is in docs/LICENSING.md.
+
+Summary
+-------
+
+  Component                                   Location                                      Licence
+  ------------------------------------------  --------------------------------------------  --------------------------
+  .NET Framework Reference Source             src/WebFormsForCore.Web, .Configuration,      MIT (Microsoft)
+    (System.Web, System.Configuration, ...)   .Web.Extensions, .Web.Services, .Web.Mobile,
+                                              .Web.DataVisualization, .Web.DynamicData,
+                                              .Web.Entity, .AspNetCompiler
+  ASP.NET Web Stack                           src/webForCore.System.*, src/webForCore.      Apache-2.0 (.NET Foundation)
+                                              Microsoft.Web.Mvc, test/webForCore.System.*
+                                              (except MonoTests), Microsoft.TestCommon,
+                                              Microsoft.Web.Mvc.Test
+  Katana                                      src|test/webForCore.Microsoft.Owin*           Apache-2.0 (.NET Foundation)
+  ASP.NET SignalR 2.4.3                       src|test/webForCore.Microsoft.AspNet.SignalR* Apache-2.0 (.NET Foundation)
+  ASP.NET Identity 2                          src/webForCore.Microsoft.AspNet.Identity.*,   MIT (Microsoft)
+                                              test/webForCore.Identity.Test
+  System.Drawing.Common 6.0 and its tests     src/webForCore.System.Drawing.Common,         MIT (.NET Foundation)
+                                              test/webForCore.System.Drawing.Common.Tests,
+                                              test/webForCore.TestUtilities
+  .NET Arcade (XUnitExtensions,               test/webForCore.Microsoft.DotNet.*            MIT (.NET Foundation)
+    RemoteExecutor)
+  .NET Runtime Assets (test data)             test/webForCore.System.Drawing.Common.Tests/  MIT (.NET Foundation)
+                                              TestData
+  Mono System.Web tests                       test/webForCore.System.Web.MonoTests          MIT (Novell, Xamarin and
+                                                                                            contributors)
+  Mono class library code                     src/WebFormsForCore.Web (Mono.Security,       MIT (Novell, Ximian)
+                                              ManagedProtection), Serialization.Formatters
+  dotnet/runtime BinaryFormatter, FontConverter src/WebFormsForCore.Serialization.Formatters MIT (.NET Foundation)
+                                              /Serialization, src/WebFormsForCore.Drawing
+  SoapFormatter (novotnyllc/SoapFormatter)    src/WebFormsForCore.Serialization.Formatters  MIT (Novell, Ximian,
+                                              /SoapFormatter                                Microsoft)
+  RoslynCodeDomProvider                       src/WebFormsForCore.Web/WebFormsForCore/      MIT (Microsoft)
+                                              CodeDom
+  Roslyn compilers (binaries)                 src/WebFormsForCore.Compilers/Roslyn.net11.0  MIT (.NET Foundation)
+  Data Visualization for .NET (SR.resx)       src/WebFormsForCore.Web.DataVisualization/    MIT (.NET Foundation)
+                                              Common/SR.resx
+  ASP.NET Web Optimization                    src/WebFormsForCore.Web.Optimization,         Apache-2.0 (Microsoft)
+                                              .Web.Optimization.WebForms
+  WebGrease, Microsoft Ajax Minifier          src/WebFormsForCore.WebGrease                 Apache-2.0 (Microsoft);
+                                                                                            Mono parts MIT
+  AjaxControlToolkit                          src/WebFormsForCore.AjaxControlToolkit        BSD-3-Clause (CodePlex
+                                                                                            Foundation)
+  Redesigner                                  src/WebFormsForCore.Build/Redesigner          BSD-3-Clause (Sean Werkema)
+  BundleTransformer (git submodule; not       src/BundleTransformer                         Apache-2.0 (Andrey
+    built by the solution)                                                                  Taritsyn); bundled tools
+                                                                                            under their own licences,
+                                                                                            src/BundleTransformer/Licenses
+  JavaScript libraries in the TestApp and     Bootstrap, jQuery, Modernizr, Jasmine,        MIT (their authors)
+    AjaxControlToolkit test site              Detect.js (MIT option of MIT/GPL)
+  SkiaSharp (NuGet), Skia                     package dependency of System.Drawing.Common   MIT (Microsoft, Xamarin);
+                                                                                            BSD-3-Clause (Google)
+
+Details
+-------
+
+The .NET Framework Reference Source (https://github.com/microsoft/referencesource, MIT License, Copyright (c)
+Microsoft Corporation) is the origin of WebFormsForCore's port of System.Web, System.Configuration,
+System.Web.Extensions, System.Web.Services, System.Web.Mobile, System.Web.DataVisualization, System.Web.DynamicData,
+System.Web.Entity and aspnet_compiler, taken through WebFormsForCore's fork of it
+(https://github.com/simonegli8/WebFormsCoreReferenceSource). The files keep Microsoft's headers.
+
+This product includes software from the ASP.NET Web Stack (https://github.com/aspnet/AspNetWebStack, commit
+2106565), licensed under the Apache License, Version 2.0 (see LICENSE-APACHE-2.0.txt). That software carries the
+following notice:
 
     Copyright (c) .NET Foundation. All rights reserved.
 
@@ -21,11 +87,10 @@ This product includes software from the ASP.NET Web Stack
     CONDITIONS OF ANY KIND, either express or implied. See the License for the
     specific language governing permissions and limitations under the License.
 
-Code taken from the ASP.NET Web Stack lives in src/webForCore.* and test/webForCore.* (except
-test/webForCore.System.Web.MonoTests, see below). Each file
-keeps its original copyright header. Files were copied from aspnet/AspNetWebStack commit 2106565
-with line endings normalised to CRLF; every other change is listed in LIFT.md, and the per-file
-source of each copy is recorded in tools/lift/manifests/.
+Code taken from the ASP.NET Web Stack lives in the src/ and test/ directories listed for it in the summary above.
+Each file keeps its original copyright header. Files were copied with line endings normalised to CRLF; every other
+change is listed in docs/lifted-changes.md and LIFT.md, and the per-file source of each copy is recorded in
+tools/lift/manifests/.
 
 The assemblies built from that code are delay signed with Microsoft's public key
 (src/SigningKey/35MSSharedLib1024.snk, from the ASP.NET Web Stack repository), so that their
@@ -92,3 +157,62 @@ tools/lift/manifests/.
 src/WebFormsForCore.Web.DataVisualization/Common/SR.resx comes from Data Visualization for .NET
 (https://github.com/dotnet/winforms-datavisualization, commit 022f396), licensed under the MIT License,
 Copyright (c) .NET Foundation and Contributors.
+
+ASP.NET Web Optimization (https://github.com/aspnet/AspNetWebOptimization) and WebGrease with the Microsoft Ajax
+Minifier (https://github.com/Licshee/WebGrease, a mirror of Microsoft's WebGrease 1.6) are licensed under the Apache
+License, Version 2.0, Copyright (c) Microsoft Corporation. They live in src/WebFormsForCore.Web.Optimization,
+src/WebFormsForCore.Web.Optimization.WebForms and src/WebFormsForCore.WebGrease. WebGrease's System.Resources files
+come from Mono (MIT License, Copyright (c) Novell, Inc. and Xamarin Inc.).
+
+AjaxControlToolkit (https://github.com/DevExpress/AjaxControlToolkit, through
+https://github.com/simonegli8/WebFormsForCore.AjaxControlToolkit commit 0c5b111, with webForCore's changes) is
+licensed under the BSD 3-Clause License, Copyright (c) 2012-2020, CodePlex Foundation (see LICENSE-BSD-3-CLAUSE.txt
+and src/WebFormsForCore.AjaxControlToolkit/LICENSE.txt). Its Jasmine test site includes Jasmine (MIT, Pivotal Labs),
+jQuery (MIT, jQuery Foundation) and Detect.js (MIT/GPL dual licence, used under MIT, Darcy Clarke).
+
+Redesigner (https://github.com/seanofw/Redesigner, through https://github.com/simonegli8/Redesigner), in
+src/WebFormsForCore.Build/Redesigner, is licensed under the New BSD License, Copyright (c) 2012-2013 by Sean Werkema
+(see LICENSE-BSD-3-CLAUSE.txt).
+
+RoslynCodeDomProvider (https://github.com/aspnet/RoslynCodeDomProvider, MIT License, Copyright (c) Microsoft
+Corporation) is the origin of src/WebFormsForCore.Web/WebFormsForCore/CodeDom. The Roslyn compiler binaries in
+src/WebFormsForCore.Compilers (https://github.com/dotnet/roslyn, MIT License, Copyright (c) .NET Foundation and
+Contributors) are redistributed unmodified.
+
+The BinaryFormatter port in src/WebFormsForCore.Serialization.Formatters/Serialization and FontConverter in
+src/WebFormsForCore.Drawing come from .NET (https://github.com/dotnet/runtime, MIT License, Copyright (c) .NET
+Foundation and Contributors). The SoapFormatter in src/WebFormsForCore.Serialization.Formatters/SoapFormatter comes
+from https://github.com/novotnyllc/SoapFormatter, which combines Mono code (MIT License, Copyright (c) 2004 Novell,
+Inc., Ximian) and Reference Source code (MIT License, Microsoft). Mono's MIT-licensed code is also in
+src/WebFormsForCore.Web/WebFormsForCore (ManagedProtection.Mono.cs, ProtectedDataPortable.cs: Copyright (c) 2005
+Novell, Inc., Sebastien Pouliot).
+
+BundleTransformer (https://github.com/Taritsyn/BundleTransformer, through https://github.com/simonegli8/BundleTransformer)
+is a git submodule at src/BundleTransformer, licensed under the Apache License, Version 2.0, Copyright (c) 2012-2026
+Andrey Taritsyn. The solution does not build it. The third-party tools and scripts it bundles keep their own
+licences, listed in src/BundleTransformer/Licenses.
+
+The TestApp (src/WebFormsForCore.TestApp) includes Bootstrap 5.2.3 (MIT, The Bootstrap Authors), jQuery 3.4.1 and
+3.7.1 (MIT, OpenJS Foundation), Modernizr 2.8.3 (MIT) and Microsoft's ASP.NET ScriptManager scripts.
+
+Licensing issues inherited from WebFormsForCore
+-----------------------------------------------
+
+These files came with the fork base and are not covered by the licences above. They are listed here so they can be
+reviewed; webForCore has not added to them.
+
+  * src/WebFormsForCore.Web/WebFormsForCore/NativeDlls/runtimes/win-*/native/webengine.dll and webengine4.dll are
+    Microsoft .NET Framework 4.8 native binaries, under the .NET Framework licence terms. They are only used on
+    Windows.
+  * src/WebFormsForCore.Web.Reporting is decompiled from Microsoft Report Viewer 12.0
+    (Microsoft.ReportViewer.WebForms), which is under Microsoft's proprietary licence terms. The solution does not
+    build it.
+  * src/WebFormsForCore.Web.RegularExpressions, parts of src/WebFormsForCore.Web.ApplicationServices,
+    src/WebFormsForCore.Web.Infrastructure and src/WebFormsForCore.Configuration, and
+    src/WebFormsForCore.Web/WebFormsForCore/DataProtector.cs appear to be decompiled from .NET Framework assemblies
+    or Microsoft.Web.Infrastructure rather than taken from the Reference Source. Equivalent Reference Source (MIT)
+    exists for most of them.
+  * The machine.config and web.config files in src/WebFormsForCore.Configuration/Config come from a .NET Framework
+    installation.
+  * Sample assets in src/BundleTransformer/samples include the Blogger Sans font (CC BY-ND 4.0), the Bitstream Vera
+    font, a jquery.validate-vsdoc.js under Microsoft's ASP.NET MVC 3 licence terms, and images of unknown origin.

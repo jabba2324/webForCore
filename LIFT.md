@@ -1278,3 +1278,34 @@ Gate (`PrecompilationTests`), on `test/webForCore.Precompiled.Site` (CodeFile co
 App_Code, Global.asax, App_GlobalResources) and a minimal host, `test/webForCore.Precompiled.Host`. Fixed: the target's
 contents, the rendered page, and a page added later refused. Updatable: the markup rewritten, edits picked up, a new
 page compiled. A broken page fails the precompilation with its error.
+
+## Documentation, CI and licences (30 Oct 2026)
+
+- **Docs** in `docs/`: MIGRATING, AGENT-MIGRATION (instructions for an AI agent), NAMESPACES, IIS-COMPATIBILITY,
+  TESTING (with coverage), MODIFICATIONS, and `lifted-changes.md`, which `tools/lift/changes_report.py` generates. It
+  diffs every lifted file against `git show <commit>:<path>` in the upstream checkouts (4,389 files, 196 changed),
+  then the fork's changes to WebFormsForCore's port since `52f4172`.
+- **AjaxControlToolkit vendored.** The submodule was pinned to a local commit (`92be3f03`, "Build on Linux and target
+  net11.0 only") that no remote has, so a fresh clone couldn't check it out. Its 1,565 tracked files are now in this
+  repository (licence BSD-3-Clause, CodePlex Foundation). The stale `.gitmodules` entries (referencesource, dotnet,
+  mono, SoapFormatter, CassiniDev, AspNetWebOptimization, WebGrease, Redesigner) are removed; their origins are in
+  NOTICE. BundleTransformer and `www` stay submodules, and the build doesn't use them.
+- **A clean build needs `src/WebFormsForCore.Build` first.** Fifteen projects import
+  `lib/WebFormsForCore.Build/netstandard2.0/FakeStrongName.targets`, which is that project's output and is ignored by
+  git.
+- **CI** (`.github/workflows/ci.yml`, Ubuntu 24.04): builds the build tasks, then the solution, fetches the
+  System.Drawing test fonts (`tools/ci/fetch-test-fonts.sh`), and runs `tools/ci/run-tests.sh` with SQL Server as a
+  service container. System.Drawing's 151 known failures are in `tools/ci/known-failures/`;
+  `tools/ci/check_failures.py` fails on any other.
+- **Licences:**
+  - `LICENSE` states how the repository is licensed, and keeps upstream's copyright line.
+  - `LICENSE-BSD-3-CLAUSE.txt` covers AjaxControlToolkit and Redesigner.
+  - `NOTICE` lists every component. It adds the Reference Source, AjaxControlToolkit, Redesigner, Web Optimization,
+    WebGrease, RoslynCodeDomProvider, the BinaryFormatter and SoapFormatter sources, the Roslyn binaries and the
+    JavaScript libraries. It also flags material inherited from WebFormsForCore that no open licence covers:
+    `webengine*.dll`, the decompiled Report Viewer, and other decompiled sources.
+  - Package metadata now follows each component's licence: lifted Web Stack, Katana and SignalR are Apache-2.0,
+    Identity and System.Drawing.Common are MIT, Web Optimization and WebGrease are Apache-2.0, AjaxControlToolkit is
+    BSD-3-Clause. The copyright and authors fields replace "Estrellas de Esperanza", and the project URL is this
+    repository.
+

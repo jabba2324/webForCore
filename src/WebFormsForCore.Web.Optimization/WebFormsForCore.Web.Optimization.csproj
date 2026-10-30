@@ -18,7 +18,7 @@
         <Description>A port of ASP.NET WebForms to .NET 10</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>WebForms;porting WebForms;NET Core;NET 10</PackageTags>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <IncludeSymbols>true</IncludeSymbols>
         <EmbedUntrackedSources>false</EmbedUntrackedSources>
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>

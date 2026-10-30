@@ -8,14 +8,20 @@
         <AssemblyVersion>11.0.0.0</AssemblyVersion>
         <AssemblyFileVersion>11.0.0.0</AssemblyFileVersion>
         <FileVersion>11.0.0.0</FileVersion>
-        <Authors>Simon Egli</Authors>
+        <Authors>webForCore contributors; Simon Jakob Egli (WebFormsForCore)</Authors>
         <Company>Estrellas de Esperanza</Company>
-        <Copyright>Estrellas de Esperanza</Copyright>
+        <Copyright>Copyright (c) Simon Jakob Egli and webForCore contributors. Portions copyright (c) Microsoft Corporation, the .NET Foundation and others; see NOTICE.</Copyright>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <PackageProjectUrl>https://github.com/webformsforcore/WebFormsForCore</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/webformsforcore/WebFormsForCore</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/jabba2324/webForCore</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/jabba2324/webForCore</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+
+    <!-- webForCore: a package's licence follows its code's origin (NOTICE). Lifted ASP.NET Web Stack, Katana and SignalR
+         projects are Apache-2.0; ASP.NET Identity and System.Drawing.Common are MIT, as is WebFormsForCore's own code. -->
+    <PropertyGroup Condition="$(MSBuildProjectName.StartsWith('webForCore.')) And !$(MSBuildProjectName.StartsWith('webForCore.Microsoft.AspNet.Identity')) And !$(MSBuildProjectName.StartsWith('webForCore.System.Drawing.Common'))">
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     </PropertyGroup>
 </Project>

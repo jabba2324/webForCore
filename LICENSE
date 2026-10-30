@@ -1,6 +1,18 @@
+webForCore is distributed under several licences:
+
+  * webForCore's own code, and WebFormsForCore's port that it builds on, are under the MIT License below.
+  * Code lifted from other projects keeps its own licence: the Apache License 2.0 (LICENSE-APACHE-2.0.txt), the
+    MIT License, or the BSD 3-Clause License (LICENSE-BSD-3-CLAUSE.txt).
+
+NOTICE lists every component, where it came from, its licence and its copyright holders, and the material whose
+licensing needs attention. Each source file keeps its original header.
+
+-------------------------------------------------------------------------------
+
 MIT License
 
 Copyright (c) 2024 Simon Jakob Egli
+Copyright (c) 2026 webForCore contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

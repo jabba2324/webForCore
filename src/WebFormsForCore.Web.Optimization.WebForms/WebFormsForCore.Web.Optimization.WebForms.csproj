@@ -5,6 +5,7 @@
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>disable</Nullable>
         <AssemblyName>Microsoft.AspNet.Web.Optimization.WebForms</AssemblyName>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 
         <PackageId>WebFormsForCore.Web.Optimization.WebForms</PackageId>
         <Title>WebFormsForCore.Web.Optimization.WebForms</Title>
