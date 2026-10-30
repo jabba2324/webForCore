@@ -947,3 +947,13 @@ SessionTest postback persists.
 
 Open items: GDI+ (WebImage, Chart); System.Web.DataVisualization resources; `<system.webServer>` (handlers, modules);
 integrated-pipeline emulation; the session provider's second cookie; DPAPI payloads; an IIS reference run.
+
+## Hidden segments: the app's binaries were downloadable (30 Oct 2026)
+
+Found while assessing the host layer. With `HandleAllRequestsWithWebForms`, every request reached System.Web, whose
+static file handler served `/bin_dotnet/System.Web.dll` (any assembly of the app), `/obj/project.assets.json` and the
+app's `*.deps.json` / `*.runtimeconfig.json` (200). IIS's request filtering hides `bin`, `App_Code`, `App_Data`,
+`App_GlobalResources`, `App_LocalResources`, `App_WebReferences` and `App_Browsers` (404.8). `AspNetCoreHost` now
+answers 404 for any path with one of those segments (ignoring case), the app's output folder (`bin_dotnet`) or `obj`,
+and for `.deps.json` / `.runtimeconfig.json` files. `App_Data/*.config` was already 403 (`*.config`), now 404 as on IIS.
+Gate: 6 more cases in Mvc.Gate.Tests (63/63). TestApp: pages, CSS and ScriptResource.axd unchanged.

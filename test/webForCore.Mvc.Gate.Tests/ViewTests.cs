@@ -51,6 +51,13 @@ namespace MvcGate
         [InlineData("/Web.config", 403)]
         [InlineData("/Global.asax", 403)]
         [InlineData("/Controllers/HomeController.cs", 403)]
+        // IIS request filtering's hidden segments (404), and .NET's output and build folders and files.
+        [InlineData("/App_Data/machine.config", 404)]
+        [InlineData("/bin_dotnet/System.Web.dll", 404)]
+        [InlineData("/BIN_DOTNET/webForCore.Mvc.Sample.runtimeconfig.json", 404)]
+        [InlineData("/obj/project.assets.json", 404)]
+        [InlineData("/App_Code/Formatting.cshtml", 404)]
+        [InlineData("/bin_dotnet/webForCore.Mvc.Sample.deps.json", 404)]
         public async Task SourceIsNotServed(string path, int status)
         {
             Assert.Equal(status, (int)(await _server.Client.GetAsync(path)).StatusCode);

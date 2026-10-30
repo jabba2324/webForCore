@@ -48,7 +48,12 @@ namespace System.Web.Hosting
         // webForCore: only files System.Web knows nothing about. The machine.config maps the others as .NET Framework's root
         // web.config does (HttpForbiddenHandler for *.cs, *.vb, *.resx, *.master, *.asax, *.ascx, *.config, ...: 403;
         // *.cshtml and *.vbhtml served by Web Pages when it is enabled), so they go to System.Web as on IIS.
-        public string[] ProhibitedExtensions { get; set; } = new string[] { ".razor", "appsettings.json" };
+        public string[] ProhibitedExtensions { get; set; } = new string[] { ".razor", "appsettings.json", ".deps.json", ".runtimeconfig.json" };
+        // webForCore: IIS request filtering's default hidden segments (answered 404), plus .NET's build folder. The app's
+        // output folder (bin_dotnet) is hidden too (IsHiddenSegment). Without this, with HandleAllRequestsWithWebForms,
+        // System.Web's static file handler served the app's assemblies and build files.
+        public string[] HiddenSegments { get; set; } = new string[] { "bin", "App_Code", "App_GlobalResources", "App_LocalResources",
+            "App_WebReferences", "App_Data", "App_Browsers", "obj" };
         public string[] DefaultDocuments { get; set; } = new string[] { "index.htm", "index.html", "Index.html", "Index.htm", "Default.htm", "iistart.htm", "Default.aspx", "default.aspx" };
         public bool UseClassicMode = false;
         public Compilation.ClientBuildManager ClientBuildManager { get; set; } 
@@ -241,6 +246,21 @@ namespace System.Web.Hosting
         }
 
         public string MapPath(string path) => HostingEnvironment.MapPath(path);
+
+        // webForCore: see HiddenSegments. Any segment of the path, compared ignoring case, as IIS does.
+        bool IsHiddenSegment(string path)
+        {
+            string output = Path.GetFileName(AppDomain.CurrentDomain.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+            foreach (string segment in path.Split('/', StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (HiddenSegments.Any(hidden => string.Equals(hidden, segment, StringComparison.OrdinalIgnoreCase))
+                    || string.Equals(output, segment, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         public bool IsLegacyRequest(Core.HttpContext context)
         {
             var path = context.Request.Path.Value;
@@ -250,6 +270,8 @@ namespace System.Web.Hosting
             if (path != "/") path = pathWithoutSlash;
 
 			var fullpath = $"{context.Request.PathBase.Value.TrimEnd('/')}/{path}";
+
+            if (IsHiddenSegment(path)) return false;
 
 			if (HandleExtensions.Any(ext => path.EndsWith(ext, StringComparison.OrdinalIgnoreCase) )) 
                 return true;
