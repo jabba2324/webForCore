@@ -1,0 +1,114 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Lifted from SignalR/SignalR 7f53f26 (test/Microsoft.AspNet.SignalR.Tests) by tools/lift/lift_aspnet.py.
+       Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. Generated; do not edit. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <AssemblyName>Microsoft.AspNet.SignalR.Tests</AssemblyName>
+    <RootNamespace>Microsoft.AspNet.SignalR.Tests</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- The C# version of Microsoft's build: later ones resolve some calls differently (new Message(a, b, null) became
+         ambiguous with the ArraySegment<byte> overload). -->
+    <LangVersion>7.3</LangVersion>
+    <DefineConstants>$(DefineConstants);NET45;SIGNED</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;CA1416;SYSLIB0011;SYSLIB0051;SYSLIB0014;SYSLIB0057;xUnit1013;xUnit1019;xUnit1031;xUnit2013;xUnit2014</NoWarn>
+    <!-- Delay signed with Microsoft's public key, as Microsoft's build does: PublicKeyToken=31bf3856ad364e35. -->
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>../../src/SigningKey/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <TieredCompilation>false</TieredCompilation>
+  </PropertyGroup>
+
+  <Import Project="../../src/webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="ArrayTextReaderFacts.cs" />
+    <Compile Include="ConfigurationManagerFacts.cs" />
+    <Compile Include="Core/ConnectionExtensionsFacts.cs" />
+    <Compile Include="Core/Hubs/DefaultJavaScriptProxyGeneratorFacts.cs" />
+    <Compile Include="Core/Hubs/Extensions/HubManagerExtensionsFacts.cs" />
+    <Compile Include="Core/Hubs/Extensions/HubTypeExtensions.cs" />
+    <Compile Include="Core/Hubs/Extensions/MethodExtensionsFacts.cs" />
+    <Compile Include="Core/Hubs/HubConnectionContextFacts.cs" />
+    <Compile Include="Core/Hubs/HubContextFacts.cs" />
+    <Compile Include="Core/Hubs/Lookup/DefaultHubManagerFacts.cs" />
+    <Compile Include="Core/Hubs/Lookup/Descriptors/HubDescriptorFacts.cs" />
+    <Compile Include="Core/Hubs/Lookup/HubMethodDispatcherFacts.cs" />
+    <Compile Include="Core/Hubs/Lookup/TestHubDescriptorProvider.cs" />
+    <Compile Include="Core/Hubs/Lookup/TestMethodDescriptorProvider.cs" />
+    <Compile Include="Core/Hubs/TestHubs.cs" />
+    <Compile Include="Core/Transports/ForeverFrameTransportFacts.cs" />
+    <Compile Include="CursorFacts.cs" />
+    <Compile Include="DefaultActionResolverFacts.cs" />
+    <Compile Include="DefaultDependencyResolverFacts.cs" />
+    <Compile Include="DefaultHubResolverFacts.cs" />
+    <Compile Include="GroupManagerFacts.cs" />
+    <Compile Include="Hosting/CookieFacts.cs" />
+    <Compile Include="Hosting/ResponseExtensionsFacts.cs" />
+    <Compile Include="Json/JsonFacts.cs" />
+    <Compile Include="Json/JsonSerializerExtensionFacts.cs" />
+    <Compile Include="MemoryPoolTextWriterFacts.cs" />
+    <Compile Include="Messaging/MessageBrokerFacts.cs" />
+    <Compile Include="Messaging/TestSubscription.cs" />
+    <Compile Include="Owin/ServerRequestFacts.cs" />
+    <Compile Include="Owin/WebSocketFacts.cs" />
+    <Compile Include="PerformanceCounterManagerFacts.cs" />
+    <Compile Include="PersistentConnectionFactoryFacts.cs" />
+    <Compile Include="PersistentConnectionFacts.cs" />
+    <Compile Include="PersistentResponseFacts.cs" />
+    <Compile Include="Server/AckHandlerFacts.cs" />
+    <Compile Include="Server/ConnectionFacts.cs" />
+    <Compile Include="Server/Connections/ConnectionFacts.cs" />
+    <Compile Include="Server/DiffSetFacts.cs" />
+    <Compile Include="Server/DisposerFacts.cs" />
+    <Compile Include="Server/Hubs/HubDispatcherFacts.cs" />
+    <Compile Include="Server/Hubs/HubFacts.cs" />
+    <Compile Include="Server/Hubs/HubProgressFacts.cs" />
+    <Compile Include="Server/Hubs/TypedClientBuilderFacts.cs" />
+    <Compile Include="Server/MessageBusFacts.cs" />
+    <Compile Include="Server/MessageResultExtensions.cs" />
+    <Compile Include="Server/ProtocolResolverFacts.cs" />
+    <Compile Include="Server/ScaleOutMessageBusFacts.cs" />
+    <Compile Include="Server/ScaleoutConfigurationFacts.cs" />
+    <Compile Include="Server/ScaleoutStoreFacts.cs" />
+    <Compile Include="Server/ScaleoutStreamFacts.cs" />
+    <Compile Include="Server/ScaleoutStreamManagerFacts.cs" />
+    <Compile Include="Server/SubscriptionFacts.cs" />
+    <Compile Include="Server/TestSubscriber.cs" />
+    <Compile Include="Server/TopicFacts.cs" />
+    <Compile Include="Server/Transports/ForeverTransportFacts.cs" />
+    <Compile Include="Server/Transports/LongPollingTransportFacts.cs" />
+    <Compile Include="Server/Transports/WebSocketTransportFacts.cs" />
+    <Compile Include="SipHashBasedStringEqualityComparerFacts.cs" />
+    <Compile Include="StringMinifierFacts.cs" />
+    <Compile Include="TaskAsyncHelperFacts.cs" />
+    <Compile Include="TaskQueueFacts.cs" />
+    <Compile Include="TestPerformanceCounterManager.cs" />
+    <Compile Include="Tracing/TraceManagerFacts.cs" />
+
+
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/webForCore.Microsoft.AspNet.SignalR.Core/webForCore.Microsoft.AspNet.SignalR.Core.csproj" />
+    <ProjectReference Include="../webForCore.Microsoft.AspNet.SignalR.Tests.Common/webForCore.Microsoft.AspNet.SignalR.Tests.Common.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin/webForCore.Microsoft.Owin.csproj" />
+    <ProjectReference Include="../../src/WebFormsForCore.Web/WebFormsForCore.Web.csproj" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="Owin" Version="1.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="xunit" Version="2.4.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5" />
+    <PackageReference Include="Moq" Version="4.21.0" />
+    <PackageReference Include="Castle.Core" Version="5.2.1" />
+  </ItemGroup>
+</Project>

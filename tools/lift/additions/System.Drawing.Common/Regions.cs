@@ -19,8 +19,11 @@ namespace System.Drawing
         public GpRegion Clone() => new GpRegion { Infinite = Infinite, Path = new SKPath(Path) };
         public void Dispose() => Path?.Dispose();
 
+        // GDI+ normalizes a rectangle with a negative width or height.
         public static GpRegion FromRect(RectangleF r)
         {
+            if (r.Width < 0) { r.X += r.Width; r.Width = -r.Width; }
+            if (r.Height < 0) { r.Y += r.Height; r.Height = -r.Height; }
             var region = new GpRegion { Infinite = false };
             if (r.Width > 0 && r.Height > 0) region.Path.AddRect(new SKRect(r.Left, r.Top, r.Right, r.Bottom));
             return region;
@@ -60,6 +63,8 @@ namespace System.Drawing
                 return;
             }
             if (mode == CombineMode.Intersect && Infinite) { Combine(other, CombineMode.Replace); return; }
+            // An empty operand leaves an infinite region infinite (Union, Xor, Exclude).
+            if (Infinite && other.IsEmpty && mode != CombineMode.Complement) return;
             if (mode == CombineMode.Intersect && other.Infinite) return;
             if (mode == CombineMode.Union && (Infinite || other.Infinite)) { SetInfinite(); return; }
             using var a = AsPath();
@@ -94,10 +99,12 @@ namespace System.Drawing
             }
         }
 
-        public bool Contains(float x, float y) => Infinite || Path.Contains(x, y);
+        // Half-open, as GDI+: a rectangle contains its left and top edges and not its right and bottom ones.
+        public bool Contains(float x, float y) => Infinite || Path.Contains(x + 1f / 1024, y + 1f / 1024);
 
         public bool Intersects(RectangleF r)
         {
+            if (r.Width <= 0 || r.Height <= 0) return false;
             if (Infinite) return true;
             using var rect = new SKPath();
             rect.AddRect(new SKRect(r.Left, r.Top, r.Right, r.Bottom));
@@ -234,7 +241,151 @@ namespace System.Drawing
             return Ok;
         }
 
-        internal static int GdipGetRegionHRgn(HandleRef region, HandleRef graphics, out IntPtr hrgn) { hrgn = IntPtr.Zero; return NotImplemented; }
+        // An HRGN is a region handle, as with libgdiplus (System.Drawing's Unix ReleaseHrgn deletes it as a region).
+        // An infinite region has no HRGN (GDI+ returns null).
+        internal static int GdipGetRegionHRgn(HandleRef region, HandleRef graphics, out IntPtr hrgn)
+        {
+            hrgn = IntPtr.Zero;
+            var r = Region(region);
+            if (r == null) return InvalidParameter;
+            if (!r.Infinite) hrgn = NewHandle(r.Clone());
+            return Ok;
+        }
+
+        internal static int GdipCreateRegionHrgn(IntPtr hRgn, out IntPtr region)
+        {
+            region = IntPtr.Zero;
+            var r = hRgn == IntPtr.Zero ? null : Get<GpRegion>(new HandleRef(null, hRgn));
+            if (r == null) return InvalidParameter;
+            region = NewHandle(r.Clone());
+            return Ok;
+        }
+
+        // Region data, in GDI+'s format: size (of what follows), checksum (CRC-32 of what follows it), version
+        // 0xDBC01002, combine-node count, then the node tree. Nodes: 1-5 Intersect/Union/Xor/Exclude/Complement
+        // (two children follow), 0x10000000 rect, 0x10000001 path (size, then a path record), 0x10000002 empty,
+        // 0x10000003 infinite. A region is written as one node; any tree is read.
+        static byte[] RegionData(GpRegion r)
+        {
+            var body = new List<byte>();
+            void U(uint v) => body.AddRange(BitConverter.GetBytes(v));
+            void F(float v) => body.AddRange(BitConverter.GetBytes(v));
+            U(0xDBC01002); U(0);
+            if (r.Infinite) U(0x10000003);
+            else if (r.IsEmpty) U(0x10000002);
+            else if (r.Path.IsRect)
+            {
+                var b = r.Path.Bounds;
+                U(0x10000000); F(b.Left); F(b.Top); F(b.Width); F(b.Height);
+            }
+            else
+            {
+                var gp = GpPath.FromSkia(r.Path, r.Path.FillType == SKPathFillType.Winding ? FillMode.Winding : FillMode.Alternate);
+                int n = gp.Count, pad = (4 - n % 4) % 4;
+                U(0x10000001); U((uint)(12 + n * 8 + n + pad));
+                U(0xDBC01001); U((uint)n); U(0);
+                foreach (var p in gp.Points) { F(p.X); F(p.Y); }
+                body.AddRange(gp.Types);
+                for (int i = 0; i < pad; i++) body.Add(0);
+            }
+            var result = new List<byte>();
+            result.AddRange(BitConverter.GetBytes((uint)(body.Count + 4)));
+            result.AddRange(BitConverter.GetBytes(Crc32(body)));
+            result.AddRange(body);
+            return result.ToArray();
+        }
+
+        static uint Crc32(List<byte> data)
+        {
+            uint crc = 0xFFFFFFFF;
+            foreach (byte b in data)
+            {
+                crc ^= b;
+                for (int k = 0; k < 8; k++) crc = (crc >> 1) ^ (0xEDB88320 & (uint)-(int)(crc & 1));
+            }
+            return ~crc;
+        }
+
+        static float ReadFloat(byte[] d, ref int at) { float v = BitConverter.ToSingle(d, at); at += 4; return v; }
+
+        static GpRegion ReadRegionNode(byte[] d, ref int at)
+        {
+            uint type = BitConverter.ToUInt32(d, at); at += 4;
+            switch (type)
+            {
+                case 0x10000000:
+                    return GpRegion.FromRect(new RectangleF(ReadFloat(d, ref at), ReadFloat(d, ref at), ReadFloat(d, ref at), ReadFloat(d, ref at)));
+                case 0x10000001:
+                {
+                    int size = BitConverter.ToInt32(d, at); at += 4;
+                    int start = at;
+                    if (BitConverter.ToUInt32(d, at) != 0xDBC01001) throw new FormatException();
+                    int n = BitConverter.ToInt32(d, at + 4), flags = BitConverter.ToInt32(d, at + 8);
+                    at += 12;
+                    if (n <= 0) throw new FormatException();
+                    var path = new GpPath { FillMode = FillMode.Winding };
+                    bool compressed = (flags & 0x4000) != 0;
+                    for (int i = 0; i < n; i++)
+                    {
+                        PointF p;
+                        if (compressed) { p = new PointF(BitConverter.ToInt16(d, at), BitConverter.ToInt16(d, at + 2)); at += 4; }
+                        else p = new PointF(ReadFloat(d, ref at), ReadFloat(d, ref at));
+                        path.Points.Add(p);
+                    }
+                    for (int i = 0; i < n; i++) path.Types.Add(d[at + i]);
+                    at = start + size;
+                    using var sk = path.ToSkia();
+                    return GpRegion.FromPath(sk);
+                }
+                case 0x10000002: { var r = new GpRegion(); r.SetEmpty(); return r; }
+                case 0x10000003: return new GpRegion();
+                case >= 1 and <= 5:
+                {
+                    var left = ReadRegionNode(d, ref at);
+                    var right = ReadRegionNode(d, ref at);
+                    left.Combine(right, (CombineMode)type);
+                    return left;
+                }
+                default: throw new FormatException();
+            }
+        }
+
+        internal static int GdipGetRegionDataSize(HandleRef region, out int bufferSize)
+        {
+            var r = Region(region);
+            bufferSize = r == null ? 0 : RegionData(r).Length;
+            return r == null ? InvalidParameter : Ok;
+        }
+
+        internal static int GdipGetRegionData(HandleRef region, byte[] regionData, int bufferSize, out int sizeFilled)
+        {
+            sizeFilled = 0;
+            var r = Region(region);
+            if (r == null || regionData == null) return InvalidParameter;
+            var data = RegionData(r);
+            if (bufferSize < data.Length || regionData.Length < data.Length) return InsufficientBuffer;
+            Array.Copy(data, regionData, data.Length);
+            sizeFilled = data.Length;
+            return Ok;
+        }
+
+        internal static int GdipCreateRegionRgnData(byte[] rgndata, int size, out IntPtr region)
+        {
+            region = IntPtr.Zero;
+            if (rgndata == null) return InvalidParameter;
+            if (size < 20 || rgndata.Length < size) return GenericError;
+            try
+            {
+                if (BitConverter.ToUInt32(rgndata, 8) != 0xDBC01002) return GenericError;
+                int at = 16;
+                region = NewHandle(ReadRegionNode(rgndata, ref at));
+                return Ok;
+            }
+            catch (Exception e) when (e is FormatException || e is ArgumentException || e is IndexOutOfRangeException)
+            {
+                return GenericError;
+            }
+        }
     }
     }
 }

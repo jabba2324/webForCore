@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- TestUtilities (dotnet/runtime 76b9680, release/6.0, src/libraries/Common/tests/TestUtilities), lifted by
+       tools/lift/lift_drawing_tests.py. MIT. Generated; do not edit. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <IsPackable>false</IsPackable>
+    <AssemblyName>TestUtilities</AssemblyName>
+    <DefineConstants>$(DefineConstants);NETCOREAPP</DefineConstants>
+    <IsTestProject>false</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="**/*.cs" Exclude="bin/**;obj/**" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../webForCore.Microsoft.DotNet.XUnitExtensions/webForCore.Microsoft.DotNet.XUnitExtensions.csproj" />
+    <PackageReference Include="xunit.abstractions" Version="2.0.3" />
+    <PackageReference Include="xunit.assert" Version="2.4.1" />
+    <PackageReference Include="xunit.extensibility.core" Version="2.4.1" />
+    <PackageReference Include="xunit.extensibility.execution" Version="2.4.1" />
+  </ItemGroup>
+</Project>

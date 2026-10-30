@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- System.Drawing.Common.Tests (dotnet/runtime 76b9680, release/6.0), lifted by tools/lift/lift_drawing_tests.py, with test data
+       from dotnet/runtime-assets 848e27e (release/6.0). MIT. Runs against the fork's System.Drawing.Common (SkiaGdiPlus). Generated; do not edit. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <IsPackable>false</IsPackable>
+    <AssemblyName>System.Drawing.Common.Tests</AssemblyName>
+    <RootNamespace>System.Drawing.Tests</RootNamespace>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <DefineConstants>$(DefineConstants);NETCOREAPP</DefineConstants>
+    <NoWarn>$(NoWarn);CS0618;CA1416;SYSLIB0011;SYSLIB0014;SYSLIB0051;xUnit1004;xUnit1013;xUnit1026;xUnit2000;xUnit2005;xUnit2009;xUnit2013;xUnit2017</NoWarn>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="**/*.cs" Exclude="bin/**;obj/**" />
+    <EmbeddedResource Include="TestData/bitmaps/48x48_multiple_entries_4bit.ico" LogicalName="System.Drawing.Tests.48x48_multiple_entries_4bit.ico" />
+    <EmbeddedResource Include="TestData/bitmaps/bitmap_173x183_indexed_8bit.bmp" LogicalName="System.Drawing.Tests.bitmap_173x183_indexed_8bit.bmp" />
+    <EmbeddedResource Include="TestData/bitmaps/empty.file" LogicalName="System.Drawing.Tests.empty.file" />
+    <EmbeddedResource Include="TestData/bitmaps/invalid.ico" LogicalName="System.Drawing.Tests.invalid.ico" />
+    <EmbeddedResource Include="TestData/bitmaps/256x256_one_entry_32bit.ico" LogicalName="System.Drawing.Tests.Icon_toolboxBitmapAttributeTest" />
+    <!-- The test data packages' contentFiles land in the output directory (bitmaps/, fonts/, colorProfiles/, *.wav). -->
+    <None Include="TestData/**" Link="%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/webForCore.System.Drawing.Common/webForCore.System.Drawing.Common.csproj" />
+    <ProjectReference Include="../webForCore.Microsoft.DotNet.XUnitExtensions/webForCore.Microsoft.DotNet.XUnitExtensions.csproj" />
+    <ProjectReference Include="../webForCore.Microsoft.DotNet.RemoteExecutor/webForCore.Microsoft.DotNet.RemoteExecutor.csproj" />
+    <ProjectReference Include="../webForCore.TestUtilities/webForCore.TestUtilities.csproj" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.abstractions" Version="2.0.3" />
+    <PackageReference Include="xunit.assert" Version="2.4.1" />
+    <PackageReference Include="xunit.extensibility.core" Version="2.4.1" />
+    <PackageReference Include="xunit.extensibility.execution" Version="2.4.1" />
+    <PackageReference Include="xunit.core" Version="2.4.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <!-- 2.4.5, the adapter of xunit 2.4's time: 3.x runs the SkippedTestCase that ConditionalFact/Theory produce
+         when a condition is false instead of skipping it. -->
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5" />
+  </ItemGroup>
+</Project>

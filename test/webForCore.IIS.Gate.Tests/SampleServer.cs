@@ -28,11 +28,8 @@ namespace IISGate
                 Directory.Delete(logs, recursive: true);
             }
 
-            var listener = new TcpListener(IPAddress.Loopback, 0);
-            listener.Start();
-            int port = ((IPEndPoint)listener.LocalEndpoint).Port;
-            listener.Stop();
-            BaseAddress = new Uri($"http://127.0.0.1:{port}");
+            BaseAddress = new Uri($"http://127.0.0.1:{FreePort()}");
+            HttpsAddress = new Uri($"https://127.0.0.1:{FreePort()}");
 
             var start = new ProcessStartInfo("dotnet", $"bin_dotnet/{sample}.dll --urls {BaseAddress}")
             {
@@ -41,6 +38,7 @@ namespace IISGate
                 RedirectStandardError = true,
             };
             start.Environment["Logging__LogLevel__Microsoft.AspNetCore.Builder"] = "Debug";
+            start.Environment["GATE_HTTPS_PORT"] = HttpsAddress.Port.ToString();
             _process = Process.Start(start);
             _process.OutputDataReceived += (s, e) => { lock (_output) _output.AppendLine(e.Data); };
             _process.ErrorDataReceived += (s, e) => { lock (_output) _output.AppendLine(e.Data); };
@@ -69,6 +67,18 @@ namespace IISGate
         public string SampleDirectory { get; }
 
         public Uri BaseAddress { get; }
+
+        // TLS with a generated server certificate; client certificates are accepted.
+        public Uri HttpsAddress { get; }
+
+        private static int FreePort()
+        {
+            var listener = new TcpListener(IPAddress.Loopback, 0);
+            listener.Start();
+            int port = ((IPEndPoint)listener.LocalEndpoint).Port;
+            listener.Stop();
+            return port;
+        }
 
         public HttpClient Client { get; }
 

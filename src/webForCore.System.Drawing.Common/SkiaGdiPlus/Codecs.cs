@@ -23,6 +23,7 @@ namespace System.Drawing
             public string Name, Description, Extension, Mime;
             public int Flags;
             public byte[][] Signatures;
+            public byte[][] Masks; // null: every signature byte is significant
         }
 
         const int Encoder = 1, Decoder = 2, SupportBitmap = 4, SupportVector = 8, Builtin = 0x10000;
@@ -34,8 +35,9 @@ namespace System.Drawing
             new CodecInfo { Clsid = Clsid(0), Format = ImageFormat.Bmp.Guid, Name = "Built-in BMP Codec", Description = "BMP", Extension = "*.BMP;*.DIB;*.RLE", Mime = "image/bmp", Flags = Encoder | Decoder | SupportBitmap | Builtin, Signatures = new[] { new byte[] { 0x42, 0x4d } } },
             new CodecInfo { Clsid = Clsid(1), Format = ImageFormat.Jpeg.Guid, Name = "Built-in JPEG Codec", Description = "JPEG", Extension = "*.JPG;*.JPEG;*.JPE;*.JFIF", Mime = "image/jpeg", Flags = Encoder | Decoder | SupportBitmap | Builtin, Signatures = new[] { new byte[] { 0xff, 0xd8 } } },
             new CodecInfo { Clsid = Clsid(2), Format = ImageFormat.Gif.Guid, Name = "Built-in GIF Codec", Description = "GIF", Extension = "*.GIF", Mime = "image/gif", Flags = Encoder | Decoder | SupportBitmap | Builtin, Signatures = new[] { Encoding.ASCII.GetBytes("GIF89a"), Encoding.ASCII.GetBytes("GIF87a") } },
-            new CodecInfo { Clsid = Clsid(3), Format = ImageFormat.Emf.Guid, Name = "Built-in EMF Codec", Description = "EMF", Extension = "*.EMF", Mime = "image/x-emf", Flags = Decoder | SupportVector | Builtin, Signatures = new[] { new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x20, 0x45, 0x4d, 0x46 } } },
-            new CodecInfo { Clsid = Clsid(4), Format = ImageFormat.Wmf.Guid, Name = "Built-in WMF Codec", Description = "WMF", Extension = "*.WMF", Mime = "image/x-wmf", Flags = Decoder | SupportVector | Builtin, Signatures = new[] { new byte[] { 0xd7, 0xcd, 0xc6, 0x9a } } },
+            new CodecInfo { Clsid = Clsid(3), Format = ImageFormat.Emf.Guid, Name = "Built-in EMF Codec", Description = "EMF", Extension = "*.EMF", Mime = "image/x-emf", Flags = Decoder | SupportBitmap | Builtin, Signatures = new[] { new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x20, 0x45, 0x4d, 0x46 } },
+                Masks = new[] { new byte[40].Concat(new byte[] { 0xff, 0xff, 0xff, 0xff }).ToArray() } }, // " EMF" at offset 40
+            new CodecInfo { Clsid = Clsid(4), Format = ImageFormat.Wmf.Guid, Name = "Built-in WMF Codec", Description = "WMF", Extension = "*.WMF", Mime = "image/x-wmf", Flags = Decoder | SupportBitmap | Builtin, Signatures = new[] { new byte[] { 0xd7, 0xcd, 0xc6, 0x9a } } },
             new CodecInfo { Clsid = Clsid(5), Format = ImageFormat.Tiff.Guid, Name = "Built-in TIFF Codec", Description = "TIFF", Extension = "*.TIF;*.TIFF", Mime = "image/tiff", Flags = Encoder | Decoder | SupportBitmap | Builtin, Signatures = new[] { new byte[] { 0x49, 0x49 }, new byte[] { 0x4d, 0x4d } } },
             new CodecInfo { Clsid = Clsid(6), Format = ImageFormat.Png.Guid, Name = "Built-in PNG Codec", Description = "PNG", Extension = "*.PNG", Mime = "image/png", Flags = Encoder | Decoder | SupportBitmap | Builtin, Signatures = new[] { new byte[] { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a } } },
             new CodecInfo { Clsid = Clsid(7), Format = ImageFormat.Icon.Guid, Name = "Built-in ICO Codec", Description = "ICO", Extension = "*.ICO", Mime = "image/x-icon", Flags = Decoder | SupportBitmap | Builtin, Signatures = new[] { new byte[] { 0, 0, 1, 0 } } },
@@ -60,7 +62,8 @@ namespace System.Drawing
             else if (StartsWith(data, 0x49, 0x49, 0x2a, 0) || StartsWith(data, 0x4d, 0x4d, 0, 0x2a)) return Tiff.Read(data, out image); // Skia has no TIFF decoder
             else return SafeNativeMethods.SkiaGdiPlus.InvalidParameter;
 
-            var skData = SKData.CreateCopy(data);
+            // GDI+ decodes one image of an icon: the one nearest 16x16 (deepest colour first); Skia would take the largest.
+            var skData = SKData.CreateCopy(raw == ImageFormat.Icon.Guid ? IconEntry(data) : data);
             var codec = SKCodec.Create(skData);
             if (codec == null) return SafeNativeMethods.SkiaGdiPlus.InvalidParameter;
             var info = new SKImageInfo(codec.Info.Width, codec.Info.Height, SKColorType.Bgra8888, SKAlphaType.Premul);
@@ -71,7 +74,8 @@ namespace System.Drawing
                 return SafeNativeMethods.SkiaGdiPlus.InvalidParameter;
             }
             image = new GpImage(first, PixelFormat.Format32bppArgb, raw);
-            image.Flags |= (int)ImageFlags.ReadOnly | (int)ImageFlags.HasRealPixelSize | (int)ImageFlags.HasRealDpi;
+            // HasRealDpi is set by the readers below when the file states a resolution (GDI+).
+            image.Flags |= (int)ImageFlags.ReadOnly | (int)ImageFlags.HasRealPixelSize | (int)ImageFlags.ColorSpaceRgb;
             try
             {
                 if (raw == ImageFormat.Jpeg.Guid) ReadJpeg(data, codec, image);
@@ -86,6 +90,31 @@ namespace System.Drawing
             image.Flags = (image.Flags & ~(int)ImageFlags.HasAlpha) | (GpImage.HasAlpha(image.Format) ? (int)ImageFlags.HasAlpha : 0);
             if (image.FrameDecoder == null) codec.Dispose();
             return SafeNativeMethods.SkiaGdiPlus.Ok;
+        }
+
+        // A one-image icon file holding the image GDI+ would pick from data's directory.
+        static byte[] IconEntry(byte[] data)
+        {
+            int count = data.Length >= 6 ? BitConverter.ToUInt16(data, 4) : 0;
+            if (count <= 1 || data.Length < 6 + 16 * count) return data;
+            int best = 0, bestScore = int.MaxValue;
+            for (int i = 0; i < count; i++)
+            {
+                int e = 6 + 16 * i;
+                int w = data[e] == 0 ? 256 : data[e], h = data[e + 1] == 0 ? 256 : data[e + 1], bits = BitConverter.ToUInt16(data, e + 6);
+                int score = (Math.Abs(w - 16) + Math.Abs(h - 16)) * 64 - bits;
+                if (score < bestScore) { best = i; bestScore = score; }
+            }
+            int entry = 6 + 16 * best;
+            int size = BitConverter.ToInt32(data, entry + 8), offset = BitConverter.ToInt32(data, entry + 12);
+            if (offset < 0 || size <= 0 || offset + size > data.Length) return data;
+            var result = new byte[6 + 16 + size];
+            Array.Copy(data, 0, result, 0, 6);
+            result[4] = 1; result[5] = 0;
+            Array.Copy(data, entry, result, 6, 12);
+            BitConverter.GetBytes(22).CopyTo(result, 18);
+            Array.Copy(data, offset, result, 22, size);
+            return result;
         }
 
         static SKBitmap DecodeFrame(SKCodec codec, SKImageInfo info, int frame)
@@ -108,7 +137,9 @@ namespace System.Drawing
             image.Format = codec.Info.ColorType == SKColorType.Gray8 ? PixelFormat.Format8bppIndexed : PixelFormat.Format24bppRgb;
             if (image.Format == PixelFormat.Format8bppIndexed)
                 image.Palette = Enumerable.Range(0, 256).Select(i => unchecked((int)0xff000000) | i << 16 | i << 8 | i).ToArray();
-            image.Flags |= (int)ImageFlags.ColorSpaceYcbcr;
+            // GDI+'s JPEG flags: the JPEG colour space (not RGB) and PartiallyScalable.
+            image.Flags = (image.Flags & ~(int)ImageFlags.ColorSpaceRgb) | (int)ImageFlags.PartiallyScalable
+                | (image.Format == PixelFormat.Format8bppIndexed ? (int)ImageFlags.ColorSpaceGray : (int)ImageFlags.ColorSpaceYcbcr);
             // Segments up to the image data: APP0 (JFIF density), APP1 (EXIF).
             int pos = 2;
             while (pos + 4 <= data.Length && data[pos] == 0xff)
@@ -120,8 +151,8 @@ namespace System.Drawing
                 if (marker == 0xe0 && length >= 16 && Encoding.ASCII.GetString(data, body, 4) == "JFIF")
                 {
                     int units = data[body + 7], x = data[body + 8] << 8 | data[body + 9], y = data[body + 10] << 8 | data[body + 11];
-                    if (units == 1 && x > 0 && y > 0) { image.DpiX = x; image.DpiY = y; }
-                    else if (units == 2 && x > 0 && y > 0) { image.DpiX = x * 2.54f; image.DpiY = y * 2.54f; }
+                    if (units == 1 && x > 0 && y > 0) { image.DpiX = x; image.DpiY = y;  image.Flags |= (int)ImageFlags.HasRealDpi; }
+                    else if (units == 2 && x > 0 && y > 0) { image.DpiX = x * 2.54f; image.DpiY = y * 2.54f;  image.Flags |= (int)ImageFlags.HasRealDpi; }
                 }
                 else if (marker == 0xe1 && length > 8 && Encoding.ASCII.GetString(data, body, 4) == "Exif")
                 {
@@ -133,7 +164,7 @@ namespace System.Drawing
                     {
                         float scale = unit != null && BitConverter.ToUInt16(unit.Value, 0) == 3 ? 2.54f : 1;
                         float rx = Rational(xres.Value), ry = Rational(yres.Value);
-                        if (rx > 0 && ry > 0) { image.DpiX = rx * scale; image.DpiY = ry * scale; }
+                        if (rx > 0 && ry > 0) { image.DpiX = rx * scale; image.DpiY = ry * scale; image.Flags |= (int)ImageFlags.HasRealDpi; }
                     }
                 }
                 pos += 2 + length;
@@ -158,6 +189,7 @@ namespace System.Drawing
                 {
                     image.DpiX = BinaryPrimitives.ReadInt32BigEndian(data.AsSpan(body)) * 0.0254f;
                     image.DpiY = BinaryPrimitives.ReadInt32BigEndian(data.AsSpan(body + 4)) * 0.0254f;
+                    image.Flags |= (int)ImageFlags.HasRealDpi;
                 }
                 else if (type == "gAMA" && length == 4)
                 {
@@ -232,7 +264,7 @@ namespace System.Drawing
             if (headerSize >= 40)
             {
                 int ppmX = BinaryPrimitives.ReadInt32LittleEndian(data.AsSpan(38)), ppmY = BinaryPrimitives.ReadInt32LittleEndian(data.AsSpan(42));
-                if (ppmX > 0 && ppmY > 0) { image.DpiX = (float)Math.Round(ppmX * 0.0254); image.DpiY = (float)Math.Round(ppmY * 0.0254); }
+                if (ppmX > 0 && ppmY > 0) { image.DpiX = (float)Math.Round(ppmX * 0.0254); image.DpiY = (float)Math.Round(ppmY * 0.0254);  image.Flags |= (int)ImageFlags.HasRealDpi; }
             }
             image.Format = bits switch
             {
@@ -283,7 +315,10 @@ namespace System.Drawing
 
         static int EncodeSkia(GpImage image, SKEncodedImageFormat format, int quality, Stream output)
         {
-            using var data = image.Pixels.Encode(format, quality);
+            // An image without alpha is written without it (a PNG of a 24bpp bitmap is RGB, and loads as 24bpp).
+            using var pixmap = image.Pixels.PeekPixels();
+            using var view = GpImage.EncodesAlpha(image.Format) ? null : new SKPixmap(pixmap.Info.WithAlphaType(SKAlphaType.Opaque), pixmap.GetPixels(), pixmap.RowBytes);
+            using var data = (view ?? pixmap).Encode(format, quality);
             if (data == null) return SafeNativeMethods.SkiaGdiPlus.GenericError;
             data.SaveTo(output);
             return SafeNativeMethods.SkiaGdiPlus.Ok;
@@ -460,7 +495,7 @@ namespace System.Drawing
         public static unsafe void Write(GpImage image, Stream output)
         {
             var format = image.Format;
-            if (!GpImage.IsIndexed(format) && format != PixelFormat.Format24bppRgb) format = GpImage.HasAlpha(format) || format == PixelFormat.Format32bppRgb ? PixelFormat.Format32bppArgb : PixelFormat.Format24bppRgb;
+            if (!GpImage.IsIndexed(format) && format != PixelFormat.Format24bppRgb) format = GpImage.EncodesAlpha(format) ? PixelFormat.Format32bppArgb : PixelFormat.Format24bppRgb;
             int bpp = GpImage.BitsPerPixel(format);
             int stride = GpImage.Stride(image.Width, format);
             int paletteSize = GpImage.IsIndexed(format) ? (image.Palette?.Length ?? 0) * 4 : 0;
@@ -615,8 +650,8 @@ namespace System.Drawing
             if (pages.Count == 0) return SafeNativeMethods.SkiaGdiPlus.InvalidParameter;
             var first = DecodePage(data, pages[0], big, out PixelFormat format, out int[] palette);
             if (first == null) return SafeNativeMethods.SkiaGdiPlus.NotImplemented;
-            image = new GpImage(first, format, ImageFormat.Tiff.Guid) { Palette = palette };
-            image.Flags |= (int)ImageFlags.ReadOnly | (int)ImageFlags.HasRealPixelSize | (int)ImageFlags.HasRealDpi;
+            image = new GpImage(first, format, ImageFormat.Tiff.Guid) { Palette = palette, PaletteFlags = 0 };
+            image.Flags |= (int)ImageFlags.ReadOnly | (int)ImageFlags.HasRealPixelSize | (int)ImageFlags.ColorSpaceRgb;
             var tags0 = pages[0];
             Exif.Read(data, 0, data.Length, image.Properties);
             var xres = image.Properties.FirstOrDefault(p => p.Id == 0x011a);
@@ -625,7 +660,7 @@ namespace System.Drawing
             {
                 float scale = tags0.TryGetValue(0x128, out var unit) && unit[0] == 3 ? 2.54f : 1;
                 float rx = Rational(xres.Value), ry = Rational(yres.Value);
-                if (rx > 0 && ry > 0) { image.DpiX = rx * scale; image.DpiY = ry * scale; }
+                if (rx > 0 && ry > 0) { image.DpiX = rx * scale; image.DpiY = ry * scale; image.Flags |= (int)ImageFlags.HasRealDpi; }
             }
             image.FrameDimension = FrameDimension.Page.Guid;
             if (pages.Count > 1)
@@ -772,7 +807,7 @@ namespace System.Drawing
 
         public static unsafe void Write(GpImage image, Stream output)
         {
-            bool alpha = GpImage.HasAlpha(image.Format);
+            bool alpha = GpImage.EncodesAlpha(image.Format);
             int channels = alpha ? 4 : 3, width = image.Width, height = image.Height;
             var pixels = new byte[width * height * channels];
             for (int y = 0; y < height; y++)

@@ -25,6 +25,7 @@ namespace System.Web {
         private bool _populated;
         private HttpRequest _request;
         private IIS7WorkerRequest _iis7workerRequest;
+        private bool _kestrelWorkerRequest; // webForCore: see Get
         private List<HttpServerVarsCollectionEntry> _unsyncedEntries;
 
         // We preallocate the base collection with a size that should be sufficient
@@ -33,6 +34,9 @@ namespace System.Web {
             // if this is an IIS7WorkerRequest, then the collection will be writeable and we will
             // call into IIS7 to update the server var block when changes are made.
             _iis7workerRequest = wr as IIS7WorkerRequest;
+#if !NETFRAMEWORK
+            _kestrelWorkerRequest = wr is AspNetCoreWorkerRequest;
+#endif
             _request = request;
             _populated = false;
 
@@ -203,7 +207,18 @@ namespace System.Web {
                 return var;
             }
             else {
-                return GetServerVar(BaseGet(name));
+                string var = GetServerVar(BaseGet(name));
+#if !NETFRAMEWORK
+                // webForCore: like IIS 7's (above), the Kestrel worker request answers variables outside the classic list
+                // (WEBSOCKET_VERSION, which Katana reads, and the others IIS's integrated pipeline exposes).
+                if (String.IsNullOrEmpty(var) && _kestrelWorkerRequest) {
+                    string fetched = _request.FetchServerVariable(name);
+                    if (!String.IsNullOrEmpty(fetched)) {
+                        var = fetched;
+                    }
+                }
+#endif
+                return var;
             }
         }
 

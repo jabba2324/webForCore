@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Microsoft.DotNet.RemoteExecutor (dotnet/arcade 565a8005, release/6.0), lifted by tools/lift/lift_drawing_tests.py. MIT.
+       Generated; do not edit. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <IsPackable>false</IsPackable>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>Microsoft.DotNet.RemoteExecutor</AssemblyName>
+    <IsTestProject>false</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="*.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit.assert" Version="2.4.1" />
+    <!-- As arcade's csproj: ClrMD, for the stack dump RemoteInvokeHandle writes when a remote process times out. -->
+    <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="1.0.5" />
+  </ItemGroup>
+</Project>

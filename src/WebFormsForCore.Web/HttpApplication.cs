@@ -2634,6 +2634,15 @@ namespace System.Web
 						}
 
 						_context.WaitForExceptionIfCancelled();  // wait outside of finally
+#if !NETFRAMEWORK
+						if (_context.CancelledByTimeout)
+						{
+							// webForCore: what the timeout's ThreadAbortException led to below.
+							PerfCounters.IncrementCounter(AppPerfCounter.REQUESTS_TIMED_OUT);
+							completedSynchronously = true;
+							return new HttpException(SR.GetString(SR.Request_timed_out), null, WebEventCodes.RuntimeErrorRequestAbort);
+						}
+#endif
 					}
 					else
 					{

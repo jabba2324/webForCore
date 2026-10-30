@@ -96,6 +96,11 @@ namespace System.Drawing
                 }
                 if (closed) types[^1] |= (byte)PathPointType.CloseSubpath;
             }
+            // A marker ends a segment of the path; reversed, it ends the segment that now comes before (GDI+): the
+            // marker on point i moves to point n - 2 - i.
+            int n = p.Count;
+            for (int i = 0; i < n - 1; i++)
+                if ((p.Types[i] & (byte)PathPointType.PathMarker) != 0) types[n - 2 - i] |= (byte)PathPointType.PathMarker;
             p.Points = points;
             p.Types = types;
         });
@@ -227,7 +232,11 @@ namespace System.Drawing
         internal static int GdipWarpPath(IntPtr path, IntPtr matrix, PointF[] points, int count, float srcx, float srcy, float srcwidth, float srcheight, WarpMode mode, float flatness)
         {
             var p = Path(path);
-            if (p == null || points == null || (count != 3 && count != 4)) return InvalidParameter;
+            if (p == null || points == null || count == 0) return InvalidParameter;
+            // GDI+: a warp without a destination parallelogram (fewer than 3 points), or with an unknown mode, leaves an
+            // empty path.
+            if (count < 3 || (mode != WarpMode.Perspective && mode != WarpMode.Bilinear)) { p.Reset(); return Ok; }
+            if (count > 4) return InvalidParameter;
             if (srcwidth == 0 || srcheight == 0) return Ok;
             GdipFlattenPath(path, matrix, flatness);
             PointF ul = points[0], ur = points[1], ll = points[2], lr = count == 4 ? points[3] : new PointF(ur.X + ll.X - ul.X, ur.Y + ll.Y - ul.Y);
@@ -428,6 +437,8 @@ namespace System.Drawing
             Marshal.Copy(new[] { mx.M11, mx.M12, mx.M21, mx.M22, mx.Dx, mx.Dy }, 0, m, 6);
             return Ok;
         }
+
+        internal static int GdipGetMatrixElements(HandleRef matrix, float* m) => GdipGetMatrixElements(matrix, (IntPtr)m);
 
         internal static int GdipIsMatrixInvertible(HandleRef matrix, out int boolean) { var m = Get<GpMatrix>(matrix); boolean = m?.IsInvertible == true ? 1 : 0; return m == null ? InvalidParameter : Ok; }
         internal static int GdipIsMatrixIdentity(HandleRef matrix, out int boolean) { var m = Get<GpMatrix>(matrix); boolean = m?.IsIdentity == true ? 1 : 0; return m == null ? InvalidParameter : Ok; }

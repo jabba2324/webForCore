@@ -177,6 +177,8 @@ namespace System.Web {
 #if NETFRAMEWORK
                     thread.Abort(new HttpApplication.CancelModuleException(true));
 #else
+                    // webForCore: no Thread.Abort on .NET; the worker request answers "Request timed out." instead.
+                    (_context.WorkerRequest as System.Web.Hosting.AspNetCoreWorkerRequest)?.TimedOut();
 #endif
                 }
             }

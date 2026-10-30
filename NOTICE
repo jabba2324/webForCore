@@ -62,6 +62,33 @@ Microsoft. It uses SkiaSharp (https://github.com/mono/SkiaSharp, MIT License, Co
 Copyright (c) 2017-2018 Microsoft Corporation) and the Skia native library it ships (BSD 3-Clause, Copyright (c)
 2011 Google Inc.).
 
+System.Drawing.Common 6.0's tests (src/libraries/System.Drawing.Common/tests, the Common/tests files they link, and
+src/libraries/Common/tests/TestUtilities with the Common/src interop files it links), from the same dotnet/runtime
+commit and under the same license, live in test/webForCore.System.Drawing.Common.Tests and test/webForCore.TestUtilities.
+They run on Microsoft.DotNet.XUnitExtensions and Microsoft.DotNet.RemoteExecutor from the .NET Arcade SDK
+(https://github.com/dotnet/arcade, branch release/6.0, commit 565a8005, src/Microsoft.DotNet.XUnitExtensions/src and
+src/Microsoft.DotNet.RemoteExecutor/src; test/webForCore.Microsoft.DotNet.XUnitExtensions and
+test/webForCore.Microsoft.DotNet.RemoteExecutor), and use test data from .NET Runtime Assets
+(https://github.com/dotnet/runtime-assets, branch release/6.0, commit 848e27e: System.Drawing.Common.TestData,
+System.ComponentModel.TypeConverter.TestData, System.Windows.Extensions.TestData; in the tests' TestData folder). Both
+are licensed under the MIT License, Copyright (c) .NET Foundation and Contributors. The copy is made by
+tools/lift/lift_drawing_tests.py, which lists every change, and the per-file source is recorded in
+tools/lift/manifests/System.Drawing.Common.Tests.tsv. The test data's fonts (Code New Roman, (c) 2015 TypoStyle Co.)
+are not committed: the font's own licence text both grants the SIL Open Font License 1.1 and forbids redistribution;
+the lift script copies them for local test runs.
+
+This product includes software from ASP.NET SignalR (https://github.com/SignalR/SignalR, tag 2.4.3, commit
+7f53f26), licensed under the Apache License, Version 2.0 (see LICENSE-APACHE-2.0.txt), Copyright (c) .NET
+Foundation. It lives in src/webForCore.Microsoft.AspNet.SignalR.* and test/webForCore.Microsoft.AspNet.SignalR.*; each
+file keeps its original header. The copy is made by tools/lift/lift_aspnet.py, which lists every change, and the
+per-file source is recorded in tools/lift/manifests/.
+
+This product includes software from ASP.NET Identity (https://github.com/aspnet/AspNetIdentity, commit
+b7fc094), licensed under the MIT License, Copyright (c) Microsoft Corporation. It lives in
+src/webForCore.Microsoft.AspNet.Identity.* and test/webForCore.Identity.Test; each file keeps its original header. The
+copy is made by tools/lift/lift_aspnet.py, which lists every change, and the per-file source is recorded in
+tools/lift/manifests/.
+
 src/WebFormsForCore.Web.DataVisualization/Common/SR.resx comes from Data Visualization for .NET
 (https://github.com/dotnet/winforms-datavisualization, commit 022f396), licensed under the MIT License,
 Copyright (c) .NET Foundation and Contributors.

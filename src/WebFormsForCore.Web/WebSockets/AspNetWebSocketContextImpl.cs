@@ -25,11 +25,11 @@ namespace System.Web.WebSockets {
         // spammed with data that's irrelevant to a WebSockets request.
         private readonly HttpContextBase _httpContext;
         private readonly HttpWorkerRequest _workerRequest;
-        private readonly AspNetWebSocket _webSocket;
+        private readonly WebSocket _webSocket; // webForCore: AspNetWebSocket on IIS, Kestrel's WebSocket on the fork
 
         private CookieCollection _cookieCollection;
 
-        public AspNetWebSocketContextImpl(HttpContextBase httpContext = null, HttpWorkerRequest workerRequest = null, AspNetWebSocket webSocket = null) {
+        public AspNetWebSocketContextImpl(HttpContextBase httpContext = null, HttpWorkerRequest workerRequest = null, WebSocket webSocket = null) {
             _httpContext = httpContext;
             _workerRequest = workerRequest;
             _webSocket = webSocket;

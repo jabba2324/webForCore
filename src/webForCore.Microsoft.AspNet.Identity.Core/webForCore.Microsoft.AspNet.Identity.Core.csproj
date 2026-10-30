@@ -1,0 +1,87 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Lifted from aspnet/AspNetIdentity b7fc094 (src/Microsoft.AspNet.Identity.Core) by tools/lift/lift_aspnet.py.
+       MIT License and NOTICE at the repo root. Generated; do not edit. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <AssemblyName>Microsoft.AspNet.Identity.Core</AssemblyName>
+    <RootNamespace>Microsoft.AspNet.Identity</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- The C# version of Microsoft's build: later ones resolve some calls differently (new Message(a, b, null) became
+         ambiguous with the ArraySegment<byte> overload). -->
+    <LangVersion>7.3</LangVersion>
+    <DefineConstants>$(DefineConstants);</DefineConstants>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;CA1416;SYSLIB0011;SYSLIB0051;SYSLIB0014;SYSLIB0057;xUnit1013;xUnit1019;xUnit1031;xUnit2013;xUnit2014</NoWarn>
+    <!-- Delay signed with Microsoft's public key, as Microsoft's build does: PublicKeyToken=31bf3856ad364e35. -->
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>../SigningKey/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>false</IsTestProject>
+  </PropertyGroup>
+
+  <Import Project="../webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="Extensions/IIdentityMessageServiceExtensions.cs" />
+    <Compile Include="TaskExtensions.cs" />
+    <Compile Include="AsyncHelper.cs" />
+    <Compile Include="IIdentityMessageService.cs" />
+    <Compile Include="IUserTokenProvider.cs" />
+    <Compile Include="IUserPhoneNumberStore.cs" />
+    <Compile Include="IUserLockoutStore.cs" />
+    <Compile Include="IUserTwoFactorStore.cs" />
+    <Compile Include="IUserEmailStore.cs" />
+    <Compile Include="IQueryableRoleStore.cs" />
+    <Compile Include="IQueryableUserStore.cs" />
+    <Compile Include="IUserSecurityStampStore.cs" />
+    <Compile Include="IClaimsIdentityFactory.cs" />
+    <Compile Include="Extensions/RoleManagerExtensions.cs" />
+    <Compile Include="IUserPasswordStore.cs" />
+    <Compile Include="PasswordValidator.cs" />
+    <Compile Include="PasswordVerificationResult.cs" />
+    <Compile Include="EmailTokenProvider.cs" />
+    <Compile Include="PhoneNumberTokenProvider.cs" />
+    <Compile Include="TotpSecurityStampBasedTokenProvider.cs" />
+    <Compile Include="Rfc6238AuthenticationService.cs" />
+    <Compile Include="RoleValidator.cs" />
+    <Compile Include="IRoleStore.cs" />
+    <Compile Include="RoleManager.cs" />
+    <Compile Include="IUserRoleStore.cs" />
+    <Compile Include="DefaultAuthenticationTypes.cs" />
+    <Compile Include="Extensions/IdentityExtensions.cs" />
+    <Compile Include="Extensions/UserManagerExtensions.cs" />
+    <Compile Include="ClaimsIdentityFactory.cs" />
+    <Compile Include="Crypto.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="IUserClaimStore.cs" />
+    <Compile Include="IUserLoginStore.cs" />
+    <Compile Include="IPasswordHasher.cs" />
+    <Compile Include="IUserStore.cs" />
+    <Compile Include="PasswordHasher.cs" />
+    <Compile Include="MinimumLengthValidator.cs" />
+    <Compile Include="Resources.Designer.cs" />
+    <Compile Include="IdentityResult.cs" />
+    <Compile Include="IRole.cs" />
+    <Compile Include="IIdentityValidator.cs" />
+    <Compile Include="UserLoginInfo.cs" />
+    <Compile Include="IUser.cs" />
+    <Compile Include="Properties/AssemblyInfo.cs" />
+    <Compile Include="UserManager.cs" />
+    <Compile Include="UserValidator.cs" />
+    <EmbeddedResource Include="Resources.resx" LogicalName="Microsoft.AspNet.Identity.Resources.resources" />
+
+
+  </ItemGroup>
+
+  <ItemGroup>
+
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="11.0.0-rc.3.26522.148" />
+  </ItemGroup>
+</Project>

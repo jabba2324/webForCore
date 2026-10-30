@@ -45,7 +45,12 @@ namespace System.Drawing
             Format = format;
             RawFormat = rawFormat;
             Flags = DefaultFlags(format);
-            if (IsIndexed(format) && Palette == null) Palette = DefaultPalette(format);
+            if (IsIndexed(format) && Palette == null)
+            {
+                Palette = DefaultPalette(format);
+                // PaletteFlags: the black/white palette is GrayScale (2), the halftone palette Halftone (4).
+                PaletteFlags = format == PixelFormat.Format1bppIndexed ? 2 : format == PixelFormat.Format8bppIndexed ? 4 : 0;
+            }
         }
 
         public static GpImage Create(int width, int height, PixelFormat format)
@@ -100,9 +105,13 @@ namespace System.Drawing
             _ => false,
         };
 
+        // GDI+'s encoders write an alpha channel for these formats (32bppRgb included: it reloads as 32bppArgb).
+        public static bool EncodesAlpha(PixelFormat format) => HasAlpha(format) || format == PixelFormat.Format32bppRgb;
+
         static int DefaultFlags(PixelFormat format)
         {
-            int flags = (int)ImageFlags.ColorSpaceRgb;
+            // A memory bitmap (GDI+): HasAlpha only.
+            int flags = 0;
             if (HasAlpha(format)) flags |= (int)ImageFlags.HasAlpha;
             return flags;
         }

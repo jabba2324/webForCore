@@ -180,6 +180,12 @@ namespace System.Web {
 
         // see comments on WebSocketInitStatus for what all of these codes mean
         private WebSocketInitStatus GetWebSocketInitStatus() {
+#if !NETFRAMEWORK
+            // webForCore: on Kestrel (classic pipeline) the WebSocket handshake is ASP.NET Core's; see AspNetCoreWorkerRequest.
+            if (_wr is AspNetCoreWorkerRequest kestrel) {
+                return kestrel.IsWebSocketRequest() ? WebSocketInitStatus.Success : WebSocketInitStatus.NotAWebSocketRequest;
+            }
+#endif
             IIS7WorkerRequest iis7wr =_wr as IIS7WorkerRequest;
             if (iis7wr == null) {
                 return WebSocketInitStatus.RequiresIntegratedMode;
@@ -326,6 +332,24 @@ namespace System.Web {
                     throw new HttpException(SR.GetString(SR.WebSockets_UnknownErrorWhileAccepting));
             }
 
+#if !NETFRAMEWORK
+            if (_wr is AspNetCoreWorkerRequest kestrel) {
+                if (options != null && options.RequireSameOrigin && !WebSocketUtil.IsSameOriginRequest(kestrel)) {
+                    throw new HttpException((int)HttpStatusCode.Forbidden, SR.GetString(SR.WebSockets_OriginCheckFailed));
+                }
+                string kestrelSubprotocol = (options != null && !String.IsNullOrEmpty(options.SubProtocol)) ? options.SubProtocol : null;
+                if (kestrelSubprotocol != null) {
+                    IList<string> requested = WebSocketRequestedProtocols;
+                    if (requested == null || !requested.Contains(kestrelSubprotocol, StringComparer.Ordinal)) {
+                        throw new ArgumentException(SR.GetString(SR.WebSockets_SubProtocolCannotBeNegotiated, kestrelSubprotocol), "options");
+                    }
+                }
+                kestrel.AcceptWebSocket(this, userFunc, kestrelSubprotocol);
+                TransitionToWebSocketState(WebSocketTransitionState.AcceptWebSocketRequestCalled);
+                _webSocketNegotiatedProtocol = kestrelSubprotocol;
+                return;
+            }
+#endif
             if (CurrentNotification > RequestNotification.ExecuteRequestHandler) {
                 // it is too late to call this method
                 throw new InvalidOperationException(SR.GetString(SR.WebSockets_CannotBeCalledAfterHandlerExecute));
@@ -1777,9 +1801,17 @@ namespace System.Web {
         }
 
         internal void WaitForExceptionIfCancelled() {
+#if NETFRAMEWORK
             while (Volatile.Read(ref _timeoutState) == -1)
                 Thread.Sleep(100);
+#else
+            // webForCore: the Thread.Abort this waited for never comes on .NET (the request hung); a request the timeout
+            // manager cancelled ends at this step boundary instead (HttpApplication.ExecuteStep, CancelledByTimeout).
+#endif
         }
+
+        // webForCore: RequestTimeoutManager cancelled the request (MustTimeout); without Thread.Abort it ends cooperatively.
+        internal bool CancelledByTimeout => Volatile.Read(ref _timeoutState) == -1;
 
         internal bool IsInCancellablePeriod {
             get { return (Volatile.Read(ref _timeoutState) == 1); }

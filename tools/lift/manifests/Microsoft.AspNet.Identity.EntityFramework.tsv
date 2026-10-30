@@ -1,0 +1,14 @@
+# identity b7fc094: source path (relative to its repository)	destination (relative to fork root)
+src/Microsoft.AspNet.Identity.EntityFramework/RoleStore.cs	src/webForCore.Microsoft.AspNet.Identity.EntityFramework/RoleStore.cs
+src/Microsoft.AspNet.Identity.EntityFramework/GlobalSuppressions.cs	src/webForCore.Microsoft.AspNet.Identity.EntityFramework/GlobalSuppressions.cs
+src/Microsoft.AspNet.Identity.EntityFramework/UserStore.cs	src/webForCore.Microsoft.AspNet.Identity.EntityFramework/UserStore.cs
+src/Microsoft.AspNet.Identity.EntityFramework/IdentityUserRole.cs	src/webForCore.Microsoft.AspNet.Identity.EntityFramework/IdentityUserRole.cs
+src/Microsoft.AspNet.Identity.EntityFramework/EntityStore.cs	src/webForCore.Microsoft.AspNet.Identity.EntityFramework/EntityStore.cs
+src/Microsoft.AspNet.Identity.EntityFramework/IdentityDbContext.cs	src/webForCore.Microsoft.AspNet.Identity.EntityFramework/IdentityDbContext.cs
+src/Microsoft.AspNet.Identity.EntityFramework/IdentityResources.Designer.cs	src/webForCore.Microsoft.AspNet.Identity.EntityFramework/IdentityResources.Designer.cs
+src/Microsoft.AspNet.Identity.EntityFramework/Properties/AssemblyInfo.cs	src/webForCore.Microsoft.AspNet.Identity.EntityFramework/Properties/AssemblyInfo.cs
+src/Microsoft.AspNet.Identity.EntityFramework/IdentityRole.cs	src/webForCore.Microsoft.AspNet.Identity.EntityFramework/IdentityRole.cs
+src/Microsoft.AspNet.Identity.EntityFramework/IdentityUser.cs	src/webForCore.Microsoft.AspNet.Identity.EntityFramework/IdentityUser.cs
+src/Microsoft.AspNet.Identity.EntityFramework/IdentityUserClaim.cs	src/webForCore.Microsoft.AspNet.Identity.EntityFramework/IdentityUserClaim.cs
+src/Microsoft.AspNet.Identity.EntityFramework/IdentityUserLogin.cs	src/webForCore.Microsoft.AspNet.Identity.EntityFramework/IdentityUserLogin.cs
+src/Microsoft.AspNet.Identity.EntityFramework/IdentityResources.resx	src/webForCore.Microsoft.AspNet.Identity.EntityFramework/IdentityResources.resx

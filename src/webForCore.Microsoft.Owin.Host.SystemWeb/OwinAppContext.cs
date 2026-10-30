@@ -102,7 +102,7 @@ namespace Microsoft.Owin.Host.SystemWeb
         {
             // There is no explicit API to detect server side websockets, just check for v4.5 / Win8.
             // Per request we can provide actual verification.
-            if (HttpRuntime.IISVersion != null && HttpRuntime.IISVersion.Major >= 8)
+            if (HttpRuntime.IISVersion == null || HttpRuntime.IISVersion.Major >= 8) // webForCore: or no IIS (Kestrel)
             {
                 WebSocketSupport = true;
                 Capabilities[Constants.WebSocketVersionKey] = Constants.WebSocketVersion;

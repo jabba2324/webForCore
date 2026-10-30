@@ -145,6 +145,7 @@ namespace System.Drawing
         internal static int GdipSetImageAttributesColorMatrix(HandleRef imageattr, ColorAdjustType type, bool enableFlag, ColorMatrix? colorMatrix, ColorMatrix? grayMatrix, ColorMatrixFlag flags)
         {
             if (enableFlag && colorMatrix == null) return InvalidParameter;
+            if (flags < ColorMatrixFlag.Default || flags > ColorMatrixFlag.AltGrays) return InvalidParameter;
             if (enableFlag && flags == ColorMatrixFlag.AltGrays && grayMatrix == null) return InvalidParameter;
             return SetAttribute(imageattr, type, s =>
             {

@@ -85,6 +85,9 @@ PROJECTS = {
                                             tfm="net11.0", roots=["src/Microsoft.Owin.Security.Cookies"]),
     "Microsoft.Owin.Security.OAuth": dict(source="katana:src/Microsoft.Owin.Security.OAuth/Microsoft.Owin.Security.OAuth.csproj",
                                           tfm="net11.0", roots=["src/Microsoft.Owin.Security.OAuth"]),
+    # SignalR's tests configure CORS with it (lift_aspnet.py); it builds on the Web Stack's System.Web.Cors.
+    "Microsoft.Owin.Cors": dict(source="katana:src/Microsoft.Owin.Cors/Microsoft.Owin.Cors.csproj", tfm="net11.0",
+                                roots=["src/Microsoft.Owin.Cors"]),
     "Microsoft.Owin.Host.SystemWeb": dict(source="katana:src/Microsoft.Owin.Host.SystemWeb/Microsoft.Owin.Host.SystemWeb.csproj",
                                           tfm="net11.0", roots=["src/Microsoft.Owin.Host.SystemWeb"]),
     # The Domain hosting starter runs the app in a new AppDomain over remoting (see FIXUPS).
@@ -127,7 +130,7 @@ KATANA_BUILTIN = {"System.Net.Http", "System.Xml", "System.Xml.Linq", "System.Ru
 # Katana's tests run on Arcade's xunit; the lifted tests use the same xunit as the Web Stack's.
 KATANA_TEST_PACKAGES = [("xunit", "2.9.3")]
 # Spike projects reference Katana from NuGet; the lifted projects reference the lifted Katana instead.
-PACKAGE_TO_PROJECT = {"Microsoft.Owin": "Microsoft.Owin"}
+PACKAGE_TO_PROJECT = {"Microsoft.Owin": "Microsoft.Owin", "Microsoft.AspNet.Cors": "System.Web.Cors"}
 # Test runner packages: Microsoft's (Test SDK 16.11, runner 2.4.5) predate .NET 11.
 PACKAGE_VERSION_OVERRIDES = {"Microsoft.NET.Test.Sdk": "18.11.0", "xunit.runner.visualstudio": "3.1.5"}
 DROP_PACKAGES = {"XunitXml.TestLogger"}
@@ -812,6 +815,13 @@ LOADER_FIXUP = ("Loader/DefaultLoader.cs",
                 "                // are in its ApplicationBase, the directory .NET Framework checks when no private bin path is set.\n"
                 "                IEnumerable<string> searchPaths = new string[] { string.Empty };\n", 1)
 FIXUPS["Microsoft.Owin.Host.SystemWeb"] = [LOADER_FIXUP]
+# Katana enables WebSockets on System.Web when it runs on IIS 8 or later (stage one), then checks each request's
+# WEBSOCKET_VERSION server variable (stage two). On Kestrel there is no IIS version; the fork's worker request provides
+# HttpContext.AcceptWebSocketRequest and WEBSOCKET_VERSION, so stage one also allows a host without IIS.
+FIXUPS["Microsoft.Owin.Host.SystemWeb"].append(
+    ("OwinAppContext.cs", "            if (HttpRuntime.IISVersion != null && HttpRuntime.IISVersion.Major >= 8)\n",
+     "            if (HttpRuntime.IISVersion == null || HttpRuntime.IISVersion.Major >= 8) // webForCore: or no IIS (Kestrel)\n", 1))
+
 # The middleware tests' servers get TestDataProtectionProvider (tools/lift/additions): DPAPI is Windows only.
 DP = ('                app.Properties["host.AppName"] = "Microsoft.Owin.Security.Tests";\n',
       '                app.Properties["host.AppName"] = "Microsoft.Owin.Security.Tests";\n'

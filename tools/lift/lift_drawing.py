@@ -42,10 +42,12 @@ FIXUPS = [
      "                // webForCore: GDI+ is SkiaGdiPlus (managed, on SkiaSharp); no native library to resolve.\n", 1),
 ]
 
+BUSY_EXEMPT = {"GdipReleaseDC", "GdipDeleteGraphics", "GdipGetDC"}
+
 DLLIMPORT = re.compile(
     r"(?P<indent>[ \t]*)\[DllImport\(LibraryName[^\]]*\)\][ \t]*\r?\n"
     r"(?P<attrs>(?:[ \t]*\[return:[^\]]*\][ \t]*\r?\n)*)"
-    r"[ \t]*(?P<access>internal|private|public) static extern (?P<ret>[\w\.\*\[\]]+) (?P<name>\w+)\((?P<params>[^;]*?)\);",
+    r"[ \t]*(?P<access>internal|private|public) static extern (?P<unsafe>unsafe )?(?P<ret>[\w\.\*\[\]]+) (?P<name>\w+)\((?P<params>[^;]*?)\);",
     re.S)
 
 
@@ -94,8 +96,15 @@ def transform_dllimports(text, functions):
         ind = m.group("indent")
         call = f"SkiaGdiPlus.{m.group('name')}({args})"
         body = f"=> {call};"
+        # GDI+ answers ObjectBusy for any call on a Graphics whose HDC is out (GetHdc), except releasing it.
+        if (infos and infos[0][1] == "HandleRef" and infos[0][2] == "graphics" and m.group("ret") == "int"
+                and m.group("name") not in BUSY_EXEMPT):
+            outs = "".join(f" {n} = default;" for mod, _, n in infos if mod == "out")
+            body = f"=> SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : {call};"
+            if outs:
+                body = f"{{ if (SkiaGdiPlus.GraphicsBusy(graphics)) {{{outs} return SkiaGdiPlus.ObjectBusy; }} return {call}; }}"
         return (f"{ind}// webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).{nl}"
-                f"{ind}{m.group('access')} static {m.group('ret')} {m.group('name')}({params}) {body}")
+                f"{ind}{m.group('access')} static {m.group('unsafe') or ''}{m.group('ret')} {m.group('name')}({params}) {body}")
     return DLLIMPORT.sub(repl, text)
 
 

@@ -362,6 +362,8 @@ namespace Microsoft.AspNetCore.Builder
 			if (optionsBuilder == null) optionsBuilder = options => { };
 			// webForCore: W3C logging and compression, when services.AddWebForms() registered them (IIS/IISServices.cs).
 			WebFormsServiceCollectionExtensions.UseWebFormsServices(builder);
+			// webForCore: HttpContext.AcceptWebSocketRequest needs ASP.NET Core's WebSocket handshake (IIS's WebSocket module).
+			builder.UseWebSockets();
 			return builder.UseMiddleware<WebFormsMiddleware>(optionsBuilder);
         }
         public static IApplicationBuilder UseAspNetCoreSessionProvider(this IApplicationBuilder builder)

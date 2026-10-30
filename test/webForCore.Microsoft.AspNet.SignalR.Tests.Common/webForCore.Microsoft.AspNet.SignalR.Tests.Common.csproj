@@ -1,0 +1,148 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Lifted from SignalR/SignalR 7f53f26 (test/Microsoft.AspNet.SignalR.Tests.Common) by tools/lift/lift_aspnet.py.
+       Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. Generated; do not edit. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <AssemblyName>Microsoft.AspNet.SignalR.Tests.Common</AssemblyName>
+    <RootNamespace>Microsoft.AspNet.SignalR.Tests.Common</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- The C# version of Microsoft's build: later ones resolve some calls differently (new Message(a, b, null) became
+         ambiguous with the ArraySegment<byte> overload). -->
+    <LangVersion>7.3</LangVersion>
+    <DefineConstants>$(DefineConstants);NET45;SIGNED</DefineConstants>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;CA1416;SYSLIB0011;SYSLIB0051;SYSLIB0014;SYSLIB0057;xUnit1013;xUnit1019;xUnit1031;xUnit2013;xUnit2014</NoWarn>
+    <!-- Delay signed with Microsoft's public key, as Microsoft's build does: PublicKeyToken=31bf3856ad364e35. -->
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>../../src/SigningKey/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>false</IsTestProject>
+  </PropertyGroup>
+
+  <Import Project="../../src/webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="App_Start/Initializer.cs" />
+    <Compile Include="App_Start/PreSendRequestHeadersModule.cs" />
+    <Compile Include="Connections/AddGroupOnConnectedConnection.cs" />
+    <Compile Include="Connections/AsyncOnConnectedConnection.cs" />
+    <Compile Include="Connections/AuthenticatedEchoConnection.cs" />
+    <Compile Include="Connections/BroadcastConnection.cs" />
+    <Compile Include="Connections/ConnectionThatUsesItems.cs" />
+    <Compile Include="Connections/EchoConnection.cs" />
+    <Compile Include="Connections/ExamineHeadersConnection.cs" />
+    <Compile Include="Connections/ExamineReconnectPath.cs" />
+    <Compile Include="Connections/FallbackToLongPollingConnection.cs" />
+    <Compile Include="Connections/FallbackToLongPollingConnectionThrows.cs" />
+    <Compile Include="Connections/MyBadConnection.cs" />
+    <Compile Include="Connections/MyGroupConnection.cs" />
+    <Compile Include="Connections/MyGroupEchoConnection.cs" />
+    <Compile Include="Connections/MyReconnect.cs" />
+    <Compile Include="Connections/MyRejoinGroupsConnection.cs" />
+    <Compile Include="Connections/MySendingConnection.cs" />
+    <Compile Include="Connections/PreserializedJsonConnection.cs" />
+    <Compile Include="Connections/RedirectionConnection.cs" />
+    <Compile Include="Connections/StatusCodeConnection.cs" />
+    <Compile Include="Connections/SyncErrorConnection.cs" />
+    <Compile Include="Connections/UnusableProtectedConnection.cs" />
+    <Compile Include="Handlers/GCHandler.cs" />
+    <Compile Include="Handlers/HandlerWithSession.cs" />
+    <Compile Include="Handlers/PingHandler.cs" />
+    <Compile Include="Hubs/AuthenticatedEchoHub.cs" />
+    <Compile Include="Hubs/ChatWithGroups.cs" />
+    <Compile Include="Hubs/ClientCallbackHub.cs" />
+    <Compile Include="Hubs/ConnectionDataVerifierHub.cs" />
+    <Compile Include="Hubs/DateAsStringHub.cs" />
+    <Compile Include="Hubs/DelayedOnConnectedHub.cs" />
+    <Compile Include="Hubs/EchoHub.cs" />
+    <Compile Include="Hubs/ExamineHeadersHub.cs" />
+    <Compile Include="Hubs/GroupJoiningHub.cs" />
+    <Compile Include="Hubs/IInvalidClientContract.cs" />
+    <Compile Include="Hubs/IValidClientContract.cs" />
+    <Compile Include="Hubs/InvalidTypedHub.cs" />
+    <Compile Include="Hubs/MyItemsHub.cs" />
+    <Compile Include="Hubs/OnConnectedBufferHub.cs" />
+    <Compile Include="Hubs/ProgressHub.cs" />
+    <Compile Include="Hubs/RedirectTestHub.cs" />
+    <Compile Include="Hubs/ValidTypedHub.cs" />
+    <Compile Include="Infrastructure/AsyncManualResetEvent.cs" />
+    <Compile Include="Infrastructure/CommonCommandLine.cs" />
+    <Compile Include="Infrastructure/CommonLog.cs" />
+    <Compile Include="Infrastructure/CountDownRange.cs" />
+    <Compile Include="Infrastructure/EmptyProtectedData.cs" />
+    <Compile Include="Infrastructure/ExternalTestHost.cs" />
+    <Compile Include="Infrastructure/FakeScaleoutBus.cs" />
+    <Compile Include="Infrastructure/HostType.cs" />
+    <Compile Include="Infrastructure/HostedTest.cs" />
+    <Compile Include="Infrastructure/HostedTestFactory.cs" />
+    <Compile Include="Infrastructure/HttpSysEtwWrapper.cs" />
+    <Compile Include="Infrastructure/ITestHost.cs" />
+    <Compile Include="Infrastructure/MemoryHost.cs" />
+    <Compile Include="Infrastructure/MemoryHostHttpHandler.cs" />
+    <Compile Include="Infrastructure/MemoryTestHost.cs" />
+    <Compile Include="Infrastructure/MessageBusType.cs" />
+    <Compile Include="Infrastructure/NameValueCollectionWrapper.cs" />
+    <Compile Include="Infrastructure/OrderedCountDownRange.cs" />
+    <Compile Include="Infrastructure/OwinTestHost.cs" />
+    <Compile Include="Infrastructure/ProcessExtensions.cs" />
+    <Compile Include="Infrastructure/RequestItemsResponse.cs" />
+    <Compile Include="Infrastructure/SystemNetLogging.cs" />
+    <Compile Include="Infrastructure/TaskExtensions.cs" />
+    <Compile Include="Infrastructure/TestUtilities.cs" />
+    <Compile Include="Infrastructure/TracingTestHost.cs" />
+    <Compile Include="Infrastructure/TransportType.cs" />
+    <Compile Include="TestRequest.cs" />
+    <Compile Include="TestResponse.cs" />
+    <Compile Include="TestTraceManager.cs" />
+    <Compile Include="TestTransport.cs" />
+    <Compile Include="TestTransportManager.cs" />
+    <Compile Include="Hubs/AdminAuthHub.cs" />
+    <Compile Include="Hubs/AuthHub.cs" />
+    <Compile Include="Hubs/AuthorizeClaimsAttribute.cs" />
+    <Compile Include="Hubs/HeaderAuthHub.cs" />
+    <Compile Include="Hubs/IncomingAuthHub.cs" />
+    <Compile Include="Hubs/InheritAuthHub.cs" />
+    <Compile Include="Hubs/InvokeAuthHub.cs" />
+    <Compile Include="Hubs/NoAuthHub.cs" />
+    <Compile Include="Hubs/UserAndRoleAuthHub.cs" />
+    <Compile Include="Hubs/Status.cs" />
+    <Compile Include="Hubs/DemoHub.cs" />
+    <Compile Include="StressServer/StressConnection.cs" />
+    <Compile Include="StressServer/ConcurrentCallsHub.cs" />
+    <Compile Include="StressServer/HubWithGroups.cs" />
+    <Compile Include="StressServer/SimpleEchoHub.cs" />
+
+
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/webForCore.Microsoft.AspNet.SignalR.Core/webForCore.Microsoft.AspNet.SignalR.Core.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.AspNet.SignalR.Client/webForCore.Microsoft.AspNet.SignalR.Client.csproj" PrivateAssets="All" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.AspNet.SignalR.SystemWeb/webForCore.Microsoft.AspNet.SignalR.SystemWeb.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin/webForCore.Microsoft.Owin.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security/webForCore.Microsoft.Owin.Security.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security.Cookies/webForCore.Microsoft.Owin.Security.Cookies.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Cors/webForCore.Microsoft.Owin.Cors.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Hosting/webForCore.Microsoft.Owin.Hosting.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Testing/webForCore.Microsoft.Owin.Testing.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Host.HttpListener/webForCore.Microsoft.Owin.Host.HttpListener.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Host.SystemWeb/webForCore.Microsoft.Owin.Host.SystemWeb.csproj" />
+    <ProjectReference Include="../../src/WebFormsForCore.Web/WebFormsForCore.Web.csproj" />
+    <ProjectReference Include="../../src/WebFormsForCore.Configuration/WebFormsForCore.Configuration.csproj" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="Owin" Version="1.0.0" />
+    <PackageReference Include="xunit.abstractions" Version="2.0.3" />
+    <PackageReference Include="xunit.assert" Version="2.4.0" />
+    <PackageReference Include="xunit.extensibility.core" Version="2.4.0" />
+    <PackageReference Include="xunit.extensibility.execution" Version="2.4.0" />
+    <PackageReference Include="Moq" Version="4.21.0" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,3 @@
+# signalr 7f53f26: source path (relative to its repository)	destination (relative to fork root)
+src/Microsoft.AspNet.SignalR.SystemWeb/RequestExtensions.cs	src/webForCore.Microsoft.AspNet.SignalR.SystemWeb/RequestExtensions.cs
+src/Microsoft.AspNet.SignalR.SystemWeb/SignalRRouteExtensions.cs	src/webForCore.Microsoft.AspNet.SignalR.SystemWeb/SignalRRouteExtensions.cs

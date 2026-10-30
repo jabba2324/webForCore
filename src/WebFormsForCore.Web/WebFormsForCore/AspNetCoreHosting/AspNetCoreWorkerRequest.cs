@@ -137,6 +137,13 @@ namespace System.Web.Hosting
 			var path = Context.Request.Path;
 			Debug.WriteLine($"EndOfRequestStart {path}");
 #endif
+			// webForCore: an accepted WebSocket request keeps its response for the handshake (Process runs it next); a
+			// timed-out request's response was already completed (TimedOut).
+			if (pendingWebSocket != null || timedOut)
+			{
+				Completed.TrySetResult(true);
+				return;
+			}
 			try
 			{
 				if (Context != null && Context.Response != null)
@@ -149,8 +156,8 @@ namespace System.Web.Hosting
 #if DebugWF4C
 								Debug.WriteLine($"EndOfRequest {path}");
 #endif
-								if (t.Exception != null) Completed.SetException(t.Exception);
-								else Completed.SetResult(true);
+								if (t.Exception != null) Completed.TrySetException(t.Exception);
+								else Completed.TrySetResult(true);
 							},
 							CancellationToken.None,
 							TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.DenyChildAttach,
@@ -161,14 +168,14 @@ namespace System.Web.Hosting
 #if DebugWF4C
 						Debug.WriteLine($"EndOfRequest Fail three {path}");
 #endif
-						Completed.SetResult(true);
+						Completed.TrySetResult(true);
 					}
 				} else
 				{
 #if DebugWF4C
 					Debug.WriteLine($"EndOfRequest Fail {path}");
 #endif
-					Completed.SetResult(true);
+					Completed.TrySetResult(true);
 				}
 			}
 			catch (Exception ex)
@@ -177,16 +184,59 @@ namespace System.Web.Hosting
 				Debug.WriteLine($"EndOfRequest Fail two {path}");
 #endif
 				//Completed.SetException(ex);
-				Completed.SetResult(true);
+				Completed.TrySetResult(true);
 			}
 		}
 
 		public override void FlushResponse(bool finalFlush)
 		{
-			using (var noSyncContext = new SafeAsync())
+			lock (responseLock)
 			{
-				Context.Response.Body.Flush();
-				if (finalFlush) Context.Response.Body.Close();
+				if (SuppressOutput) return;
+				using (var noSyncContext = new SafeAsync())
+				{
+					Context.Response.Body.Flush();
+					if (finalFlush) Context.Response.Body.Close();
+				}
+			}
+		}
+
+		// webForCore: output is dropped once the request has timed out (its response was sent) or turned into a WebSocket.
+		bool SuppressOutput => timedOut || pendingWebSocket != null;
+		readonly object responseLock = new object();
+		volatile bool timedOut;
+
+		// webForCore: <httpRuntime executionTimeout>. ASP.NET aborts the request's thread and answers "Request timed out."
+		// (500); .NET cannot abort a thread, so RequestTimeoutManager calls this instead: the client gets ASP.NET's
+		// response now, Request.TimedOutToken is canceled, and whatever the request's code writes from then on is dropped.
+		// The Kestrel request stays open until that code finishes, so its HttpContext stays valid for it.
+		internal void TimedOut()
+		{
+			lock (responseLock)
+			{
+				if (timedOut || pendingWebSocket != null) return;
+				timedOut = true;
+				try
+				{
+					var response = Context.Response;
+					if (!response.HasStarted)
+					{
+						Core.ResponseExtensions.Clear(response);
+						response.StatusCode = 500;
+						response.ContentType = "text/html; charset=utf-8";
+						response.Headers.Connection = "close";
+						var body = Encoding.UTF8.GetBytes("<html><head><title>Request timed out.</title></head><body><h1>Server Error in '" +
+							HttpUtility.HtmlEncode(Host.VirtualPath) + "' Application.</h1><h2><i>Request timed out.</i></h2>" +
+							"<b>Exception Details: </b>System.Web.HttpException: Request timed out.</body></html>");
+						response.ContentLength = body.Length;
+						using (new SafeAsync()) response.Body.Write(body, 0, body.Length);
+					}
+					_ = response.CompleteAsync();
+				}
+				catch (Exception e) when (e is InvalidOperationException || e is ObjectDisposedException || e is IOException)
+				{
+					// the response could not be completed; the connection is closed when the request ends
+				}
 			}
 		}
 
@@ -247,6 +297,30 @@ namespace System.Web.Hosting
 			if (str2 == null)
 			{
 				return processUser;
+			}
+			// webForCore: the IIS server variables the classic pipeline asks the worker request for.
+			switch (str2)
+			{
+				case "HTTPS": return Context.Request.IsHttps ? "on" : "off";
+				case "HTTPS_KEYSIZE":
+				case "CERT_KEYSIZE": return Context.Request.IsHttps ? KeySize() : "";
+				case "HTTPS_SECRETKEYSIZE":
+				case "CERT_SECRETKEYSIZE": return "";
+				case "CERT_FLAGS": return CertificateFlags();
+				case "CERT_COOKIE": return ClientCertificate?.Thumbprint.ToLowerInvariant() ?? "";
+				case "CERT_ISSUER": return IisName(ClientCertificate?.IssuerName);
+				case "CERT_SUBJECT": return IisName(ClientCertificate?.SubjectName);
+				case "CERT_SERIALNUMBER":
+					var serial = ClientCertificate?.GetSerialNumberString();
+					return serial == null ? "" : string.Join("-", Enumerable.Range(0, serial.Length / 2).Select(i => serial.Substring(i * 2, 2).ToLowerInvariant()));
+				case "REMOTE_PORT": return GetRemotePort().ToString(CultureInfo.InvariantCulture);
+				case "GATEWAY_INTERFACE": return "CGI/1.1";
+				case "SERVER_SOFTWARE": return "Kestrel";
+				case "INSTANCE_ID": return "1";
+				case "INSTANCE_META_PATH": return "/LM/W3SVC/1";
+				case "APPL_MD_PATH": return "/LM/W3SVC/1/ROOT" + (Host.VirtualPath == "/" ? "" : Host.VirtualPath.TrimEnd('/'));
+				// IIS's WebSocket module sets it on every request; Katana reads it to enable WebSockets (UseWebForms adds them).
+				case "WEBSOCKET_VERSION": return "13";
 			}
 			if (str2 != "ALLRAW")
 			{
@@ -324,7 +398,49 @@ namespace System.Web.Hosting
 			return headersSent;
 		}
 
-		public override bool IsClientConnected() => true;
+		public override bool IsClientConnected() => !timedOut && !Context.RequestAborted.IsCancellationRequested;
+
+		// webForCore: HTTPS (Request.IsSecureConnection, Request.Url's scheme, SERVER_PORT_SECURE).
+		public override bool IsSecure() => Context.Request.IsHttps;
+
+		// webForCore: the client certificate Kestrel negotiated (HttpsConnectionAdapterOptions.ClientCertificateMode
+		// AllowCertificate or RequireCertificate), for Request.ClientCertificate and the CERT_ server variables.
+		System.Security.Cryptography.X509Certificates.X509Certificate2 ClientCertificate => Context.Connection.ClientCertificate;
+
+		public override byte[] GetClientCertificate() => ClientCertificate?.RawData ?? Array.Empty<byte>();
+		public override DateTime GetClientCertificateValidFrom() => ClientCertificate?.NotBefore ?? DateTime.Now;
+		public override DateTime GetClientCertificateValidUntil() => ClientCertificate?.NotAfter ?? DateTime.Now;
+		public override byte[] GetClientCertificateBinaryIssuer() => ClientCertificate?.IssuerName.RawData ?? Array.Empty<byte>();
+		public override int GetClientCertificateEncoding() => ClientCertificate != null ? 1 : 0; // X509_ASN_ENCODING
+		public override byte[] GetClientCertificatePublicKey() => ClientCertificate?.GetPublicKey() ?? Array.Empty<byte>();
+
+		// CERT_FLAGS: bit 0, a certificate is present; bit 1, its issuer is not trusted (IIS: not in the server's CA list).
+		string certificateFlags;
+		string CertificateFlags()
+		{
+			if (certificateFlags != null) return certificateFlags;
+			var certificate = ClientCertificate;
+			if (certificate == null) return certificateFlags = "0";
+			using var chain = new System.Security.Cryptography.X509Certificates.X509Chain();
+			chain.ChainPolicy.RevocationMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.NoCheck;
+			bool trusted;
+			try { trusted = chain.Build(certificate); }
+			catch (System.Security.Cryptography.CryptographicException) { trusted = false; }
+			return certificateFlags = trusted ? "1" : "3";
+		}
+
+		// IIS's form of a distinguished name: most significant part first ("C=US, O=Contoso, CN=name").
+		static string IisName(System.Security.Cryptography.X509Certificates.X500DistinguishedName name) =>
+			name == null ? "" : string.Join(", ", name.Format(true).Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+
+		// TLS strength for HTTPS_KEYSIZE / CERT_KEYSIZE.
+		string KeySize()
+		{
+#pragma warning disable SYSLIB0058 // CipherStrength: the closest Kestrel has to IIS's key size
+			var tls = Context.Features.Get<Microsoft.AspNetCore.Connections.Features.ITlsHandshakeFeature>();
+			return tls == null || tls.CipherStrength == 0 ? "" : tls.CipherStrength.ToString(CultureInfo.InvariantCulture);
+#pragma warning restore SYSLIB0058
+		}
 		public override bool IsEntireEntityBodyIsPreloaded() => false;
 		public override string MapPath(string path)
 		{
@@ -422,6 +538,7 @@ namespace System.Web.Hosting
 #if DebugWF4C
 				Debug.WriteLine($"Request {Context.Request.Path} finished");
 #endif
+				if (pendingWebSocket != null) await RunWebSocket();
 			}
 		}
 
@@ -437,13 +554,15 @@ namespace System.Web.Hosting
 			{
 				var reader = Context.Request.Body;
 
-				bytesRead = reader.Read(buffer, 0, size);
+				// webForCore: at the offset asked for (HttpBufferlessInputStream reads into the middle of its buffer).
+				bytesRead = timedOut ? 0 : reader.Read(buffer, offset, size);
 			}
 			return bytesRead;
 		}
 
 		public override void SendCalculatedContentLength(int contentLength)
 		{
+			if (SuppressOutput) return;
 			if (!headersSent)
 			{
 				Context.Response.ContentLength = contentLength;
@@ -452,7 +571,7 @@ namespace System.Web.Hosting
 
 		public override void SendKnownResponseHeader(int index, string value)
 		{
-			if (headersSent)
+			if (headersSent || SuppressOutput)
 			{
 				return;
 			}
@@ -550,15 +669,20 @@ namespace System.Web.Hosting
 		{
 			if (length > 0)
 			{
-				using (var noSyncContext = new SafeAsync())
+				lock (responseLock)
 				{
-					Context.Response.Body.Write(data, 0, length);
+					if (SuppressOutput) return;
+					using (var noSyncContext = new SafeAsync())
+					{
+						Context.Response.Body.Write(data, 0, length);
+					}
 				}
 			}
 		}
 
 		public override void SendStatus(int statusCode, string statusDescription)
 		{
+			if (SuppressOutput) return;
 			Context.Response.StatusCode = statusCode;
 			// webForCore: IIS sends HttpResponse.StatusDescription as the reason phrase (HttpStatusCodeResult(code, description),
 			// Response.StatusDescription). Kestrel sends its own unless the response feature carries one (HTTP/1.x only).
@@ -572,7 +696,7 @@ namespace System.Web.Hosting
 
 		public override void SendUnknownResponseHeader(string name, string value)
 		{
-			if (headersSent)
+			if (headersSent || SuppressOutput)
 				return;
 
 			if (Context.Response.Headers.ContainsKey(name)) {
@@ -581,6 +705,70 @@ namespace System.Web.Hosting
 			} else
 			{
 				Context.Response.Headers[name] = value;
+			}
+		}
+
+		// webForCore: WebSockets through HttpContext.AcceptWebSocketRequest, as IIS 8's WebSocket module provides them to
+		// ASP.NET: the request runs through the pipeline, then (instead of its response) the handshake is made and the
+		// application's function runs with an AspNetWebSocketContext over Kestrel's WebSocket. UseWebForms adds ASP.NET
+		// Core's WebSocket middleware.
+		sealed class WebSocketRequest
+		{
+			public HttpContext HttpContext;
+			public Func<System.Web.WebSockets.AspNetWebSocketContext, Task> UserFunc;
+			public string SubProtocol;
+		}
+
+		volatile WebSocketRequest pendingWebSocket;
+
+		internal bool IsWebSocketRequest() => Context.WebSockets.IsWebSocketRequest;
+
+		internal void AcceptWebSocket(HttpContext context, Func<System.Web.WebSockets.AspNetWebSocketContext, Task> userFunc, string subProtocol)
+		{
+			lock (responseLock)
+			{
+				if (timedOut || Context.Response.HasStarted) throw new InvalidOperationException(SR.GetString(SR.WebSockets_CannotBeCalledAfterHandlerExecute));
+				pendingWebSocket = new WebSocketRequest { HttpContext = context, UserFunc = userFunc, SubProtocol = subProtocol };
+			}
+		}
+
+		async Task RunWebSocket()
+		{
+			var request = pendingWebSocket;
+			System.Net.WebSockets.WebSocket socket = null;
+			try
+			{
+				socket = await Context.WebSockets.AcceptWebSocketAsync(request.SubProtocol);
+				var context = request.HttpContext;
+				context.TransitionToWebSocketState(WebSocketTransitionState.TransitionStarted);
+				context.CompleteTransitionToWebSocket();
+				var webSocketContext = new System.Web.WebSockets.AspNetWebSocketContextImpl(new HttpContextWrapper(context), this, socket);
+				Task task;
+				var previous = HttpContext.Current;
+				HttpContext.Current = context;
+				try
+				{
+					task = request.UserFunc(webSocketContext);
+				}
+				finally
+				{
+					HttpContext.Current = previous;
+				}
+				request.UserFunc = null;
+				if (task != null) await task.ConfigureAwait(false);
+			}
+			catch (Exception e)
+			{
+				System.Web.Management.WebBaseEvent.RaiseRuntimeError(e, null);
+			}
+			finally
+			{
+				if (socket != null)
+				{
+					// IIS aborts the socket when the application's function returns.
+					if (socket.State != System.Net.WebSockets.WebSocketState.Closed) socket.Abort();
+					socket.Dispose();
+				}
 			}
 		}
 
@@ -849,7 +1037,7 @@ namespace System.Web.Hosting
 				length = fileSize - offset;
 			}
 
-			if (length == 0 || offset < 0 || length > fileSize - offset)
+			if (length == 0 || offset < 0 || length > fileSize - offset || SuppressOutput)
 			{
 				return;
 			}

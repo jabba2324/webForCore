@@ -41,5 +41,10 @@
     <ProjectReference Include="..\..\src\WebFormsForCore.Web.Extensions\WebFormsForCore.Web.Extensions.csproj" />
     <ProjectReference Include="..\..\src\WebFormsForCore.Web.Infrastructure\WebFormsForCore.Web.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\WebFormsForCore.Compilers\WebFormsForCore.Compilers.csproj" />
+    <!-- System.Web.Optimization (Global.asax's bundles). -->
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Optimization\WebFormsForCore.Web.Optimization.csproj" />
+    <!-- SignalR 2 on Katana's System.Web host (App_Code/SignalRStartup.cs). -->
+    <ProjectReference Include="..\..\src\webForCore.Microsoft.AspNet.SignalR.SystemWeb\webForCore.Microsoft.AspNet.SignalR.SystemWeb.csproj" />
+    <ProjectReference Include="..\..\src\webForCore.Microsoft.Owin.Host.SystemWeb\webForCore.Microsoft.Owin.Host.SystemWeb.csproj" />
   </ItemGroup>
 </Project>

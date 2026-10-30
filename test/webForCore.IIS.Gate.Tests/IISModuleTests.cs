@@ -104,6 +104,87 @@ namespace IISGate
             Assert.EndsWith("/Default.aspx", response.Headers.Location.OriginalString);
         }
 
+        // Distributed rules in shop/web.config: matched relative to /shop/, a relative URL stays in /shop/, a '/'-rooted one
+        // is site-relative; the root's rules still run first.
+        [Fact]
+        public async Task UrlRewriteSubfolderRules()
+        {
+            var (item, itemBody) = await Get("/shop/item/7");
+            Assert.Equal(HttpStatusCode.OK, item.StatusCode);
+            Assert.Contains("Shop item 7 (/shop/Item.aspx)", itemBody);
+            var (product, productBody) = await Get("/shop/p/9");
+            Assert.Contains("Product 9 (/Product.aspx)", productBody);
+            var (home, _) = await Get("/shop/home");
+            Assert.Equal(HttpStatusCode.Found, home.StatusCode);
+            Assert.Equal("/Default.aspx", home.Headers.Location.OriginalString);
+            var (root, rootBody) = await Get("/products/3"); // the root's rule, unaffected
+            Assert.Contains("Product 3 (/Product.aspx)", rootBody);
+            var (unmatched, _) = await Get("/item/7"); // shop's rule does not apply outside /shop/
+            Assert.Equal(HttpStatusCode.NotFound, unmatched.StatusCode);
+        }
+
+        // <outboundRules>: tag attributes (filterByTags), a body pattern and a response header, under a precondition on
+        // the content type.
+        [Fact]
+        public async Task UrlRewriteOutboundRules()
+        {
+            var (page, body) = await Get("/outbound/Links.aspx");
+            Assert.Equal(HttpStatusCode.OK, page.StatusCode);
+            Assert.Contains("<a href=\"/new-link/page.htm\">", body);
+            Assert.Contains("<img src=\"/new-img/logo.png\"", body);
+            Assert.Contains("href='/elsewhere/x.htm'", body); // not matched: unchanged, quotes kept
+            Assert.Contains("replaced-token", body);
+            Assert.DoesNotContain("OUTBOUND-TOKEN", body);
+            Assert.Equal("outbound-page", Assert.Single(page.Headers.GetValues("X-App")));
+            var (text, textBody) = await Get("/outbound/data.txt"); // text/plain: the IsHtml precondition fails
+            Assert.Equal("plain /old-link/page.htm OUTBOUND-TOKEN\n", textBody);
+        }
+
+        [Fact]
+        public async Task DirectoryBrowse()
+        {
+            var (response, body) = await Get("/browse/");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("<A HREF=\"/\">[To Parent Directory]</A>", body);
+            Assert.Contains("<A HREF=\"/browse/a.txt\">a.txt</A>", body);
+            Assert.Contains("&lt;dir&gt; <A HREF=\"/browse/sub/\">sub</A>", body);
+            var (sub, subBody) = await Get("/browse/sub/");
+            Assert.Contains("<A HREF=\"/browse/sub/b.txt\">b.txt</A>", subBody);
+            var (docs, docsBody) = await Get("/docs/"); // browsing is off elsewhere: the default document still wins
+            Assert.Contains("docs home", docsBody);
+        }
+
+        [Fact]
+        public async Task IPSecurityDeniesUnlisted()
+        {
+            var (denied, _) = await Get("/iprestricted/x.txt"); // allowUnlisted="false"; only 10.0.0.0/8 allowed (403.6)
+            Assert.Equal(HttpStatusCode.Forbidden, denied.StatusCode);
+            var (allowed, body) = await Get("/ipallowed/x.txt"); // 127.0.0.1 allowed
+            Assert.Equal(HttpStatusCode.OK, allowed.StatusCode);
+            Assert.Equal("allowed\n", body);
+        }
+
+        [Fact]
+        public async Task IPSecurityProxyMode()
+        {
+            var (direct, _) = await Get("/proxied/x.txt");
+            Assert.Equal(HttpStatusCode.OK, direct.StatusCode);
+            var request = new HttpRequestMessage(HttpMethod.Get, "/proxied/x.txt");
+            request.Headers.Add("X-Forwarded-For", "203.0.113.5"); // denied subnet, through the proxy
+            var proxied = await Client.SendAsync(request);
+            Assert.Equal(HttpStatusCode.Forbidden, proxied.StatusCode);
+        }
+
+        [Fact]
+        public async Task DynamicIPSecurityRequestRate()
+        {
+            var statuses = new List<HttpStatusCode>();
+            for (int i = 0; i < 5; i++) statuses.Add((await Get("/ratelimited/x.txt")).Response.StatusCode); // maxRequests="3" per 10 s
+            Assert.Equal(new[] { HttpStatusCode.OK, HttpStatusCode.OK, HttpStatusCode.OK, HttpStatusCode.Forbidden, HttpStatusCode.Forbidden }, statuses);
+            var (other, _) = await Get("/site.css"); // other URLs are not limited
+            Assert.Equal(HttpStatusCode.OK, other.StatusCode);
+        }
+
         [Fact]
         public async Task DefaultDocument()
         {

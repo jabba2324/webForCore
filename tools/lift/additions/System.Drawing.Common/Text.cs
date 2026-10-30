@@ -509,7 +509,8 @@ namespace System.Drawing
         {
             if (filename == null) return InvalidParameter;
             if (!File.Exists(filename)) return FileNotFound;
-            return AddPrivate(fontCollection, SKTypeface.FromFile(filename));
+            var typeface = SKTypeface.FromFile(filename);
+            return typeface == null ? Ok : AddPrivate(fontCollection, typeface); // GDI+ skips a file that is not a font
         }
 
         internal static int GdipPrivateAddMemoryFont(HandleRef fontCollection, IntPtr memory, int length)
@@ -573,15 +574,15 @@ namespace System.Drawing
         {
             var f = Font(font);
             var g = Get<GpGraphics>(graphics);
-            if (f == null) return InvalidParameter;
-            float dpi = g?.DpiY ?? 96;
+            if (f == null || g == null) return InvalidParameter;
+            float dpi = g.DpiY;
             lf.lfHeight = -(int)Math.Round(f.Pixels(dpi));
             lf.lfWidth = 0;
             lf.lfWeight = (f.Style & FontStyle.Bold) != 0 ? 700 : 400;
             lf.lfItalic = (byte)((f.Style & FontStyle.Italic) != 0 ? 1 : 0);
             lf.lfUnderline = (byte)((f.Style & FontStyle.Underline) != 0 ? 1 : 0);
             lf.lfStrikeOut = (byte)((f.Style & FontStyle.Strikeout) != 0 ? 1 : 0);
-            lf.lfCharSet = 1; // DEFAULT_CHARSET
+            lf.lfCharSet = 0; // GDI+ leaves ANSI_CHARSET; Font.ToLogFont then puts in the font's GdiCharSet
             var face = lf.lfFaceName;
             face.Clear();
             f.Family.Name.AsSpan(0, Math.Min(f.Family.Name.Length, face.Length - 1)).CopyTo(face);
@@ -696,8 +697,20 @@ namespace System.Drawing
             var format = Format(stringFormat);
             if (g == null || f == null || textString == null || region == null) return InvalidParameter;
             string text = length >= 0 && length < textString.Length ? textString.Substring(0, length) : textString;
-            var layout = TextLayout.Create(text, f, WorldFontSize(g, f), layoutRect, format);
             var ranges = format?.Ranges ?? Array.Empty<CharacterRange>();
+            // GDI+: a range outside the text is an invalid parameter.
+            foreach (var range in ranges)
+            {
+                int end = range.First + range.Length;
+                if (range.First < 0 || range.First > text.Length || end < 0 || end > text.Length) return InvalidParameter;
+            }
+            // A layout rectangle with a negative size measures to infinite regions (GDI+).
+            if (layoutRect.Width < 0 || layoutRect.Height < 0)
+            {
+                for (int i = 0; i < Math.Min(characterCount, ranges.Length); i++) Get<GpRegion>(region[i])?.SetInfinite();
+                return Ok;
+            }
+            var layout = TextLayout.Create(text, f, WorldFontSize(g, f), layoutRect, format);
             for (int i = 0; i < Math.Min(characterCount, ranges.Length); i++)
             {
                 var r = Get<GpRegion>(region[i]);

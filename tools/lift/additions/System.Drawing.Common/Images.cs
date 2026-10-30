@@ -44,9 +44,62 @@ namespace System.Drawing
         {
             image = IntPtr.Zero;
             if (filename == null) return InvalidParameter;
-            if (!File.Exists(filename)) return OutOfMemory; // GDI+ reports a missing file this way; System.Drawing checks first
+            if (!File.Exists(filename)) return InvalidParameter; // GDI+: a missing file is an invalid parameter (ArgumentException)
             int status = Load(File.ReadAllBytes(filename), out image);
             return status == InvalidParameter ? OutOfMemory : status; // GDI+: undecodable files are "Out of memory"
+        }
+
+        // HICON and HBITMAP are image handles, as with libgdiplus (System.Drawing's Unix Icon uses its bitmap's handle as
+        // its HICON). Each holds its own copy, so it outlives the bitmap it came from. A bitmap made from one is a memory
+        // bitmap with the flags GDI+ gives it (0x52010).
+        internal static int GdipCreateHICONFromBitmap(HandleRef nativeBitmap, out IntPtr hicon)
+        {
+            hicon = IntPtr.Zero;
+            var img = Image(nativeBitmap);
+            if (img == null) return InvalidParameter;
+            hicon = NewHandle(HandleCopy(img, PixelFormat.Format32bppArgb, 0));
+            return Ok;
+        }
+
+        internal static int GdipCreateHBITMAPFromBitmap(HandleRef nativeBitmap, out IntPtr hbitmap, int argbBackground)
+        {
+            hbitmap = IntPtr.Zero;
+            var img = Image(nativeBitmap);
+            if (img == null) return InvalidParameter;
+            // An HBITMAP has no alpha: the image is composed on the background colour (a COLORREF, 0x00BBGGRR).
+            var copy = HandleCopy(img, PixelFormat.Format32bppRgb, 0);
+            using (var canvas = new SKCanvas(copy.Pixels))
+            {
+                canvas.Clear(new SKColor((byte)argbBackground, (byte)(argbBackground >> 8), (byte)(argbBackground >> 16)));
+                canvas.DrawBitmap(img.Pixels, 0, 0);
+            }
+            hbitmap = NewHandle(copy);
+            return Ok;
+        }
+
+        internal static int GdipCreateBitmapFromHICON(IntPtr hicon, out IntPtr bitmap)
+        {
+            bitmap = IntPtr.Zero;
+            var img = hicon == IntPtr.Zero ? null : Get<GpImage>(new HandleRef(null, hicon));
+            if (img == null) return InvalidParameter;
+            bitmap = NewHandle(HandleCopy(img, PixelFormat.Format32bppArgb, 0x52010));
+            return Ok;
+        }
+
+        internal static int GdipCreateBitmapFromHBITMAP(IntPtr hbitmap, IntPtr hpalette, out IntPtr bitmap)
+        {
+            bitmap = IntPtr.Zero;
+            var img = hbitmap == IntPtr.Zero ? null : Get<GpImage>(new HandleRef(null, hbitmap));
+            if (img == null) return InvalidParameter;
+            bitmap = NewHandle(HandleCopy(img, PixelFormat.Format32bppRgb, 0x52010));
+            return Ok;
+        }
+
+        static GpImage HandleCopy(GpImage img, PixelFormat format, int flags)
+        {
+            var frame = img.Pixels.Copy();
+            if (frame == null) throw new OutOfMemoryException();
+            return new GpImage(frame, format, ImageFormat.MemoryBmp.Guid) { Flags = flags, DpiX = img.DpiX, DpiY = img.DpiY };
         }
 
         internal static int GdipLoadImageFromFileICM(string filename, out IntPtr image) => GdipLoadImageFromFile(filename, out image);
@@ -156,7 +209,7 @@ namespace System.Drawing
                     SigSize = sigSize,
                 };
                 info.SigPattern = PutBytes(c.Signatures.SelectMany(s => s.Concat(new byte[sigSize - s.Length])).ToArray());
-                info.SigMask = PutBytes(c.Signatures.SelectMany(s => Enumerable.Repeat((byte)0xff, s.Length).Concat(new byte[sigSize - s.Length])).ToArray());
+                info.SigMask = PutBytes(c.Signatures.SelectMany((s, i) => (c.Masks?[i] ?? Enumerable.Repeat((byte)0xff, s.Length).ToArray()).Concat(new byte[sigSize - s.Length])).ToArray());
                 Marshal.StructureToPtr(info, (IntPtr)((byte*)buffer + i * structSize), false);
             }
             return Ok;
@@ -502,7 +555,7 @@ namespace System.Drawing
         internal static int GdipBitmapSetResolution(HandleRef bitmap, float dpix, float dpiy)
         {
             var img = Image(bitmap);
-            if (img == null || dpix <= 0 || dpiy <= 0) return InvalidParameter;
+            if (img == null || !(dpix > 0) || !(dpiy > 0)) return InvalidParameter; // NaN and non-positive; infinity is accepted
             img.DpiX = dpix;
             img.DpiY = dpiy;
             return Ok;
@@ -538,8 +591,8 @@ namespace System.Drawing
         internal static int GdipBitmapUnlockBits(HandleRef bitmap, BitmapData lockedBitmapData)
         {
             var img = Image(bitmap);
-            if (img == null) return InvalidParameter;
-            if (img.LockedBuffer == IntPtr.Zero) return WrongState;
+            if (img == null || lockedBitmapData == null) return InvalidParameter;
+            if (img.LockedBuffer == IntPtr.Zero) return Win32Error; // GDI+: unlocking an unlocked bitmap (ExternalException)
             if ((img.LockedMode & ImageLockMode.WriteOnly) != 0)
                 img.WritePixels(img.LockedRect, img.LockedFormat, (byte*)img.LockedBuffer, img.LockedStride);
             if (img.LockedOwnBuffer) Marshal.FreeHGlobal(img.LockedBuffer);

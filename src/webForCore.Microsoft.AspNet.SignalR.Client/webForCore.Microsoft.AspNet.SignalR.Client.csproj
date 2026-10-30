@@ -1,0 +1,122 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Lifted from SignalR/SignalR 7f53f26 (src/Microsoft.AspNet.SignalR.Client) by tools/lift/lift_aspnet.py.
+       Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. Generated; do not edit. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <AssemblyName>Microsoft.AspNet.SignalR.Client</AssemblyName>
+    <RootNamespace>Microsoft.AspNet.SignalR.Client</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- The C# version of Microsoft's build: later ones resolve some calls differently (new Message(a, b, null) became
+         ambiguous with the ArraySegment<byte> overload). -->
+    <LangVersion>7.3</LangVersion>
+    <DefineConstants>$(DefineConstants);CLIENT;NETSTANDARD;NETSTANDARD2_0;SIGNED</DefineConstants>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;CA1416;SYSLIB0011;SYSLIB0051;SYSLIB0014;SYSLIB0057;xUnit1013;xUnit1019;xUnit1031;xUnit2013;xUnit2014</NoWarn>
+    <!-- Delay signed with Microsoft's public key, as Microsoft's build does: PublicKeyToken=31bf3856ad364e35. -->
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>../SigningKey/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>false</IsTestProject>
+  </PropertyGroup>
+
+  <Import Project="../webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="Connection.cs" />
+    <Compile Include="ConnectionExtensions.cs" />
+    <Compile Include="ConnectionState.cs" />
+    <Compile Include="HeaderDictionary.cs" />
+    <Compile Include="HeartBeatMonitor.cs" />
+    <Compile Include="Http/DefaultHttpClient.cs" />
+    <Compile Include="Http/DefaultHttpHandler.cs" />
+    <Compile Include="Http/HttpHelper.cs" />
+    <Compile Include="Http/HttpRequestMessageWrapper.cs" />
+    <Compile Include="Http/HttpResponseMessageWrapper.cs" />
+    <Compile Include="Http/HttpWebRequestWrapper.cs" />
+    <Compile Include="Http/HttpWebResponseWrapper.cs" />
+    <Compile Include="Http/IHttpClient.cs" />
+    <Compile Include="Http/IHttpClientExtensions.cs" />
+    <Compile Include="Http/IRequest.cs" />
+    <Compile Include="Http/IResponse.cs" />
+    <Compile Include="Http/IResponseExtensions.cs" />
+    <Compile Include="HubConnection.cs" />
+    <Compile Include="HubException.cs" />
+    <Compile Include="HubProxyExtensions.cs" />
+    <Compile Include="Hubs/HubInvocation.cs" />
+    <Compile Include="Hubs/HubProgressUpdate.cs" />
+    <Compile Include="Hubs/HubProxy.cs" />
+    <Compile Include="Hubs/HubRegistrationData.cs" />
+    <Compile Include="Hubs/HubResult.cs" />
+    <Compile Include="Hubs/Hubservable.cs" />
+    <Compile Include="Hubs/IHubConnection.cs" />
+    <Compile Include="Hubs/Subscription.cs" />
+    <Compile Include="IConnection.cs" />
+    <Compile Include="IHubProxy.cs" />
+    <Compile Include="Infrastructure/ErrorExtensions.cs" />
+    <Compile Include="Infrastructure/ExceptionHelper.cs" />
+    <Compile Include="Infrastructure/HttpClientException.cs" />
+    <Compile Include="Infrastructure/ITaskMonitor.cs" />
+    <Compile Include="Infrastructure/SignalRError.cs" />
+    <Compile Include="Infrastructure/SlowCallbackException.cs" />
+    <Compile Include="Infrastructure/StartException.cs" />
+    <Compile Include="Infrastructure/StreamExtensions.cs" />
+    <Compile Include="Infrastructure/TaskQueueMonitor.cs" />
+    <Compile Include="Infrastructure/ThreadSafeInvoker.cs" />
+    <Compile Include="Infrastructure/TransportAbortHandler.cs" />
+    <Compile Include="Infrastructure/TransportInitializationHandler.cs" />
+    <Compile Include="Infrastructure/UrlBuilder.cs" />
+    <Compile Include="Infrastructure/UrlEncoder.cs" />
+    <Compile Include="KeepAliveData.cs" />
+    <Compile Include="NegotiationResponse.cs" />
+    <Compile Include="ObservableConnection.cs" />
+    <Compile Include="Properties/AssemblyInfo.cs" />
+    <Compile Include="Resources.Designer.cs" />
+    <Compile Include="StateChange.cs" />
+    <Compile Include="TraceLevels.cs" />
+    <Compile Include="Transports/AsyncStreamReader.cs" />
+    <Compile Include="Transports/AutoTransport.cs" />
+    <Compile Include="Transports/ClientTransportBase.cs" />
+    <Compile Include="Transports/HttpBasedTransport.cs" />
+    <Compile Include="Transports/IClientTransport.cs" />
+    <Compile Include="Transports/LongPollingTransport.cs" />
+    <Compile Include="Transports/ServerSentEvents/ChunkBuffer.cs" />
+    <Compile Include="Transports/ServerSentEvents/EventSourceStreamReader.cs" />
+    <Compile Include="Transports/ServerSentEvents/EventType.cs" />
+    <Compile Include="Transports/ServerSentEvents/SseEvent.cs" />
+    <Compile Include="Transports/ServerSentEventsTransport.cs" />
+    <Compile Include="Transports/TransportHelper.cs" />
+    <Compile Include="Transports/WebSocketTransport.cs" />
+    <Compile Include="Transports/WebSockets/ClientWebSocketHandler.cs" />
+    <Compile Include="Transports/WebSockets/WebSocketWrapperRequest.cs" />
+    <Compile Include="net40/Http/DefaultHttpClient.cs" />
+    <Compile Include="Infrastructure/CancellationTokenExtensions.cs" />
+    <Compile Include="Infrastructure/DispatchingTaskCompletionSource.cs" />
+    <Compile Include="Infrastructure/DisposableAction.cs" />
+    <Compile Include="Infrastructure/Disposer.cs" />
+    <Compile Include="Infrastructure/ExceptionsExtensions.cs" />
+    <Compile Include="Infrastructure/MonoUtility.cs" />
+    <Compile Include="Infrastructure/TaskQueue.cs" />
+    <Compile Include="Infrastructure/ByteBuffer.cs" />
+    <Compile Include="Transports/WebSockets/WebSocketHandler.cs" />
+    <Compile Include="Transports/WebSockets/WebSocketMessage.cs" />
+    <Compile Include="Transports/WebSockets/WebSocketMessageReader.cs" />
+    <Compile Include="Infrastructure/TaskAsyncHelper.cs" />
+    <Compile Include="Infrastructure/TaskAwaiterHelper.cs" />
+    <Compile Include="AssemblyMetadataAttribute.cs" />
+    <EmbeddedResource Include="Resources.resx" LogicalName="Microsoft.AspNet.SignalR.Client.Resources.resources" />
+
+
+  </ItemGroup>
+
+  <ItemGroup>
+
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+  </ItemGroup>
+</Project>

@@ -22,9 +22,10 @@ namespace WebFormsForCore.Hosting.IIS
 {
 	// webForCore: IIS's native modules that sit in front of ASP.NET, configured from <system.webServer>
 	// (WebServerConfiguration), in IIS's order: the concurrent request limit (serverRuntime appConcurrentRequestLimit),
-	// request filtering, HTTP redirection, URL Rewrite, the default document (with IIS's courtesy redirect of a directory
-	// to its trailing slash), custom and redirect headers, the static file MIME map and client cache headers, and custom
-	// errors (httpErrors). WebFormsMiddleware runs them around the application. Static and dynamic compression and W3C
+	// IP and dynamic IP restrictions (IPSecurity), request filtering, HTTP redirection, URL Rewrite's inbound rules and,
+	// around the rest, its outbound rules (UrlRewrite.cs), the default document (with IIS's courtesy redirect of a
+	// directory to its trailing slash), directory browsing, custom and redirect headers, the static file MIME map and
+	// client cache headers, and custom errors (httpErrors). WebFormsMiddleware runs them around the application. Static and dynamic compression and W3C
 	// logging are ASP.NET Core's middleware, configured the IIS way (IISServices.AddWebForms).
 	public sealed class IISModules
 	{
@@ -49,7 +50,9 @@ namespace WebFormsForCore.Hosting.IIS
 		readonly IWebHostEnvironment environment;
 		readonly FileExtensionContentTypeProvider defaultMimeMap = new FileExtensionContentTypeProvider();
 		int active;
-		(int Version, RewriteMiddleware Middleware, RequestDelegate Next) rewrite = (-1, null, null);
+		readonly InboundRewrite inbound;
+		readonly OutboundRewrite outbound;
+		readonly IPSecurity ipSecurity;
 
 		public IISModules(WebServerConfiguration config, Options options, ILoggerFactory loggerFactory, IWebHostEnvironment environment)
 		{
@@ -58,6 +61,9 @@ namespace WebFormsForCore.Hosting.IIS
 			this.loggerFactory = loggerFactory;
 			this.environment = environment;
 			logger = loggerFactory?.CreateLogger<IISModules>() ?? (ILogger)Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
+			inbound = new InboundRewrite(config, logger);
+			outbound = new OutboundRewrite(logger);
+			ipSecurity = new IPSecurity(logger);
 		}
 
 		public WebServerConfiguration Configuration => config;
@@ -90,11 +96,14 @@ namespace WebFormsForCore.Hosting.IIS
 			var section = SectionFor(context.Request.Path.Value);
 			// IIS adds the custom headers to every response, the ones its own modules answer included.
 			ResponseHeaders(context, section);
+			if (await ipSecurity.Deny(context, section, WriteError)) return;
 			if (await RequestFiltering(context, section)) return;
 			if (await HttpRedirect(context, section)) return;
-			var rewriter = Rewriter(application);
-			if (rewriter != null) await rewriter.Invoke(context);
-			else await AfterRewrite(context, application);
+			await outbound.Invoke(context, section, async () =>
+			{
+				if (inbound.Apply(context, section)) return; // a rule ended the response
+				await AfterRewrite(context, application);
+			});
 		}
 
 		async Task AfterRewrite(HttpContext context, RequestDelegate application)
@@ -102,6 +111,7 @@ namespace WebFormsForCore.Hosting.IIS
 			if (context.Response.HasStarted || context.Response.StatusCode != 200) return; // the rewrite module answered
 			var section = SectionFor(context.Request.Path.Value);
 			if (await DefaultDocument(context, section)) return;
+			if (await DirectoryBrowse(context, section)) return;
 			section = SectionFor(context.Request.Path.Value);
 			if (await StaticContent(context, section)) return;
 			await application(context);
@@ -245,31 +255,6 @@ namespace WebFormsForCore.Hosting.IIS
 			System.Text.RegularExpressions.Regex.IsMatch(path, "^" + System.Text.RegularExpressions.Regex.Escape(pattern).Replace("\\*", ".*").Replace("\\?", ".") + "$",
 				System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
-		// <rewrite>: the URL Rewrite module's rules, run by ASP.NET Core's rewrite middleware (Microsoft.AspNetCore.Rewrite
-		// reads the IIS rule format). The application's rules apply to every URL; rules in subdirectory web.config files
-		// and outbound rules are not supported.
-		RewriteMiddleware Rewriter(RequestDelegate application)
-		{
-			var current = rewrite;
-			if (current.Version == config.Version) return current.Middleware;
-			RewriteMiddleware middleware = null;
-			var rules = config.GetSection("/").Element("rewrite");
-			if (rules != null && rules.Element("rules")?.Elements("rule").Any() == true)
-			{
-				try
-				{
-					var rewriteOptions = new RewriteOptions().AddIISUrlRewrite(new StringReader(new XElement("configuration", new XElement("system.webServer", rules)).ToString()));
-					middleware = new RewriteMiddleware(ctx => AfterRewrite(ctx, application), environment, loggerFactory, Microsoft.Extensions.Options.Options.Create(rewriteOptions));
-				}
-				catch (Exception e) when (e is FormatException || e is NotSupportedException || e is InvalidOperationException)
-				{
-					logger.LogError(e, "The <rewrite> rules in web.config cannot be used.");
-				}
-			}
-			rewrite = (config.Version, middleware, null);
-			return middleware;
-		}
-
 		// <defaultDocument>, and IIS's courtesy redirect of a directory URL without its trailing slash.
 		async Task<bool> DefaultDocument(HttpContext context, XElement section)
 		{
@@ -297,6 +282,52 @@ namespace WebFormsForCore.Hosting.IIS
 				}
 			}
 			return false;
+		}
+
+		// <directoryBrowse enabled="true">: a directory without a default document is listed, in IIS's format, with the
+		// columns of showFlags (Date, Time, Size, Extension, LongDate). Hidden segments, the application's output folder and
+		// dot files are left out. When browsing is disabled the request goes on to the application, as an extensionless URL
+		// does in IIS's integrated pipeline (routing).
+		async Task<bool> DirectoryBrowse(HttpContext context, XElement section)
+		{
+			var path = context.Request.Path.Value ?? "/";
+			if (!path.EndsWith("/")) return false;
+			var browse = Element(section, "directoryBrowse");
+			if (!Bool(browse, "enabled", false)) return false;
+			var directory = MapPath(path);
+			if (!Directory.Exists(directory)) return false;
+			var flags = Attr(browse, "showFlags", "Date, Time, Size, Extension").Split(',').Select(f => f.Trim()).ToHashSet(StringComparer.OrdinalIgnoreCase);
+			var hidden = Items(section, "security/requestFiltering/hiddenSegments").Select(e => Attr(e, "segment")).Concat(config.ExcludedDirectories)
+				.ToHashSet(StringComparer.OrdinalIgnoreCase);
+			var culture = System.Globalization.CultureInfo.GetCultureInfo("en-US");
+			var basePath = context.Request.PathBase + path;
+			var host = context.Request.Host.Host;
+			var html = new StringBuilder();
+			html.Append($"<html><head><title>{WebUtility.HtmlEncode(host)} - {WebUtility.HtmlEncode(basePath)}</title></head><body><H1>{WebUtility.HtmlEncode(host)} - {WebUtility.HtmlEncode(basePath)}</H1><hr>\r\n\r\n<pre>");
+			if (path != "/")
+			{
+				var parent = context.Request.PathBase + path.Substring(0, path.TrimEnd('/').LastIndexOf('/') + 1);
+				html.Append($"<A HREF=\"{WebUtility.HtmlEncode(parent)}\">[To Parent Directory]</A><br><br>");
+			}
+			var entries = new DirectoryInfo(directory).EnumerateFileSystemInfos()
+				.Where(e => !e.Name.StartsWith(".") && !hidden.Contains(e.Name) && (e.Attributes & FileAttributes.Hidden) == 0)
+				.OrderBy(e => e.Name, StringComparer.OrdinalIgnoreCase);
+			foreach (var entry in entries)
+			{
+				bool isDirectory = entry is DirectoryInfo;
+				var modified = entry.LastWriteTime;
+				var line = new StringBuilder();
+				if (flags.Contains("LongDate")) line.Append(modified.ToString("dddd, MMMM dd, yyyy", culture).PadLeft(30));
+				else if (flags.Contains("Date")) line.Append(modified.ToString("M/d/yyyy", culture).PadLeft(10));
+				if (flags.Contains("Time")) line.Append(modified.ToString("h:mm tt", culture).PadLeft(10));
+				if (flags.Contains("Size")) line.Append((isDirectory ? "&lt;dir&gt;" : ((FileInfo)entry).Length.ToString(culture)).PadLeft(isDirectory ? 21 : 13));
+				var name = isDirectory || flags.Contains("Extension") ? entry.Name : Path.GetFileNameWithoutExtension(entry.Name);
+				var href = basePath + Uri.EscapeDataString(entry.Name) + (isDirectory ? "/" : "");
+				html.Append(line).Append($" <A HREF=\"{WebUtility.HtmlEncode(href)}\">{WebUtility.HtmlEncode(name)}</A><br>");
+			}
+			html.Append("</pre><hr></body></html>");
+			await WriteBody(context, "text/html; charset=UTF-8", html.ToString());
+			return true;
 		}
 
 		// <httpProtocol><customHeaders>, <redirectHeaders>; <requestFiltering removeServerHeader>.

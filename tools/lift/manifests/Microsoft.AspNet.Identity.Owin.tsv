@@ -1,0 +1,16 @@
+# identity b7fc094: source path (relative to its repository)	destination (relative to fork root)
+src/Microsoft.AspNet.Identity.Owin/Extensions/SignInManagerExtensions.cs	src/webForCore.Microsoft.AspNet.Identity.Owin/Extensions/SignInManagerExtensions.cs
+src/Microsoft.AspNet.Identity.Owin/IdentityFactoryMiddleware.cs	src/webForCore.Microsoft.AspNet.Identity.Owin/IdentityFactoryMiddleware.cs
+src/Microsoft.AspNet.Identity.Owin/IdentityFactoryOptions.cs	src/webForCore.Microsoft.AspNet.Identity.Owin/IdentityFactoryOptions.cs
+src/Microsoft.AspNet.Identity.Owin/IIdentityFactoryProvider.cs	src/webForCore.Microsoft.AspNet.Identity.Owin/IIdentityFactoryProvider.cs
+src/Microsoft.AspNet.Identity.Owin/IdentityFactoryProvider.cs	src/webForCore.Microsoft.AspNet.Identity.Owin/IdentityFactoryProvider.cs
+src/Microsoft.AspNet.Identity.Owin/DataProtectorTokenProvider.cs	src/webForCore.Microsoft.AspNet.Identity.Owin/DataProtectorTokenProvider.cs
+src/Microsoft.AspNet.Identity.Owin/Extensions/AppBuilderExtensions.cs	src/webForCore.Microsoft.AspNet.Identity.Owin/Extensions/AppBuilderExtensions.cs
+src/Microsoft.AspNet.Identity.Owin/Extensions/AuthenticationManagerExtensions.cs	src/webForCore.Microsoft.AspNet.Identity.Owin/Extensions/AuthenticationManagerExtensions.cs
+src/Microsoft.AspNet.Identity.Owin/Extensions/OwinContextExtensions.cs	src/webForCore.Microsoft.AspNet.Identity.Owin/Extensions/OwinContextExtensions.cs
+src/Microsoft.AspNet.Identity.Owin/ExternalLoginInfo.cs	src/webForCore.Microsoft.AspNet.Identity.Owin/ExternalLoginInfo.cs
+src/Microsoft.AspNet.Identity.Owin/GlobalSuppressions.cs	src/webForCore.Microsoft.AspNet.Identity.Owin/GlobalSuppressions.cs
+src/Microsoft.AspNet.Identity.Owin/Properties/AssemblyInfo.cs	src/webForCore.Microsoft.AspNet.Identity.Owin/Properties/AssemblyInfo.cs
+src/Microsoft.AspNet.Identity.Owin/SecurityStampValidator.cs	src/webForCore.Microsoft.AspNet.Identity.Owin/SecurityStampValidator.cs
+src/Microsoft.AspNet.Identity.Owin/SignInManager.cs	src/webForCore.Microsoft.AspNet.Identity.Owin/SignInManager.cs
+src/Microsoft.AspNet.Identity.Owin/SignInStatus.cs	src/webForCore.Microsoft.AspNet.Identity.Owin/SignInStatus.cs

@@ -1005,7 +1005,11 @@ Tests: the 9 AppDomain tests that were skipped now run:
 | requestFiltering | fileExtensions 404.7 (IIS's default deny list: .cs, .config, .asax, ...), hiddenSegments 404.8 (plus the output folder and obj), verbs 404.6, double escaping and '+' 404.11, high-bit 404.12, denyUrlSequences 404.5, denyQueryStringSequences 404.18, maxAllowedContentLength 404.13, maxUrl 404.14, maxQueryString 404.15, headerLimits 404.10, alwaysAllowedUrls |
 | httpProtocol | customHeaders on every response (IIS's default `X-Powered-By: ASP.NET`), redirectHeaders on 3xx, `removeServerHeader` |
 | httpRedirect | destination with the rest of the URL below the configuring level, exactDestination, childOnly, wildcards, status Permanent/Found/Temporary/PermRedirect |
-| URL Rewrite | the app's `<rewrite><rules>` through ASP.NET Core's IIS rule parser. Not supported: rules in subdirectory web.configs, outbound rules |
+| URL Rewrite, inbound | `<rewrite><rules>` of every level (web.config files and `<location>`s), distributed as IIS does: a level's rules apply below it, matched against the URL relative to that level, parents' rules first; a relative rewrite or redirect URL is relative to the level, a '/'-rooted one to the site; isFile/isDirectory resolve under the level. ASP.NET Core's IIS rule parser compiles the rules, and `InboundRewrite` applies them one by one, so `stopProcessing` and redirects end the whole chain |
+| URL Rewrite, outbound | `<outboundRules>` (`OutboundRewrite`, new: ASP.NET Core has none): `serverVariable="RESPONSE_x"` rewrites that header; otherwise the body, by `filterByTags` (A, Area, Base, Form, Frame, Head, IFrame, Img, Input, Link, Script, `<customTags>`) or, without it, every match. preConditions, conditions, negate, ECMAScript/Wildcard/ExactMatch, `{R:n}`/`{C:n}`, server variables, rewrite maps, `{ToLower:}`/`{UrlEncode:}`/`{UrlDecode:}`. A compressed body is not rewritten (IIS: 500.52) |
+| security/ipSecurity | the first `<add>` that matches decides (ipAddress with a dotted mask or prefix length, or domainName with `enableReverseDns`), else `allowUnlisted`; `enableProxyMode` also checks X-Forwarded-For; denyAction Forbidden (403.6, 403.8 by name), Unauthorized, NotFound, AbortRequest |
+| security/dynamicIpSecurity | `denyByConcurrentRequests` (403.501) and `denyByRequestRate` (403.502) per client address, `enableLoggingOnlyMode`, `enableProxyMode`, denyAction |
+| directoryBrowse | `enabled="true"`: a directory without a default document is listed in IIS's format, with `showFlags` (Date, Time, Size, Extension, LongDate); hidden segments, the output folder and dot files are left out. Disabled, the request goes on to the application (as an extensionless URL does in integrated mode) |
 | defaultDocument | IIS's list or the configured one, case-insensitive; 301 courtesy redirect of a directory URL without its trailing slash |
 | staticContent | mimeMap over IIS's default map (ASP.NET Core's provider, derived from it); an unmapped static file is 404.3; clientCache (UseMaxAge, UseExpires, DisableCache, cacheControlCustom) |
 | httpErrors | errorMode (DetailedLocalOnly by default), existingResponse Auto/Replace/PassThrough, error entries by status and substatus, File/ExecuteURL/Redirect. ASP.NET sets `TrySkipIisCustomErrors` on its error pages, so Auto passes them through, as on IIS |
@@ -1022,11 +1026,73 @@ Tests: the 9 AppDomain tests that were skipped now run:
 
 Not done:
 - Windows authentication (needs Kerberos and the Negotiate package);
-- IP restrictions, dynamic content caching and directory browsing (P2/P3);
+- dynamic content caching (output caching in the kernel), `<serverVariables>` set by rewrite rules, the IIS 403.14 for a directory without a default document when browsing is off;
 - configuration errors as 500.19 (a malformed web.config's section is ignored);
 - `cs-username` in the W3C log.
 
 Gate: `test/webForCore.IIS.Sample` and `test/webForCore.IIS.Gate.Tests`: one test or more per feature above, and the in-process restart (new static state, Application_Start again, every request answered during the restart).
+
+### The worker request: what IIS gave ASP.NET (30 Oct 2026)
+
+`AspNetCoreWorkerRequest` (the Kestrel side of `HttpWorkerRequest`):
+- **WebSockets:** `HttpContext.AcceptWebSocketRequest` and `IsWebSocketRequest` work as with IIS 8's WebSocket module. The
+  request runs through the pipeline; its response is held back; then ASP.NET Core makes the handshake (UseWebForms adds
+  `UseWebSockets`) and the application's function runs with an `AspNetWebSocketContext` over Kestrel's WebSocket, which
+  is aborted when the function returns, as on IIS. Options: `SubProtocol`, `RequireSameOrigin`. `WEBSOCKET_VERSION` is
+  set, so Katana's System.Web host enables WebSockets (with a `FIXUPS` entry: Katana required IIS 8). Not done: aborting
+  open sockets when the application shuts down (`AspNetWebSocketManager`).
+- **HTTPS and client certificates:** `IsSecure` (Request.IsSecureConnection, the URL's scheme, SERVER_PORT_SECURE),
+  `HTTPS`, `HTTPS_KEYSIZE`, and `Request.ClientCertificate` with `CERT_FLAGS` (present; issuer not trusted),
+  `CERT_SUBJECT`/`CERT_ISSUER` in IIS's order (C=..., O=..., CN=...), `CERT_SERIALNUMBER` (IIS's dashed form),
+  `CERT_COOKIE`, and the binary issuer, public key and validity. The certificate is the one Kestrel negotiated
+  (`ClientCertificateMode.AllowCertificate` or `RequireCertificate`, IIS's "Accept" and "Require"); no renegotiation.
+  Not available: the server certificate's `CERT_SERVER_*`/`HTTPS_SERVER_*`.
+- **Server variables:** `INSTANCE_ID`, `INSTANCE_META_PATH`, `APPL_MD_PATH`, `GATEWAY_INTERFACE`, `REMOTE_PORT`,
+  `SERVER_SOFTWARE` (Kestrel). As IIS 7's integrated mode does, a variable outside the classic list is asked of the
+  worker request (`HttpServerVarsCollection`).
+- **`IsClientConnected`:** false once the client has gone (`RequestAborted`) or the request timed out (was always true).
+- **`ReadEntityBody(buffer, offset, size)`:** the offset was ignored, so `GetBufferlessInputStream` reads into the middle of
+  a buffer were written at its start.
+- **`executionTimeout`:** ASP.NET aborts the request's thread; .NET cannot. Before, a timed-out request hung for ever:
+  `HttpContext.WaitForExceptionIfCancelled` waited for the abort. Now, when `RequestTimeoutManager` times a request out
+  (its 15-second timer, not with `debug="true"`), the client gets ASP.NET's 500 "Request timed out.", `Request.TimedOutToken`
+  is canceled, and at the next pipeline step the request ends with ASP.NET's `HttpException` ("Request timed out.",
+  through `Application_Error` and the error events). The request's code runs on until it returns (nothing can stop it);
+  what it writes is dropped, and the Kestrel request stays open until then so its HttpContext stays valid.
+
+Gate (`ConnectionTests`): a WebSocket echo through `AcceptWebSocketRequest` (subprotocol, query string, close), the
+handler without an upgrade, the HTTP and HTTPS server variables with a client certificate (the sample listens with TLS
+too, `GATE_HTTPS_PORT`), a timed-out page (500 within the timer's period), a 200 KB bufferless read.
+
+### SignalR 2, ASP.NET Identity 2, System.Web.Optimization (30 Oct 2026)
+
+`tools/lift/lift_aspnet.py` lifts two more of Microsoft's open-source ASP.NET 4.x libraries the way the Web Stack was
+lifted (files byte for byte, `FIXUPS` listed, same assembly names, delay signed with Microsoft's key):
+- **SignalR 2.4.3** (SignalR/SignalR, Apache 2.0): `Microsoft.AspNet.SignalR.Core`, `.SystemWeb` and the .NET client
+  (`.Client`, its netstandard2.0 build). Built as Microsoft built them: `SERVER`, `PERFCOUNTERS`, `NET45`, `SIGNED`, C# 7.3.
+  Fixups: `AssemblyBuilder.DefineDynamicAssembly` (.NET has no `AppDomain.DefineDynamicAssembly`), and a `(string)null`
+  where .NET 11's `ArraySegment<T>` made a null argument ambiguous. Not lifted: the Redis, SQL Server and Service Bus
+  scale-outs, the JavaScript client (an app's own script), self-host.
+- **ASP.NET Identity 2** (aspnet/AspNetIdentity, MIT): `Microsoft.AspNet.Identity.Core`, `.EntityFramework` (on
+  EntityFramework 6.5.1, which runs on .NET), `.Owin`. No source changes.
+- `Microsoft.Owin.Cors` (Katana; for SignalR's tests), through `lift_project.py`.
+- System.Web.Optimization was already ported by WebFormsForCore (`src/WebFormsForCore.Web.Optimization`); the gate checks it.
+
+Tests:
+- **SignalR's unit tests** (`Microsoft.AspNet.SignalR.Tests` with `Tests.Common`, less IIS Express hosting and the Service
+  Bus facts; the stress server's hubs compiled in): 487 of 489 pass, 2 skipped by SignalR. On Microsoft's xunit (2.4.0).
+  Corrected: the check that a thread-pool thread keeps the default culture runs without the test's ExecutionContext
+  (culture flows with it on .NET and .NET Framework 4.6+; BCL). `TieredCompilation=false`: two weak-reference tests rely on
+  a local being dead after its last use, which .NET Framework's JIT gave and .NET's tier-0 code does not.
+- **Identity's tests** (`Identity.Test`): 298 of 311 pass. They need SQL Server: LocalDB is Windows-only, so
+  `tools/lift/sqlserver.sh` runs SQL Server 2022 in a container (podman or docker) and the tests' App.config points at
+  it (`FIXUPS`). On xunit 2 (Microsoft's were on xunit 1.9: `Assert.ThrowsDelegate` is `Action`, `Xunit.Extensions` is
+  gone), one at a time as xunit 1.9 ran them (they share one database), in Pacific time (one test assumes UTC-8).
+  Corrected: .NET's ArgumentException message format (BCL). The 13 failures need DPAPI: they create Katana's
+  `DpapiDataProtectionProvider` for token providers, which is Windows-only (apps use the machine key or Data Protection).
+- **Gate:** a hub in the IIS sample (`App_Code/SignalRStartup.cs`, `OwinStartup`, `MapSignalR`) with SignalR's .NET client
+  over WebSockets, Server-Sent Events and long polling, and `/signalr/hubs`; script and style bundles rendered, served
+  concatenated and minified.
 
 ### System.Drawing on libgdiplus: tried and rejected (30 Oct 2026)
 
@@ -1080,7 +1146,7 @@ The engine:
 - **ImageAttributes:** remap tables, colour keys, colour matrices (with grey modes), threshold, gamma, output channel,
   per adjust type, applied exactly on the CPU.
 
-Not implemented: metafiles (EMF/WMF), Windows handles (HBITMAP, HICON, HRGN, HDC), X11/macOS surfaces, region data,
+Not implemented: metafiles (EMF/WMF), X11/macOS surfaces,
 SaveAdd (multi-frame saving), the encoder parameter list, pen compound arrays and alignment, path-gradient blends and
 focus scales, ICC profiles, JPEG-compressed or tiled TIFF. Text: no font fallback for characters a font lacks, no
 bidirectional or vertical layout, tabs as four spaces.
@@ -1093,3 +1159,41 @@ Tests: System.Web.Helpers.Test's 136 WebImage and Chart tests run (they were ski
 (`x:\file.jpg`, rooted on Windows only) become Linux-rooted, and ChartTest strips a drive letter only if there is one
 (test data, `RE_TRANSFORMS`). **Result: 418/418** (was 279 passed, 136 skipped). With libgdiplus: 79 of 137 passed and
 the process crashed.
+
+### System.Drawing.Common's own tests (30 Oct 2026)
+
+`tools/lift/lift_drawing_tests.py` lifts Microsoft's System.Drawing.Common 6.0 test suite (90 files) with what it needs:
+TestUtilities (PlatformDetection, AssertExtensions) from dotnet/runtime, Microsoft.DotNet.XUnitExtensions and
+RemoteExecutor from dotnet/arcade release/6.0 (built from source instead of the dotnet-eng feed), and the test data
+from dotnet/runtime-assets release/6.0. Test files are unchanged. The suite's "is GDI+ available" checks probe for
+libgdiplus and screen out old libgdiplus builds (by version, and on RedHat/Fedora/openSUSE); those four checks answer
+for SkiaGdiPlus instead (fixups in the script). Selection is upstream's (`category!=failing` on Linux).
+
+Result (tools/lift/test-results, round 11): **3,716 of 3,883 pass** in Microsoft's Linux selection; of the 151
+failures, 141 are metafiles, 8 are deliberate differences from libgdiplus or .NET Core (listed there), 1 compares
+against Windows' pixels and 1 is premultiplied-alpha rounding. Of the 1,008 tests Microsoft disabled on Unix because
+libgdiplus failed them, 560 pass. The first run had 563 failures in the Linux selection.
+
+Engine changes the suite drove, each following Windows GDI+ as the tests record it:
+- **Lift:** `static extern unsafe` imports were not rewritten (GdipGetMatrixElements(float*) still called libgdiplus).
+  Every Graphics function now returns ObjectBusy while the Graphics' HDC is out (generated in the lift).
+- **Pixels:** the GDI+-to-Skia shift is 0.5 - 1/32, not 0.5: Skia's aliased rasterizer rounds an edge on a pixel
+  centre the other way from GDI+, which put fills, clips and even-width pens one pixel off. Aliased 1 px lines cover
+  both end pixels.
+- **Matrix:** IsIdentity within 0.0001; finite overflow saturates at float.MaxValue (infinities stay); non-finite
+  matrices are not invertible; invalid MatrixOrder is rejected (on brushes and pens Multiply treats it as Append and
+  rejects non-invertible matrices); world transforms stay invertible.
+- **LinearGradientBrush:** GDI+'s model, a horizontal gradient across the rectangle mapped by the brush transform; the
+  constructor's angle is in Transform (rotation about the centre, scaled to span the corners).
+- **Graphics:** BeginContainer resets the settings and clip (the outer clip becomes the container's), folds the page
+  transform into the container and rejects World/Display units; DrawImage rejects World/Display source units and
+  overflows past GDI+'s 28.4 fixed-point range.
+- **Handles:** HDC, HICON, HBITMAP and HRGN are handles (libgdiplus's convention, which System.Drawing's Unix code
+  assumes); region data is written and read in GDI+'s format (one node per region; any node tree is read).
+- **Images:** ImageFlags as GDI+ (memory bitmaps HasAlpha only; HasRealDpi only when the file states a resolution;
+  JPEG's colour space), icons decode the image nearest 16x16, PNG/TIFF write alpha unless the format has none
+  (32bppRgb keeps it), default palette flags, missing files are ArgumentException.
+- **Validation and details:** custom line caps, pen caps and dash patterns, path reverse markers and warp, region
+  normalisation and half-open containment, MeasureCharacterRanges ranges and negative layouts, ImageAttributes flags,
+  path-gradient bounds, surround colours and 256/511-point sigma blends, ToLogFont's charset, codec masks.
+

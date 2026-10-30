@@ -98,6 +98,13 @@
     <Project Path="src/webForCore.System.Web.Mvc/webForCore.System.Web.Mvc.csproj" />
     <Project Path="src/webForCore.System.Web.Helpers/webForCore.System.Web.Helpers.csproj" />
     <Project Path="src/webForCore.System.Drawing.Common/webForCore.System.Drawing.Common.csproj" />
+    <Project Path="src/webForCore.Microsoft.Owin.Cors/webForCore.Microsoft.Owin.Cors.csproj" />
+    <Project Path="src/webForCore.Microsoft.AspNet.SignalR.Core/webForCore.Microsoft.AspNet.SignalR.Core.csproj" />
+    <Project Path="src/webForCore.Microsoft.AspNet.SignalR.SystemWeb/webForCore.Microsoft.AspNet.SignalR.SystemWeb.csproj" />
+    <Project Path="src/webForCore.Microsoft.AspNet.SignalR.Client/webForCore.Microsoft.AspNet.SignalR.Client.csproj" />
+    <Project Path="src/webForCore.Microsoft.AspNet.Identity.Core/webForCore.Microsoft.AspNet.Identity.Core.csproj" />
+    <Project Path="src/webForCore.Microsoft.AspNet.Identity.EntityFramework/webForCore.Microsoft.AspNet.Identity.EntityFramework.csproj" />
+    <Project Path="src/webForCore.Microsoft.AspNet.Identity.Owin/webForCore.Microsoft.AspNet.Identity.Owin.csproj" />
     <Project Path="src/webForCore.Microsoft.Web.Mvc/webForCore.Microsoft.Web.Mvc.csproj" />
   </Folder>
   <Folder Name="/Katana/">
@@ -112,6 +119,13 @@
   </Folder>
   <Folder Name="/WebStack.Tests/">
     <Project Path="test/webForCore.Microsoft.TestCommon/webForCore.Microsoft.TestCommon.csproj" />
+    <Project Path="test/webForCore.Microsoft.AspNet.SignalR.Tests.Common/webForCore.Microsoft.AspNet.SignalR.Tests.Common.csproj" />
+    <Project Path="test/webForCore.Microsoft.AspNet.SignalR.Tests/webForCore.Microsoft.AspNet.SignalR.Tests.csproj" />
+    <Project Path="test/webForCore.Identity.Test/webForCore.Identity.Test.csproj" />
+    <Project Path="test/webForCore.Microsoft.DotNet.XUnitExtensions/webForCore.Microsoft.DotNet.XUnitExtensions.csproj" />
+    <Project Path="test/webForCore.Microsoft.DotNet.RemoteExecutor/webForCore.Microsoft.DotNet.RemoteExecutor.csproj" />
+    <Project Path="test/webForCore.TestUtilities/webForCore.TestUtilities.csproj" />
+    <Project Path="test/webForCore.System.Drawing.Common.Tests/webForCore.System.Drawing.Common.Tests.csproj" />
     <Project Path="test/webForCore.System.Net.Http.Formatting.Test/webForCore.System.Net.Http.Formatting.Test.csproj" />
     <Project Path="test/webForCore.System.Web.Razor.Test/webForCore.System.Web.Razor.Test.csproj" />
     <Project Path="test/webForCore.System.Web.Http.Test/webForCore.System.Web.Http.Test.csproj" />

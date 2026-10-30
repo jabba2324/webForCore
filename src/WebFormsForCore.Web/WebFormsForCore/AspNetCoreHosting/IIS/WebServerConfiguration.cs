@@ -43,7 +43,10 @@ namespace WebFormsForCore.Hosting.IIS
 			["security/requestFiltering/requestLimits/headerLimits"] = ("add", new[] { "header" }),
 			["rewrite/rules"] = ("rule", new[] { "name" }),
 			["rewrite/outboundRules"] = ("rule", new[] { "name" }),
+			["rewrite/outboundRules/preConditions"] = ("preCondition", new[] { "name" }),
+			["rewrite/outboundRules/customTags"] = ("tags", new[] { "name" }),
 			["rewrite/rewriteMaps"] = ("rewriteMap", new[] { "name" }),
+			["security/ipSecurity"] = ("add", new[] { "ipAddress", "subnetMask", "domainName" }),
 		};
 
 		// applicationHost.config's defaults for the sections the hosting layer implements (IIS 10).
@@ -54,7 +57,7 @@ namespace WebFormsForCore.Hosting.IIS
       <add value=""iisstart.htm"" /><add value=""default.aspx"" />
     </files>
   </defaultDocument>
-  <directoryBrowse enabled=""false"" />
+  <directoryBrowse enabled=""false"" showFlags=""Date, Time, Size, Extension"" />
   <httpErrors errorMode=""DetailedLocalOnly"" existingResponse=""Auto"" defaultResponseMode=""File"" />
   <httpProtocol allowKeepAlive=""true"">
     <customHeaders><add name=""X-Powered-By"" value=""ASP.NET"" /></customHeaders>
@@ -78,6 +81,11 @@ namespace WebFormsForCore.Hosting.IIS
   </httpCompression>
   <security>
     <authorization><add accessType=""Allow"" users=""*"" /></authorization>
+    <ipSecurity allowUnlisted=""true"" denyAction=""Forbidden"" enableProxyMode=""false"" enableReverseDns=""false"" />
+    <dynamicIpSecurity denyAction=""Forbidden"" enableProxyMode=""false"" enableLoggingOnlyMode=""false"">
+      <denyByConcurrentRequests enabled=""false"" maxConcurrentRequests=""20"" />
+      <denyByRequestRate enabled=""false"" maxRequests=""20"" requestIntervalInMilliseconds=""200"" />
+    </dynamicIpSecurity>
     <requestFiltering allowDoubleEscaping=""false"" allowHighBitCharacters=""true"" removeServerHeader=""false"">
       <fileExtensions allowUnlisted=""true"">
         <add fileExtension="".asa"" allowed=""false"" /><add fileExtension="".asax"" allowed=""false"" />
@@ -265,13 +273,16 @@ namespace WebFormsForCore.Hosting.IIS
 					{
 						var key = Key(child, collection.Key);
 						var existing = target.Elements(collection.Add).FirstOrDefault(e => Key(e, collection.Key) == key);
+						var copy = new XElement(child);
+						// A rewrite rule runs against the URL relative to the level that defined it (distributed rules).
+						if (path == "rewrite/rules" && name == collection.Add) copy.SetAttributeValue(LevelPathAttribute, levelPath);
 						if (name == "remove")
 						{
 							if (existing != null) existing.Remove();
-							else target.Add(new XElement(child));
+							else target.Add(copy);
 						}
-						else if (existing != null) existing.ReplaceWith(new XElement(child));
-						else target.Add(new XElement(child));
+						else if (existing != null) existing.ReplaceWith(copy);
+						else target.Add(copy);
 					}
 					continue;
 				}

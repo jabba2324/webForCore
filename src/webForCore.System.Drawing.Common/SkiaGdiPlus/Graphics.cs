@@ -13,6 +13,11 @@ namespace System.Drawing
 {
     // A Graphics drawing on a bitmap. GDI+ state is kept here and applied for each call: the device matrix is
     // world transform x page transform (unit and scale) x pixel offset, and the clip is a region in device space.
+    internal sealed class GpHdc
+    {
+        public GpGraphics Graphics;
+    }
+
     internal sealed class GpGraphics : IDisposable
     {
         public GpImage Target;
@@ -48,10 +53,13 @@ namespace System.Drawing
             public int TextContrast;
             public Point RenderingOrigin;
             public GpMatrix Container;
+            public GpRegion ContainerClip;
         }
 
-        // Containers: an extra transform (and clip) between the world transform and the page.
+        // Containers: an extra transform between the world transform and the page, and the clip of the enclosing
+        // containers (device space). Inside a container Clip starts infinite and is intersected with ContainerClip.
         public GpMatrix Container = new GpMatrix();
+        public GpRegion ContainerClip = new GpRegion();
 
         public GpGraphics(GpImage target)
         {
@@ -61,14 +69,21 @@ namespace System.Drawing
             DpiY = target.DpiY;
         }
 
-        public void Dispose() => Canvas?.Dispose();
+        public IntPtr Hdc;
+        public bool HdcHeld;
+
+        public void Dispose()
+        {
+            Canvas?.Dispose();
+            if (Hdc != IntPtr.Zero) { SafeNativeMethods.SkiaGdiPlus.Free(Hdc); Hdc = IntPtr.Zero; }
+        }
 
         public State Save() => new State
         {
             World = World.Clone(), PageUnit = PageUnit, PageScale = PageScale, Clip = Clip.Clone(), CompositingMode = CompositingMode,
             CompositingQuality = CompositingQuality, SmoothingMode = SmoothingMode, PixelOffsetMode = PixelOffsetMode,
             InterpolationMode = InterpolationMode, TextRenderingHint = TextRenderingHint, TextContrast = TextContrast,
-            RenderingOrigin = RenderingOrigin, Container = Container.Clone(),
+            RenderingOrigin = RenderingOrigin, Container = Container.Clone(), ContainerClip = ContainerClip.Clone(),
         };
 
         public void Restore(State s)
@@ -76,7 +91,7 @@ namespace System.Drawing
             World = s.World; PageUnit = s.PageUnit; PageScale = s.PageScale; Clip = s.Clip; CompositingMode = s.CompositingMode;
             CompositingQuality = s.CompositingQuality; SmoothingMode = s.SmoothingMode; PixelOffsetMode = s.PixelOffsetMode;
             InterpolationMode = s.InterpolationMode; TextRenderingHint = s.TextRenderingHint; TextContrast = s.TextContrast;
-            RenderingOrigin = s.RenderingOrigin; Container = s.Container;
+            RenderingOrigin = s.RenderingOrigin; Container = s.Container; ContainerClip = s.ContainerClip;
         }
 
         // Pixels per unit.
@@ -98,11 +113,14 @@ namespace System.Drawing
         public bool HalfPixel => PixelOffsetMode == PixelOffsetMode.Half || PixelOffsetMode == PixelOffsetMode.HighQuality;
         public bool AntiAlias => SmoothingMode == SmoothingMode.AntiAlias || SmoothingMode == SmoothingMode.HighQuality;
 
-        // GDI+ (PixelOffsetMode None/Default) puts pixel centres at integer coordinates, Skia at +0.5.
+        // GDI+ (PixelOffsetMode None/Default) puts pixel centres at integer coordinates, Skia at +0.5. The shift is a
+        // little under 0.5: an edge exactly on a pixel centre then covers it on the left/top and not on the
+        // right/bottom, GDI+'s rule (Skia's aliased rasterizer rounds a centre on the edge the other way).
+        public const float PixelShift = 0.5f - 1f / 32;
         public SKMatrix DeviceMatrix(bool forImage = false)
         {
             var m = WorldToDevice.ToSkia();
-            if (!HalfPixel && !forImage) m = m.PostConcat(SKMatrix.CreateTranslation(0.5f, 0.5f));
+            if (!HalfPixel && !forImage) m = m.PostConcat(SKMatrix.CreateTranslation(PixelShift, PixelShift));
             return m;
         }
 
@@ -111,6 +129,7 @@ namespace System.Drawing
         {
             Canvas.Save();
             Canvas.ResetMatrix();
+            if (!ContainerClip.Infinite) Canvas.ClipPath(ContainerClip.Path, SKClipOperation.Intersect, false);
             if (!Clip.Infinite) Canvas.ClipPath(Clip.Path, SKClipOperation.Intersect, false);
             Canvas.SetMatrix(DeviceMatrix(forImage));
             draw(Canvas);
@@ -144,7 +163,13 @@ namespace System.Drawing
         public SKPaint Stroke(GpPen pen)
         {
             var paint = NewPaint();
-            pen.Apply(paint, PenWidth(pen), DeviceMatrix(), RenderingOrigin);
+            float width = PenWidth(pen);
+            pen.Apply(paint, width, DeviceMatrix(), RenderingOrigin);
+            // An aliased line a pixel wide covers both of its end pixels in GDI+; a flat cap would stop half a pixel
+            // short of the last one.
+            var m = WorldToDevice;
+            if (!AntiAlias && paint.StrokeCap == SKStrokeCap.Butt && paint.PathEffect == null && width * Math.Sqrt(Math.Abs(m.Determinant)) <= 1.0001)
+                paint.StrokeCap = SKStrokeCap.Square;
             return paint;
         }
 
@@ -162,6 +187,9 @@ namespace System.Drawing
     internal static unsafe partial class SkiaGdiPlus
     {
         static GpGraphics G(HandleRef g) => Get<GpGraphics>(g);
+
+        // Called by every Graphics flat-API function (lift_drawing.py): the Graphics is busy while its HDC is out.
+        internal static bool GraphicsBusy(HandleRef graphics) => G(graphics)?.HdcHeld == true;
         static GpGraphics G(IntPtr g) => Get<GpGraphics>(g);
 
         internal static int GdipGetImageGraphicsContext(IntPtr image, out IntPtr graphics)
@@ -179,8 +207,27 @@ namespace System.Drawing
         // Not a bitmap: there are no HDCs, windows or X drawables here.
         internal static int GdipCreateFromHDC(IntPtr hdc, out IntPtr graphics) { graphics = IntPtr.Zero; return NotImplemented; }
         internal static int GdipCreateFromHWND(IntPtr hwnd, out IntPtr graphics) { graphics = IntPtr.Zero; return NotImplemented; }
-        internal static int GdipGetDC(HandleRef graphics, out IntPtr hdc) { hdc = IntPtr.Zero; return NotImplemented; }
-        internal static int GdipReleaseDC(HandleRef graphics, HandleRef hdc) => NotImplemented;
+        // There is no GDI to hand a device context to: GetHdc returns a token for the Graphics (the same one each time),
+        // and ReleaseHdc accepts it once per GetHdc, as GDI+ does with a real HDC.
+        internal static int GdipGetDC(HandleRef graphics, out IntPtr hdc)
+        {
+            hdc = IntPtr.Zero;
+            var g = G(graphics);
+            if (g == null) return InvalidParameter;
+            if (g.HdcHeld) return ObjectBusy;
+            if (g.Hdc == IntPtr.Zero) g.Hdc = NewHandle(new GpHdc { Graphics = g });
+            g.HdcHeld = true;
+            hdc = g.Hdc;
+            return Ok;
+        }
+
+        internal static int GdipReleaseDC(HandleRef graphics, HandleRef hdc)
+        {
+            var g = G(graphics);
+            if (g == null || hdc.Handle == IntPtr.Zero || hdc.Handle != g.Hdc || !g.HdcHeld) return InvalidParameter;
+            g.HdcHeld = false;
+            return Ok;
+        }
 
         internal static int GdipFlush(HandleRef graphics, FlushIntention intention)
         {
@@ -194,6 +241,18 @@ namespace System.Drawing
         // State
 
         static int Set(HandleRef graphics, Action<GpGraphics> set) { var g = G(graphics); if (g == null) return InvalidParameter; set(g); return Ok; }
+
+        // GDI+ keeps the world transform invertible: an operation that would make it singular fails and changes nothing.
+        static int World(HandleRef graphics, Action<GpMatrix> op)
+        {
+            var g = G(graphics);
+            if (g == null) return InvalidParameter;
+            var m = g.World.Clone();
+            op(m);
+            if (!m.IsInvertible) return InvalidParameter;
+            g.World = m;
+            return Ok;
+        }
 
         internal static int GdipSetCompositingMode(HandleRef graphics, CompositingMode compositingMode) => Set(graphics, g => g.CompositingMode = compositingMode);
         internal static int GdipGetCompositingMode(HandleRef graphics, out CompositingMode compositingMode) { var g = G(graphics); compositingMode = g?.CompositingMode ?? 0; return g == null ? InvalidParameter : Ok; }
@@ -248,9 +307,22 @@ namespace System.Drawing
             uint id = g.NextState++;
             g.States.Add((id, g.Save()));
             state = (int)id;
-            // The new container: the current world transform becomes part of it, and the world transform starts as identity.
-            g.Container = GpMatrix.Product(container, GpMatrix.Product(g.World, g.Container));
+            // The new container (GDI+): the current world and page transforms become part of it and the clip becomes the
+            // container's; the graphics settings start at their defaults, except the rendering origin.
+            g.Container = GpMatrix.Product(container, GpMatrix.Product(g.World, GpMatrix.Product(g.Container, g.PageMatrix)));
             g.World = new GpMatrix();
+            g.PageUnit = GraphicsUnit.Display;
+            g.PageScale = 1;
+            g.ContainerClip = g.ContainerClip.Clone();
+            g.ContainerClip.Combine(g.Clip, CombineMode.Intersect);
+            g.Clip = new GpRegion();
+            g.CompositingMode = CompositingMode.SourceOver;
+            g.CompositingQuality = CompositingQuality.Default;
+            g.SmoothingMode = SmoothingMode.None;
+            g.PixelOffsetMode = PixelOffsetMode.Default;
+            g.InterpolationMode = InterpolationMode.Bilinear;
+            g.TextRenderingHint = TextRenderingHint.SystemDefault;
+            g.TextContrast = 4;
             return Ok;
         }
 
@@ -259,6 +331,7 @@ namespace System.Drawing
             state = 0;
             var g = G(graphics);
             if (g == null || srcRect.Width == 0 || srcRect.Height == 0) return InvalidParameter;
+            if (unit < GraphicsUnit.Pixel || unit > GraphicsUnit.Millimeter) return InvalidParameter; // not World or Display
             float scale = GpGraphics.UnitScale(unit, g.DpiX) / GpGraphics.UnitScale(g.PageUnit, g.DpiX) / g.PageScale;
             var m = new GpMatrix();
             m.Translate(-srcRect.X, -srcRect.Y, MatrixOrder.Append);
@@ -300,15 +373,15 @@ namespace System.Drawing
         {
             var g = G(graphics);
             var m = Get<GpMatrix>(matrix);
-            if (g == null || m == null) return InvalidParameter;
+            if (g == null || m == null || BadOrder(order)) return InvalidParameter;
             if (!m.IsInvertible) return InvalidParameter;
             g.World.Multiply(m, order);
             return Ok;
         }
 
-        internal static int GdipTranslateWorldTransform(HandleRef graphics, float dx, float dy, MatrixOrder order) => Set(graphics, g => g.World.Translate(dx, dy, order));
-        internal static int GdipScaleWorldTransform(HandleRef graphics, float sx, float sy, MatrixOrder order) => Set(graphics, g => g.World.Scale(sx, sy, order));
-        internal static int GdipRotateWorldTransform(HandleRef graphics, float angle, MatrixOrder order) => Set(graphics, g => g.World.Rotate(angle, order));
+        internal static int GdipTranslateWorldTransform(HandleRef graphics, float dx, float dy, MatrixOrder order) => BadOrder(order) ? InvalidParameter : World(graphics, m => m.Translate(dx, dy, order));
+        internal static int GdipScaleWorldTransform(HandleRef graphics, float sx, float sy, MatrixOrder order) => BadOrder(order) ? InvalidParameter : World(graphics, m => m.Scale(sx, sy, order));
+        internal static int GdipRotateWorldTransform(HandleRef graphics, float angle, MatrixOrder order) => BadOrder(order) ? InvalidParameter : World(graphics, m => m.Rotate(angle, order));
         internal static int GdipGetWorldTransform(HandleRef graphics, HandleRef matrix) { var g = G(graphics); var m = Get<GpMatrix>(matrix); if (g == null || m == null) return InvalidParameter; m.Set(g.World); return Ok; }
 
         // CoordinateSpace: World 0, Page 1, Device 2.
@@ -436,6 +509,7 @@ namespace System.Drawing
         static GpRegion VisibleClip(GpGraphics g)
         {
             var visible = GpRegion.FromRect(new RectangleF(0, 0, g.Target.Width, g.Target.Height));
+            visible.Combine(g.ContainerClip, CombineMode.Intersect);
             visible.Combine(g.Clip, CombineMode.Intersect);
             return visible;
         }
@@ -776,6 +850,13 @@ namespace System.Drawing
         static int DrawImage(GpGraphics g, GpImage image, RectangleF src, PointF ul, PointF ur, PointF ll, GpImageAttributes attributes)
         {
             if (g == null || image == null) return InvalidParameter;
+            // GDI+ rasterizes in 28.4 fixed point: a destination beyond its range is ValueOverflow (OverflowException).
+            var device = g.WorldToDevice;
+            foreach (var p in new[] { ul, ur, ll })
+            {
+                var d = device.Transform(p);
+                if (!(Math.Abs(d.X) < FixedPointLimit && Math.Abs(d.Y) < FixedPointLimit)) return ValueOverflow;
+            }
             if (src.Width == 0 || src.Height == 0) return Ok;
             var pixels = attributes != null ? attributes.Apply(image.Pixels, ColorAdjustType.Bitmap) : image.Pixels;
             try
@@ -806,6 +887,11 @@ namespace System.Drawing
             float sx = GpGraphics.UnitScale(unit, image.DpiX), sy = GpGraphics.UnitScale(unit, image.DpiY);
             return new RectangleF(src.X * sx, src.Y * sy, src.Width * sx, src.Height * sy);
         }
+
+        const float FixedPointLimit = 1 << 23;
+
+        // DrawImage's source rectangle is in an image unit: World and Display are not units of an image (GDI+).
+        static bool BadSourceUnit(GraphicsUnit unit) => unit == GraphicsUnit.World || unit == GraphicsUnit.Display || unit < 0 || unit > GraphicsUnit.Millimeter;
 
         static int DrawImageRect(GpGraphics g, GpImage image, RectangleF dst, RectangleF src, GpImageAttributes attributes)
             => DrawImage(g, image, src, dst.Location, new PointF(dst.Right, dst.Top), new PointF(dst.Left, dst.Bottom), attributes);
@@ -854,7 +940,7 @@ namespace System.Drawing
         internal static int GdipDrawImageRectRect(HandleRef graphics, HandleRef image, float dstx, float dsty, float dstwidth, float dstheight, float srcx, float srcy, float srcwidth, float srcheight, GraphicsUnit srcunit, HandleRef imageAttributes, Graphics.DrawImageAbort? callback, HandleRef callbackdata)
         {
             var img = Image(image);
-            if (img == null) return InvalidParameter;
+            if (img == null || BadSourceUnit(srcunit)) return InvalidParameter;
             var src = SourcePixels(img, new RectangleF(srcx, srcy, srcwidth, srcheight), srcunit);
             return DrawImageRect(G(graphics), img, new RectangleF(dstx, dsty, dstwidth, dstheight), src, Get<GpImageAttributes>(imageAttributes));
         }
@@ -880,7 +966,7 @@ namespace System.Drawing
         internal static int GdipDrawImagePointsRect(HandleRef graphics, HandleRef image, PointF* points, int count, float srcx, float srcy, float srcwidth, float srcheight, GraphicsUnit srcunit, HandleRef imageAttributes, Graphics.DrawImageAbort? callback, HandleRef callbackdata)
         {
             var img = Image(image);
-            if (img == null || points == null) return InvalidParameter;
+            if (img == null || points == null || BadSourceUnit(srcunit)) return InvalidParameter;
             if (count != 3) return NotImplemented;
             var src = SourcePixels(img, new RectangleF(srcx, srcy, srcwidth, srcheight), srcunit);
             return DrawImage(G(graphics), img, src, points[0], points[1], points[2], Get<GpImageAttributes>(imageAttributes));

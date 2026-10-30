@@ -18,15 +18,21 @@ namespace System.Drawing
         public GpMatrix Clone() => (GpMatrix)MemberwiseClone();
         public void Set(GpMatrix m) { M11 = m.M11; M12 = m.M12; M21 = m.M21; M22 = m.M22; Dx = m.Dx; Dy = m.Dy; }
         public void Reset() => Set(new GpMatrix());
-        public bool IsIdentity => M11 == 1 && M12 == 0 && M21 == 0 && M22 == 1 && Dx == 0 && Dy == 0;
+        // GDI+ treats elements within 0.0001 of the identity's as identity (Equals stays exact).
+        public bool IsIdentity => NearOne(M11) && NearZero(M12) && NearZero(M21) && NearOne(M22) && NearZero(Dx) && NearZero(Dy);
+        static bool NearOne(float v) => v >= 0.9999f && v <= 1.0001f;
+        static bool NearZero(float v) => v >= -0.0001f && v <= 0.0001f;
         public float Determinant => M11 * M22 - M12 * M21;
-        public bool IsInvertible => Math.Abs(Determinant) > 1e-12f;
+        bool IsFinite => float.IsFinite(M11) && float.IsFinite(M12) && float.IsFinite(M21) && float.IsFinite(M22) && float.IsFinite(Dx) && float.IsFinite(Dy);
+        public bool IsInvertible => IsFinite && Math.Abs(Determinant) > 1e-12f;
 
-        // a * b: a applied first.
+        // a * b: a applied first. Finite results that overflow a float saturate at float.MaxValue, as GDI+'s do;
+        // infinite elements stay infinite.
         public static GpMatrix Product(GpMatrix a, GpMatrix b) => new GpMatrix(
-            a.M11 * b.M11 + a.M12 * b.M21, a.M11 * b.M12 + a.M12 * b.M22,
-            a.M21 * b.M11 + a.M22 * b.M21, a.M21 * b.M12 + a.M22 * b.M22,
-            a.Dx * b.M11 + a.Dy * b.M21 + b.Dx, a.Dx * b.M12 + a.Dy * b.M22 + b.Dy);
+            Sat((double)a.M11 * b.M11 + (double)a.M12 * b.M21), Sat((double)a.M11 * b.M12 + (double)a.M12 * b.M22),
+            Sat((double)a.M21 * b.M11 + (double)a.M22 * b.M21), Sat((double)a.M21 * b.M12 + (double)a.M22 * b.M22),
+            Sat((double)a.Dx * b.M11 + (double)a.Dy * b.M21 + b.Dx), Sat((double)a.Dx * b.M12 + (double)a.Dy * b.M22 + b.Dy));
+        static float Sat(double v) => double.IsInfinity(v) ? (float)v : v > float.MaxValue ? float.MaxValue : v < -float.MaxValue ? -float.MaxValue : (float)v;
 
         // Prepend: m applied before this; Append: after.
         public void Multiply(GpMatrix m, MatrixOrder order) => Set(order == MatrixOrder.Prepend ? Product(m, this) : Product(this, m));
@@ -43,7 +49,7 @@ namespace System.Drawing
         public bool Invert()
         {
             float det = Determinant;
-            if (Math.Abs(det) < 1e-12f) return false;
+            if (!IsFinite || Math.Abs(det) < 1e-12f) return false;
             Set(new GpMatrix(M22 / det, -M12 / det, -M21 / det, M11 / det, (M21 * Dy - M22 * Dx) / det, (M12 * Dx - M11 * Dy) / det));
             return true;
         }

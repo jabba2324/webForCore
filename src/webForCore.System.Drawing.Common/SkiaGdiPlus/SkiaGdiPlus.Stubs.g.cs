@@ -14,15 +14,7 @@ internal static partial class SafeNativeMethods
     internal static unsafe partial class SkiaGdiPlus
     {
         internal static int GdipCreateFontFromDC(IntPtr hdc, ref IntPtr font) { return NotImplemented; }
-        internal static int GdipCreateRegionRgnData(byte[] rgndata, int size, out IntPtr region) { region = default; return NotImplemented; }
-        internal static int GdipCreateRegionHrgn(IntPtr hRgn, out IntPtr region) { region = default; return NotImplemented; }
-        internal static int GdipGetRegionDataSize(HandleRef region, out int bufferSize) { bufferSize = default; return NotImplemented; }
-        internal static int GdipGetRegionData(HandleRef region, byte[] regionData, int bufferSize, out int sizeFilled) { sizeFilled = default; return NotImplemented; }
-        internal static int GdipCreateBitmapFromHBITMAP(IntPtr hbitmap, IntPtr hpalette, out IntPtr bitmap) { bitmap = default; return NotImplemented; }
-        internal static int GdipCreateBitmapFromHICON(IntPtr hicon, out IntPtr bitmap) { bitmap = default; return NotImplemented; }
         internal static int GdipCreateBitmapFromResource(IntPtr hresource, IntPtr name, out IntPtr bitmap) { bitmap = default; return NotImplemented; }
-        internal static int GdipCreateHBITMAPFromBitmap(HandleRef nativeBitmap, out IntPtr hbitmap, int argbBackground) { hbitmap = default; return NotImplemented; }
-        internal static int GdipCreateHICONFromBitmap(HandleRef nativeBitmap, out IntPtr hicon) { hicon = default; return NotImplemented; }
         internal static int GdipCreateMetafileFromEmf(IntPtr hEnhMetafile, bool deleteEmf, out IntPtr metafile) { metafile = default; return NotImplemented; }
         internal static int GdipCreateMetafileFromWmf(IntPtr hMetafile, bool deleteWmf, WmfPlaceableFileHeader wmfplacealbeHeader, out IntPtr metafile) { metafile = default; return NotImplemented; }
         internal static int GdipCreateMetafileFromFile(string file, out IntPtr metafile) { metafile = default; return NotImplemented; }

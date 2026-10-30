@@ -16,16 +16,16 @@ namespace System.Drawing
         {
             // Shared function imports (all platforms)
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipBeginContainer(HandleRef graphics, ref RectangleF dstRect, ref RectangleF srcRect, GraphicsUnit unit, out int state) => SkiaGdiPlus.GdipBeginContainer(graphics, ref dstRect, ref srcRect, unit, out state);
+            internal static int GdipBeginContainer(HandleRef graphics, ref RectangleF dstRect, ref RectangleF srcRect, GraphicsUnit unit, out int state) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { state = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipBeginContainer(graphics, ref dstRect, ref srcRect, unit, out state); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipBeginContainer2(HandleRef graphics, out int state) => SkiaGdiPlus.GdipBeginContainer2(graphics, out state);
+            internal static int GdipBeginContainer2(HandleRef graphics, out int state) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { state = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipBeginContainer2(graphics, out state); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipBeginContainerI(HandleRef graphics, ref Rectangle dstRect, ref Rectangle srcRect, GraphicsUnit unit, out int state) => SkiaGdiPlus.GdipBeginContainerI(graphics, ref dstRect, ref srcRect, unit, out state);
+            internal static int GdipBeginContainerI(HandleRef graphics, ref Rectangle dstRect, ref Rectangle srcRect, GraphicsUnit unit, out int state) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { state = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipBeginContainerI(graphics, ref dstRect, ref srcRect, unit, out state); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipEndContainer(HandleRef graphics, int state) => SkiaGdiPlus.GdipEndContainer(graphics, state);
+            internal static int GdipEndContainer(HandleRef graphics, int state) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipEndContainer(graphics, state);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
             internal static int GdipCreateAdjustableArrowCap(float height, float width, bool isFilled, out IntPtr adjustableArrowCap) => SkiaGdiPlus.GdipCreateAdjustableArrowCap(height, width, isFilled, out adjustableArrowCap);
@@ -662,91 +662,91 @@ namespace System.Drawing
             internal static int GdipGetPenCompoundArray(HandleRef pen, float[] array, int count) => SkiaGdiPlus.GdipGetPenCompoundArray(pen, array, count);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipSetWorldTransform(HandleRef graphics, HandleRef matrix) => SkiaGdiPlus.GdipSetWorldTransform(graphics, matrix);
+            internal static int GdipSetWorldTransform(HandleRef graphics, HandleRef matrix) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipSetWorldTransform(graphics, matrix);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipResetWorldTransform(HandleRef graphics) => SkiaGdiPlus.GdipResetWorldTransform(graphics);
+            internal static int GdipResetWorldTransform(HandleRef graphics) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipResetWorldTransform(graphics);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipMultiplyWorldTransform(HandleRef graphics, HandleRef matrix, MatrixOrder order) => SkiaGdiPlus.GdipMultiplyWorldTransform(graphics, matrix, order);
+            internal static int GdipMultiplyWorldTransform(HandleRef graphics, HandleRef matrix, MatrixOrder order) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipMultiplyWorldTransform(graphics, matrix, order);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipTranslateWorldTransform(HandleRef graphics, float dx, float dy, MatrixOrder order) => SkiaGdiPlus.GdipTranslateWorldTransform(graphics, dx, dy, order);
+            internal static int GdipTranslateWorldTransform(HandleRef graphics, float dx, float dy, MatrixOrder order) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipTranslateWorldTransform(graphics, dx, dy, order);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipScaleWorldTransform(HandleRef graphics, float sx, float sy, MatrixOrder order) => SkiaGdiPlus.GdipScaleWorldTransform(graphics, sx, sy, order);
+            internal static int GdipScaleWorldTransform(HandleRef graphics, float sx, float sy, MatrixOrder order) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipScaleWorldTransform(graphics, sx, sy, order);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipRotateWorldTransform(HandleRef graphics, float angle, MatrixOrder order) => SkiaGdiPlus.GdipRotateWorldTransform(graphics, angle, order);
+            internal static int GdipRotateWorldTransform(HandleRef graphics, float angle, MatrixOrder order) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipRotateWorldTransform(graphics, angle, order);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipGetWorldTransform(HandleRef graphics, HandleRef matrix) => SkiaGdiPlus.GdipGetWorldTransform(graphics, matrix);
+            internal static int GdipGetWorldTransform(HandleRef graphics, HandleRef matrix) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipGetWorldTransform(graphics, matrix);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipSetCompositingMode(HandleRef graphics, CompositingMode compositingMode) => SkiaGdiPlus.GdipSetCompositingMode(graphics, compositingMode);
+            internal static int GdipSetCompositingMode(HandleRef graphics, CompositingMode compositingMode) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipSetCompositingMode(graphics, compositingMode);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipSetTextRenderingHint(HandleRef graphics, TextRenderingHint textRenderingHint) => SkiaGdiPlus.GdipSetTextRenderingHint(graphics, textRenderingHint);
+            internal static int GdipSetTextRenderingHint(HandleRef graphics, TextRenderingHint textRenderingHint) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipSetTextRenderingHint(graphics, textRenderingHint);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipSetTextContrast(HandleRef graphics, int textContrast) => SkiaGdiPlus.GdipSetTextContrast(graphics, textContrast);
+            internal static int GdipSetTextContrast(HandleRef graphics, int textContrast) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipSetTextContrast(graphics, textContrast);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipSetInterpolationMode(HandleRef graphics, InterpolationMode interpolationMode) => SkiaGdiPlus.GdipSetInterpolationMode(graphics, interpolationMode);
+            internal static int GdipSetInterpolationMode(HandleRef graphics, InterpolationMode interpolationMode) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipSetInterpolationMode(graphics, interpolationMode);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipGetCompositingMode(HandleRef graphics, out CompositingMode compositingMode) => SkiaGdiPlus.GdipGetCompositingMode(graphics, out compositingMode);
+            internal static int GdipGetCompositingMode(HandleRef graphics, out CompositingMode compositingMode) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { compositingMode = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipGetCompositingMode(graphics, out compositingMode); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipSetRenderingOrigin(HandleRef graphics, int x, int y) => SkiaGdiPlus.GdipSetRenderingOrigin(graphics, x, y);
+            internal static int GdipSetRenderingOrigin(HandleRef graphics, int x, int y) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipSetRenderingOrigin(graphics, x, y);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipGetRenderingOrigin(HandleRef graphics, out int x, out int y) => SkiaGdiPlus.GdipGetRenderingOrigin(graphics, out x, out y);
+            internal static int GdipGetRenderingOrigin(HandleRef graphics, out int x, out int y) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { x = default; y = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipGetRenderingOrigin(graphics, out x, out y); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipSetCompositingQuality(HandleRef graphics, CompositingQuality quality) => SkiaGdiPlus.GdipSetCompositingQuality(graphics, quality);
+            internal static int GdipSetCompositingQuality(HandleRef graphics, CompositingQuality quality) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipSetCompositingQuality(graphics, quality);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipGetCompositingQuality(HandleRef graphics, out CompositingQuality quality) => SkiaGdiPlus.GdipGetCompositingQuality(graphics, out quality);
+            internal static int GdipGetCompositingQuality(HandleRef graphics, out CompositingQuality quality) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { quality = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipGetCompositingQuality(graphics, out quality); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipSetSmoothingMode(HandleRef graphics, SmoothingMode smoothingMode) => SkiaGdiPlus.GdipSetSmoothingMode(graphics, smoothingMode);
+            internal static int GdipSetSmoothingMode(HandleRef graphics, SmoothingMode smoothingMode) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipSetSmoothingMode(graphics, smoothingMode);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipGetSmoothingMode(HandleRef graphics, out SmoothingMode smoothingMode) => SkiaGdiPlus.GdipGetSmoothingMode(graphics, out smoothingMode);
+            internal static int GdipGetSmoothingMode(HandleRef graphics, out SmoothingMode smoothingMode) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { smoothingMode = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipGetSmoothingMode(graphics, out smoothingMode); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipSetPixelOffsetMode(HandleRef graphics, PixelOffsetMode pixelOffsetMode) => SkiaGdiPlus.GdipSetPixelOffsetMode(graphics, pixelOffsetMode);
+            internal static int GdipSetPixelOffsetMode(HandleRef graphics, PixelOffsetMode pixelOffsetMode) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipSetPixelOffsetMode(graphics, pixelOffsetMode);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipGetPixelOffsetMode(HandleRef graphics, out PixelOffsetMode pixelOffsetMode) => SkiaGdiPlus.GdipGetPixelOffsetMode(graphics, out pixelOffsetMode);
+            internal static int GdipGetPixelOffsetMode(HandleRef graphics, out PixelOffsetMode pixelOffsetMode) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { pixelOffsetMode = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipGetPixelOffsetMode(graphics, out pixelOffsetMode); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipGetTextRenderingHint(HandleRef graphics, out TextRenderingHint textRenderingHint) => SkiaGdiPlus.GdipGetTextRenderingHint(graphics, out textRenderingHint);
+            internal static int GdipGetTextRenderingHint(HandleRef graphics, out TextRenderingHint textRenderingHint) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { textRenderingHint = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipGetTextRenderingHint(graphics, out textRenderingHint); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipGetTextContrast(HandleRef graphics, out int textContrast) => SkiaGdiPlus.GdipGetTextContrast(graphics, out textContrast);
+            internal static int GdipGetTextContrast(HandleRef graphics, out int textContrast) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { textContrast = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipGetTextContrast(graphics, out textContrast); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipGetInterpolationMode(HandleRef graphics, out InterpolationMode interpolationMode) => SkiaGdiPlus.GdipGetInterpolationMode(graphics, out interpolationMode);
+            internal static int GdipGetInterpolationMode(HandleRef graphics, out InterpolationMode interpolationMode) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { interpolationMode = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipGetInterpolationMode(graphics, out interpolationMode); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipGetPageUnit(HandleRef graphics, out GraphicsUnit unit) => SkiaGdiPlus.GdipGetPageUnit(graphics, out unit);
+            internal static int GdipGetPageUnit(HandleRef graphics, out GraphicsUnit unit) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { unit = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipGetPageUnit(graphics, out unit); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipGetPageScale(HandleRef graphics, out float scale) => SkiaGdiPlus.GdipGetPageScale(graphics, out scale);
+            internal static int GdipGetPageScale(HandleRef graphics, out float scale) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { scale = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipGetPageScale(graphics, out scale); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipSetPageUnit(HandleRef graphics, GraphicsUnit unit) => SkiaGdiPlus.GdipSetPageUnit(graphics, unit);
+            internal static int GdipSetPageUnit(HandleRef graphics, GraphicsUnit unit) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipSetPageUnit(graphics, unit);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipSetPageScale(HandleRef graphics, float scale) => SkiaGdiPlus.GdipSetPageScale(graphics, scale);
+            internal static int GdipSetPageScale(HandleRef graphics, float scale) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipSetPageScale(graphics, scale);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipGetDpiX(HandleRef graphics, out float dpi) => SkiaGdiPlus.GdipGetDpiX(graphics, out dpi);
+            internal static int GdipGetDpiX(HandleRef graphics, out float dpi) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { dpi = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipGetDpiX(graphics, out dpi); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipGetDpiY(HandleRef graphics, out float dpi) => SkiaGdiPlus.GdipGetDpiY(graphics, out dpi);
+            internal static int GdipGetDpiY(HandleRef graphics, out float dpi) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { dpi = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipGetDpiY(graphics, out dpi); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
             internal static int GdipCreateMatrix(out IntPtr matrix) => SkiaGdiPlus.GdipCreateMatrix(out matrix);
@@ -799,8 +799,8 @@ namespace System.Drawing
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
             internal static int GdipVectorTransformMatrixPointsI(HandleRef matrix, Point* pts, int count) => SkiaGdiPlus.GdipVectorTransformMatrixPointsI(matrix, pts, count);
 
-            [DllImport(LibraryName, ExactSpelling = true)]
-            internal static extern unsafe int GdipGetMatrixElements(HandleRef matrix, float* m);
+            // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
+            internal static unsafe int GdipGetMatrixElements(HandleRef matrix, float* m) => SkiaGdiPlus.GdipGetMatrixElements(matrix, m);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
             internal static int GdipIsMatrixInvertible(HandleRef matrix, out int boolean) => SkiaGdiPlus.GdipIsMatrixInvertible(matrix, out boolean);
@@ -836,7 +836,7 @@ namespace System.Drawing
             internal static int GdipDeleteRegion(HandleRef region) => SkiaGdiPlus.GdipDeleteRegion(region);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipFillRegion(HandleRef graphics, HandleRef brush, HandleRef region) => SkiaGdiPlus.GdipFillRegion(graphics, brush, region);
+            internal static int GdipFillRegion(HandleRef graphics, HandleRef brush, HandleRef region) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipFillRegion(graphics, brush, region);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
             internal static int GdipSetInfinite(HandleRef region) => SkiaGdiPlus.GdipSetInfinite(region);
@@ -908,55 +908,55 @@ namespace System.Drawing
             internal static int GdipCreateFromHDC(IntPtr hdc, out IntPtr graphics) => SkiaGdiPlus.GdipCreateFromHDC(hdc, out graphics);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipSetClipGraphics(HandleRef graphics, HandleRef srcgraphics, CombineMode mode) => SkiaGdiPlus.GdipSetClipGraphics(graphics, srcgraphics, mode);
+            internal static int GdipSetClipGraphics(HandleRef graphics, HandleRef srcgraphics, CombineMode mode) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipSetClipGraphics(graphics, srcgraphics, mode);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipSetClipRect(HandleRef graphics, float x, float y, float width, float height, CombineMode mode) => SkiaGdiPlus.GdipSetClipRect(graphics, x, y, width, height, mode);
+            internal static int GdipSetClipRect(HandleRef graphics, float x, float y, float width, float height, CombineMode mode) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipSetClipRect(graphics, x, y, width, height, mode);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipSetClipRectI(HandleRef graphics, int x, int y, int width, int height, CombineMode mode) => SkiaGdiPlus.GdipSetClipRectI(graphics, x, y, width, height, mode);
+            internal static int GdipSetClipRectI(HandleRef graphics, int x, int y, int width, int height, CombineMode mode) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipSetClipRectI(graphics, x, y, width, height, mode);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipSetClipPath(HandleRef graphics, HandleRef path, CombineMode mode) => SkiaGdiPlus.GdipSetClipPath(graphics, path, mode);
+            internal static int GdipSetClipPath(HandleRef graphics, HandleRef path, CombineMode mode) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipSetClipPath(graphics, path, mode);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipSetClipRegion(HandleRef graphics, HandleRef region, CombineMode mode) => SkiaGdiPlus.GdipSetClipRegion(graphics, region, mode);
+            internal static int GdipSetClipRegion(HandleRef graphics, HandleRef region, CombineMode mode) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipSetClipRegion(graphics, region, mode);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipResetClip(HandleRef graphics) => SkiaGdiPlus.GdipResetClip(graphics);
+            internal static int GdipResetClip(HandleRef graphics) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipResetClip(graphics);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipTranslateClip(HandleRef graphics, float dx, float dy) => SkiaGdiPlus.GdipTranslateClip(graphics, dx, dy);
+            internal static int GdipTranslateClip(HandleRef graphics, float dx, float dy) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipTranslateClip(graphics, dx, dy);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipGetClip(HandleRef graphics, HandleRef region) => SkiaGdiPlus.GdipGetClip(graphics, region);
+            internal static int GdipGetClip(HandleRef graphics, HandleRef region) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipGetClip(graphics, region);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipGetClipBounds(HandleRef graphics, out RectangleF rect) => SkiaGdiPlus.GdipGetClipBounds(graphics, out rect);
+            internal static int GdipGetClipBounds(HandleRef graphics, out RectangleF rect) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { rect = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipGetClipBounds(graphics, out rect); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipIsClipEmpty(HandleRef graphics, out bool result) => SkiaGdiPlus.GdipIsClipEmpty(graphics, out result);
+            internal static int GdipIsClipEmpty(HandleRef graphics, out bool result) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { result = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipIsClipEmpty(graphics, out result); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipGetVisibleClipBounds(HandleRef graphics, out RectangleF rect) => SkiaGdiPlus.GdipGetVisibleClipBounds(graphics, out rect);
+            internal static int GdipGetVisibleClipBounds(HandleRef graphics, out RectangleF rect) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { rect = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipGetVisibleClipBounds(graphics, out rect); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipIsVisibleClipEmpty(HandleRef graphics, out bool result) => SkiaGdiPlus.GdipIsVisibleClipEmpty(graphics, out result);
+            internal static int GdipIsVisibleClipEmpty(HandleRef graphics, out bool result) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { result = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipIsVisibleClipEmpty(graphics, out result); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipIsVisiblePoint(HandleRef graphics, float x, float y, out bool result) => SkiaGdiPlus.GdipIsVisiblePoint(graphics, x, y, out result);
+            internal static int GdipIsVisiblePoint(HandleRef graphics, float x, float y, out bool result) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { result = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipIsVisiblePoint(graphics, x, y, out result); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipIsVisiblePointI(HandleRef graphics, int x, int y, out bool result) => SkiaGdiPlus.GdipIsVisiblePointI(graphics, x, y, out result);
+            internal static int GdipIsVisiblePointI(HandleRef graphics, int x, int y, out bool result) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { result = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipIsVisiblePointI(graphics, x, y, out result); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipIsVisibleRect(HandleRef graphics, float x, float y, float width, float height, out bool result) => SkiaGdiPlus.GdipIsVisibleRect(graphics, x, y, width, height, out result);
+            internal static int GdipIsVisibleRect(HandleRef graphics, float x, float y, float width, float height, out bool result) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { result = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipIsVisibleRect(graphics, x, y, width, height, out result); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipIsVisibleRectI(HandleRef graphics, int x, int y, int width, int height, out bool result) => SkiaGdiPlus.GdipIsVisibleRectI(graphics, x, y, width, height, out result);
+            internal static int GdipIsVisibleRectI(HandleRef graphics, int x, int y, int width, int height, out bool result) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { result = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipIsVisibleRectI(graphics, x, y, width, height, out result); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipFlush(HandleRef graphics, FlushIntention intention) => SkiaGdiPlus.GdipFlush(graphics, intention);
+            internal static int GdipFlush(HandleRef graphics, FlushIntention intention) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipFlush(graphics, intention);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
             internal static int GdipGetDC(HandleRef graphics, out IntPtr hdc) => SkiaGdiPlus.GdipGetDC(graphics, out hdc);
@@ -1181,187 +1181,187 @@ namespace System.Drawing
             internal static int GdipPlayMetafileRecord(HandleRef metafile, EmfPlusRecordType recordType, int flags, int dataSize, byte[] data) => SkiaGdiPlus.GdipPlayMetafileRecord(metafile, recordType, flags, dataSize, data);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipSaveGraphics(HandleRef graphics, out int state) => SkiaGdiPlus.GdipSaveGraphics(graphics, out state);
+            internal static int GdipSaveGraphics(HandleRef graphics, out int state) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { state = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipSaveGraphics(graphics, out state); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawArc(HandleRef graphics, HandleRef pen, float x, float y, float width, float height, float startAngle, float sweepAngle) => SkiaGdiPlus.GdipDrawArc(graphics, pen, x, y, width, height, startAngle, sweepAngle);
+            internal static int GdipDrawArc(HandleRef graphics, HandleRef pen, float x, float y, float width, float height, float startAngle, float sweepAngle) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawArc(graphics, pen, x, y, width, height, startAngle, sweepAngle);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawArcI(HandleRef graphics, HandleRef pen, int x, int y, int width, int height, float startAngle, float sweepAngle) => SkiaGdiPlus.GdipDrawArcI(graphics, pen, x, y, width, height, startAngle, sweepAngle);
+            internal static int GdipDrawArcI(HandleRef graphics, HandleRef pen, int x, int y, int width, int height, float startAngle, float sweepAngle) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawArcI(graphics, pen, x, y, width, height, startAngle, sweepAngle);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawLinesI(HandleRef graphics, HandleRef pen, Point* points, int count) => SkiaGdiPlus.GdipDrawLinesI(graphics, pen, points, count);
+            internal static int GdipDrawLinesI(HandleRef graphics, HandleRef pen, Point* points, int count) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawLinesI(graphics, pen, points, count);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawBezier(HandleRef graphics, HandleRef pen, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) => SkiaGdiPlus.GdipDrawBezier(graphics, pen, x1, y1, x2, y2, x3, y3, x4, y4);
+            internal static int GdipDrawBezier(HandleRef graphics, HandleRef pen, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawBezier(graphics, pen, x1, y1, x2, y2, x3, y3, x4, y4);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawEllipse(HandleRef graphics, HandleRef pen, float x, float y, float width, float height) => SkiaGdiPlus.GdipDrawEllipse(graphics, pen, x, y, width, height);
+            internal static int GdipDrawEllipse(HandleRef graphics, HandleRef pen, float x, float y, float width, float height) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawEllipse(graphics, pen, x, y, width, height);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawEllipseI(HandleRef graphics, HandleRef pen, int x, int y, int width, int height) => SkiaGdiPlus.GdipDrawEllipseI(graphics, pen, x, y, width, height);
+            internal static int GdipDrawEllipseI(HandleRef graphics, HandleRef pen, int x, int y, int width, int height) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawEllipseI(graphics, pen, x, y, width, height);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawLine(HandleRef graphics, HandleRef pen, float x1, float y1, float x2, float y2) => SkiaGdiPlus.GdipDrawLine(graphics, pen, x1, y1, x2, y2);
+            internal static int GdipDrawLine(HandleRef graphics, HandleRef pen, float x1, float y1, float x2, float y2) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawLine(graphics, pen, x1, y1, x2, y2);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawLineI(HandleRef graphics, HandleRef pen, int x1, int y1, int x2, int y2) => SkiaGdiPlus.GdipDrawLineI(graphics, pen, x1, y1, x2, y2);
+            internal static int GdipDrawLineI(HandleRef graphics, HandleRef pen, int x1, int y1, int x2, int y2) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawLineI(graphics, pen, x1, y1, x2, y2);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawLines(HandleRef graphics, HandleRef pen, PointF* points, int count) => SkiaGdiPlus.GdipDrawLines(graphics, pen, points, count);
+            internal static int GdipDrawLines(HandleRef graphics, HandleRef pen, PointF* points, int count) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawLines(graphics, pen, points, count);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawPath(HandleRef graphics, HandleRef pen, HandleRef path) => SkiaGdiPlus.GdipDrawPath(graphics, pen, path);
+            internal static int GdipDrawPath(HandleRef graphics, HandleRef pen, HandleRef path) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawPath(graphics, pen, path);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawPie(HandleRef graphics, HandleRef pen, float x, float y, float width, float height, float startAngle, float sweepAngle) => SkiaGdiPlus.GdipDrawPie(graphics, pen, x, y, width, height, startAngle, sweepAngle);
+            internal static int GdipDrawPie(HandleRef graphics, HandleRef pen, float x, float y, float width, float height, float startAngle, float sweepAngle) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawPie(graphics, pen, x, y, width, height, startAngle, sweepAngle);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawPieI(HandleRef graphics, HandleRef pen, int x, int y, int width, int height, float startAngle, float sweepAngle) => SkiaGdiPlus.GdipDrawPieI(graphics, pen, x, y, width, height, startAngle, sweepAngle);
+            internal static int GdipDrawPieI(HandleRef graphics, HandleRef pen, int x, int y, int width, int height, float startAngle, float sweepAngle) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawPieI(graphics, pen, x, y, width, height, startAngle, sweepAngle);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawPolygon(HandleRef graphics, HandleRef pen, PointF* points, int count) => SkiaGdiPlus.GdipDrawPolygon(graphics, pen, points, count);
+            internal static int GdipDrawPolygon(HandleRef graphics, HandleRef pen, PointF* points, int count) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawPolygon(graphics, pen, points, count);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawPolygonI(HandleRef graphics, HandleRef pen, Point* points, int count) => SkiaGdiPlus.GdipDrawPolygonI(graphics, pen, points, count);
+            internal static int GdipDrawPolygonI(HandleRef graphics, HandleRef pen, Point* points, int count) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawPolygonI(graphics, pen, points, count);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipFillEllipse(HandleRef graphics, HandleRef brush, float x, float y, float width, float height) => SkiaGdiPlus.GdipFillEllipse(graphics, brush, x, y, width, height);
+            internal static int GdipFillEllipse(HandleRef graphics, HandleRef brush, float x, float y, float width, float height) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipFillEllipse(graphics, brush, x, y, width, height);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipFillEllipseI(HandleRef graphics, HandleRef brush, int x, int y, int width, int height) => SkiaGdiPlus.GdipFillEllipseI(graphics, brush, x, y, width, height);
+            internal static int GdipFillEllipseI(HandleRef graphics, HandleRef brush, int x, int y, int width, int height) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipFillEllipseI(graphics, brush, x, y, width, height);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipFillPolygon(HandleRef graphics, HandleRef brush, PointF* points, int count, FillMode brushMode) => SkiaGdiPlus.GdipFillPolygon(graphics, brush, points, count, brushMode);
+            internal static int GdipFillPolygon(HandleRef graphics, HandleRef brush, PointF* points, int count, FillMode brushMode) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipFillPolygon(graphics, brush, points, count, brushMode);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipFillPolygonI(HandleRef graphics, HandleRef brush, Point* points, int count, FillMode brushMode) => SkiaGdiPlus.GdipFillPolygonI(graphics, brush, points, count, brushMode);
+            internal static int GdipFillPolygonI(HandleRef graphics, HandleRef brush, Point* points, int count, FillMode brushMode) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipFillPolygonI(graphics, brush, points, count, brushMode);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipFillRectangle(HandleRef graphics, HandleRef brush, float x, float y, float width, float height) => SkiaGdiPlus.GdipFillRectangle(graphics, brush, x, y, width, height);
+            internal static int GdipFillRectangle(HandleRef graphics, HandleRef brush, float x, float y, float width, float height) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipFillRectangle(graphics, brush, x, y, width, height);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipFillRectangleI(HandleRef graphics, HandleRef brush, int x, int y, int width, int height) => SkiaGdiPlus.GdipFillRectangleI(graphics, brush, x, y, width, height);
+            internal static int GdipFillRectangleI(HandleRef graphics, HandleRef brush, int x, int y, int width, int height) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipFillRectangleI(graphics, brush, x, y, width, height);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipFillRectangles(HandleRef graphics, HandleRef brush, RectangleF* rects, int count) => SkiaGdiPlus.GdipFillRectangles(graphics, brush, rects, count);
+            internal static int GdipFillRectangles(HandleRef graphics, HandleRef brush, RectangleF* rects, int count) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipFillRectangles(graphics, brush, rects, count);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipFillRectanglesI(HandleRef graphics, HandleRef brush, Rectangle* rects, int count) => SkiaGdiPlus.GdipFillRectanglesI(graphics, brush, rects, count);
+            internal static int GdipFillRectanglesI(HandleRef graphics, HandleRef brush, Rectangle* rects, int count) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipFillRectanglesI(graphics, brush, rects, count);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawString(HandleRef graphics, string textString, int length, HandleRef font, ref RectangleF layoutRect, HandleRef stringFormat, HandleRef brush) => SkiaGdiPlus.GdipDrawString(graphics, textString, length, font, ref layoutRect, stringFormat, brush);
+            internal static int GdipDrawString(HandleRef graphics, string textString, int length, HandleRef font, ref RectangleF layoutRect, HandleRef stringFormat, HandleRef brush) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawString(graphics, textString, length, font, ref layoutRect, stringFormat, brush);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawImageRectI(HandleRef graphics, HandleRef image, int x, int y, int width, int height) => SkiaGdiPlus.GdipDrawImageRectI(graphics, image, x, y, width, height);
+            internal static int GdipDrawImageRectI(HandleRef graphics, HandleRef image, int x, int y, int width, int height) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawImageRectI(graphics, image, x, y, width, height);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipGraphicsClear(HandleRef graphics, int argb) => SkiaGdiPlus.GdipGraphicsClear(graphics, argb);
+            internal static int GdipGraphicsClear(HandleRef graphics, int argb) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipGraphicsClear(graphics, argb);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawClosedCurve(HandleRef graphics, HandleRef pen, PointF* points, int count) => SkiaGdiPlus.GdipDrawClosedCurve(graphics, pen, points, count);
+            internal static int GdipDrawClosedCurve(HandleRef graphics, HandleRef pen, PointF* points, int count) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawClosedCurve(graphics, pen, points, count);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawClosedCurveI(HandleRef graphics, HandleRef pen, Point* points, int count) => SkiaGdiPlus.GdipDrawClosedCurveI(graphics, pen, points, count);
+            internal static int GdipDrawClosedCurveI(HandleRef graphics, HandleRef pen, Point* points, int count) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawClosedCurveI(graphics, pen, points, count);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawClosedCurve2(HandleRef graphics, HandleRef pen, PointF* points, int count, float tension) => SkiaGdiPlus.GdipDrawClosedCurve2(graphics, pen, points, count, tension);
+            internal static int GdipDrawClosedCurve2(HandleRef graphics, HandleRef pen, PointF* points, int count, float tension) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawClosedCurve2(graphics, pen, points, count, tension);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawClosedCurve2I(HandleRef graphics, HandleRef pen, Point* points, int count, float tension) => SkiaGdiPlus.GdipDrawClosedCurve2I(graphics, pen, points, count, tension);
+            internal static int GdipDrawClosedCurve2I(HandleRef graphics, HandleRef pen, Point* points, int count, float tension) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawClosedCurve2I(graphics, pen, points, count, tension);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawCurve(HandleRef graphics, HandleRef pen, PointF* points, int count) => SkiaGdiPlus.GdipDrawCurve(graphics, pen, points, count);
+            internal static int GdipDrawCurve(HandleRef graphics, HandleRef pen, PointF* points, int count) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawCurve(graphics, pen, points, count);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawCurveI(HandleRef graphics, HandleRef pen, Point* points, int count) => SkiaGdiPlus.GdipDrawCurveI(graphics, pen, points, count);
+            internal static int GdipDrawCurveI(HandleRef graphics, HandleRef pen, Point* points, int count) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawCurveI(graphics, pen, points, count);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawCurve2(HandleRef graphics, HandleRef pen, PointF* points, int count, float tension) => SkiaGdiPlus.GdipDrawCurve2(graphics, pen, points, count, tension);
+            internal static int GdipDrawCurve2(HandleRef graphics, HandleRef pen, PointF* points, int count, float tension) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawCurve2(graphics, pen, points, count, tension);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawCurve2I(HandleRef graphics, HandleRef pen, Point* points, int count, float tension) => SkiaGdiPlus.GdipDrawCurve2I(graphics, pen, points, count, tension);
+            internal static int GdipDrawCurve2I(HandleRef graphics, HandleRef pen, Point* points, int count, float tension) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawCurve2I(graphics, pen, points, count, tension);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawCurve3(HandleRef graphics, HandleRef pen, PointF* points, int count, int offset, int numberOfSegments, float tension) => SkiaGdiPlus.GdipDrawCurve3(graphics, pen, points, count, offset, numberOfSegments, tension);
+            internal static int GdipDrawCurve3(HandleRef graphics, HandleRef pen, PointF* points, int count, int offset, int numberOfSegments, float tension) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawCurve3(graphics, pen, points, count, offset, numberOfSegments, tension);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawCurve3I(HandleRef graphics, HandleRef pen, Point* points, int count, int offset, int numberOfSegments, float tension) => SkiaGdiPlus.GdipDrawCurve3I(graphics, pen, points, count, offset, numberOfSegments, tension);
+            internal static int GdipDrawCurve3I(HandleRef graphics, HandleRef pen, Point* points, int count, int offset, int numberOfSegments, float tension) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawCurve3I(graphics, pen, points, count, offset, numberOfSegments, tension);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipFillClosedCurve(HandleRef graphics, HandleRef brush, PointF* points, int count) => SkiaGdiPlus.GdipFillClosedCurve(graphics, brush, points, count);
+            internal static int GdipFillClosedCurve(HandleRef graphics, HandleRef brush, PointF* points, int count) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipFillClosedCurve(graphics, brush, points, count);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipFillClosedCurveI(HandleRef graphics, HandleRef brush, Point* points, int count) => SkiaGdiPlus.GdipFillClosedCurveI(graphics, brush, points, count);
+            internal static int GdipFillClosedCurveI(HandleRef graphics, HandleRef brush, Point* points, int count) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipFillClosedCurveI(graphics, brush, points, count);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipFillClosedCurve2(HandleRef graphics, HandleRef brush, PointF* points, int count, float tension, FillMode mode) => SkiaGdiPlus.GdipFillClosedCurve2(graphics, brush, points, count, tension, mode);
+            internal static int GdipFillClosedCurve2(HandleRef graphics, HandleRef brush, PointF* points, int count, float tension, FillMode mode) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipFillClosedCurve2(graphics, brush, points, count, tension, mode);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipFillClosedCurve2I(HandleRef graphics, HandleRef brush, Point* points, int count, float tension, FillMode mode) => SkiaGdiPlus.GdipFillClosedCurve2I(graphics, brush, points, count, tension, mode);
+            internal static int GdipFillClosedCurve2I(HandleRef graphics, HandleRef brush, Point* points, int count, float tension, FillMode mode) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipFillClosedCurve2I(graphics, brush, points, count, tension, mode);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipFillPie(HandleRef graphics, HandleRef brush, float x, float y, float width, float height, float startAngle, float sweepAngle) => SkiaGdiPlus.GdipFillPie(graphics, brush, x, y, width, height, startAngle, sweepAngle);
+            internal static int GdipFillPie(HandleRef graphics, HandleRef brush, float x, float y, float width, float height, float startAngle, float sweepAngle) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipFillPie(graphics, brush, x, y, width, height, startAngle, sweepAngle);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipFillPieI(HandleRef graphics, HandleRef brush, int x, int y, int width, int height, float startAngle, float sweepAngle) => SkiaGdiPlus.GdipFillPieI(graphics, brush, x, y, width, height, startAngle, sweepAngle);
+            internal static int GdipFillPieI(HandleRef graphics, HandleRef brush, int x, int y, int width, int height, float startAngle, float sweepAngle) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipFillPieI(graphics, brush, x, y, width, height, startAngle, sweepAngle);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipMeasureString(HandleRef graphics, string textString, int length, HandleRef font, ref RectangleF layoutRect, HandleRef stringFormat, ref RectangleF boundingBox, out int codepointsFitted, out int linesFilled) => SkiaGdiPlus.GdipMeasureString(graphics, textString, length, font, ref layoutRect, stringFormat, ref boundingBox, out codepointsFitted, out linesFilled);
+            internal static int GdipMeasureString(HandleRef graphics, string textString, int length, HandleRef font, ref RectangleF layoutRect, HandleRef stringFormat, ref RectangleF boundingBox, out int codepointsFitted, out int linesFilled) { if (SkiaGdiPlus.GraphicsBusy(graphics)) { codepointsFitted = default; linesFilled = default; return SkiaGdiPlus.ObjectBusy; } return SkiaGdiPlus.GdipMeasureString(graphics, textString, length, font, ref layoutRect, stringFormat, ref boundingBox, out codepointsFitted, out linesFilled); }
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipMeasureCharacterRanges(HandleRef graphics, string textString, int length, HandleRef font, ref RectangleF layoutRect, HandleRef stringFormat, int characterCount, [In] [Out] IntPtr[] region) => SkiaGdiPlus.GdipMeasureCharacterRanges(graphics, textString, length, font, ref layoutRect, stringFormat, characterCount, region);
+            internal static int GdipMeasureCharacterRanges(HandleRef graphics, string textString, int length, HandleRef font, ref RectangleF layoutRect, HandleRef stringFormat, int characterCount, [In] [Out] IntPtr[] region) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipMeasureCharacterRanges(graphics, textString, length, font, ref layoutRect, stringFormat, characterCount, region);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawImageI(HandleRef graphics, HandleRef image, int x, int y) => SkiaGdiPlus.GdipDrawImageI(graphics, image, x, y);
+            internal static int GdipDrawImageI(HandleRef graphics, HandleRef image, int x, int y) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawImageI(graphics, image, x, y);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawImage(HandleRef graphics, HandleRef image, float x, float y) => SkiaGdiPlus.GdipDrawImage(graphics, image, x, y);
+            internal static int GdipDrawImage(HandleRef graphics, HandleRef image, float x, float y) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawImage(graphics, image, x, y);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawImagePoints(HandleRef graphics, HandleRef image, PointF* points, int count) => SkiaGdiPlus.GdipDrawImagePoints(graphics, image, points, count);
+            internal static int GdipDrawImagePoints(HandleRef graphics, HandleRef image, PointF* points, int count) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawImagePoints(graphics, image, points, count);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawImagePointsI(HandleRef graphics, HandleRef image, Point* points, int count) => SkiaGdiPlus.GdipDrawImagePointsI(graphics, image, points, count);
+            internal static int GdipDrawImagePointsI(HandleRef graphics, HandleRef image, Point* points, int count) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawImagePointsI(graphics, image, points, count);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawImageRectRectI(HandleRef graphics, HandleRef image, int dstx, int dsty, int dstwidth, int dstheight, int srcx, int srcy, int srcwidth, int srcheight, GraphicsUnit srcunit, HandleRef imageAttributes, Graphics.DrawImageAbort? callback, HandleRef callbackdata) => SkiaGdiPlus.GdipDrawImageRectRectI(graphics, image, dstx, dsty, dstwidth, dstheight, srcx, srcy, srcwidth, srcheight, srcunit, imageAttributes, callback, callbackdata);
+            internal static int GdipDrawImageRectRectI(HandleRef graphics, HandleRef image, int dstx, int dsty, int dstwidth, int dstheight, int srcx, int srcy, int srcwidth, int srcheight, GraphicsUnit srcunit, HandleRef imageAttributes, Graphics.DrawImageAbort? callback, HandleRef callbackdata) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawImageRectRectI(graphics, image, dstx, dsty, dstwidth, dstheight, srcx, srcy, srcwidth, srcheight, srcunit, imageAttributes, callback, callbackdata);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawImagePointsRect(HandleRef graphics, HandleRef image, PointF* points, int count, float srcx, float srcy, float srcwidth, float srcheight, GraphicsUnit srcunit, HandleRef imageAttributes, Graphics.DrawImageAbort? callback, HandleRef callbackdata) => SkiaGdiPlus.GdipDrawImagePointsRect(graphics, image, points, count, srcx, srcy, srcwidth, srcheight, srcunit, imageAttributes, callback, callbackdata);
+            internal static int GdipDrawImagePointsRect(HandleRef graphics, HandleRef image, PointF* points, int count, float srcx, float srcy, float srcwidth, float srcheight, GraphicsUnit srcunit, HandleRef imageAttributes, Graphics.DrawImageAbort? callback, HandleRef callbackdata) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawImagePointsRect(graphics, image, points, count, srcx, srcy, srcwidth, srcheight, srcunit, imageAttributes, callback, callbackdata);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawImageRectRect(HandleRef graphics, HandleRef image, float dstx, float dsty, float dstwidth, float dstheight, float srcx, float srcy, float srcwidth, float srcheight, GraphicsUnit srcunit, HandleRef imageAttributes, Graphics.DrawImageAbort? callback, HandleRef callbackdata) => SkiaGdiPlus.GdipDrawImageRectRect(graphics, image, dstx, dsty, dstwidth, dstheight, srcx, srcy, srcwidth, srcheight, srcunit, imageAttributes, callback, callbackdata);
+            internal static int GdipDrawImageRectRect(HandleRef graphics, HandleRef image, float dstx, float dsty, float dstwidth, float dstheight, float srcx, float srcy, float srcwidth, float srcheight, GraphicsUnit srcunit, HandleRef imageAttributes, Graphics.DrawImageAbort? callback, HandleRef callbackdata) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawImageRectRect(graphics, image, dstx, dsty, dstwidth, dstheight, srcx, srcy, srcwidth, srcheight, srcunit, imageAttributes, callback, callbackdata);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawImagePointsRectI(HandleRef graphics, HandleRef image, Point* points, int count, int srcx, int srcy, int srcwidth, int srcheight, GraphicsUnit srcunit, HandleRef imageAttributes, Graphics.DrawImageAbort? callback, HandleRef callbackdata) => SkiaGdiPlus.GdipDrawImagePointsRectI(graphics, image, points, count, srcx, srcy, srcwidth, srcheight, srcunit, imageAttributes, callback, callbackdata);
+            internal static int GdipDrawImagePointsRectI(HandleRef graphics, HandleRef image, Point* points, int count, int srcx, int srcy, int srcwidth, int srcheight, GraphicsUnit srcunit, HandleRef imageAttributes, Graphics.DrawImageAbort? callback, HandleRef callbackdata) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawImagePointsRectI(graphics, image, points, count, srcx, srcy, srcwidth, srcheight, srcunit, imageAttributes, callback, callbackdata);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawImageRect(HandleRef graphics, HandleRef image, float x, float y, float width, float height) => SkiaGdiPlus.GdipDrawImageRect(graphics, image, x, y, width, height);
+            internal static int GdipDrawImageRect(HandleRef graphics, HandleRef image, float x, float y, float width, float height) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawImageRect(graphics, image, x, y, width, height);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawImagePointRect(HandleRef graphics, HandleRef image, float x, float y, float srcx, float srcy, float srcwidth, float srcheight, int srcunit) => SkiaGdiPlus.GdipDrawImagePointRect(graphics, image, x, y, srcx, srcy, srcwidth, srcheight, srcunit);
+            internal static int GdipDrawImagePointRect(HandleRef graphics, HandleRef image, float x, float y, float srcx, float srcy, float srcwidth, float srcheight, int srcunit) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawImagePointRect(graphics, image, x, y, srcx, srcy, srcwidth, srcheight, srcunit);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawImagePointRectI(HandleRef graphics, HandleRef image, int x, int y, int srcx, int srcy, int srcwidth, int srcheight, int srcunit) => SkiaGdiPlus.GdipDrawImagePointRectI(graphics, image, x, y, srcx, srcy, srcwidth, srcheight, srcunit);
+            internal static int GdipDrawImagePointRectI(HandleRef graphics, HandleRef image, int x, int y, int srcx, int srcy, int srcwidth, int srcheight, int srcunit) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawImagePointRectI(graphics, image, x, y, srcx, srcy, srcwidth, srcheight, srcunit);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawRectangle(HandleRef graphics, HandleRef pen, float x, float y, float width, float height) => SkiaGdiPlus.GdipDrawRectangle(graphics, pen, x, y, width, height);
+            internal static int GdipDrawRectangle(HandleRef graphics, HandleRef pen, float x, float y, float width, float height) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawRectangle(graphics, pen, x, y, width, height);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawRectangleI(HandleRef graphics, HandleRef pen, int x, int y, int width, int height) => SkiaGdiPlus.GdipDrawRectangleI(graphics, pen, x, y, width, height);
+            internal static int GdipDrawRectangleI(HandleRef graphics, HandleRef pen, int x, int y, int width, int height) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawRectangleI(graphics, pen, x, y, width, height);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawRectangles(HandleRef graphics, HandleRef pen, RectangleF* rects, int count) => SkiaGdiPlus.GdipDrawRectangles(graphics, pen, rects, count);
+            internal static int GdipDrawRectangles(HandleRef graphics, HandleRef pen, RectangleF* rects, int count) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawRectangles(graphics, pen, rects, count);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipDrawRectanglesI(HandleRef graphics, HandleRef pen, Rectangle* rects, int count) => SkiaGdiPlus.GdipDrawRectanglesI(graphics, pen, rects, count);
+            internal static int GdipDrawRectanglesI(HandleRef graphics, HandleRef pen, Rectangle* rects, int count) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipDrawRectanglesI(graphics, pen, rects, count);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipTransformPoints(HandleRef graphics, int destSpace, int srcSpace, PointF* points, int count) => SkiaGdiPlus.GdipTransformPoints(graphics, destSpace, srcSpace, points, count);
+            internal static int GdipTransformPoints(HandleRef graphics, int destSpace, int srcSpace, PointF* points, int count) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipTransformPoints(graphics, destSpace, srcSpace, points, count);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
-            internal static int GdipTransformPointsI(HandleRef graphics, int destSpace, int srcSpace, Point* points, int count) => SkiaGdiPlus.GdipTransformPointsI(graphics, destSpace, srcSpace, points, count);
+            internal static int GdipTransformPointsI(HandleRef graphics, int destSpace, int srcSpace, Point* points, int count) => SkiaGdiPlus.GraphicsBusy(graphics) ? SkiaGdiPlus.ObjectBusy : SkiaGdiPlus.GdipTransformPointsI(graphics, destSpace, srcSpace, points, count);
 
             // webForCore: was [DllImport(LibraryName)] (libgdiplus); GDI+ on SkiaSharp (SkiaGdiPlus).
             internal static int GdipLoadImageFromFileICM(string filename, out IntPtr image) => SkiaGdiPlus.GdipLoadImageFromFileICM(filename, out image);

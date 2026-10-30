@@ -1,0 +1,7 @@
+# aspnet/AspNetKatana 096e225: source path (relative to repo root)	destination (relative to fork root)
+src/Microsoft.Owin.Cors/CorsExtensions.cs	src/webForCore.Microsoft.Owin.Cors/CorsExtensions.cs
+src/Microsoft.Owin.Cors/CorsMiddleware.cs	src/webForCore.Microsoft.Owin.Cors/CorsMiddleware.cs
+src/Microsoft.Owin.Cors/CorsOptions.cs	src/webForCore.Microsoft.Owin.Cors/CorsOptions.cs
+src/Microsoft.Owin.Cors/CorsPolicyProvider.cs	src/webForCore.Microsoft.Owin.Cors/CorsPolicyProvider.cs
+src/Microsoft.Owin.Cors/ICorsPolicyProvider.cs	src/webForCore.Microsoft.Owin.Cors/ICorsPolicyProvider.cs
+src/Microsoft.Owin.Cors/Properties/AssemblyInfo.cs	src/webForCore.Microsoft.Owin.Cors/Properties/AssemblyInfo.cs

@@ -1,0 +1,84 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Lifted from aspnet/AspNetIdentity b7fc094 (test/Identity.Test) by tools/lift/lift_aspnet.py.
+       MIT License and NOTICE at the repo root. Generated; do not edit. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <AssemblyName>Identity.Test</AssemblyName>
+    <RootNamespace>Identity.Test</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- The C# version of Microsoft's build: later ones resolve some calls differently (new Message(a, b, null) became
+         ambiguous with the ArraySegment<byte> overload). -->
+    <LangVersion>7.3</LangVersion>
+    <DefineConstants>$(DefineConstants);</DefineConstants>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;CA1416;SYSLIB0011;SYSLIB0051;SYSLIB0014;SYSLIB0057;xUnit1013;xUnit1019;xUnit1031;xUnit2013;xUnit2014</NoWarn>
+    <!-- Delay signed with Microsoft's public key, as Microsoft's build does: PublicKeyToken=31bf3856ad364e35. -->
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>../../src/SigningKey/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <RunSettingsFilePath>$(MSBuildProjectDirectory)/test.runsettings</RunSettingsFilePath>
+  </PropertyGroup>
+
+  <Import Project="../../src/webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="AuthenticationManagerExtensionsTest.cs" />
+    <Compile Include="ApplicationUserTest.cs" />
+    <Compile Include="AsyncHelperTest.cs" />
+    <Compile Include="SignInManagerTest.cs" />
+    <Compile Include="UserLockoutStoreTests.cs" />
+    <Compile Include="PasswordValidatorTest.cs" />
+    <Compile Include="OwinContextExtensionsTest.cs" />
+    <Compile Include="SecurityStampTest.cs" />
+    <Compile Include="CustomGuidKeyTest.cs" />
+    <Compile Include="CustomIntKeyTest.cs" />
+    <Compile Include="IdentityExtensionsTest.cs" />
+    <Compile Include="IdentityDbContextTest.cs" />
+    <Compile Include="InMemoryStore.cs" />
+    <Compile Include="UserStoreTest.cs" />
+    <Compile Include="IdentityResultTest.cs" />
+    <Compile Include="ClaimsIdentityFactoryTest.cs" />
+    <Compile Include="InMemoryStoreTest.cs" />
+    <Compile Include="UserManagerTest.cs" />
+    <Compile Include="RolesTest.cs" />
+    <Compile Include="LoginsTest.cs" />
+    <Compile Include="ExceptionHelper.cs" />
+    <Compile Include="Properties/AssemblyInfo.cs" />
+    <Compile Include="TestUtil.cs" />
+    <Compile Include="UserClaimsTest.cs" />
+    <Compile Include="UnitTestHelper.cs" />
+
+    <None Include="App.config" Link="testhost.dll.config" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/webForCore.Microsoft.AspNet.Identity.Core/webForCore.Microsoft.AspNet.Identity.Core.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.AspNet.Identity.EntityFramework/webForCore.Microsoft.AspNet.Identity.EntityFramework.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.AspNet.Identity.Owin/webForCore.Microsoft.AspNet.Identity.Owin.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin/webForCore.Microsoft.Owin.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security/webForCore.Microsoft.Owin.Security.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security.Cookies/webForCore.Microsoft.Owin.Security.Cookies.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security.OAuth/webForCore.Microsoft.Owin.Security.OAuth.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Testing/webForCore.Microsoft.Owin.Testing.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Hosting/webForCore.Microsoft.Owin.Hosting.csproj" />
+    <ProjectReference Include="../../src/WebFormsForCore.Configuration/WebFormsForCore.Configuration.csproj" />
+    <PackageReference Include="EntityFramework" Version="6.5.1" />
+    <PackageReference Include="Owin" Version="1.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <PackageReference Include="Moq" Version="4.21.0" />
+    <PackageReference Include="Castle.Core" Version="5.2.1" />
+  </ItemGroup>
+</Project>

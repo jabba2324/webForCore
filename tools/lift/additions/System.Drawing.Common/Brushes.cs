@@ -129,29 +129,47 @@ namespace System.Drawing
             return new SKColor(L(16), L(8), L(0), L(24));
         }
 
-        // GDI+'s SetSigmaBellShape / SetBlendTriangularShape.
+        // GDI+'s SetSigmaBellShape: a bell curve sampled at 256 points on each side of the focus (one side when the focus
+        // is at an end, 256 points; otherwise 511), from 0 at the ends to `scale` at the focus. Each side is the
+        // complement of a normal cumulative distribution, so it starts and ends exactly at 0 and scale.
         public void SetSigmaBlend(float focus, float scale)
         {
-            const int n = 33;
+            const int side = 256;
             var factors = new List<float>();
             var positions = new List<float>();
-            for (int i = 0; i < n; i++)
-            {
-                float p = i / (float)(n - 1);
-                float f;
-                if (p <= focus)
-                    f = focus == 0 ? scale : (float)(scale * Normal((p - focus) / focus));
-                else
-                    f = focus == 1 ? scale : (float)(scale * Normal((p - focus) / (1 - focus)));
-                positions.Add(p);
-                factors.Add(f);
-            }
+            if (focus > 0)
+                for (int i = 0; i < side; i++)
+                {
+                    positions.Add(i == side - 1 ? focus : focus * i / (side - 1));
+                    factors.Add(scale * Bell(1 - i / (float)(side - 1)));
+                }
+            if (focus < 1)
+                for (int i = focus > 0 ? 1 : 0; i < side; i++)
+                {
+                    positions.Add(i == side - 1 ? 1 : focus + (1 - focus) * i / (side - 1));
+                    factors.Add(scale * Bell(i / (float)(side - 1)));
+                }
             BlendFactors = factors.ToArray();
             BlendPositions = positions.ToArray();
             PresetColors = null;
         }
 
-        static double Normal(double x) => Math.Exp(-x * x * 4.5);
+        // 1 at d = 0 (the focus), 0 at d = 1 (an end).
+        static float Bell(float d)
+        {
+            if (d <= 0) return 1;
+            if (d >= 1) return 0;
+            const double c = 2.5; // the curve's steepness: sigma = 1 / (2c) of the half-width
+            return (float)((1 - Erf((d - 0.5) * 2 * c) / Erf(c)) / 2);
+        }
+
+        // Abramowitz and Stegun 7.1.26 (|error| < 1.5e-7).
+        static double Erf(double x)
+        {
+            double t = 1 / (1 + 0.3275911 * Math.Abs(x));
+            double y = 1 - ((((1.061405429 * t - 1.453152027) * t + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.Exp(-x * x);
+            return x < 0 ? -y : y;
+        }
 
         public void SetLinearBlend(float focus, float scale)
         {
@@ -169,16 +187,19 @@ namespace System.Drawing
         };
     }
 
+    // GDI+'s model: a horizontal gradient across Rect, from its left edge (Color1) to its right edge (Color2), mapped
+    // through Transform. The constructors' angle lives in Transform (as GDI+ reports it): a rotation about the centre
+    // of Rect, scaled so the gradient spans the rectangle's corners in that direction. ResetTransform makes it
+    // horizontal again.
     internal sealed class GpLinearGradientBrush : GpGradientBrush
     {
-        public PointF Start, End;
         public RectangleF Rect;
         public int Color1, Color2;
         public override BrushType Type => BrushType.LinearGradient;
 
         public override GpBrush Clone()
         {
-            var b = new GpLinearGradientBrush { Start = Start, End = End, Rect = Rect, Color1 = Color1, Color2 = Color2 };
+            var b = new GpLinearGradientBrush { Rect = Rect, Color1 = Color1, Color2 = Color2 };
             CopyTo(b);
             return b;
         }
@@ -187,22 +208,26 @@ namespace System.Drawing
         {
             var (colors, positions) = Stops(Color1, Color2);
             paint.Color = SKColors.Black;
-            paint.Shader = SKShader.CreateLinearGradient(new SKPoint(Start.X, Start.Y), new SKPoint(End.X, End.Y), colors, positions, TileMode, Transform.ToSkia());
+            float cy = Rect.Y + Rect.Height / 2;
+            paint.Shader = SKShader.CreateLinearGradient(new SKPoint(Rect.Left, cy), new SKPoint(Rect.Right, cy), colors, positions, TileMode, Transform.ToSkia());
         }
 
-        // The gradient line for a rectangle and an angle: from where the corners project first to where they project last.
-        public static (PointF, PointF) LineFromRect(RectangleF r, float angle, bool scalable)
+        // The transform for a gradient at `degrees` across r. With `scalable`, the angle is measured in r scaled to a
+        // square (the gradient keeps its slope relative to the rectangle when r is stretched).
+        public static GpMatrix InitialTransform(RectangleF r, double degrees, bool scalable)
         {
-            double a = angle * Math.PI / 180;
+            double a = degrees * Math.PI / 180;
             if (scalable && r.Width > 0 && r.Height > 0)
-                a = Math.Atan2(Math.Sin(a) * r.Height / r.Width, Math.Cos(a)) ;
-            double dx = Math.Cos(a), dy = Math.Sin(a);
-            var corners = new[] { new PointF(r.X, r.Y), new PointF(r.Right, r.Y), new PointF(r.X, r.Bottom), new PointF(r.Right, r.Bottom) };
-            double min = corners.Min(c => c.X * dx + c.Y * dy), max = corners.Max(c => c.X * dx + c.Y * dy);
+                a = Math.Atan2(Math.Sin(a) * r.Height / r.Width, Math.Cos(a));
+            double c = Math.Cos(a), s = Math.Sin(a);
+            if (Math.Abs(c) < 1e-7) c = 0;
+            if (Math.Abs(s) < 1e-7) s = 0;
+            double wRatio = (Math.Abs(c) * r.Width + Math.Abs(s) * r.Height) / r.Width;
+            double hRatio = (Math.Abs(s) * r.Width + Math.Abs(c) * r.Height) / r.Height;
+            float m11 = (float)(c * wRatio), m12 = (float)(s * wRatio), m21 = (float)(-s * hRatio), m22 = (float)(c * hRatio);
             float cx = r.X + r.Width / 2, cy = r.Y + r.Height / 2;
-            double centre = cx * dx + cy * dy;
-            return (new PointF((float)(cx + (min - centre) * dx), (float)(cy + (min - centre) * dy)),
-                    new PointF((float)(cx + (max - centre) * dx), (float)(cy + (max - centre) * dy)));
+            // Rotate and scale about the centre: the centre maps to itself.
+            return new GpMatrix(m11, m12, m21, m22, cx - (cx * m11 + cy * m21), cy - (cx * m12 + cy * m22));
         }
     }
 
@@ -411,11 +436,12 @@ namespace System.Drawing
 
         // Linear gradients
 
-        static int NewLinear(PointF p1, PointF p2, RectangleF rect, int c1, int c2, WrapMode wrap, out IntPtr brush)
+        static int NewLinear(RectangleF rect, double angle, bool scalable, int c1, int c2, WrapMode wrap, out IntPtr brush)
         {
             brush = IntPtr.Zero;
             if (wrap == WrapMode.Clamp) return InvalidParameter;
-            brush = NewHandle(new GpLinearGradientBrush { Start = p1, End = p2, Rect = rect, Color1 = c1, Color2 = c2, WrapMode = wrap });
+            var transform = GpLinearGradientBrush.InitialTransform(rect, angle, scalable);
+            brush = NewHandle(new GpLinearGradientBrush { Rect = rect, Color1 = c1, Color2 = c2, WrapMode = wrap, Transform = transform });
             return Ok;
         }
 
@@ -426,7 +452,8 @@ namespace System.Drawing
             var rect = RectangleF.FromLTRB(Math.Min(point1.X, point2.X), Math.Min(point1.Y, point2.Y), Math.Max(point1.X, point2.X), Math.Max(point1.Y, point2.Y));
             if (rect.Width == 0) { rect.X -= Math.Abs(point2.Y - point1.Y) / 2; rect.Width = Math.Abs(point2.Y - point1.Y); }
             if (rect.Height == 0) { rect.Y -= Math.Abs(point2.X - point1.X) / 2; rect.Height = Math.Abs(point2.X - point1.X); }
-            return NewLinear(point1, point2, rect, color1, color2, wrapMode, out lineGradient);
+            double angle = Math.Atan2(point2.Y - point1.Y, point2.X - point1.X) * 180 / Math.PI;
+            return NewLinear(rect, angle, false, color1, color2, wrapMode, out lineGradient);
         }
 
         internal static int GdipCreateLineBrushI(ref Point point1, ref Point point2, int color1, int color2, WrapMode wrapMode, out IntPtr lineGradient)
@@ -440,8 +467,7 @@ namespace System.Drawing
             lineGradient = IntPtr.Zero;
             if (rect.Width == 0 || rect.Height == 0) return OutOfMemory;
             float angle = lineGradientMode switch { LinearGradientMode.Vertical => 90, LinearGradientMode.ForwardDiagonal => 45, LinearGradientMode.BackwardDiagonal => 135, _ => 0 };
-            var (p1, p2) = GpLinearGradientBrush.LineFromRect(rect, angle, true);
-            return NewLinear(p1, p2, rect, color1, color2, wrapMode, out lineGradient);
+            return NewLinear(rect, angle, true, color1, color2, wrapMode, out lineGradient);
         }
 
         internal static int GdipCreateLineBrushFromRectI(ref Rectangle rect, int color1, int color2, LinearGradientMode lineGradientMode, WrapMode wrapMode, out IntPtr lineGradient)
@@ -454,8 +480,7 @@ namespace System.Drawing
         {
             lineGradient = IntPtr.Zero;
             if (rect.Width == 0 || rect.Height == 0) return OutOfMemory;
-            var (p1, p2) = GpLinearGradientBrush.LineFromRect(rect, angle, isAngleScaleable);
-            return NewLinear(p1, p2, rect, color1, color2, wrapMode, out lineGradient);
+            return NewLinear(rect, angle, isAngleScaleable, color1, color2, wrapMode, out lineGradient);
         }
 
         internal static int GdipCreateLineBrushFromRectWithAngleI(ref Rectangle rect, int color1, int color2, float angle, bool isAngleScaleable, WrapMode wrapMode, out IntPtr lineGradient)
@@ -525,9 +550,11 @@ namespace System.Drawing
         internal static int GdipMultiplyLineTransform(HandleRef brush, HandleRef matrix, MatrixOrder order) => Multiply(Linear(brush)?.Transform, matrix, order);
         internal static int GdipGetLineTransform(HandleRef brush, HandleRef matrix) => CopyMatrix(Linear(brush)?.Transform, matrix, true);
         internal static int GdipSetLineTransform(HandleRef brush, HandleRef matrix) => CopyMatrix(Linear(brush)?.Transform, matrix, false);
-        internal static int GdipTranslateLineTransform(HandleRef brush, float dx, float dy, MatrixOrder order) => WithMatrix(Linear(brush)?.Transform, m => m.Translate(dx, dy, order));
-        internal static int GdipScaleLineTransform(HandleRef brush, float sx, float sy, MatrixOrder order) => WithMatrix(Linear(brush)?.Transform, m => m.Scale(sx, sy, order));
-        internal static int GdipRotateLineTransform(HandleRef brush, float angle, MatrixOrder order) => WithMatrix(Linear(brush)?.Transform, m => m.Rotate(angle, order));
+        internal static int GdipTranslateLineTransform(HandleRef brush, float dx, float dy, MatrixOrder order) => BadOrder(order) ? InvalidParameter : WithMatrix(Linear(brush)?.Transform, m => m.Translate(dx, dy, order));
+        internal static int GdipScaleLineTransform(HandleRef brush, float sx, float sy, MatrixOrder order) => BadOrder(order) ? InvalidParameter : WithMatrix(Linear(brush)?.Transform, m => m.Scale(sx, sy, order));
+        internal static int GdipRotateLineTransform(HandleRef brush, float angle, MatrixOrder order) => BadOrder(order) ? InvalidParameter : WithMatrix(Linear(brush)?.Transform, m => m.Rotate(angle, order));
+
+        static bool BadOrder(MatrixOrder order) => order != MatrixOrder.Prepend && order != MatrixOrder.Append;
 
         static int WithMatrix(GpMatrix m, Action<GpMatrix> action)
         {
@@ -540,7 +567,9 @@ namespace System.Drawing
         {
             var m = Get<GpMatrix>(matrix);
             if (target == null || m == null) return InvalidParameter;
-            target.Multiply(m, order);
+            // Brushes and pens (GDI+): a non-invertible matrix is rejected and an invalid order means Append.
+            if (!m.IsInvertible) return InvalidParameter;
+            target.Multiply(m, BadOrder(order) ? MatrixOrder.Append : order);
             return Ok;
         }
 
@@ -549,6 +578,7 @@ namespace System.Drawing
         {
             var m = Get<GpMatrix>(matrix);
             if (target == null || m == null) return InvalidParameter;
+            if (!get && !m.IsInvertible) return InvalidParameter; // a brush or pen transform must be invertible (GDI+)
             if (get) m.Set(target); else target.Set(m);
             return Ok;
         }
@@ -597,7 +627,9 @@ namespace System.Drawing
             {
                 float length = measure.Length;
                 int steps = Math.Max(8, (int)(length / 2));
-                for (int i = 0; i < steps; i++)
+                // An open figure keeps its end point (a closed one would repeat its start).
+                int last = measure.IsClosed ? steps - 1 : steps;
+                for (int i = 0; i <= last; i++)
                     if (measure.GetPosition(length * i / steps, out var pt)) result.Add(new PointF(pt.X, pt.Y));
             } while (measure.NextContour());
             return result;
@@ -621,7 +653,8 @@ namespace System.Drawing
         {
             var b = PathGradient(brush);
             if (b == null || argb == null || count <= 0 || count > b.Boundary.Count) return InvalidParameter;
-            b.SurroundColors = argb.Take(count).ToArray();
+            // GDI+ keeps one colour when they are all the same.
+            b.SurroundColors = argb.Take(count).Distinct().Count() == 1 ? new[] { argb[0] } : argb.Take(count).ToArray();
             return Ok;
         }
 
@@ -629,7 +662,7 @@ namespace System.Drawing
         internal static int GdipSetPathGradientCenterPoint(HandleRef brush, ref PointF point) { var b = PathGradient(brush); if (b == null) return InvalidParameter; b.Center = point; return Ok; }
         internal static int GdipGetPathGradientRect(HandleRef brush, out RectangleF gprectf) { var b = PathGradient(brush); gprectf = b?.Bounds ?? default; return b == null ? InvalidParameter : Ok; }
         internal static int GdipGetPathGradientPointCount(HandleRef brush, out int count) { var b = PathGradient(brush); count = b?.Boundary.Count ?? 0; return b == null ? InvalidParameter : Ok; }
-        internal static int GdipGetPathGradientSurroundColorCount(HandleRef brush, out int count) { var b = PathGradient(brush); count = b?.Boundary.Count ?? 0; return b == null ? InvalidParameter : Ok; }
+        internal static int GdipGetPathGradientSurroundColorCount(HandleRef brush, out int count) { var b = PathGradient(brush); count = b?.SurroundColors.Length ?? 0; return b == null ? InvalidParameter : Ok; }
         internal static int GdipGetPathGradientBlendCount(HandleRef brush, out int count) { var b = PathGradient(brush); count = b?.BlendFactors.Length ?? 0; return b == null ? InvalidParameter : Ok; }
 
         internal static int GdipGetPathGradientBlend(HandleRef brush, float[] blend, float[] positions, int count)
@@ -681,9 +714,9 @@ namespace System.Drawing
         internal static int GdipGetPathGradientTransform(HandleRef brush, HandleRef matrix) => CopyMatrix(PathGradient(brush)?.Transform, matrix, true);
         internal static int GdipResetPathGradientTransform(HandleRef brush) => WithMatrix(PathGradient(brush)?.Transform, m => m.Reset());
         internal static int GdipMultiplyPathGradientTransform(HandleRef brush, HandleRef matrix, MatrixOrder order) => Multiply(PathGradient(brush)?.Transform, matrix, order);
-        internal static int GdipTranslatePathGradientTransform(HandleRef brush, float dx, float dy, MatrixOrder order) => WithMatrix(PathGradient(brush)?.Transform, m => m.Translate(dx, dy, order));
-        internal static int GdipScalePathGradientTransform(HandleRef brush, float sx, float sy, MatrixOrder order) => WithMatrix(PathGradient(brush)?.Transform, m => m.Scale(sx, sy, order));
-        internal static int GdipRotatePathGradientTransform(HandleRef brush, float angle, MatrixOrder order) => WithMatrix(PathGradient(brush)?.Transform, m => m.Rotate(angle, order));
+        internal static int GdipTranslatePathGradientTransform(HandleRef brush, float dx, float dy, MatrixOrder order) => BadOrder(order) ? InvalidParameter : WithMatrix(PathGradient(brush)?.Transform, m => m.Translate(dx, dy, order));
+        internal static int GdipScalePathGradientTransform(HandleRef brush, float sx, float sy, MatrixOrder order) => BadOrder(order) ? InvalidParameter : WithMatrix(PathGradient(brush)?.Transform, m => m.Scale(sx, sy, order));
+        internal static int GdipRotatePathGradientTransform(HandleRef brush, float angle, MatrixOrder order) => BadOrder(order) ? InvalidParameter : WithMatrix(PathGradient(brush)?.Transform, m => m.Rotate(angle, order));
 
         internal static int GdipGetPathGradientFocusScales(HandleRef brush, float[] xScale, float[] yScale)
         {
@@ -739,9 +772,9 @@ namespace System.Drawing
         internal static int GdipGetTextureTransform(HandleRef brush, HandleRef matrix) => CopyMatrix(Texture(brush)?.Transform, matrix, true);
         internal static int GdipResetTextureTransform(HandleRef brush) => WithMatrix(Texture(brush)?.Transform, m => m.Reset());
         internal static int GdipMultiplyTextureTransform(HandleRef brush, HandleRef matrix, MatrixOrder order) => Multiply(Texture(brush)?.Transform, matrix, order);
-        internal static int GdipTranslateTextureTransform(HandleRef brush, float dx, float dy, MatrixOrder order) => WithMatrix(Texture(brush)?.Transform, m => m.Translate(dx, dy, order));
-        internal static int GdipScaleTextureTransform(HandleRef brush, float sx, float sy, MatrixOrder order) => WithMatrix(Texture(brush)?.Transform, m => m.Scale(sx, sy, order));
-        internal static int GdipRotateTextureTransform(HandleRef brush, float angle, MatrixOrder order) => WithMatrix(Texture(brush)?.Transform, m => m.Rotate(angle, order));
+        internal static int GdipTranslateTextureTransform(HandleRef brush, float dx, float dy, MatrixOrder order) => BadOrder(order) ? InvalidParameter : WithMatrix(Texture(brush)?.Transform, m => m.Translate(dx, dy, order));
+        internal static int GdipScaleTextureTransform(HandleRef brush, float sx, float sy, MatrixOrder order) => BadOrder(order) ? InvalidParameter : WithMatrix(Texture(brush)?.Transform, m => m.Scale(sx, sy, order));
+        internal static int GdipRotateTextureTransform(HandleRef brush, float angle, MatrixOrder order) => BadOrder(order) ? InvalidParameter : WithMatrix(Texture(brush)?.Transform, m => m.Rotate(angle, order));
         internal static int GdipSetTextureWrapMode(HandleRef brush, int wrapMode) { var b = Texture(brush); if (b == null) return InvalidParameter; b.WrapMode = (WrapMode)wrapMode; return Ok; }
         internal static int GdipGetTextureWrapMode(HandleRef brush, out int wrapMode) { var b = Texture(brush); wrapMode = (int)(b?.WrapMode ?? 0); return b == null ? InvalidParameter : Ok; }
 
@@ -783,7 +816,8 @@ namespace System.Drawing
         internal static int GdipGetPenMode(HandleRef pen, out PenAlignment penAlign) { var p = Pen(pen); penAlign = p?.Alignment ?? 0; return p == null ? InvalidParameter : Ok; }
         internal static int GdipSetPenWidth(HandleRef pen, float width) { var p = Pen(pen); if (p == null) return InvalidParameter; p.Width = width; return Ok; }
         internal static int GdipGetPenWidth(HandleRef pen, float[] width) { var p = Pen(pen); if (p == null) return InvalidParameter; width[0] = p.Width; return Ok; }
-        internal static int GdipSetPenLineCap197819(HandleRef pen, int startCap, int endCap, int dashCap) { var p = Pen(pen); if (p == null) return InvalidParameter; p.StartCap = (LineCap)startCap; p.EndCap = (LineCap)endCap; p.DashCap = (DashCap)dashCap; return Ok; }
+        internal static int GdipSetPenLineCap197819(HandleRef pen, int startCap, int endCap, int dashCap) { var p = Pen(pen); if (p == null) return InvalidParameter; p.StartCap = (LineCap)startCap; p.EndCap = (LineCap)endCap; p.DashCap = ValidDashCap(dashCap) ? (DashCap)dashCap : DashCap.Flat; return Ok; }
+        static bool ValidDashCap(int cap) => cap == (int)DashCap.Flat || cap == (int)DashCap.Round || cap == (int)DashCap.Triangle;
         internal static int GdipSetPenStartCap(HandleRef pen, int startCap) { var p = Pen(pen); if (p == null) return InvalidParameter; p.StartCap = (LineCap)startCap; p.CustomStart = null; return Ok; }
         internal static int GdipSetPenEndCap(HandleRef pen, int endCap) { var p = Pen(pen); if (p == null) return InvalidParameter; p.EndCap = (LineCap)endCap; p.CustomEnd = null; return Ok; }
         internal static int GdipGetPenStartCap(HandleRef pen, out int startCap) { var p = Pen(pen); startCap = (int)(p?.StartCap ?? 0); return p == null ? InvalidParameter : Ok; }
@@ -830,9 +864,9 @@ namespace System.Drawing
         internal static int GdipGetPenTransform(HandleRef pen, HandleRef matrix) => CopyMatrix(Pen(pen)?.Transform, matrix, true);
         internal static int GdipResetPenTransform(HandleRef brush) => WithMatrix(Pen(brush)?.Transform, m => m.Reset());
         internal static int GdipMultiplyPenTransform(HandleRef brush, HandleRef matrix, MatrixOrder order) => Multiply(Pen(brush)?.Transform, matrix, order);
-        internal static int GdipTranslatePenTransform(HandleRef brush, float dx, float dy, MatrixOrder order) => WithMatrix(Pen(brush)?.Transform, m => m.Translate(dx, dy, order));
-        internal static int GdipScalePenTransform(HandleRef brush, float sx, float sy, MatrixOrder order) => WithMatrix(Pen(brush)?.Transform, m => m.Scale(sx, sy, order));
-        internal static int GdipRotatePenTransform(HandleRef brush, float angle, MatrixOrder order) => WithMatrix(Pen(brush)?.Transform, m => m.Rotate(angle, order));
+        internal static int GdipTranslatePenTransform(HandleRef brush, float dx, float dy, MatrixOrder order) => BadOrder(order) ? InvalidParameter : WithMatrix(Pen(brush)?.Transform, m => m.Translate(dx, dy, order));
+        internal static int GdipScalePenTransform(HandleRef brush, float sx, float sy, MatrixOrder order) => BadOrder(order) ? InvalidParameter : WithMatrix(Pen(brush)?.Transform, m => m.Scale(sx, sy, order));
+        internal static int GdipRotatePenTransform(HandleRef brush, float angle, MatrixOrder order) => BadOrder(order) ? InvalidParameter : WithMatrix(Pen(brush)?.Transform, m => m.Rotate(angle, order));
 
         internal static int GdipSetPenColor(HandleRef pen, int argb) { var p = Pen(pen); if (p == null) return InvalidParameter; p.Color = argb; p.Brush = null; return Ok; }
 
@@ -871,7 +905,15 @@ namespace System.Drawing
         }
 
         internal static int GdipGetPenDashStyle(HandleRef pen, out int dashstyle) { var p = Pen(pen); dashstyle = (int)(p?.DashStyle ?? 0); return p == null ? InvalidParameter : Ok; }
-        internal static int GdipSetPenDashStyle(HandleRef pen, int dashstyle) { var p = Pen(pen); if (p == null || dashstyle < 0 || dashstyle > 5) return InvalidParameter; p.DashStyle = (DashStyle)dashstyle; return Ok; }
+        internal static int GdipSetPenDashStyle(HandleRef pen, int dashstyle)
+        {
+            var p = Pen(pen);
+            if (p == null || dashstyle < 0 || dashstyle > 5) return InvalidParameter;
+            // Custom keeps the pattern of the style it replaces (GDI+).
+            if ((DashStyle)dashstyle == DashStyle.Custom && p.DashStyle != DashStyle.Custom && p.Pattern != null) p.DashPattern = p.Pattern;
+            p.DashStyle = (DashStyle)dashstyle;
+            return Ok;
+        }
 
         internal static int GdipSetPenDashArray(HandleRef pen, HandleRef memorydash, int count)
         {
@@ -926,7 +968,8 @@ namespace System.Drawing
             var fill = Get<GpPath>(fillpath);
             var stroke = Get<GpPath>(strokepath);
             if (fill == null && stroke == null) return InvalidParameter;
-            customCap = NewHandle(new GpCustomLineCap { Fill = fill?.Clone(), Stroke = stroke?.Clone(), BaseCap = baseCap, BaseInset = baseInset });
+            // A base cap that is not a plain cap (an anchor, Custom, or out of range) becomes Flat (GDI+).
+            customCap = NewHandle(new GpCustomLineCap { Fill = fill?.Clone(), Stroke = stroke?.Clone(), BaseCap = PlainCap(baseCap) ? baseCap : LineCap.Flat, BaseInset = baseInset });
             return Ok;
         }
 
@@ -943,11 +986,15 @@ namespace System.Drawing
         internal static int GdipDeleteCustomLineCap(HandleRef customCap) => Free(customCap);
         internal static int GdipCloneCustomLineCap(HandleRef customCap, out IntPtr clonedCap) { clonedCap = IntPtr.Zero; var c = Cap(customCap); if (c == null) return InvalidParameter; clonedCap = NewHandle(c.Clone()); return Ok; }
         internal static int GdipGetCustomLineCapType(IntPtr customCap, out CustomLineCapType capType) { var c = Get<GpCustomLineCap>(customCap); capType = c?.IsArrow == true ? CustomLineCapType.AdjustableArrowCap : CustomLineCapType.Default; return c == null ? InvalidParameter : Ok; }
-        internal static int GdipSetCustomLineCapStrokeCaps(HandleRef customCap, LineCap startCap, LineCap endCap) => CapSet(customCap, c => { c.StartCap = startCap; c.EndCap = endCap; });
+        // Flat, Square, Round and Triangle: the caps a custom cap can be based on or stroked with.
+        static bool PlainCap(LineCap cap) => cap >= LineCap.Flat && cap <= LineCap.Triangle;
+
+        internal static int GdipSetCustomLineCapStrokeCaps(HandleRef customCap, LineCap startCap, LineCap endCap)
+            => !PlainCap(startCap) || !PlainCap(endCap) ? InvalidParameter : CapSet(customCap, c => { c.StartCap = startCap; c.EndCap = endCap; });
         internal static int GdipGetCustomLineCapStrokeCaps(HandleRef customCap, out LineCap startCap, out LineCap endCap) { var c = Cap(customCap); startCap = c?.StartCap ?? 0; endCap = c?.EndCap ?? 0; return c == null ? InvalidParameter : Ok; }
         internal static int GdipSetCustomLineCapStrokeJoin(HandleRef customCap, LineJoin lineJoin) => CapSet(customCap, c => c.Join = lineJoin);
         internal static int GdipGetCustomLineCapStrokeJoin(HandleRef customCap, out LineJoin lineJoin) { var c = Cap(customCap); lineJoin = c?.Join ?? 0; return c == null ? InvalidParameter : Ok; }
-        internal static int GdipSetCustomLineCapBaseCap(HandleRef customCap, LineCap baseCap) => CapSet(customCap, c => c.BaseCap = baseCap);
+        internal static int GdipSetCustomLineCapBaseCap(HandleRef customCap, LineCap baseCap) => !PlainCap(baseCap) ? InvalidParameter : CapSet(customCap, c => c.BaseCap = baseCap);
         internal static int GdipGetCustomLineCapBaseCap(HandleRef customCap, out LineCap baseCap) { var c = Cap(customCap); baseCap = c?.BaseCap ?? 0; return c == null ? InvalidParameter : Ok; }
         internal static int GdipSetCustomLineCapBaseInset(HandleRef customCap, float inset) => CapSet(customCap, c => c.BaseInset = inset);
         internal static int GdipGetCustomLineCapBaseInset(HandleRef customCap, out float inset) { var c = Cap(customCap); inset = c?.BaseInset ?? 0; return c == null ? InvalidParameter : Ok; }
@@ -970,7 +1017,8 @@ namespace System.Drawing
         internal static int GdipCreateMatrix3(ref RectangleF rect, PointF* dstplg, out IntPtr matrix)
         {
             matrix = IntPtr.Zero;
-            if (dstplg == null || rect.Width == 0 || rect.Height == 0) return InvalidParameter;
+            if (dstplg == null) return InvalidParameter;
+            if (rect.Width == 0 || rect.Height == 0) return OutOfMemory;
             // Maps rect's top-left, top-right and bottom-left to the three points.
             float sx = rect.Width, sy = rect.Height;
             var m11 = (dstplg[1].X - dstplg[0].X) / sx; var m12 = (dstplg[1].Y - dstplg[0].Y) / sx;
@@ -992,11 +1040,18 @@ namespace System.Drawing
         internal static int GdipCloneMatrix(HandleRef matrix, out IntPtr cloneMatrix) { cloneMatrix = IntPtr.Zero; var m = Matrix(matrix); if (m == null) return InvalidParameter; cloneMatrix = NewHandle(m.Clone()); return Ok; }
         internal static int GdipDeleteMatrix(HandleRef matrix) => Free(matrix);
         internal static int GdipSetMatrixElements(HandleRef matrix, float m11, float m12, float m21, float m22, float dx, float dy) => WithMatrix(Matrix(matrix), m => m.Set(new GpMatrix(m11, m12, m21, m22, dx, dy)));
-        internal static int GdipMultiplyMatrix(HandleRef matrix, HandleRef matrix2, MatrixOrder order) => Multiply(Matrix(matrix), matrix2, order);
-        internal static int GdipTranslateMatrix(HandleRef matrix, float offsetX, float offsetY, MatrixOrder order) => WithMatrix(Matrix(matrix), m => m.Translate(offsetX, offsetY, order));
-        internal static int GdipScaleMatrix(HandleRef matrix, float scaleX, float scaleY, MatrixOrder order) => WithMatrix(Matrix(matrix), m => m.Scale(scaleX, scaleY, order));
-        internal static int GdipRotateMatrix(HandleRef matrix, float angle, MatrixOrder order) => WithMatrix(Matrix(matrix), m => m.Rotate(angle, order));
-        internal static int GdipShearMatrix(HandleRef matrix, float shearX, float shearY, MatrixOrder order) => WithMatrix(Matrix(matrix), m => m.Shear(shearX, shearY, order));
+        internal static int GdipMultiplyMatrix(HandleRef matrix, HandleRef matrix2, MatrixOrder order)
+        {
+            var target = Matrix(matrix);
+            var m = Get<GpMatrix>(matrix2);
+            if (target == null || m == null || BadOrder(order)) return InvalidParameter;
+            target.Multiply(m, order);
+            return Ok;
+        }
+        internal static int GdipTranslateMatrix(HandleRef matrix, float offsetX, float offsetY, MatrixOrder order) => BadOrder(order) ? InvalidParameter : WithMatrix(Matrix(matrix), m => m.Translate(offsetX, offsetY, order));
+        internal static int GdipScaleMatrix(HandleRef matrix, float scaleX, float scaleY, MatrixOrder order) => BadOrder(order) ? InvalidParameter : WithMatrix(Matrix(matrix), m => m.Scale(scaleX, scaleY, order));
+        internal static int GdipRotateMatrix(HandleRef matrix, float angle, MatrixOrder order) => BadOrder(order) ? InvalidParameter : WithMatrix(Matrix(matrix), m => m.Rotate(angle, order));
+        internal static int GdipShearMatrix(HandleRef matrix, float shearX, float shearY, MatrixOrder order) => BadOrder(order) ? InvalidParameter : WithMatrix(Matrix(matrix), m => m.Shear(shearX, shearY, order));
         internal static int GdipInvertMatrix(HandleRef matrix) { var m = Matrix(matrix); if (m == null) return InvalidParameter; return m.Invert() ? Ok : InvalidParameter; }
 
         internal static int GdipTransformMatrixPoints(HandleRef matrix, PointF* pts, int count) { var m = Matrix(matrix); if (m == null || pts == null) return InvalidParameter; for (int i = 0; i < count; i++) pts[i] = m.Transform(pts[i]); return Ok; }

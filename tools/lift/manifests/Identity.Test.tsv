@@ -1,0 +1,27 @@
+# identity b7fc094: source path (relative to its repository)	destination (relative to fork root)
+test/Identity.Test/AuthenticationManagerExtensionsTest.cs	test/webForCore.Identity.Test/AuthenticationManagerExtensionsTest.cs
+test/Identity.Test/ApplicationUserTest.cs	test/webForCore.Identity.Test/ApplicationUserTest.cs
+test/Identity.Test/AsyncHelperTest.cs	test/webForCore.Identity.Test/AsyncHelperTest.cs
+test/Identity.Test/SignInManagerTest.cs	test/webForCore.Identity.Test/SignInManagerTest.cs
+test/Identity.Test/UserLockoutStoreTests.cs	test/webForCore.Identity.Test/UserLockoutStoreTests.cs
+test/Identity.Test/PasswordValidatorTest.cs	test/webForCore.Identity.Test/PasswordValidatorTest.cs
+test/Identity.Test/OwinContextExtensionsTest.cs	test/webForCore.Identity.Test/OwinContextExtensionsTest.cs
+test/Identity.Test/SecurityStampTest.cs	test/webForCore.Identity.Test/SecurityStampTest.cs
+test/Identity.Test/CustomGuidKeyTest.cs	test/webForCore.Identity.Test/CustomGuidKeyTest.cs
+test/Identity.Test/CustomIntKeyTest.cs	test/webForCore.Identity.Test/CustomIntKeyTest.cs
+test/Identity.Test/IdentityExtensionsTest.cs	test/webForCore.Identity.Test/IdentityExtensionsTest.cs
+test/Identity.Test/IdentityDbContextTest.cs	test/webForCore.Identity.Test/IdentityDbContextTest.cs
+test/Identity.Test/InMemoryStore.cs	test/webForCore.Identity.Test/InMemoryStore.cs
+test/Identity.Test/UserStoreTest.cs	test/webForCore.Identity.Test/UserStoreTest.cs
+test/Identity.Test/IdentityResultTest.cs	test/webForCore.Identity.Test/IdentityResultTest.cs
+test/Identity.Test/ClaimsIdentityFactoryTest.cs	test/webForCore.Identity.Test/ClaimsIdentityFactoryTest.cs
+test/Identity.Test/InMemoryStoreTest.cs	test/webForCore.Identity.Test/InMemoryStoreTest.cs
+test/Identity.Test/UserManagerTest.cs	test/webForCore.Identity.Test/UserManagerTest.cs
+test/Identity.Test/RolesTest.cs	test/webForCore.Identity.Test/RolesTest.cs
+test/Identity.Test/LoginsTest.cs	test/webForCore.Identity.Test/LoginsTest.cs
+test/Identity.Test/ExceptionHelper.cs	test/webForCore.Identity.Test/ExceptionHelper.cs
+test/Identity.Test/Properties/AssemblyInfo.cs	test/webForCore.Identity.Test/Properties/AssemblyInfo.cs
+test/Identity.Test/TestUtil.cs	test/webForCore.Identity.Test/TestUtil.cs
+test/Identity.Test/UserClaimsTest.cs	test/webForCore.Identity.Test/UserClaimsTest.cs
+test/Identity.Test/UnitTestHelper.cs	test/webForCore.Identity.Test/UnitTestHelper.cs
+test/Identity.Test/App.config	test/webForCore.Identity.Test/App.config
