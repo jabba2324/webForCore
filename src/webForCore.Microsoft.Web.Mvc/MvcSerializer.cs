@@ -51,9 +51,11 @@ namespace Microsoft.Web.Mvc
         // Deserializes a stream to a graph using the NetDataContractSerializer (binary mode)
         private static object DeserializeGraph(Stream rawBytes)
         {
-            // webForCore: NetDataContractSerializer is .NET Framework only. Html.Serialize and [Deserialize] fail with a
-            // SerializationException (CreateSerializationException wraps this), as Microsoft's Futures binary does on .NET.
-            throw new PlatformNotSupportedException("NetDataContractSerializer is not supported on .NET.");
+            using (XmlDictionaryReader dr = XmlDictionaryReader.CreateBinaryReader(rawBytes, XmlDictionaryReaderQuotas.Max))
+            {
+                object deserialized = new NetDataContractSerializer().ReadObject(dr);
+                return deserialized;
+            }
         }
 
         public virtual string Serialize(object state)
@@ -85,9 +87,10 @@ namespace Microsoft.Web.Mvc
         // Serializes a graph to a byte array using the NetDataContractSerializer (binary mode)
         private static void SerializeGraph(Stream outputStream, object graph)
         {
-            // webForCore: NetDataContractSerializer is .NET Framework only. Html.Serialize and [Deserialize] fail with a
-            // SerializationException (CreateSerializationException wraps this), as Microsoft's Futures binary does on .NET.
-            throw new PlatformNotSupportedException("NetDataContractSerializer is not supported on .NET.");
+            using (XmlDictionaryWriter dw = XmlDictionaryWriter.CreateBinaryWriter(outputStream, null, null, ownsStream: false))
+            {
+                new NetDataContractSerializer().WriteObject(dw, graph);
+            }
         }
     }
 }

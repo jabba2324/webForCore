@@ -1,0 +1,7 @@
+@model MvcSample.Models.WizardState
+@using Microsoft.Web.Mvc
+@{ Layout = null; }
+<form method="post" action="/Futures/Wizard">
+    @Html.Serialize("state", Model)
+    <button type="submit">Next</button>
+</form>

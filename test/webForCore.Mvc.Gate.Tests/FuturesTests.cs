@@ -1,3 +1,5 @@
+using System.Net;
+using System.Text.RegularExpressions;
 using Xunit;
 
 namespace MvcGate
@@ -43,12 +45,36 @@ namespace MvcGate
         }
 
         [Fact]
-        public async Task MvcSerializerIsNotSupported()
+        public async Task HtmlSerializeRoundTripsThroughTheForm()
         {
-            // Html.Serialize and [Deserialize] use NetDataContractSerializer, which .NET does not have.
-            string body = await _server.Client.GetStringAsync("/Futures/Serialize");
+            // Html.Serialize puts the state in a hidden field, signed and encrypted with the machine key; [Deserialize]
+            // reads it back from the post (webForCore's NetDataContractSerializer replacement under MvcSerializer).
+            string page = await _server.Client.GetStringAsync("/Futures/Wizard");
+            Match field = Regex.Match(page, "<input name=\"state\" type=\"hidden\" value=\"([^\"]+)\"");
+            Assert.True(field.Success, page);
+            string value = WebUtility.HtmlDecode(field.Groups[1].Value);
+            Assert.DoesNotContain("Ada", value); // encrypted, not just encoded
 
-            Assert.StartsWith("failed: System.", body);
+            HttpResponseMessage response = await _server.Client.PostAsync("/Futures/Wizard",
+                new FormUrlEncodedContent(new Dictionary<string, string> { ["state"] = value }));
+
+            Assert.Equal("step 2: Ada, red+green, 2026-10-30T12:00Z, Leeds/UK", await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task DeserializeRejectsATamperedValue()
+        {
+            string page = await _server.Client.GetStringAsync("/Futures/Wizard");
+            string value = WebUtility.HtmlDecode(Regex.Match(page, "<input name=\"state\" type=\"hidden\" value=\"([^\"]+)\"").Groups[1].Value);
+            char[] chars = value.ToCharArray();
+            chars[chars.Length / 2] = chars[chars.Length / 2] == 'A' ? 'B' : 'A';
+
+            HttpResponseMessage response = await _server.Client.PostAsync("/Futures/Wizard",
+                new FormUrlEncodedContent(new Dictionary<string, string> { ["state"] = new string(chars) }));
+
+            // As on .NET Framework, [Deserialize] lets MvcSerializer's SerializationException through: the request fails.
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+            Assert.Contains("Deserialization failed.", await response.Content.ReadAsStringAsync());
         }
     }
 }

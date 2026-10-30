@@ -1394,3 +1394,24 @@ reconstructions are now replaced (details and table: `docs/LICENSING.md`):
   border-skin images, not in the assembly), and AjaxControlToolkit's HtmlEditor popups look for
   `ScriptResources.BaseScriptsResources.resources`.
 
+## MVC Futures: Html.Serialize and [Deserialize] work (30 Oct 2026)
+
+`MvcSerializer` serializes with `NetDataContractSerializer` (binary XML), then signs and encrypts with the machine key.
+`NetDataContractSerializer` is .NET Framework only, so the lift had replaced both calls with a throw, and two
+`MvcSerializerTest` tests were skipped. Now `tools/lift/additions/Microsoft.Web.Mvc/NetDataContractSerializer.cs`
+provides an internal class of that name, which `MvcSerializer` finds by its simple name. Both fixups and both skips are
+gone, and `MvcSerializer.cs` is byte for byte upstream.
+
+How the replacement works: `DataContractSerializer` with a `DataContractResolver`.
+- The serializer's own contracts (XML Schema primitives and the `schemas.microsoft.com/2003/10/Serialization`
+  namespaces) keep their names; every other type is written as its full name, with its assembly as the namespace.
+  That is what made `NetDataContractSerializer` read a graph back without known types.
+- On reading, a URI namespace goes to the built-in resolver, and an assembly name is loaded. Delegates are refused
+  either way, although the payload is machine-key protected before it's read.
+- `PreserveObjectReferences` is on, as with `NetDataContractSerializer`.
+- The format differs from .NET Framework's, which only matters for a value serialized there and read here.
+
+Tests: Microsoft.Web.Mvc.Test 456/456 (2 more run). The MVC gate (64) has a wizard: `Html.Serialize` of a
+`[Serializable]` graph (list, date, nested object) in a form, read back by `[Deserialize]` on the post. A tampered
+value fails the request with MvcSerializer's "Deserialization failed." (500), as on .NET Framework.
+

@@ -732,22 +732,9 @@ FIXUPS["Microsoft.Web.Mvc"] = [
      "#if NETFRAMEWORK // webForCore: " + NO_LINQ + "\n"
      "            new SimpleModelBinderProvider(typeof(Binary), new LinqBinaryExtensibleModelBinder())\n#endif\n", 1),
 ]
-NO_NDCS = ("// webForCore: NetDataContractSerializer is .NET Framework only. Html.Serialize and [Deserialize] fail with a\n"
-           "            // SerializationException (CreateSerializationException wraps this), as Microsoft's Futures binary does on .NET.\n")
+# MvcSerializer (Html.Serialize, [Deserialize]) uses NetDataContractSerializer, which .NET does not have; webForCore's
+# replacement (tools/lift/additions/Microsoft.Web.Mvc/NetDataContractSerializer.cs) is found by its simple name.
 FIXUPS["Microsoft.Web.Mvc"] += [
-    ("MvcSerializer.cs",
-     "            using (XmlDictionaryReader dr = XmlDictionaryReader.CreateBinaryReader(rawBytes, XmlDictionaryReaderQuotas.Max))\n"
-     "            {\n"
-     "                object deserialized = new NetDataContractSerializer().ReadObject(dr);\n"
-     "                return deserialized;\n"
-     "            }\n",
-     "            " + NO_NDCS + "            throw new PlatformNotSupportedException(\"NetDataContractSerializer is not supported on .NET.\");\n", 1),
-    ("MvcSerializer.cs",
-     "            using (XmlDictionaryWriter dw = XmlDictionaryWriter.CreateBinaryWriter(outputStream, null, null, ownsStream: false))\n"
-     "            {\n"
-     "                new NetDataContractSerializer().WriteObject(dw, graph);\n"
-     "            }\n",
-     "            " + NO_NDCS + "            throw new PlatformNotSupportedException(\"NetDataContractSerializer is not supported on .NET.\");\n", 1),
     ("Resources/XmlFormatHandler.cs",
      "            DataContractSerializer xml = new DataContractSerializer(bindingContext.ModelType, null, Int32.MaxValue, true, true, null);\n",
      "            // webForCore: .NET has the same settings as DataContractSerializerSettings (no data contract surrogate here: null).\n"
@@ -775,10 +762,6 @@ FIXUPS["Microsoft.Web.Mvc"] += [
      "        public override bool IsValid(object value)\n", 1),
 ]
 FIXUPS["Microsoft.Web.Mvc.Test"] = [("ModelBinding/Test/BinaryDataModelBinderProviderTest.cs",) + USING("System.Data.Linq")]
-NO_NDCS_TEST = "MvcSerializer needs NetDataContractSerializer, which .NET does not have."
-MEMBER_EDITS["Microsoft.Web.Mvc.Test"] = [
-    ("Test/MvcSerializerTest.cs", f"public void {m}()", "skip", NO_NDCS_TEST)
-    for m in ("SerializeAllowsNullValues", "SerializeAndDeserializeRoundTripsValue")]
 RE_TRANSFORMS["Microsoft.Web.Mvc.Test"] = [
     ("**/*.cs", r'\\r\\nParameter name: (\w+)"', r" (Parameter '\1')" + '"', None),
     ("**/*.cs", r'"\s*\+\s*Environment\.NewLine\s*\+\s*"Parameter name: (\w+)"', r" (Parameter '\1')" + '"', None),

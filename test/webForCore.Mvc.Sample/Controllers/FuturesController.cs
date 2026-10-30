@@ -43,17 +43,24 @@ namespace MvcSample.Controllers
             return Content((name ?? "(null)") + "/" + other);
         }
 
-        // MvcSerializer (Html.Serialize, [Deserialize]) uses NetDataContractSerializer, which .NET does not have.
-        public ActionResult Serialize()
+        // Html.Serialize writes the state into the form; [Deserialize] reads it back on the next request.
+        public ActionResult Wizard()
         {
-            try
+            return View(new Models.WizardState
             {
-                return Content(new MvcSerializer().Serialize("state"));
-            }
-            catch (Exception e)
-            {
-                return Content("failed: " + e.GetType().FullName + ": " + e.Message);
-            }
+                Step = 1,
+                Name = "Ada",
+                Choices = { "red", "green" },
+                Started = new DateTime(2026, 10, 30, 12, 0, 0, DateTimeKind.Utc),
+                Shipping = new Models.Address { City = "Leeds", Country = "UK" },
+            });
+        }
+
+        [HttpPost]
+        public ActionResult Wizard([Deserialize] Models.WizardState state)
+        {
+            state.Step++;
+            return Content($"step {state.Step}: {state.Name}, {string.Join("+", state.Choices)}, {state.Started:yyyy-MM-ddTHH:mm}Z, {state.Shipping.City}/{state.Shipping.Country}");
         }
     }
 }

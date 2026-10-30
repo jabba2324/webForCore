@@ -51,7 +51,7 @@ Do this before changing anything, and present the findings to the user.
    | `.xsd` in `App_Code`, `App_WebReferences` | Build providers that don't generate code |
    | `Microsoft.Win32.Registry`, `[ComImport]`, `Marshal.GetActiveObject`, `System.Messaging`, `Microsoft.Office.Interop` | Windows only |
    | `Metafile`, `.emf`, `.wmf` | System.Drawing metafiles: not implemented |
-   | `NetDataContractSerializer`, `Html.Serialize` | Not on .NET |
+   | `NetDataContractSerializer` (outside MVC Futures) | Not on .NET (`Html.Serialize`/`[Deserialize]` work) |
    | `AppDomain.CreateDomain`, `Thread.Abort`, `Thread.ResetAbort` | Different on .NET |
    | `Transaction=` in `@Page`, `System.EnterpriseServices` | COM+: not available |
    | `DataProtectionConfigurationProvider` in a `configProtectedData` section | Must be decrypted on Windows first |

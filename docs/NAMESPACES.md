@@ -32,7 +32,7 @@ in the code; the rest are from `LIFT.md`.
 | Typed DataSets in App_Code | `.xsd` build provider (throws at compile time) | Generate the DataSet class at design time and compile it into the app |
 | Web references | `App_WebReferences` (generates nothing) | Generate the proxy with `dotnet-svcutil` and compile it into the app |
 | Metafiles | EMF/WMF in System.Drawing | PNG/SVG |
-| NetDataContractSerializer | MVC Futures `Html.Serialize` / `[Deserialize]` | Another serializer |
+| `System.Runtime.Serialization.NetDataContractSerializer` in app code | Apps that use it directly (MVC Futures' `Html.Serialize` / `[Deserialize]` work: webForCore provides their serializer) | `DataContractSerializer` with a `DataContractResolver` |
 | BinaryFormatter in app code | .NET 11's `System.Runtime.Serialization.Formatters.Binary.BinaryFormatter` throws | `WebFormsForCore.Serialization.Formatters.Binary.BinaryFormatter` (System.Web uses it for session and view state) |
 | Windows-DPAPI-encrypted configuration | Sections encrypted on Windows with `DataProtectionConfigurationProvider` | Decrypt them on Windows; re-encrypt with `webforcore-regiis` or RSA (see [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md#deployment-tools)) |
 | Code Access Security, partial trust | Trust levels, CAS attributes | Ignored: everything runs in full trust |
@@ -140,7 +140,7 @@ the key directory; containers exported with `aspnet_regiis -px` can be imported.
 | Assembly (version) | Namespaces | Caveats |
 | --- | --- | --- |
 | System.Web.Mvc 5.3 | `System.Web.Mvc` (~250 types), `.Ajax`, `.Async`, `.Filters`, `.Html`, `.Razor`, `.Routing`, `.Routing.Constraints` | `LinqBinaryModelBinder` and the LINQ to SQL `Binary` editor support are compiled out; the EF 1 `EntityState` check too. Views are compiled at run time: turn off the ASP.NET Core Razor SDK in the project |
-| Microsoft.Web.Mvc (MVC Futures) | `Microsoft.Web.Mvc`, `.Controls`, `.ModelBinding`, `.Resources` | `MvcSerializer`, `Html.Serialize` and `[Deserialize]` throw: NetDataContractSerializer doesn't exist on .NET |
+| Microsoft.Web.Mvc (MVC Futures) | `Microsoft.Web.Mvc`, `.Controls`, `.ModelBinding`, `.Resources` | `Html.Serialize` / `[Deserialize]` work: `MvcSerializer` uses webForCore's replacement for NetDataContractSerializer (type-preserving `DataContractSerializer`, machine-key signed and encrypted as before). The hidden-field format differs from .NET Framework's, so a value serialized by a .NET Framework server can't be read back |
 | System.Web.Razor 3.0 | `System.Web.Razor`, `.Generator`, `.Parser`, `.Text`, `.Tokenizer`, `.Editor` | Generated code uses `\n` on Linux |
 | System.Web.WebPages 3.0 | `System.Web.WebPages`, `.Html`, `.Scope`, `.Instrumentation`, `System.Web.Helpers` (AntiForgery) | Side-by-side Web Pages versions aren't supported |
 | System.Web.WebPages.Razor 3.0 | `System.Web.WebPages.Razor`, `.Configuration` | |

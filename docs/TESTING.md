@@ -6,7 +6,7 @@ where .NET's base class library behaves differently from .NET Framework's; those
 [lifted-changes.md](lifted-changes.md). On top of them, webForCore's own **gate suites** run real sample applications
 on Kestrel and check them over HTTP against IIS's documented behaviour.
 
-**Latest run (round 14, 30 Oct 2026, Linux x64, Release): 27,276 tests in 24 suites. 27,088 pass, 37 are skipped
+**Latest run (round 14, 30 Oct 2026, Linux x64, Release, plus MVC Futures' serializer since): 27,277 tests in 24 suites. 27,091 pass, 35 are skipped
 with a reason, and 151 fail, all of them known System.Drawing differences (141 are metafiles).**
 
 ## Running the tests
@@ -34,7 +34,7 @@ that now pass, so the list only shrinks.
 | --- | --- | ---: | ---: | ---: | --- |
 | System.Web.MonoTests | Mono `mcs/class/System.Web/Test` | 2,634 | 2,628 | 6 | System.Web itself: HttpRequest/Response, caching, configuration, controls, forms authentication, hosting, HttpUtility. Corrected to Microsoft's 4.5+ behaviour where Mono's implementation differed |
 | System.Web.Mvc.Test | AspNetWebStack | 5,498 | 5,498 | 0 | MVC 5 |
-| Microsoft.Web.Mvc.Test | AspNetWebStack | 456 | 454 | 2 | MVC Futures |
+| Microsoft.Web.Mvc.Test | AspNetWebStack | 456 | 456 | 0 | MVC Futures |
 | System.Web.Razor.Test | AspNetWebStack | 1,460 | 1,460 | 0 | Razor 3 parser and code generator |
 | System.Web.WebPages.Test | AspNetWebStack | 973 | 971 | 2 | Web Pages |
 | System.Web.WebPages.Razor.Test | AspNetWebStack | 46 | 45 | 1 | Web Pages' Razor host |
@@ -63,7 +63,7 @@ rounding difference; they are listed in `tools/lift/test-results/2026-10-30.md`.
 | --- | ---: | --- |
 | IIS.Gate.Tests | 58 | `test/webForCore.IIS.Sample` on Kestrel: each `<system.webServer>` feature against IIS 10's documented behaviour (request filtering, rewrite rules, redirects, default documents, errors, IP restrictions, directory browsing, compression, logging), the in-process restart, WebSockets, HTTPS and client certificates, timeouts, SignalR, bundling, protected configuration, integrated-pipeline APIs, and precompiled sites (`aspnetcore_compiler`: fixed, updatable, compile errors, usage) |
 | WebApi.Gate.Tests | 66 | `test/webForCore.WebApi.Sample` (Visual Studio's Web API template and the "Getting Started" tutorial's controllers). Each request runs through System.Web and through OWIN, and is compared with an oracle: the same controllers in Web API's in-memory server, without System.Web. Status, media type, body, Location and Allow must match |
-| Mvc.Gate.Tests | 63 | `test/webForCore.Mvc.Sample` and `test/webForCore.WebPages.Sample`: model binding, validation, post-redirect-get with TempData, anti-forgery tokens, filters, error pages, layouts, display and editor templates, Razor features, MVC Futures, Web Pages, and that source files aren't served |
+| Mvc.Gate.Tests | 64 | `test/webForCore.Mvc.Sample` and `test/webForCore.WebPages.Sample`: model binding, validation, post-redirect-get with TempData, `Html.Serialize`/`[Deserialize]` state (and tampering), anti-forgery tokens, filters, error pages, layouts, display and editor templates, Razor features, MVC Futures, Web Pages, and that source files aren't served |
 | Serialization.Tests | 10 | `NameValueCollection` and its subclasses through the BinaryFormatter port, in .NET Framework's format |
 
 ## Code coverage

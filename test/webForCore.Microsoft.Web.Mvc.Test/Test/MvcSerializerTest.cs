@@ -46,10 +46,9 @@ namespace Microsoft.Web.Mvc.Test
                 delegate { serializer.Deserialize(null); }, "serializedValue");
         }
 
-        [Fact(Skip = "webForCore: MvcSerializer needs NetDataContractSerializer, which .NET does not have.")]
+        [Fact]
         public void SerializeAllowsNullValues()
         {
-#if NETFRAMEWORK
             // Arrange
             IMachineKey machineKey = new MockMachineKey();
 
@@ -58,13 +57,11 @@ namespace Microsoft.Web.Mvc.Test
 
             // Assert
             Assert.Equal(@"Microsoft.Web.Mvc.MvcSerializer.v1-dwdhbnlUeXBlLgNuaWyGCQF6M2h0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vMjAwMy8xMC9TZXJpYWxpemF0aW9uLwkBaSlodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYS1pbnN0YW5jZQE=", serializedValue);
-#endif
         }
 
-        [Fact(Skip = "webForCore: MvcSerializer needs NetDataContractSerializer, which .NET does not have.")]
+        [Fact]
         public void SerializeAndDeserializeRoundTripsValue()
         {
-#if NETFRAMEWORK
             // Arrange
             IMachineKey machineKey = new MockMachineKey();
 
@@ -74,7 +71,6 @@ namespace Microsoft.Web.Mvc.Test
 
             // Assert
             Assert.Equal(42, deserializedValue);
-#endif
         }
 
         private sealed class MockMachineKey : IMachineKey
