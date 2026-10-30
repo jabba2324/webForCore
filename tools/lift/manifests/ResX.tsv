@@ -1,0 +1,14 @@
+# dotnet/winforms 8266870: source path (relative to repo root)	destination (relative to fork root)
+src/System.Windows.Forms/src/System/Resources/AssemblyNamesTypeResolutionService.cs	src/WebFormsForCore.Web/WebFormsForCore/System.Resources/winforms/AssemblyNamesTypeResolutionService.cs
+src/System.Windows.Forms/src/System/Resources/DataNodeInfo.cs	src/WebFormsForCore.Web/WebFormsForCore/System.Resources/winforms/DataNodeInfo.cs
+src/System.Windows.Forms/src/System/Resources/IAliasResolver.cs	src/WebFormsForCore.Web/WebFormsForCore/System.Resources/winforms/IAliasResolver.cs
+src/System.Windows.Forms/src/System/Resources/ResXDataNode.cs	src/WebFormsForCore.Web/WebFormsForCore/System.Resources/winforms/ResXDataNode.cs
+src/System.Windows.Forms/src/System/Resources/ResxFileRef.Converter.cs	src/WebFormsForCore.Web/WebFormsForCore/System.Resources/winforms/ResxFileRef.Converter.cs
+src/System.Windows.Forms/src/System/Resources/ResXFileRef.cs	src/WebFormsForCore.Web/WebFormsForCore/System.Resources/winforms/ResXFileRef.cs
+src/System.Windows.Forms/src/System/Resources/ResXNullRef.cs	src/WebFormsForCore.Web/WebFormsForCore/System.Resources/winforms/ResXNullRef.cs
+src/System.Windows.Forms/src/System/Resources/ResXResourceReader.cs	src/WebFormsForCore.Web/WebFormsForCore/System.Resources/winforms/ResXResourceReader.cs
+src/System.Windows.Forms/src/System/Resources/ResXResourceReader.ReaderAliasResolver.cs	src/WebFormsForCore.Web/WebFormsForCore/System.Resources/winforms/ResXResourceReader.ReaderAliasResolver.cs
+src/System.Windows.Forms/src/System/Resources/ResXResourceSet.cs	src/WebFormsForCore.Web/WebFormsForCore/System.Resources/winforms/ResXResourceSet.cs
+src/System.Windows.Forms/src/System/Resources/ResXResourceWriter.cs	src/WebFormsForCore.Web/WebFormsForCore/System.Resources/winforms/ResXResourceWriter.cs
+src/System.Windows.Forms/src/System/Resources/ResXSerializationBinder.cs	src/WebFormsForCore.Web/WebFormsForCore/System.Resources/winforms/ResXSerializationBinder.cs
+src/System.Windows.Forms/src/misc/MultitargetUtil.cs	src/WebFormsForCore.Web/WebFormsForCore/System.Resources/winforms/MultitargetUtil.cs

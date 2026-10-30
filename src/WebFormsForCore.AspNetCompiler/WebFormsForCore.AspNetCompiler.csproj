@@ -54,4 +54,8 @@
         <Compile Include="..\VersionInfo.cs" Link="Properties\VersionInfo.cs" />
     </ItemGroup>
 
+    <ItemGroup>
+        <!-- The Reference Source's CompilerResources (ReferenceSource/aspnet_compiler) looks its strings up by this name. -->
+        <EmbeddedResource Update="CompilerResources.resx" LogicalName="System.Web.Compilation.CompilerResources.resources" />
+    </ItemGroup>
 </Project>

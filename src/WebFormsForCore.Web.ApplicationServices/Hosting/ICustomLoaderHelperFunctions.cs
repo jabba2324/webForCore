@@ -1,14 +1,17 @@
-﻿#nullable disable
-namespace System.Web.Hosting
-{
-  internal interface ICustomLoaderHelperFunctions
-  {
-    string AppPhysicalPath { get; }
+﻿//------------------------------------------------------------------------------
+// <copyright file="ICustomLoaderHelperFunctions.cs" company="Microsoft">
+//    Copyright (c) Microsoft Corporation.  All rights reserved.
+// </copyright>
+//------------------------------------------------------------------------------
 
-    bool? CustomLoaderIsEnabled { get; }
+namespace System.Web.Hosting {
+    using System;
 
-    string GetTrustLevel(string appConfigMetabasePath);
+    internal interface ICustomLoaderHelperFunctions {
+        string AppPhysicalPath { get; }
+        bool? CustomLoaderIsEnabled { get; } // true = always enabled, false = always disabled, null = check trust level
 
-    string MapPath(string relativePath);
-  }
+        string GetTrustLevel(string appConfigMetabasePath);
+        string MapPath(string relativePath);
+    }
 }

@@ -1,0 +1,3 @@
+# microsoft/referencesource ec9fa9a: source path (relative to repo root)	destination (relative to fork root)
+aspnet_compiler/aspnet_compiler.cs	src/WebFormsForCore.AspNetCompiler/ReferenceSource/aspnet_compiler/aspnet_compiler.cs
+aspnet_compiler/DataAnnotationsResources.Designer.cs	src/WebFormsForCore.AspNetCompiler/ReferenceSource/aspnet_compiler/DataAnnotationsResources.Designer.cs

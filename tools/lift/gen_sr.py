@@ -5,7 +5,7 @@ Microsoft's build generates these classes for each assembly; WebFormsForCore had
 generates its own from the project's .resx (docs/LICENSING.md).
 
 Usage: gen_sr.py <file.resx> <output.cs> --namespace N --class SR --resource <manifest resource name>
-                 [--attributes] [--public]
+                 [--attributes] [--nonstatic]
 --attributes also emits <class>DescriptionAttribute and <class>CategoryAttribute, which look their text up by name.
 """
 import argparse
@@ -19,6 +19,8 @@ parser.add_argument("--namespace", required=True)
 parser.add_argument("--class", dest="cls", default="SR")
 parser.add_argument("--resource", required=True)
 parser.add_argument("--attributes", action="store_true")
+parser.add_argument("--properties", action="store_true", help="one property per string returning its text (winforms style), instead of name constants")
+parser.add_argument("--nonstatic", action="store_true", help="a class that can be derived from (System.Web.Mobile's SR is)")
 args = parser.parse_args()
 
 names = [d.get("name") for d in ET.parse(args.resx).getroot().iter("data") if d.get("type") is None and d.get("mimetype") is None]
@@ -30,7 +32,7 @@ lines = [
     "",
     f"namespace {args.namespace}",
     "{",
-    f"\tinternal static partial class {cls}",
+    f"\tinternal {'' if args.nonstatic else 'static '}partial class {cls}",
     "\t{",
     f"\t\tprivate static ResourceManager s_resources;",
     "",
@@ -67,7 +69,10 @@ for name in names:
     ident = re.sub(r"\W", "_", name)
     if ident[0].isdigit():
         ident = "_" + ident
-    lines.append(f"\t\tinternal const string {ident} = \"{name}\";")
+    if args.properties:
+        lines.append(f"\t\tinternal static string {ident} => GetString(\"{name}\");")
+    else:
+        lines.append(f"\t\tinternal const string {ident} = \"{name}\";")
 lines += ["\t}"]
 if args.attributes:
     for kind, base in (("Description", "System.ComponentModel.DescriptionAttribute"), ("Category", "System.ComponentModel.CategoryAttribute")):

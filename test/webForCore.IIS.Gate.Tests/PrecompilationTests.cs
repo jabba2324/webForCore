@@ -66,6 +66,25 @@ namespace IISGate
             Assert.Matches(@"Broken\.aspx\(2\): error CS0103: The name 'Missing' does not exist in the current context", site.CompilerOutput);
         }
 
+        [Fact]
+        public void UsageListsAspnetCompilersSwitches()
+        {
+            var repository = AppContext.BaseDirectory;
+            while (!File.Exists(Path.Combine(repository, "WebFormsForCore.slnx"))) repository = Path.GetDirectoryName(repository);
+            var compiler = Path.Combine(repository, "src", "WebFormsForCore.AspNetCompiler", "bin", "Release", "net11.0", "aspnetcore_compiler.dll");
+            var start = new ProcessStartInfo("dotnet") { RedirectStandardOutput = true, RedirectStandardError = true };
+            start.ArgumentList.Add(compiler);
+            start.ArgumentList.Add("-?");
+            using var process = Process.Start(start);
+            var output = process.StandardOutput.ReadToEnd() + process.StandardError.ReadToEnd();
+            process.WaitForExit();
+            Assert.Contains("ASP.NET Compilation Tool", output); // the banner (resources found)
+            Assert.Contains("aspnet_compiler [-?] [-m metabasePath | -v virtualPath [-p physicalDir]]", output);
+            Assert.Contains("-fixednames", output);
+            Assert.Matches(@"(?m)^-b\s", output); // WebFormsForCore's bin folder switch
+            Assert.Matches(@"(?m)^-t\s", output); // and target framework switch
+        }
+
         private static void AssertRendered(string body)
         {
             Assert.Contains("<title>Precompiled site</title>", body); // App_GlobalResources

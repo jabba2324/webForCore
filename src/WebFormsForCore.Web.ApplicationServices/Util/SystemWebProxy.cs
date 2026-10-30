@@ -1,31 +1,52 @@
-﻿using System.Security.Permissions;
-using System.Web.Security;
+﻿//------------------------------------------------------------------------------
+// <copyright file="SystemWebProxy.cs" company="Microsoft">
+//    Copyright (c) Microsoft Corporation.  All rights reserved.
+// </copyright>
+//------------------------------------------------------------------------------
 
-#nullable disable
-namespace System.Web.Util
-{
-	internal static class SystemWebProxy
-	{
-		public static readonly IMembershipAdapter Membership = SystemWebProxy.GetMembershipAdapter();
+namespace System.Web.Util {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Reflection;
+    using System.Web.Security;
+    using System.Security.Permissions;    
 
-		private static IMembershipAdapter GetMembershipAdapter()
-		{
-			return SystemWebProxy.CreateSystemWebMembershipAdapter() ?? (IMembershipAdapter)new DefaultMembershipAdapter();
-		}
+    // Because this assembly ships in the client SKU, whereas System.Web.dll ships in the Extended SKU, we need to
+    // proxy any usage of System.Web.dll. This allows us to fail gracefully if the Extended SKU is not present. 
+    // Users can avoid this failure by overridding all virtual members on both of these types which will prevent 
+    // this class, and hence, System.Web.dll, from ever being called.
+    internal static class SystemWebProxy {
 
-		private static IMembershipAdapter CreateSystemWebMembershipAdapter()
-		{
-#if NETFRAMEWORK
-            Type type = Type.GetType("System.Web.Security.MembershipAdapter, System.Web, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", false);
-#else
-			// webForCore: the fork's System.Web assembly is named System.Web; "WebFormsForCore.Web" never resolved, so every
-			// MembershipUser and membership password call fell back to DefaultMembershipAdapter (PlatformNotSupportedException).
-			Type type = Type.GetType("System.Web.Security.MembershipAdapter, System.Web", false);
-#endif
-			return type != (Type)null ? (IMembershipAdapter)SystemWebProxy.DangerousCreateInstance(type) : (IMembershipAdapter)null;
-		}
+        public static readonly IMembershipAdapter Membership = GetMembershipAdapter();
 
-		[ReflectionPermission(SecurityAction.Assert, Flags = ReflectionPermissionFlag.MemberAccess)]
-		private static object DangerousCreateInstance(Type type) => Activator.CreateInstance(type);
-	}
+        private static IMembershipAdapter GetMembershipAdapter() {
+            IMembershipAdapter membership = CreateSystemWebMembershipAdapter();
+            if (membership == null) {
+                membership = new DefaultMembershipAdapter();
+            }
+
+            return membership;
+        }
+
+        private static IMembershipAdapter CreateSystemWebMembershipAdapter() {
+            Type type = Type.GetType("System.Web.Security.MembershipAdapter, System.Web", throwOnError:false); // webForCore: the fork's System.Web
+            if (type != null) {
+                // Running on Extended SKU
+
+                return (IMembershipAdapter)DangerousCreateInstance(type);
+            }
+
+            // Running on Client SKU
+            return null;            
+        }
+
+        // Partially trusted callers might not have permissions to create an instance of 
+        // System.Web’s MembershipAdapter type (it’s an internal type), so give them access.
+        [ReflectionPermission(SecurityAction.Assert, Flags=ReflectionPermissionFlag.MemberAccess)]
+        private static object DangerousCreateInstance(Type type) {
+
+            return Activator.CreateInstance(type);
+        }
+    }
 }

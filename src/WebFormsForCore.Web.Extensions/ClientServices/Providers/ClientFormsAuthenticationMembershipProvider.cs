@@ -11,7 +11,7 @@ namespace System.Web.ClientServices.Providers
     using System.Data;
     using System.Data.OleDb;
     using System.IO;
-    using System.Windows.Forms;
+    // webForCore: "using System.Windows.Forms;" removed: nothing here uses it, and the namespace no longer exists
     using System.Web;
     using System.Web.Resources;
     using System.Web.Security;

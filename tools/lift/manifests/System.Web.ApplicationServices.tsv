@@ -1,0 +1,22 @@
+# microsoft/referencesource ec9fa9a: source path (relative to repo root)	destination (relative to fork root)
+System.Web.ApplicationServices/ApplicationServicesStrings.Designer.cs	src/WebFormsForCore.Web.ApplicationServices/ApplicationServicesStrings.Designer.cs
+System.Web.ApplicationServices/ApplicationServicesStrings.resx	src/WebFormsForCore.Web.ApplicationServices/ApplicationServicesStrings.resx
+System.Web.ApplicationServices/Configuration/MembershipPasswordCompatibilityMode.cs	src/WebFormsForCore.Web.ApplicationServices/Configuration/MembershipPasswordCompatibilityMode.cs
+System.Web.ApplicationServices/Hosting/CustomLoaderAttribute.cs	src/WebFormsForCore.Web.ApplicationServices/Hosting/CustomLoaderAttribute.cs
+System.Web.ApplicationServices/Hosting/CustomLoaderHelper.cs	src/WebFormsForCore.Web.ApplicationServices/Hosting/CustomLoaderHelper.cs
+System.Web.ApplicationServices/Hosting/ICustomLoaderHelperFunctions.cs	src/WebFormsForCore.Web.ApplicationServices/Hosting/ICustomLoaderHelperFunctions.cs
+System.Web.ApplicationServices/Security/DefaultMembershipAdapter.cs	src/WebFormsForCore.Web.ApplicationServices/Security/DefaultMembershipAdapter.cs
+System.Web.ApplicationServices/Security/IMembershipAdapter.cs	src/WebFormsForCore.Web.ApplicationServices/Security/IMembershipAdapter.cs
+System.Web.ApplicationServices/Security/MembershipCreateStatus.cs	src/WebFormsForCore.Web.ApplicationServices/Security/MembershipCreateStatus.cs
+System.Web.ApplicationServices/Security/MembershipCreateUserException.cs	src/WebFormsForCore.Web.ApplicationServices/Security/MembershipCreateUserException.cs
+System.Web.ApplicationServices/Security/MembershipPasswordException.cs	src/WebFormsForCore.Web.ApplicationServices/Security/MembershipPasswordException.cs
+System.Web.ApplicationServices/Security/MembershipPasswordFormat.cs	src/WebFormsForCore.Web.ApplicationServices/Security/MembershipPasswordFormat.cs
+System.Web.ApplicationServices/Security/MembershipProvider.cs	src/WebFormsForCore.Web.ApplicationServices/Security/MembershipProvider.cs
+System.Web.ApplicationServices/Security/MembershipProviderCollection.cs	src/WebFormsForCore.Web.ApplicationServices/Security/MembershipProviderCollection.cs
+System.Web.ApplicationServices/Security/MembershipUser.cs	src/WebFormsForCore.Web.ApplicationServices/Security/MembershipUser.cs
+System.Web.ApplicationServices/Security/MembershipUserCollection.cs	src/WebFormsForCore.Web.ApplicationServices/Security/MembershipUserCollection.cs
+System.Web.ApplicationServices/Security/MembershipValidatePasswordEventHandler.cs	src/WebFormsForCore.Web.ApplicationServices/Security/MembershipValidatePasswordEventHandler.cs
+System.Web.ApplicationServices/Security/RoleProvider.cs	src/WebFormsForCore.Web.ApplicationServices/Security/RoleProvider.cs
+System.Web.ApplicationServices/Security/ValidatePasswordEventArgs.cs	src/WebFormsForCore.Web.ApplicationServices/Security/ValidatePasswordEventArgs.cs
+System.Web.ApplicationServices/Util/SecurityServices.cs	src/WebFormsForCore.Web.ApplicationServices/Util/SecurityServices.cs
+System.Web.ApplicationServices/Util/SystemWebProxy.cs	src/WebFormsForCore.Web.ApplicationServices/Util/SystemWebProxy.cs

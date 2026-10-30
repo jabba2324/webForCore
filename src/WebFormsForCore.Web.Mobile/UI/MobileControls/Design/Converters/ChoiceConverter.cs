@@ -14,7 +14,9 @@ namespace System.Web.UI.Design.MobileControls.Converters
     using System.Reflection;
     using System.Web.UI.Design.MobileControls.Util;
     using System.Web.UI.MobileControls;
+#if NETFRAMEWORK // webForCore: WinForms is used only in the .NET Framework designer code below
     using System.Windows.Forms;
+#endif
 
     /// <summary>
     ///    <para>
