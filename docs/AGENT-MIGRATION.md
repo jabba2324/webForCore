@@ -47,7 +47,6 @@ Do this before changing anything, and present the findings to the user.
    | `.svc` files, `ServiceHost`, `<system.serviceModel><services>` | WCF hosting: not available (client proxies may work) |
    | `System.Data.Linq`, `DataContext`, `.dbml`, `LinqDataSource` | LINQ to SQL: not available |
    | `ObjectContext`, `.edmx` with EF < 6, `EntityDataSource` | EF 1–4: not available |
-   | `System.Web.Mail` | Old mail API: throws on Linux |
    | `.xsd` in `App_Code`, `App_WebReferences` | Build providers that don't generate code |
    | `Microsoft.Win32.Registry`, `[ComImport]`, `Marshal.GetActiveObject`, `System.Messaging`, `Microsoft.Office.Interop` | Windows only |
    | `Metafile`, `.emf`, `.wmf` | System.Drawing metafiles: not implemented |

@@ -119,7 +119,15 @@ namespace System.Web.Services.Protocols {
 #endif
 			XmlSerializer[] serializers = null;
             if (AppDomain.CurrentDomain.IsHomogenous) {
+#if NETFRAMEWORK
                 serializers = XmlSerializer.FromMappings(xmlMappings);
+#else
+                // webForCore: the type gives XmlSerializer the load context to generate its serializer in; without it the
+                // serializer is generated in the default context, which can't reference the application's types when the
+                // application runs in a collectible PseudoAppDomain ("A non-collectible assembly may not reference a collectible
+                // assembly").
+                serializers = XmlSerializer.FromMappings(xmlMappings, type);
+#endif
             }
             else {
 #pragma warning disable 618 // If we're in a non-homogenous domain, legacy CAS mode is enabled, so passing through evidence will not fail

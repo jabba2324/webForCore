@@ -463,6 +463,13 @@ namespace System.Web
                             out hostingEnvironmentSection,
                             out configInitException);
 
+#if !NETFRAMEWORK
+                    // webForCore: .NET's DbProviderFactories doesn't read <system.data><DbProviderFactories>; register them.
+                    if (configInitException == null) {
+                        System.Web.Configuration.DbProviderFactoriesConfiguration.Apply();
+                    }
+#endif
+
                     // Once the configuration system is initialized, we can read
                     // the cache configuration settings.
                     //

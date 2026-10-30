@@ -453,6 +453,11 @@ public class SmtpMail {
     [SecurityPermission(SecurityAction.Assert, UnmanagedCode=true)]
     public static void Send(String from, String to, String subject, String messageText) {
         lock (_lockObject) {
+#if !NETFRAMEWORK
+            // webForCore: no CDO on .NET; System.Net.Mail.SmtpClient sends the message (WebFormsForCore/SmtpMailSender.cs).
+            SmtpMailSender.Send(from, to, subject, messageText);
+            return;
+#endif
 #if !FEATURE_PAL // FEATURE_PAL does not enable SmtpMail
             if (Environment.OSVersion.Platform != PlatformID.Win32NT) {
                 throw new PlatformNotSupportedException(SR.GetString(SR.RequiresNT));
@@ -480,6 +485,11 @@ public class SmtpMail {
     [SecurityPermission(SecurityAction.Assert, UnmanagedCode=true)]
     public static void Send(MailMessage message) {
         lock (_lockObject) {
+#if !NETFRAMEWORK
+            // webForCore: no CDO on .NET; System.Net.Mail.SmtpClient sends the message (WebFormsForCore/SmtpMailSender.cs).
+            SmtpMailSender.Send(message);
+            return;
+#endif
 #if !FEATURE_PAL // FEATURE_PAL does not enable SmtpMail
             if (Environment.OSVersion.Platform != PlatformID.Win32NT) {
                 throw new PlatformNotSupportedException(SR.GetString(SR.RequiresNT));

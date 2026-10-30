@@ -815,6 +815,16 @@ public class AssemblyBuilder
             }
         }
 
+#if !NETFRAMEWORK
+        // webForCore: .NET's System, mscorlib, ... are facades that forward their types to other assemblies (System's
+        // MarshalByValueComponent is in System.ComponentModel.TypeConverter). The compiler needs those too (CS0012), so
+        // each referenced facade brings the assemblies its forwarded types live in.
+        foreach (Assembly target in ForwardedTypeAssemblies(_initialReferencedAssemblies))
+        {
+            _initialReferencedAssemblies.Add(target);
+        }
+#endif
+
         // Add all the referenced assemblies to the compilParams
         Util.AddAssembliesToStringCollection(_initialReferencedAssemblies, compilParams.ReferencedAssemblies);
 
@@ -823,6 +833,40 @@ public class AssemblyBuilder
 
         return compilParams;
     }
+
+#if !NETFRAMEWORK
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<Assembly, Assembly[]> s_forwardTargets =
+        new System.Collections.Concurrent.ConcurrentDictionary<Assembly, Assembly[]>();
+
+    // .NET assemblies whose types System.Web itself defines: netstandard forwards HttpUtility to System.Web.HttpUtility,
+    // and referencing it as well would make HttpUtility ambiguous (CS0433).
+    private static readonly HashSet<string> s_definedBySystemWeb = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "System.Web.HttpUtility" };
+
+    // The assemblies that the given framework facades forward types to (only assemblies of the shared framework).
+    private static List<Assembly> ForwardedTypeAssemblies(ICollection referenced)
+    {
+        string runtimeDirectory = Path.GetDirectoryName(typeof(object).Assembly.Location);
+        var targets = new List<Assembly>();
+        foreach (Assembly assembly in referenced)
+        {
+            if (assembly.IsDynamic || string.IsNullOrEmpty(assembly.Location) ||
+                !string.Equals(Path.GetDirectoryName(assembly.Location), runtimeDirectory, StringComparison.OrdinalIgnoreCase))
+                continue;
+            targets.AddRange(s_forwardTargets.GetOrAdd(assembly, a =>
+            {
+                try
+                {
+                    return a.GetForwardedTypes().Select(t => t.Assembly).Distinct().Where(t => t != a).ToArray();
+                }
+                catch (ReflectionTypeLoadException e)
+                {
+                    return e.Types.Where(t => t != null).Select(t => t.Assembly).Distinct().Where(t => t != a).ToArray();
+                }
+            }).Where(t => !s_definedBySystemWeb.Contains(t.GetName().Name)));
+        }
+        return targets;
+    }
+#endif
 
     static string s_vbImportsString;
 

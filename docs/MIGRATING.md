@@ -11,7 +11,7 @@ For an AI agent doing the migration, the same procedure is written as instructio
 
 1. **Check the blockers.** Search the solution for the APIs in the summary table of [NAMESPACES.md](NAMESPACES.md):
    `WindowsIdentity`, `<authentication mode="Windows">`, `System.ServiceModel` hosting (`.svc`), `System.Data.Linq`,
-   `ObjectContext`/EDMX (EF 1–4), `System.Web.Mail`, registry and COM use, `.xsd` files in App_Code, `App_WebReferences`,
+   `ObjectContext`/EDMX (EF 1–4), registry and COM use, `.xsd` files in App_Code, `App_WebReferences`,
    EMF/WMF metafiles. Each one needs a code change; plan these first.
 2. **Inventory the dependencies.** List NuGet packages and referenced DLLs:
    - Microsoft's ASP.NET packages (`Microsoft.AspNet.Mvc`, `.WebApi.*`, `.WebPages`, `.Razor`, `.Cors`,
@@ -158,8 +158,9 @@ reach System.Web, and ASP.NET Core serves everything else.
 - **Protected sections:** sections encrypted with RSA can be read once the key container is imported
   (`webforcore-regiis -pi`). Sections encrypted with Windows DPAPI must be decrypted on Windows first. See
   [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md#deployment-tools).
-- **`<system.data><DbProviderFactories>`** entries aren't registered from configuration; call
-  `DbProviderFactories.RegisterFactory` in `Program.cs` before `UseWebForms`.
+- **`<system.data><DbProviderFactories>`** entries are registered from configuration at application start, as on
+  .NET Framework; the provider's assembly must be in `bin_dotnet`.
+- **`<system.net><mailSettings>`** is read by `System.Net.Mail.SmtpClient` and `System.Web.Mail.SmtpMail`.
 
 ## 6. Code changes
 

@@ -6,7 +6,7 @@ where .NET's base class library behaves differently from .NET Framework's; those
 [lifted-changes.md](lifted-changes.md). On top of them, webForCore's own **gate suites** run real sample applications
 on Kestrel and check them over HTTP against IIS's documented behaviour.
 
-**Latest run (round 14, 30 Oct 2026, Linux x64, Release, plus MVC Futures' serializer since): 27,277 tests in 24 suites. 27,091 pass, 35 are skipped
+**Latest run (round 16, 30 Oct 2026, Linux x64, Release): 27,290 tests in 24 suites. 27,104 pass, 35 are skipped
 with a reason, and 151 fail, all of them known System.Drawing differences (141 are metafiles).**
 
 ## Running the tests
@@ -61,7 +61,7 @@ rounding difference; they are listed in `tools/lift/test-results/2026-10-30.md`.
 
 | Suite | Tests | What it checks |
 | --- | ---: | --- |
-| IIS.Gate.Tests | 58 | `test/webForCore.IIS.Sample` on Kestrel: each `<system.webServer>` feature against IIS 10's documented behaviour (request filtering, rewrite rules, redirects, default documents, errors, IP restrictions, directory browsing, compression, logging), the in-process restart, WebSockets, HTTPS and client certificates, timeouts, SignalR, bundling, protected configuration, integrated-pipeline APIs, and precompiled sites (`aspnetcore_compiler`: fixed, updatable, compile errors, usage) |
+| IIS.Gate.Tests | 71 | `test/webForCore.IIS.Sample` on Kestrel: each `<system.webServer>` feature against IIS 10's documented behaviour (request filtering, rewrite rules, redirects, default documents, errors, IP restrictions, directory browsing, compression, logging), the in-process restart, WebSockets, HTTPS and client certificates, timeouts, SignalR, bundling, protected configuration, integrated-pipeline APIs, precompiled sites (`aspnetcore_compiler`: fixed, updatable, compile errors, usage), ASMX (SOAP 1.1/1.2, faults, HTTP POST, WSDL, help page, JSON), ASP.NET AJAX (ScriptResource.axd, UpdatePanel partial postback, page methods), `System.Web.Mail` and `<DbProviderFactories>` |
 | WebApi.Gate.Tests | 66 | `test/webForCore.WebApi.Sample` (Visual Studio's Web API template and the "Getting Started" tutorial's controllers). Each request runs through System.Web and through OWIN, and is compared with an oracle: the same controllers in Web API's in-memory server, without System.Web. Status, media type, body, Location and Allow must match |
 | Mvc.Gate.Tests | 64 | `test/webForCore.Mvc.Sample` and `test/webForCore.WebPages.Sample`: model binding, validation, post-redirect-get with TempData, `Html.Serialize`/`[Deserialize]` state (and tampering), anti-forgery tokens, filters, error pages, layouts, display and editor templates, Razor features, MVC Futures, Web Pages, and that source files aren't served |
 | Serialization.Tests | 10 | `NameValueCollection` and its subclasses through the BinaryFormatter port, in .NET Framework's format |
@@ -83,8 +83,9 @@ Web API 91%, Razor 90%, Formatting 90%. The port is the weak spot:
 - **System.Web (27.8% of 146,216 lines)** is covered by Mono's tests and the gates. The hosting layer webForCore
   added is well covered (the IIS layer 84%, the worker request 69%), but large parts of the Web Forms control set
   and the configuration sections are only exercised indirectly.
-- **System.Web.Services (ASMX) has no coverage at all**, and **System.Web.Extensions** (AJAX, ScriptManager,
-  UpdatePanel) has 3.1%. Both are used by real apps and are the clearest gaps.
+- **System.Web.Services (ASMX) had no coverage at all**, and **System.Web.Extensions** (AJAX, ScriptManager,
+  UpdatePanel) had 3.1%. Since these figures, the IIS gate has suites for both (`WebServiceTests`, `AjaxTests`), but
+  they cover the main paths only; both remain thin.
 - System.Web.DataVisualization (8.9%) and WebGrease (7.5%) are large and only touched through the Chart helper and
   bundling.
 

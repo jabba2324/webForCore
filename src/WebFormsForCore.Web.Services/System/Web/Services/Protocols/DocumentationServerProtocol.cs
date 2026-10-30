@@ -130,6 +130,9 @@ namespace System.Web.Services.Protocols {
             if (config.WsdlHelpGenerator.Href != null && config.WsdlHelpGenerator.Href.Length > 0)
             {
                 TraceMethod caller = Tracing.On ? new TraceMethod(this, "Initialize") : null;
+#if !NETFRAMEWORK
+                ExtractDefaultHelpGenerator(config.WsdlHelpGenerator.HelpGeneratorPath);
+#endif
                 if (Tracing.On) Tracing.Enter("ASP.NET", caller, new TraceMethod(typeof(PageParser), "GetCompiledPageInstance", config.WsdlHelpGenerator.HelpGeneratorVirtualPath, config.WsdlHelpGenerator.HelpGeneratorPath, Context));
 
                 handler = GetCompiledPageInstance(config.WsdlHelpGenerator.HelpGeneratorVirtualPath,
@@ -151,6 +154,32 @@ namespace System.Web.Services.Protocols {
         {
             return PageParser.GetCompiledPageInstance(virtualPath, inputFile, context);
         }
+
+#if !NETFRAMEWORK
+        // webForCore: .NET Framework installed DefaultWsdlHelpGenerator.aspx in its CONFIG folder; here machine.config is
+        // extracted to the app's App_Data, so the help page that machine.config names is extracted next to it, from
+        // webForCore's own page embedded in this assembly. A page the app or machine.config points elsewhere is left alone.
+        static readonly object helpGeneratorLock = new object();
+        static string extractedHelpGeneratorPath;
+
+        static void ExtractDefaultHelpGenerator(string path) {
+            const string name = "DefaultWsdlHelpGenerator.aspx";
+            if (!string.Equals(Path.GetFileName(path), name, StringComparison.OrdinalIgnoreCase)
+                || !string.Equals(Path.GetDirectoryName(Path.GetFullPath(path)), Path.GetFullPath(HttpRuntime.MachineConfigurationDirectory).TrimEnd(Path.DirectorySeparatorChar), StringComparison.Ordinal)) {
+                return;
+            }
+            lock (helpGeneratorLock) {
+                if (extractedHelpGeneratorPath == path) return;
+                string text;
+                using (Stream stream = typeof(DocumentationServerProtocol).Assembly.GetManifestResourceStream(name))
+                using (StreamReader reader = new StreamReader(stream)) {
+                    text = reader.ReadToEnd();
+                }
+                if (!File.Exists(path) || File.ReadAllText(path) != text) File.WriteAllText(path, text);
+                extractedHelpGeneratorPath = path;
+            }
+        }
+#endif
 
         internal override ServerType ServerType {
             get { return serverType; }

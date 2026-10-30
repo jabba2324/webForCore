@@ -953,6 +953,13 @@ namespace System.Web.Configuration {
 			return retAssembly;
 		}
 
+#if !NETFRAMEWORK
+        // System.Web.Services.Description: the WCF client package (from CoreWCF), which has WsiProfiles, ServiceDescription
+        // and other types of System.Web.Services.
+        private static readonly System.Collections.Generic.HashSet<string> s_duplicatesOfSystemWebTypes =
+            new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase) { "System.Web.Services.Description" };
+#endif
+
 		internal Assembly[] LoadAllAssembliesFromAppDomainBinDirectory() {
             // Get the path to the bin directory
             string binPath = HttpRuntime.BinDirectoryInternal;
@@ -980,6 +987,13 @@ namespace System.Web.Configuration {
                         // Don't autoload generated assemblies in bin (VSWhidbey 467936)
                         if (assemblyName.StartsWith(BuildManager.WebAssemblyNamePrefix, StringComparison.Ordinal))
                             continue;
+
+#if !NETFRAMEWORK
+                        // webForCore: .NET packages in the output folder that define System.Web's own types again; pages
+                        // compile against System.Web's assemblies only, as on .NET Framework (CS0433 otherwise).
+                        if (s_duplicatesOfSystemWebTypes.Contains(assemblyName))
+                            continue;
+#endif
 
                         if (!GetAssembliesCollection().IsRemoved(assemblyName)) {
                             assembly = LoadAssemblyFromFileHelper(assemblyName, assemblyFile, true);

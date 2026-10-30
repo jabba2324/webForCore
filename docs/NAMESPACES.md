@@ -27,7 +27,6 @@ in the code; the rest are from `LIFT.md`.
 | Windows authentication | `<authentication mode="Windows">`, `WindowsIdentity`, impersonation, file ACL authorization | Forms, cookie or OpenID Connect authentication |
 | WCF | Hosting `.svc` services; `ApplicationServicesHostFactory` | CoreWCF, or ASMX (`.asmx` works) |
 | LINQ to SQL, Entity Framework 1–4 | `LinqDataSource`, MVC's `LinqBinaryModelBinder`, the `Binary` editor templates, `EntityDataSource` (not built), the DynamicData LINQ to SQL provider | EF 6.4+ or EF Core, with `ObjectDataSource`/model binding |
-| Old mail API | `System.Web.Mail.SmtpMail.Send` (needs Windows CDO) | `System.Net.Mail.SmtpClient` or a mail library |
 | COM+ transactions | `<%@ Page Transaction=... %>`, `Transactions.InvokeTransacted` | `System.Transactions.TransactionScope` |
 | Typed DataSets in App_Code | `.xsd` build provider (throws at compile time) | Generate the DataSet class at design time and compile it into the app |
 | Web references | `App_WebReferences` (generates nothing) | Generate the proxy with `dotnet-svcutil` and compile it into the app |
@@ -75,14 +74,18 @@ Caveats:
   `ThreadAbortException` instance, but no thread is aborted, so code that relies on `Thread.ResetAbort` or on an abort
   interrupting a running thread behaves differently. A request that exceeds `executionTimeout` gets its 500 on time;
   its code runs to the end.
-- **Windows-only APIs throw `PlatformNotSupportedException`:** `System.Web.Mail.SmtpMail.Send`
-  (`Util/SmtpMail.cs`), `Util.WorkItem.Post`, `Util.Transactions.InvokeTransacted` (page transactions),
+- **Windows-only APIs throw `PlatformNotSupportedException`:** `Util.WorkItem.Post`, `Util.Transactions.InvokeTransacted` (page transactions),
   `HttpRequest.HttpChannelBinding`, and `IisTraceListener`/`IisTraceWebEventProvider`.
 - **Build providers:** `.xsd` files in App_Code throw `NotImplementedException` when compiled
   (`Compilation/XsdBuildProvider.cs`); `App_WebReferences` produce no proxy (`Compilation/WebReferencesBuildProvider.cs`).
 - **Windows authentication**, impersonation and `FileAuthorizationModule`'s ACL checks aren't available.
-- `<system.data><DbProviderFactories>` entries from the app's configuration aren't registered; register factories in
-  code with `DbProviderFactories.RegisterFactory`.
+- **`System.Web.Mail.SmtpMail.Send`** sends with `System.Net.Mail.SmtpClient` instead of Windows CDO
+  (`WebFormsForCore/SmtpMailSender.cs`). The message's CDO fields (`smtpserver`, `smtpserverport`, `smtpusessl`,
+  `smtpauthenticate` with `sendusername`/`sendpassword`, `sendusing` with a pickup directory) are honoured; without
+  them, `SmtpMail.SmtpServer` and then `<system.net><mailSettings><smtp>` apply. CDO's other fields (NTLM
+  authentication, proxy settings) are ignored.
+- `<system.data><DbProviderFactories>` in the app's configuration (`<add>`, `<remove>`, `<clear>`) registers ADO.NET
+  providers at application start, as on .NET Framework (`WebFormsForCore/DbProviderFactoriesSectionHandler.cs`).
 - `HttpUtility` follows .NET Framework 4.5+ (strict decoding); the 4.0 compatibility quirks of apps without
   `targetFramework` aren't emulated.
 - A `.resx` file reference to an icon (`ResXFileRef` of type `Icon`) throws off Windows.
@@ -106,8 +109,14 @@ primitives.
 ### System.Web.Services (`src/WebFormsForCore.Web.Services`)
 
 `System.Web.Services`, `.Configuration`, `.Description`, `.Discovery`, `.Protocols`: ASMX web services and SOAP
-client proxies. XML serialization uses .NET's `XmlSerializer`. The HTTP/MIME
+client proxies. SOAP 1.1 and 1.2, faults, HTTP POST from the local machine, `?WSDL` and `[ScriptService]` JSON are
+covered by the IIS gate. XML serialization uses .NET's `XmlSerializer`. The HTTP/MIME
 WSDL importers are .NET Framework only; importing WSDL that uses HTTP bindings is untested.
+
+Caveat: the page a browser gets for a `.asmx` (and `?op=<name>`) is webForCore's own `DefaultWsdlHelpGenerator.aspx`
+(MIT): .NET Framework's isn't open source. It lists the operations with their documentation, links the service
+description and, for local requests, has an HTTP POST test form; it doesn't show SOAP request/response samples or WS-I
+conformance warnings. An app's own `<wsdlHelpGenerator href>` still replaces it.
 
 ### System.Configuration (`src/WebFormsForCore.Configuration`)
 

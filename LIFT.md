@@ -1389,10 +1389,10 @@ reconstructions are now replaced (details and table: `docs/LICENSING.md`):
 - **Resource names checked.** Two Reference Source resource classes look up their strings by a fixed name (aspnet_compiler's
   `CompilerResources`, ApplicationServices' `ApplicationServicesStrings`), and so does `ResXSR`. Each needed a
   LogicalName in its project; until then, any error message from them failed to load. Every `new ResourceManager("...")`
-  in the port is now checked against the resources embedded in the built assembly. Two mismatches predate this work and
-  are not fixed: DataVisualization's `Borders3D` looks for `System.Web.UI.DataVisualization.Charting.resources` (the 3D
-  border-skin images, not in the assembly), and AjaxControlToolkit's HtmlEditor popups look for
-  `ScriptResources.BaseScriptsResources.resources`.
+  in the port is now checked against the resources embedded in the built assembly. Two names match nothing, and neither
+  is ever read: `Borders3D.ResourceManager` (DataVisualization, `System.Web.UI.DataVisualization.Charting`) has no
+  caller, and the HtmlEditor `Popup`'s `_rm` (AjaxControlToolkit, `ScriptResources.BaseScriptsResources`) is assigned
+  and never used. Not defects; left as they are.
 
 ## MVC Futures: Html.Serialize and [Deserialize] work (30 Oct 2026)
 
@@ -1415,3 +1415,50 @@ Tests: Microsoft.Web.Mvc.Test 456/456 (2 more run). The MVC gate (64) has a wiza
 `[Serializable]` graph (list, date, nested object) in a form, read back by `[Deserialize]` on the post. A tampered
 value fails the request with MvcSerializer's "Deserialization failed." (500), as on .NET Framework.
 
+## ASMX, ASP.NET AJAX, mail and provider registration (30 Oct 2026)
+
+New IIS gate suites for features with no tests until now, and the fixes they needed.
+
+**ASMX** (`WebServiceTests`, 7 tests, `services/Catalog.asmx` with `App_Code/Catalog.cs`): `?WSDL`, SOAP 1.1, SOAP 1.2
+with a complex return type, an exception as a SOAP fault, HTTP POST from the local machine, the help page, and
+`[ScriptService]` JSON. Three fixes:
+- **CS0012 compiling App_Code** (`MarshalByValueComponent` "defined in an assembly that is not referenced"): .NET's
+  `System.dll` facade forwards types to `System.ComponentModel.TypeConverter` and others, which the run-time compiler
+  wasn't given. `AssemblyBuilder` now adds the targets of the forwarded types of each runtime-directory reference.
+- **CS0433 `WsiProfiles`**: the WCF client package puts `System.Web.Services.Description.dll` in `bin`, which defines
+  types System.Web.Services also has. `CompilationSection` skips that assembly when it adds `bin` assemblies.
+- **"A non-collectible assembly may not reference a collectible assembly"**: `XmlSerializer.FromMappings(mappings)`
+  generates its serializer in a non-collectible context, but the service type lives in the app's collectible
+  PseudoAppDomain. `SoapServerProtocol`, `SoapServerMethod` and `XmlReturnReader` pass the service type
+  (`FromMappings(mappings, type)`), which puts the generated assembly in that type's context.
+
+**The ASMX help page.** A browser opening a `.asmx` got an empty page: nothing configured a help generator.
+.NET Framework's root web.config names `DefaultWsdlHelpGenerator.aspx` in its CONFIG folder, a Microsoft file that
+isn't open source. webForCore has its own page (`src/WebFormsForCore.Web.Services/DefaultWsdlHelpGenerator.aspx`, MIT),
+embedded in System.Web.Services; machine.config names it, and `DocumentationServerProtocol` extracts it next to the
+extracted machine.config before compiling it. It lists the operations, links the WSDL and, for local requests, has an
+HTTP POST test form. No SOAP samples or conformance warnings.
+
+**ASP.NET AJAX** (`AjaxTests`, 4 tests, `ajax/Panel.aspx`): the ScriptManager's scripts from `ScriptResource.axd`, an
+UpdatePanel partial postback (the delta response, only the panel rendered), a full postback of the same page, and a
+page method called with JSON. No fixes needed. Two things the tests had to respect, both as on IIS: partial
+rendering depends on the browser definitions, so a client without a known User-Agent gets none; and the sample's
+`maxQueryString="100"` (a request filtering test) rejects `ScriptResource.axd` URLs, so the sample lifts it there.
+
+**`System.Web.Mail.SmtpMail.Send`** threw `PlatformNotSupportedException` (it drove Windows CDO). It now maps the
+message to `System.Net.Mail` (`src/WebFormsForCore.Web/WebFormsForCore/SmtpMailSender.cs`): addresses (`;` or `,`
+separated), subject, body and format, encoding, priority, headers, `Content-Base`/`Content-Location`, attachments,
+and the CDO fields for server, port, SSL, timeout, basic authentication and pickup directory. machine.config's
+`<system.net><mailSettings>` declarations now name `System.Configuration.ConfigurationManager`, where the types are, so
+the section is readable. `MailTests` sends to a pickup directory and checks the message file.
+
+**`<system.data><DbProviderFactories>`** entries were ignored (.NET's `DbProviderFactories` has no configuration).
+`DbProviderFactoriesSectionHandler` (`src/WebFormsForCore.Web/WebFormsForCore/`) parses `<add>`, `<remove>` and
+`<clear>`, inheriting the parent's list, and `HttpRuntime` applies the result with `RegisterFactory` and
+`UnregisterFactory` at application start. machine.config's `system.data` section uses it. `DataTests` checks an added
+provider, a removed built-in and a kept one.
+
+The full regression (round 16) caught one regression from the CS0012 fix: `netstandard.dll` forwards `HttpUtility` to
+.NET's `System.Web.HttpUtility.dll`, and referencing it as well made `HttpUtility` ambiguous with System.Web's
+(CS0433 on any page using it). Forward targets whose types System.Web defines are now left out. Round 16: 27,290
+tests in 24 suites; 27,104 pass, 35 skipped, 151 known System.Drawing failures. IIS gate 71 (13 new).

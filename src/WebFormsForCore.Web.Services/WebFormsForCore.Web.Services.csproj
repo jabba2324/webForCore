@@ -66,6 +66,8 @@
 		<EmbeddedResource Include="*.resx">
 		    <LogicalName>%(FileName).resources</LogicalName>
 	    </EmbeddedResource>
+		<!-- webForCore: the help page DocumentationServerProtocol extracts next to machine.config. -->
+		<EmbeddedResource Include="DefaultWsdlHelpGenerator.aspx" LogicalName="DefaultWsdlHelpGenerator.aspx" />
 	</ItemGroup>
 	
     <PropertyGroup>
