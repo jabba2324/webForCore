@@ -779,6 +779,30 @@ namespace System.Web {
         public void TransferRequest(string path, bool preserveForm, string method, NameValueCollection headers, bool preserveUser) {
             EnsureHasNotTransitionedToWebSocket();
 
+#if !NETFRAMEWORK
+            // webForCore: the Kestrel host runs the transferred request itself (AspNetCoreWorkerRequest.ScheduleTransfer).
+            if (_context?.WorkerRequest is AspNetCoreWorkerRequest kestrel) {
+                if (path == null) {
+                    throw new ArgumentNullException("path");
+                }
+                path = _context.Response.RemoveAppPathModifier(path);
+                String kqs = null;
+                int kiqs = path.IndexOf('?');
+                if (kiqs >= 0) {
+                    kqs = (kiqs < path.Length - 1) ? path.Substring(kiqs + 1) : String.Empty;
+                    path = path.Substring(0, kiqs);
+                }
+                if (!UrlPath.IsValidVirtualPathWithoutProtocol(path)) {
+                    throw new ArgumentException(SR.GetString(SR.Invalid_path_for_child_request, path));
+                }
+                VirtualPath kVirtualPath = _context.Request.FilePathObject.Combine(VirtualPath.Create(path));
+                kestrel.ScheduleTransfer(kVirtualPath.VirtualPathString, kqs, method, preserveForm,
+                    preserveForm ? _context.Request.EntityBody : null, headers, preserveUser ? _context.User : null);
+                _context.ApplicationInstance.EnsureReleaseState();
+                _context.ApplicationInstance.CompleteRequest();
+                return;
+            }
+#endif
             if (!HttpRuntime.UseIntegratedPipeline) {
                 throw new PlatformNotSupportedException(SR.GetString(SR.Requires_Iis_Integrated_Mode));
             }

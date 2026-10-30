@@ -24,6 +24,7 @@ namespace System.Web {
         private HttpRequest _request;
         private HttpResponse _response;
         private IIS7WorkerRequest _iis7WorkerRequest;
+        private AspNetCoreWorkerRequest _kestrelRequest; // webForCore: request headers write through to the Kestrel host
         // webForCore: response headers on the fork's Kestrel host (see the constructor below).
         private bool _managedResponse;
         
@@ -36,6 +37,7 @@ namespace System.Web {
             // if this is an IIS7WorkerRequest, then the collection will be writeable and we will
             // call into IIS7 to update the header blocks when changes are made.
             _iis7WorkerRequest = wr as IIS7WorkerRequest;
+            _kestrelRequest = wr as AspNetCoreWorkerRequest;
 
             _request = request;
         }
@@ -68,6 +70,7 @@ namespace System.Web {
             _request = col._request;
             _response = col._response;
             _iis7WorkerRequest = col._iis7WorkerRequest;
+            _kestrelRequest = col._kestrelRequest;
             _managedResponse = col._managedResponse;
         }
 
@@ -85,7 +88,7 @@ namespace System.Web {
                 _response.AppendHeader(name, value);
                 return;
             }
-            if (_iis7WorkerRequest == null) {
+            if (_iis7WorkerRequest == null && !KestrelRequest) {
                 throw new PlatformNotSupportedException();
             }
             // append to existing value
@@ -115,15 +118,18 @@ namespace System.Web {
                 _response.AppendHeader(name, value);
                 return;
             }
-            if (_iis7WorkerRequest == null) {
+            if (_iis7WorkerRequest == null && !KestrelRequest) {
                 throw new PlatformNotSupportedException();
             }
             // set new value
             SetHeader(name, value, true /*replace*/);
         }
 
+        // webForCore: request headers on the Kestrel host, writable as in integrated mode.
+        private bool KestrelRequest => _request != null && _kestrelRequest != null;
+
         internal void SetHeader(String name, String value, bool replace) {
-            Debug.Assert(_iis7WorkerRequest != null, "_iis7WorkerRequest != null");
+            Debug.Assert(_iis7WorkerRequest != null || KestrelRequest, "_iis7WorkerRequest != null");
 
             if (name == null) {
                 throw new ArgumentNullException("name"); 
@@ -134,7 +140,8 @@ namespace System.Web {
             }
 
             if (_request != null) {
-                _iis7WorkerRequest.SetRequestHeader(name, value, replace);
+                if (_kestrelRequest != null) _kestrelRequest.SetRequestHeader(name, value, replace);
+                else _iis7WorkerRequest.SetRequestHeader(name, value, replace);
             }
             else {
                 if (_response.HeadersWritten) {
@@ -225,7 +232,7 @@ namespace System.Web {
                 base.Remove(name);
                 return;
             }
-            if (_iis7WorkerRequest == null) {
+            if (_iis7WorkerRequest == null && !KestrelRequest) {
                 throw new PlatformNotSupportedException();
             }
 
@@ -235,7 +242,8 @@ namespace System.Web {
 
             if (_request != null) {
                 // delete by sending null value
-                _iis7WorkerRequest.SetRequestHeader(name, null /*value*/, false /*replace*/);
+                if (_kestrelRequest != null) _kestrelRequest.SetRequestHeader(name, null, false);
+                else _iis7WorkerRequest.SetRequestHeader(name, null /*value*/, false /*replace*/);
             }
             else {
                 _iis7WorkerRequest.SetResponseHeader(name, null /*value*/, false /*replace*/);

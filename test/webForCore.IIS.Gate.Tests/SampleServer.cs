@@ -39,6 +39,8 @@ namespace IISGate
             };
             start.Environment["Logging__LogLevel__Microsoft.AspNetCore.Builder"] = "Debug";
             start.Environment["GATE_HTTPS_PORT"] = HttpsAddress.Port.ToString();
+            // The test key container and DPAPI key the sample's protected sections were encrypted with (App_Data is hidden).
+            start.Environment["WEBFORCORE_KEYS"] = Path.Combine(SampleDirectory, "App_Data", "keys");
             _process = Process.Start(start);
             _process.OutputDataReceived += (s, e) => { lock (_output) _output.AppendLine(e.Data); };
             _process.ErrorDataReceived += (s, e) => { lock (_output) _output.AppendLine(e.Data); };

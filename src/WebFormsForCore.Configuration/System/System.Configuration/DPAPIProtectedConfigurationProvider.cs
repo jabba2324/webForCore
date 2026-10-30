@@ -69,6 +69,11 @@ namespace System.Configuration
         {
             if (clearText == null || clearText.Length < 1)
                 return clearText;
+            // webForCore: DPAPI is Windows-only; elsewhere its emulation (WebFormsForCore.Security.LocalDataProtection),
+            // with the same entropy and scope.
+            if (!OperatingSystem.IsWindows())
+                return Convert.ToBase64String(WebFormsForCore.Security.LocalDataProtection.Protect(
+                    Encoding.Unicode.GetBytes(clearText), Encoding.Unicode.GetBytes(_KeyEntropy ?? ""), UseMachineProtection));
 
             DATA_BLOB inputData, entData, outputData;
             SafeNativeMemoryHandle safeInputDataHandle = new SafeNativeMemoryHandle();
@@ -135,6 +140,19 @@ namespace System.Configuration
         {
             if (encText == null || encText.Length < 1)
                 return encText;
+            if (!OperatingSystem.IsWindows()) {
+                byte[] data = Convert.FromBase64String(encText);
+                if (WebFormsForCore.Security.LocalDataProtection.IsWindowsDpapiBlob(data))
+                    throw new ConfigurationErrorsException("webForCore: this section was encrypted with Windows DPAPI (DataProtectionConfigurationProvider), " +
+                        "whose keys stay on the Windows machine that encrypted it. Decrypt it there (aspnet_regiis -pdf), then protect it " +
+                        "here (webforcore-regiis -pef) or with RsaProtectedConfigurationProvider and an exported key container (LIFT.md).");
+                try {
+                    return Encoding.Unicode.GetString(WebFormsForCore.Security.LocalDataProtection.Unprotect(
+                        data, Encoding.Unicode.GetBytes(_KeyEntropy ?? ""), UseMachineProtection));
+                } catch (System.Security.Cryptography.CryptographicException e) {
+                    throw new ConfigurationErrorsException(e.Message, e);
+                }
+            }
 
             DATA_BLOB inputData, entData, outputData;
             SafeNativeMemoryHandle safeInputDataHandle = new SafeNativeMemoryHandle();

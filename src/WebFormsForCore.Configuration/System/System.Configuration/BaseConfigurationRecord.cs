@@ -4394,10 +4394,21 @@ namespace System.Configuration {
             }
         }
 
+#if NETFRAMEWORK
         const string ProtectedConfigurationSectionTypeName = "System.Configuration.ProtectedConfigurationSection, " + AssemblyRef.SystemConfiguration;
+#else
+        // webForCore: the fork's own type. "System.Configuration, Version=4.0.0.0" resolves through the shared framework's
+        // System.Configuration facade, whose type forwards resolve in the default load context: in a PseudoAppDomain that is
+        // another copy of this assembly, and its section did not inherit from this one's (configProtectedData failed).
+        static readonly string ProtectedConfigurationSectionTypeName = typeof(ProtectedConfigurationSection).AssemblyQualifiedName;
+#endif
         internal const string RESERVED_SECTION_PROTECTED_CONFIGURATION       = "configProtectedData";
         internal const string Microsoft_CONFIGURATION_SECTION = ConfigurationStringConstants.WinformsApplicationConfigurationSectionName;
+#if NETFRAMEWORK
         const string SystemConfigurationSectionTypeName = "System.Configuration.AppSettingsSection, " + AssemblyRef.SystemConfiguration;
+#else
+        static readonly string SystemConfigurationSectionTypeName = typeof(AppSettingsSection).AssemblyQualifiedName; // webForCore: as above
+#endif
 
         internal static bool IsImplicitSection(string configKey) {
             if (string.Equals(configKey, RESERVED_SECTION_PROTECTED_CONFIGURATION, StringComparison.Ordinal) || 

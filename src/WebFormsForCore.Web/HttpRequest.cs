@@ -2248,7 +2248,8 @@ namespace System.Web {
                 if (_wr != null)
                     FillInHeadersCollection();
 
-                if (!(_wr is IIS7WorkerRequest)) {
+                // webForCore: writable on the Kestrel host, as in integrated mode (HttpHeaderCollection writes through).
+                if (!(_wr is IIS7WorkerRequest) && !(_wr is AspNetCoreWorkerRequest)) {
                     _headers.MakeReadOnly();
                 }
             }
@@ -2292,7 +2293,7 @@ namespace System.Web {
             if (_serverVariables == null) {
                 _serverVariables = new HttpServerVarsCollection(_wr, this);
 
-                if ( !(_wr is IIS7WorkerRequest) ) {
+                if ( !(_wr is IIS7WorkerRequest) && !(_wr is AspNetCoreWorkerRequest) ) { // webForCore: as Headers
                     _serverVariables.MakeReadOnly();
                 }
             }
@@ -3200,7 +3201,8 @@ namespace System.Web {
             EnsureHasNotTransitionedToWebSocket();
 
             IIS7WorkerRequest wr = _wr as IIS7WorkerRequest;
-            if (wr == null)
+            AspNetCoreWorkerRequest kestrel = _wr as AspNetCoreWorkerRequest; // webForCore: the Kestrel host's equivalent
+            if (wr == null && kestrel == null)
                 throw new PlatformNotSupportedException(SR.GetString(SR.Requires_Iis_Integrated_Mode));
             if (buffer == null)
                 throw new ArgumentNullException("buffer");
@@ -3211,7 +3213,8 @@ namespace System.Web {
             if (buffer.Length - offset < count)
                 throw new ArgumentException(SR.GetString(SR.InvalidOffsetOrCount, "offset", "count"));
 
-            wr.InsertEntityBody(buffer, offset, count);
+            if (kestrel != null) kestrel.InsertEntityBody(buffer, offset, count);
+            else wr.InsertEntityBody(buffer, offset, count);
             NeedToInsertEntityBody = false;
         }
 
@@ -3222,12 +3225,14 @@ namespace System.Web {
         // request entity after it has been read by ASP.NET.
         public void InsertEntityBody() {
             IIS7WorkerRequest wr = _wr as IIS7WorkerRequest;
-            if (wr == null)
+            AspNetCoreWorkerRequest kestrel = _wr as AspNetCoreWorkerRequest; // webForCore: the Kestrel host's equivalent
+            if (wr == null && kestrel == null)
                 throw new PlatformNotSupportedException(SR.GetString(SR.Requires_Iis_Integrated_Mode));
             byte[] buffer = EntityBody;
             if (buffer == null)
                 return;
-            wr.InsertEntityBody(buffer, 0, buffer.Length);
+            if (kestrel != null) kestrel.InsertEntityBody(buffer, 0, buffer.Length);
+            else wr.InsertEntityBody(buffer, 0, buffer.Length);
             NeedToInsertEntityBody = false;
         }
 
@@ -3305,6 +3310,9 @@ namespace System.Web {
             IIS7WorkerRequest wr = _wr as IIS7WorkerRequest;
             if (wr != null) {
                 wr.AbortConnection();
+            }
+            else if (_wr is AspNetCoreWorkerRequest kestrel) { // webForCore
+                kestrel.AbortConnection();
             }
             else {
                 throw new PlatformNotSupportedException(SR.GetString(SR.Requires_Iis_Integrated_Mode));

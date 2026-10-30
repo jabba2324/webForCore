@@ -25,7 +25,8 @@ namespace System.Web {
         private bool _populated;
         private HttpRequest _request;
         private IIS7WorkerRequest _iis7workerRequest;
-        private bool _kestrelWorkerRequest; // webForCore: see Get
+        private AspNetCoreWorkerRequest _kestrel; // webForCore: see Get and Set
+        private bool _kestrelWorkerRequest => _kestrel != null;
         private List<HttpServerVarsCollectionEntry> _unsyncedEntries;
 
         // We preallocate the base collection with a size that should be sufficient
@@ -35,7 +36,7 @@ namespace System.Web {
             // call into IIS7 to update the server var block when changes are made.
             _iis7workerRequest = wr as IIS7WorkerRequest;
 #if !NETFRAMEWORK
-            _kestrelWorkerRequest = wr is AspNetCoreWorkerRequest;
+            _kestrel = wr as AspNetCoreWorkerRequest;
 #endif
             _request = request;
             _populated = false;
@@ -97,7 +98,7 @@ namespace System.Web {
                         _unsyncedEntries.Clear();
                     }
 
-                    if (_iis7workerRequest == null) {
+                    if (_iis7workerRequest == null && !_kestrelWorkerRequest) { // webForCore: writable on the Kestrel host
                         MakeReadOnly();
                     }
                 }
@@ -229,7 +230,7 @@ namespace System.Web {
 
         [AspNetHostingPermission(SecurityAction.Demand, Level=AspNetHostingPermissionLevel.High)]
         public override void Set(String name, String value) {
-            if (_iis7workerRequest == null) {
+            if (_iis7workerRequest == null && !_kestrelWorkerRequest) { // webForCore: writable on the Kestrel host
                 throw new PlatformNotSupportedException();
             }
             
@@ -245,7 +246,8 @@ namespace System.Web {
                 value = String.Empty;
             }
           
-            _iis7workerRequest.SetServerVariable(name, value);
+            if (_iis7workerRequest != null) _iis7workerRequest.SetServerVariable(name, value);
+            else if (StringUtil.StringStartsWith(name, "HTTP_")) _kestrel.SetRequestHeader(name.Substring(5).Replace('_', '-'), value, true);
             SetServerVariableManagedOnly(name, value);
             SynchronizeHeader(name, value);
             _request.InvalidateParams();
@@ -316,7 +318,7 @@ namespace System.Web {
 
         [AspNetHostingPermission(SecurityAction.Demand, Level=AspNetHostingPermissionLevel.High)]
         public override void Remove(String name) {
-            if (_iis7workerRequest == null) {
+            if (_iis7workerRequest == null && !_kestrelWorkerRequest) {
                 throw new PlatformNotSupportedException();
             }
 
@@ -329,7 +331,8 @@ namespace System.Web {
 
         internal void RemoveNoDemand(String name) {
             // delete by sending null value
-            _iis7workerRequest.SetServerVariable(name, null /*value*/);
+            if (_iis7workerRequest != null) _iis7workerRequest.SetServerVariable(name, null /*value*/);
+            else if (StringUtil.StringStartsWith(name, "HTTP_")) _kestrel.SetRequestHeader(name.Substring(5).Replace('_', '-'), null, false);
 
             base.Remove(name);
             SynchronizeHeader(name, null);

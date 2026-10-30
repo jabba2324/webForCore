@@ -7,10 +7,11 @@ namespace Microsoft.Owin.Security.DataProtection
 {
     internal class DpapiDataProtector : IDataProtector
     {
-        // webForCore: System.Security.Cryptography.DpapiDataProtector is .NET Framework only. ProtectedData makes the same
-        // DPAPI call (CurrentUser scope); it works on Windows and throws PlatformNotSupportedException elsewhere. The
-        // entropy is a SHA-256 of the application name and purposes, so payloads are not interchangeable with .NET
-        // Framework's. On System.Web the host supplies MachineKey data protection instead (OwinAppContext).
+        // webForCore: System.Security.Cryptography.DpapiDataProtector is .NET Framework only. LocalDataProtection makes the
+        // same DPAPI call (CurrentUser scope) on Windows and emulates it elsewhere (a per-user key file; see
+        // WebFormsForCore/Security/LocalDataProtection.cs). The entropy is a SHA-256 of the application name and
+        // purposes, so payloads are not interchangeable with .NET Framework's. On System.Web the host supplies MachineKey
+        // data protection instead (OwinAppContext).
         private readonly byte[] _entropy;
 
         public DpapiDataProtector(string appName, string[] purposes)
@@ -25,12 +26,12 @@ namespace Microsoft.Owin.Security.DataProtection
 
         public byte[] Protect(byte[] userData)
         {
-            return ProtectedData.Protect(userData, _entropy, DataProtectionScope.CurrentUser);
+            return WebFormsForCore.Security.LocalDataProtection.Protect(userData, _entropy, machineScope: false);
         }
 
         public byte[] Unprotect(byte[] protectedData)
         {
-            return ProtectedData.Unprotect(protectedData, _entropy, DataProtectionScope.CurrentUser);
+            return WebFormsForCore.Security.LocalDataProtection.Unprotect(protectedData, _entropy, machineScope: false);
         }
     }
 }

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- webforcore-regiis: aspnet_regiis's protected-configuration commands for the fork (-pef/-pdf, -pc/-pz/-pi/-px),
+       on the fork's System.Web and System.Configuration (RSA key containers and DPAPI as files on Linux). -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net11.0</TargetFramework>
+    <AssemblyName>webforcore-regiis</AssemblyName>
+    <RootNamespace>WebFormsForCore.RegIIS</RootNamespace>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <Import Project="..\webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\WebFormsForCore.Configuration\WebFormsForCore.Configuration.csproj" />
+    <ProjectReference Include="..\WebFormsForCore.Web\WebFormsForCore.Web.csproj" />
+  </ItemGroup>
+</Project>

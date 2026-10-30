@@ -85,6 +85,7 @@
     <Compile Include="Provider/ReturnEndpointContext.cs" />
     <Compile Include="Resources.Designer.cs" />
     <Compile Include="SubjectPublicKeyInfoAlgorithm.cs" />
+    <Compile Include="WebFormsForCore/LocalDataProtection.cs" />
     <Compile Include="Win32.cs" />
   </ItemGroup>
 

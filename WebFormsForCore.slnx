@@ -30,6 +30,7 @@
     <BuildDependency Project="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
   </Project>
   <Project Path="src/WebFormsForCore.AspNetCompiler/WebFormsForCore.AspNetCompiler.csproj" />
+  <Project Path="src/WebFormsForCore.RegIIS/WebFormsForCore.RegIIS.csproj" />
   <Project Path="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
   <Project Path="src/WebFormsForCore.Compilers/WebFormsForCore.Compilers.csproj" />
   <Project Path="src/WebFormsForCore.Configuration/WebFormsForCore.Configuration.csproj">
@@ -145,6 +146,7 @@
     <Project Path="test/webForCore.Mvc.Gate.Tests/webForCore.Mvc.Gate.Tests.csproj" />
     <Project Path="test/webForCore.IIS.Gate.Tests/webForCore.IIS.Gate.Tests.csproj" />
     <Project Path="test/webForCore.IIS.Sample/webForCore.IIS.Sample.csproj" />
+    <Project Path="test/webForCore.Precompiled.Host/webForCore.Precompiled.Host.csproj" />
     <Project Path="test/webForCore.WebPages.Sample/webForCore.WebPages.Sample.csproj" />
     <Project Path="test/webForCore.System.Web.WebPages.Test/webForCore.System.Web.WebPages.Test.csproj" />
     <Project Path="test/webForCore.System.Web.WebPages.Razor.Test/webForCore.System.Web.WebPages.Razor.Test.csproj" />

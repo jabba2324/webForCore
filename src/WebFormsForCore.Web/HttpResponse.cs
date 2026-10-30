@@ -520,9 +520,28 @@ namespace System.Web {
 
              // Fire pre-send headers event
 
+#if !NETFRAMEWORK
+            // webForCore: on the Kestrel host, headers go out in integrated mode's SendResponse notification
+            // (PreSendRequestHeaders, AddOnSendingHeaders), whatever step flushed them.
+            bool kestrelHost = _wr is IAspNetCoreWorkerRequest && _context != null && !HttpRuntime.UseIntegratedPipeline;
+            RequestNotification notification = kestrelHost ? _context.CurrentNotification : default;
+            bool isPost = kestrelHost && _context.IsPostNotification;
+            if (kestrelHost) _context.SetClassicNotification(RequestNotification.SendResponse, false);
+            try {
+#endif
             if (_context != null && _context.ApplicationInstance != null) {
                 _context.ApplicationInstance.RaiseOnPreSendRequestHeaders();
             }
+
+            // webForCore: AddOnSendingHeaders callbacks, as the integrated pipeline fires them, on the Kestrel host.
+            if (_wr is IAspNetCoreWorkerRequest && !_onSendingHeadersSubscriptionQueue.IsEmpty) {
+                _onSendingHeadersSubscriptionQueue.FireAndComplete(cb => cb(Context));
+            }
+#if !NETFRAMEWORK
+            } finally {
+                if (kestrelHost) _context.SetClassicNotification(notification, isPost);
+            }
+#endif
 
             // status
             // VSWhidbey 270635: We need to reset the status code for mobile devices.
@@ -1548,16 +1567,18 @@ namespace System.Web {
         // since this doesn't get emitted in the protocol
         // we won't send it through the worker request interface
         // directly
+        // webForCore: on the Kestrel host the substatus goes to the IIS module layer (httpErrors' substatus matching), as
+        // IIS gets it from the integrated pipeline.
         public int SubStatusCode {
             get {
-                if ( !(_wr is IIS7WorkerRequest) ) {
+                if ( !(_wr is IIS7WorkerRequest) && !(_wr is IAspNetCoreWorkerRequest) ) {
                     throw new PlatformNotSupportedException(SR.GetString(SR.Requires_Iis_Integrated_Mode));
                 }
 
                 return _subStatusCode;
             }
             set {
-                if ( !(_wr is IIS7WorkerRequest) ) {
+                if ( !(_wr is IIS7WorkerRequest) && !(_wr is IAspNetCoreWorkerRequest) ) {
                     throw new PlatformNotSupportedException(SR.GetString(SR.Requires_Iis_Integrated_Mode));
                 }
 
@@ -1567,6 +1588,7 @@ namespace System.Web {
 
                 _subStatusCode = value;
                 _statusSet = true;
+                (_wr as AspNetCoreWorkerRequest)?.SetSubStatus(value);
             }
         }
 
@@ -1574,7 +1596,7 @@ namespace System.Web {
         // the substatus code is ignored so as not to throw an exception.
         internal void SetStatusCode(int statusCode, int subStatus = -1) {
             StatusCode = statusCode;
-            if (subStatus >= 0 && _wr is IIS7WorkerRequest) {
+            if (subStatus >= 0 && (_wr is IIS7WorkerRequest || _wr is IAspNetCoreWorkerRequest)) {
                 SubStatusCode = subStatus;
             }
         }
@@ -2322,7 +2344,8 @@ namespace System.Web {
                 throw new ArgumentNullException("callback");
             }
 
-            if (!(_wr is IIS7WorkerRequest)) {
+            // webForCore: the Kestrel host fires these in the classic pipeline too (WriteHeaders).
+            if (!(_wr is IIS7WorkerRequest) && !(_wr is IAspNetCoreWorkerRequest)) {
                 throw new PlatformNotSupportedException(SR.GetString(SR.Requires_Iis_Integrated_Mode));
             }
 

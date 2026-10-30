@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <PackAsTool Condition="$(PackAsTool) == ''">true</PackAsTool>
@@ -27,30 +27,21 @@
     </PropertyGroup>
 
     <ItemGroup Condition="$(TargetFramework) == 'net11.0'">
-        <!--<ProjectReference Include="..\WebFormsForCore.Compilers\WebFormsForCore.Compilers.csproj" />
+        <!-- webForCore: the fork's own assemblies, so a site is precompiled with the System.Web it runs on (the upstream
+             WebFormsForCore packages are a different System.Web). -->
+        <ProjectReference Include="..\WebFormsForCore.Compilers\WebFormsForCore.Compilers.csproj" />
         <ProjectReference Include="..\WebFormsForCore.Drawing\WebFormsForCore.Drawing.csproj" />
         <ProjectReference Include="..\WebFormsForCore.Configuration\WebFormsForCore.Configuration.csproj" />
-        <ProjectReference Include="..\WebFormsForCore.Serialization.Formatters\WebFormsForCore.Serialization.Formatters.csproj" Condition="'$(TargetFramework)' != 'net48'" />
+        <ProjectReference Include="..\WebFormsForCore.Serialization.Formatters\WebFormsForCore.Serialization.Formatters.csproj" />
         <ProjectReference Include="..\WebFormsForCore.Web.ApplicationServices\WebFormsForCore.Web.ApplicationServices.csproj" />
         <ProjectReference Include="..\WebFormsForCore.Web.RegularExpressions\WebFormsForCore.Web.RegularExpressions.csproj" />
-        <ProjectReference Include="..\WebFormsForCore.Web\WebFormsForCore.Web.csproj" SpecificVersion="false" />
+        <ProjectReference Include="..\WebFormsForCore.Web\WebFormsForCore.Web.csproj" />
         <ProjectReference Include="..\WebFormsForCore.Web.Services\WebFormsForCore.Web.Services.csproj" />
         <ProjectReference Include="..\WebFormsForCore.Web.Infrastructure\WebFormsForCore.Web.Infrastructure.csproj" />
         <ProjectReference Include="..\WebFormsForCore.Web.Extensions\WebFormsForCore.Web.Extensions.csproj" />
-        -->
-        <PackageReference Include="WebFormsForCore.Configuration" Version="1.7.0-rc3" ExcludeAssets="compile" />
-        <PackageReference Include="WebFormsForCore.Compilers" Version="1.7.0-rc3" ExcludeAssets="compile" />
-        <PackageReference Include="WebFormsForCore.Web" Version="1.7.0-rc3" />
-        <PackageReference Include="WebFormsForCore.Web.Services" Version="1.7.0-rc3" ExcludeAssets="compile" />
-        <PackageReference Include="WebFormsForCore.Web.Extensions" Version="1.7.0-rc3" ExcludeAssets="compile" />
-        <PackageReference Include="WebFormsForCore.Drawing" Version="1.7.0-rc3" ExcludeAssets="compile" />
-        <PackageReference Include="WebFormsForCore.Web.ApplicationServices" Version="1.7.0-rc3" ExcludeAssets="compile" />
-        <PackageReference Include="WebFormsForCore.Web.RegularExpressions" Version="1.7.0-rc3" ExcludeAssets="compile" />
-        <Reference Include="System.Web" SpecificVersion="false" />
     </ItemGroup>
 
     <ItemGroup Condition="$(TargetFramework) == 'net11.0'">
-        <PackageReference Include="System.Configuration.ConfigurationManager" Version="$(netlib)" Aliases="NET" />
         <PackageReference Include="System.CodeDom" Version="$(netlib)" />
     </ItemGroup>
 

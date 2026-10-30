@@ -139,7 +139,7 @@ namespace System.Web.Hosting
 #endif
 			// webForCore: an accepted WebSocket request keeps its response for the handshake (Process runs it next); a
 			// timed-out request's response was already completed (TimedOut).
-			if (pendingWebSocket != null || timedOut)
+			if (pendingWebSocket != null || pendingTransfer != null || timedOut)
 			{
 				Completed.TrySetResult(true);
 				return;
@@ -201,8 +201,80 @@ namespace System.Web.Hosting
 			}
 		}
 
-		// webForCore: output is dropped once the request has timed out (its response was sent) or turned into a WebSocket.
-		bool SuppressOutput => timedOut || pendingWebSocket != null;
+		// webForCore: output is dropped once the request has timed out (its response was sent), turned into a WebSocket,
+		// or been transferred (Server.TransferRequest: the transferred request answers).
+		bool SuppressOutput => timedOut || pendingWebSocket != null || pendingTransfer != null;
+
+		// webForCore: integrated-mode APIs, on the classic pipeline of the Kestrel host.
+
+		// Response.SubStatusCode, for the IIS module layer (httpErrors' substatus matching).
+		public const string AppSubStatusKey = "webForCore.IIS.AppSubStatus";
+		internal void SetSubStatus(int subStatus) => Context.Items[AppSubStatusKey] = subStatus;
+
+		// Request.Headers.Add/Set/Remove (and HTTP_ server variables): the request Kestrel and later reads see.
+		internal void SetRequestHeader(string name, string value, bool replace)
+		{
+			var headers = Context.Request.Headers;
+			if (value == null) headers.Remove(name);
+			else if (replace || !headers.ContainsKey(name)) headers[name] = value;
+			else headers[name] = StringValues.Concat(headers[name], value);
+			ParseHeaders();
+		}
+
+		// Request.InsertEntityBody: the body read so far, for whatever reads the request after ASP.NET (a transferred
+		// request, middleware after UseWebForms).
+		internal void InsertEntityBody(byte[] buffer, int offset, int count)
+		{
+			var copy = new byte[count];
+			Buffer.BlockCopy(buffer, offset, copy, 0, count);
+			Context.Request.Body = new MemoryStream(copy);
+			Context.Request.ContentLength = count;
+		}
+
+		// Request.Abort.
+		internal void AbortConnection() => Context.Abort();
+
+		// Server.TransferRequest: once this request has ended, the pipeline runs again in the same Kestrel request for the
+		// new URL, as IIS's child execution does (ScheduleExecuteUrl). preserveForm keeps the body and, without a query in
+		// the path, the query string; headers are set on the new request; preserveUser carries User over.
+		sealed class Transfer
+		{
+			public string Path, Query, Method;
+			public byte[] Body;
+			public bool PreserveForm;
+			public System.Collections.Specialized.NameValueCollection Headers;
+			public IPrincipal User;
+		}
+
+		volatile Transfer pendingTransfer;
+		int transferDepth;
+		internal IPrincipal TransferredUser { get; private set; }
+
+		internal void ScheduleTransfer(string path, string query, string method, bool preserveForm, byte[] body,
+			System.Collections.Specialized.NameValueCollection headers, IPrincipal user)
+		{
+			if (transferDepth >= 16) throw new HttpException("Too many request transfers (Server.TransferRequest).");
+			pendingTransfer = new Transfer { Path = path, Query = query, Method = method, PreserveForm = preserveForm, Body = body, Headers = headers, User = user };
+		}
+
+		async Task RunTransfer()
+		{
+			var transfer = pendingTransfer;
+			var request = Context.Request;
+			var pathBase = request.PathBase.Value ?? "";
+			request.Path = transfer.Path.StartsWith(pathBase + "/", StringComparison.OrdinalIgnoreCase) && pathBase.Length > 0
+				? transfer.Path.Substring(pathBase.Length) : transfer.Path;
+			if (transfer.Query != null) request.QueryString = new Core.QueryString("?" + transfer.Query);
+			else if (!transfer.PreserveForm) request.QueryString = Core.QueryString.Empty;
+			if (!string.IsNullOrEmpty(transfer.Method)) request.Method = transfer.Method;
+			if (transfer.Headers != null)
+				foreach (string name in transfer.Headers)
+					request.Headers[name] = transfer.Headers[name];
+			if (transfer.PreserveForm && transfer.Body != null) InsertEntityBody(transfer.Body, 0, transfer.Body.Length);
+			else if (!transfer.PreserveForm) { request.Body = Stream.Null; request.ContentLength = 0; }
+			var next = new AspNetCoreWorkerRequest(Host, Context) { TransferredUser = transfer.User, transferDepth = transferDepth + 1 };
+			await next.Process();
+		}
 		readonly object responseLock = new object();
 		volatile bool timedOut;
 
@@ -539,6 +611,7 @@ namespace System.Web.Hosting
 				Debug.WriteLine($"Request {Context.Request.Path} finished");
 #endif
 				if (pendingWebSocket != null) await RunWebSocket();
+				else if (pendingTransfer != null) await RunTransfer();
 			}
 		}
 

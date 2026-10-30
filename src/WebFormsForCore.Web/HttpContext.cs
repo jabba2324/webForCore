@@ -2025,10 +2025,26 @@ namespace System.Web {
             set { _notificationContext = value; }
         }
 
+#if !NETFRAMEWORK
+        // webForCore: the step the classic pipeline is running (ApplicationStepManager.BuildSteps), as integrated mode reports it.
+        private RequestNotification _classicNotification;
+        private bool _classicIsPostNotification;
+
+        internal void SetClassicNotification(RequestNotification notification, bool isPost) {
+            _classicNotification = notification;
+            _classicIsPostNotification = isPost;
+        }
+#endif
+
         public RequestNotification CurrentNotification {
             get {
                 EnsureHasNotTransitionedToWebSocket();
 
+#if !NETFRAMEWORK
+                if (!HttpRuntime.UseIntegratedPipeline) {
+                    return _classicNotification;
+                }
+#endif
                 if (!HttpRuntime.UseIntegratedPipeline) {
                     throw new PlatformNotSupportedException(SR.GetString(SR.Requires_Iis_Integrated_Mode));
                 }
@@ -2162,6 +2178,11 @@ namespace System.Web {
             get {
                 EnsureHasNotTransitionedToWebSocket();
 
+#if !NETFRAMEWORK
+                if (!HttpRuntime.UseIntegratedPipeline) {
+                    return _classicIsPostNotification;
+                }
+#endif
                 if (!HttpRuntime.UseIntegratedPipeline) {
                     throw new PlatformNotSupportedException(SR.GetString(SR.Requires_Iis_Integrated_Mode));
                 }

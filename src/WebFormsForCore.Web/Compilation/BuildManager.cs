@@ -2781,6 +2781,8 @@ private static void GetGhostedVirtualPath(ref string virtualPath) {
     // Precompilation related code
     //
 
+    private string _precompTargetPrepared;
+
     internal void SetPrecompilationInfo(HostingEnvironmentParameters hostingParameters, bool deleteDir = true)
     {
 
@@ -2796,6 +2798,12 @@ private static void GetGhostedVirtualPath(ref string virtualPath) {
         _precompTargetPhysicalDir = hostingParameters.PrecompilationTargetPhysicalDirectory;
         if (_precompTargetPhysicalDir == null)
             return;
+
+        // webForCore: BuildManagerHost calls this again once the BuildManager has initialized; the target then holds the
+        // marker file this call created, which is not a reason to refuse it (as when -f was not given).
+        if (_precompTargetPrepared == _precompTargetPhysicalDir)
+            return;
+        _precompTargetPrepared = _precompTargetPhysicalDir;
 
         // Check if the target dir already exists and is not empty
         if (Util.IsNonEmptyDirectory(_precompTargetPhysicalDir))

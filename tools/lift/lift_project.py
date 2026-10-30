@@ -80,7 +80,10 @@ PROJECTS = {
                                    unsigned=True),
     "Microsoft.Owin": dict(source="katana:src/Microsoft.Owin/Microsoft.Owin.csproj", tfm="net11.0", roots=["src/Microsoft.Owin"]),
     "Microsoft.Owin.Security": dict(source="katana:src/Microsoft.Owin.Security/Microsoft.Owin.Security.csproj", tfm="net11.0",
-                                    roots=["src/Microsoft.Owin.Security"]),
+                                    roots=["src/Microsoft.Owin.Security"],
+                                    # DPAPI or its emulation (DpapiDataProtector); internal here, public in System.Configuration.
+                                    fork_sources=[("src/WebFormsForCore.Configuration/WebFormsForCore/Security/LocalDataProtection.cs",
+                                                   "WebFormsForCore/LocalDataProtection.cs")]),
     "Microsoft.Owin.Security.Cookies": dict(source="katana:src/Microsoft.Owin.Security.Cookies/Microsoft.Owin.Security.Cookies.csproj",
                                             tfm="net11.0", roots=["src/Microsoft.Owin.Security.Cookies"]),
     "Microsoft.Owin.Security.OAuth": dict(source="katana:src/Microsoft.Owin.Security.OAuth/Microsoft.Owin.Security.OAuth.csproj",
@@ -918,10 +921,11 @@ FIXUPS["Microsoft.Owin.Security"] = [
      "        {\n"
      "            return _protector.Unprotect(protectedData);\n"
      "        }\n",
-     "        // webForCore: System.Security.Cryptography.DpapiDataProtector is .NET Framework only. ProtectedData makes the same\n"
-     "        // DPAPI call (CurrentUser scope); it works on Windows and throws PlatformNotSupportedException elsewhere. The\n"
-     "        // entropy is a SHA-256 of the application name and purposes, so payloads are not interchangeable with .NET\n"
-     "        // Framework's. On System.Web the host supplies MachineKey data protection instead (OwinAppContext).\n"
+     "        // webForCore: System.Security.Cryptography.DpapiDataProtector is .NET Framework only. LocalDataProtection makes the\n"
+     "        // same DPAPI call (CurrentUser scope) on Windows and emulates it elsewhere (a per-user key file; see\n"
+     "        // WebFormsForCore/Security/LocalDataProtection.cs). The entropy is a SHA-256 of the application name and\n"
+     "        // purposes, so payloads are not interchangeable with .NET Framework's. On System.Web the host supplies MachineKey\n"
+     "        // data protection instead (OwinAppContext).\n"
      "        private readonly byte[] _entropy;\n"
      "\n"
      "        public DpapiDataProtector(string appName, string[] purposes)\n"
@@ -936,12 +940,12 @@ FIXUPS["Microsoft.Owin.Security"] = [
      "\n"
      "        public byte[] Protect(byte[] userData)\n"
      "        {\n"
-     "            return ProtectedData.Protect(userData, _entropy, DataProtectionScope.CurrentUser);\n"
+     "            return WebFormsForCore.Security.LocalDataProtection.Protect(userData, _entropy, machineScope: false);\n"
      "        }\n"
      "\n"
      "        public byte[] Unprotect(byte[] protectedData)\n"
      "        {\n"
-     "            return ProtectedData.Unprotect(protectedData, _entropy, DataProtectionScope.CurrentUser);\n"
+     "            return WebFormsForCore.Security.LocalDataProtection.Unprotect(protectedData, _entropy, machineScope: false);\n"
      "        }\n", 1)]
 
 
@@ -1196,6 +1200,12 @@ def lift(name, cfg, roots, spike, fork, commits):
             notes.append(f"{rel}: LogicalName {logical} ({'from Designer.cs' if literal else 'RootNamespace + path'}; "
                          f"spike build named it {r.get('ManifestResourceName')})")
         resources.append((rel, logical))
+    # Files of the fork's own projects compiled into a lifted one (copied, so the fork's copy is the only source).
+    for src_rel, rel in cfg.get("fork_sources", []):
+        os.makedirs(os.path.dirname(os.path.join(dest_dir, rel)), exist_ok=True)
+        shutil.copy2(os.path.join(fork, src_rel), os.path.join(dest_dir, rel))
+        compiles.append(rel)
+        notes.append(f"added {rel} (copied from {src_rel})")
     # webForCore's own files for a lifted project: tools/lift/additions/<Name>/ (each says so in its header).
     adir = os.path.join(fork, "tools", "lift", "additions", name)
     for a in sorted(glob.glob(os.path.join(adir, "**", "*.cs"), recursive=True)):

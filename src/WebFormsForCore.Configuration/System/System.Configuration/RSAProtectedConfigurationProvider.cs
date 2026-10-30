@@ -15,6 +15,7 @@ namespace System.Configuration
     using System.Security;
     using System.Security.Cryptography;
     using System.Security.Cryptography.Xml;
+    using System.Linq;
     using System.IO;
     using System.Runtime.InteropServices;
     using Microsoft.Win32;
@@ -98,6 +99,7 @@ namespace System.Configuration
 
         public void AddKey(int keySize, bool exportable)
         {
+            if (!OperatingSystem.IsWindows()) { KeyFiles.Add(this, keySize, exportable); return; }
             RSACryptoServiceProvider rsa = GetCryptoServiceProvider(exportable, false);
             rsa.KeySize = keySize;
             rsa.PersistKeyInCsp = true;
@@ -106,12 +108,14 @@ namespace System.Configuration
 
         public void DeleteKey()
         {
+            if (!OperatingSystem.IsWindows()) { KeyFiles.Delete(this); return; }
             RSACryptoServiceProvider rsa = GetCryptoServiceProvider(false, true);
             rsa.PersistKeyInCsp = false;
             rsa.Clear();
         }
         public void ImportKey(string xmlFileName, bool exportable)
         {
+            if (!OperatingSystem.IsWindows()) { KeyFiles.Import(this, File.ReadAllText(xmlFileName), exportable); return; }
             RSACryptoServiceProvider rsa = GetCryptoServiceProvider(exportable, false);
             rsa.FromXmlString(File.ReadAllText(xmlFileName));
             rsa.PersistKeyInCsp = true;
@@ -120,6 +124,7 @@ namespace System.Configuration
 
         public void ExportKey(string xmlFileName, bool includePrivateParameters)
         {
+            if (!OperatingSystem.IsWindows()) { File.WriteAllText(xmlFileName, KeyFiles.Export(this, includePrivateParameters)); return; }
             RSACryptoServiceProvider rsa = GetCryptoServiceProvider(false, false);
             string xmlString = rsa.ToXmlString(includePrivateParameters);
             File.WriteAllText(xmlFileName, xmlString);
@@ -163,6 +168,8 @@ namespace System.Configuration
 
         private RSACryptoServiceProvider GetCryptoServiceProvider(bool exportable, bool keyMustExist)
         {
+            if (!OperatingSystem.IsWindows())
+                return KeyFiles.Open(this, exportable, keyMustExist);
             try {
                 CspParameters csp = new CspParameters();
                 csp.KeyContainerName = KeyContainerName;
@@ -219,6 +226,84 @@ namespace System.Configuration
                     hProv.Dispose();
             }
         }
+        // webForCore: CAPI key containers are Windows-only. Elsewhere a container is a file in the key directory of its
+        // scope (useMachineContainer: machine; see WebFormsForCore.Security.LocalDataProtection.KeyDirectory), named
+        // after the container, holding the key in the XML of aspnet_regiis -px (an exported Windows container can be
+        // copied in, or imported with ImportKey). As with CAPI, encrypting with a container that does not exist creates
+        // it (2048-bit), and a non-exportable key's private part cannot be exported.
+        static class KeyFiles
+        {
+            static string FileOf(RsaProtectedConfigurationProvider p, bool create)
+            {
+                var name = string.Concat(p.KeyContainerName.Select(c => char.IsLetterOrDigit(c) || c == '-' || c == '_' || c == '.' ? c.ToString() : "%" + ((int)c).ToString("X2")));
+                return Path.Combine(WebFormsForCore.Security.LocalDataProtection.KeyDirectory(p.UseMachineContainer, create), name + ".rsakey.xml");
+            }
+
+            static (string Xml, bool Exportable)? Read(RsaProtectedConfigurationProvider p)
+            {
+                var file = FileOf(p, create: false);
+                if (!File.Exists(file)) return null;
+                var document = new XmlDocument();
+                document.Load(file);
+                var root = document.DocumentElement;
+                if (root.Name == "RSAKeyValue") return (root.OuterXml, true); // as aspnet_regiis -px writes it
+                return (root["RSAKeyValue"].OuterXml, root.GetAttribute("exportable") != "false");
+            }
+
+            static void Write(RsaProtectedConfigurationProvider p, string keyXml, bool exportable)
+            {
+                var file = FileOf(p, create: true);
+                var content = "<KeyContainer name=\"" + System.Security.SecurityElement.Escape(p.KeyContainerName) + "\" exportable=\"" + (exportable ? "true" : "false") + "\">" + keyXml + "</KeyContainer>";
+                File.Delete(file);
+                WebFormsForCore.Security.LocalDataProtection.ReadOrCreate(file, () => System.Text.Encoding.UTF8.GetBytes(content), b => b.Length > 0);
+            }
+
+            public static RSACryptoServiceProvider Open(RsaProtectedConfigurationProvider p, bool exportable, bool keyMustExist)
+            {
+                var key = Read(p);
+                var rsa = new RSACryptoServiceProvider();
+                if (key == null) {
+                    if (keyMustExist)
+                        throw new ConfigurationErrorsException(SR.GetString(SR.Key_container_doesnt_exist_or_access_denied) + " (" + FileOf(p, create: false) + ")");
+                    rsa = new RSACryptoServiceProvider(2048);
+                    Write(p, rsa.ToXmlString(true), exportable);
+                    return rsa;
+                }
+                rsa.FromXmlString(key.Value.Xml);
+                return rsa;
+            }
+
+            public static void Add(RsaProtectedConfigurationProvider p, int keySize, bool exportable)
+            {
+                if (Read(p) != null) return; // as CAPI: an existing container keeps its key
+                using var rsa = new RSACryptoServiceProvider(keySize);
+                Write(p, rsa.ToXmlString(true), exportable);
+            }
+
+            public static void Delete(RsaProtectedConfigurationProvider p)
+            {
+                var file = FileOf(p, create: false);
+                if (!File.Exists(file)) throw new ConfigurationErrorsException(SR.GetString(SR.Key_container_doesnt_exist_or_access_denied) + " (" + file + ")");
+                File.Delete(file);
+            }
+
+            public static void Import(RsaProtectedConfigurationProvider p, string xml, bool exportable)
+            {
+                using var rsa = new RSACryptoServiceProvider();
+                rsa.FromXmlString(xml); // validates it
+                Write(p, rsa.ToXmlString(!rsa.PublicOnly), exportable);
+            }
+
+            public static string Export(RsaProtectedConfigurationProvider p, bool includePrivateParameters)
+            {
+                var key = Read(p) ?? throw new ConfigurationErrorsException(SR.GetString(SR.Key_container_doesnt_exist_or_access_denied) + " (" + FileOf(p, create: false) + ")");
+                if (includePrivateParameters && !key.Exportable) throw new CryptographicException("Key not valid for use in specified state.");
+                using var rsa = new RSACryptoServiceProvider();
+                rsa.FromXmlString(key.Xml);
+                return rsa.ToXmlString(includePrivateParameters);
+            }
+        }
+
         const uint PROV_Rsa_FULL = 1;
         const uint CRYPT_MACHINE_KEYSET = 0x00000020;
 

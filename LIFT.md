@@ -1084,12 +1084,12 @@ Tests:
   Corrected: the check that a thread-pool thread keeps the default culture runs without the test's ExecutionContext
   (culture flows with it on .NET and .NET Framework 4.6+; BCL). `TieredCompilation=false`: two weak-reference tests rely on
   a local being dead after its last use, which .NET Framework's JIT gave and .NET's tier-0 code does not.
-- **Identity's tests** (`Identity.Test`): 298 of 311 pass. They need SQL Server: LocalDB is Windows-only, so
+- **Identity's tests** (`Identity.Test`): 298 of 311 passed at first; all 311 pass with the DPAPI emulation (below). They need SQL Server: LocalDB is Windows-only, so
   `tools/lift/sqlserver.sh` runs SQL Server 2022 in a container (podman or docker) and the tests' App.config points at
   it (`FIXUPS`). On xunit 2 (Microsoft's were on xunit 1.9: `Assert.ThrowsDelegate` is `Action`, `Xunit.Extensions` is
   gone), one at a time as xunit 1.9 ran them (they share one database), in Pacific time (one test assumes UTC-8).
-  Corrected: .NET's ArgumentException message format (BCL). The 13 failures need DPAPI: they create Katana's
-  `DpapiDataProtectionProvider` for token providers, which is Windows-only (apps use the machine key or Data Protection).
+  Corrected: .NET's ArgumentException message format (BCL). The 13 that failed create Katana's
+  `DpapiDataProtectionProvider` for token providers, which was Windows-only.
 - **Gate:** a hub in the IIS sample (`App_Code/SignalRStartup.cs`, `OwinStartup`, `MapSignalR`) with SignalR's .NET client
   over WebSockets, Server-Sent Events and long polling, and `/signalr/hubs`; script and style bundles rendered, served
   concatenated and minified.
@@ -1197,3 +1197,84 @@ Engine changes the suite drove, each following Windows GDI+ as the tests record 
   normalisation and half-open containment, MeasureCharacterRanges ranges and negative layouts, ImageAttributes flags,
   path-gradient bounds, surround colours and 256/511-point sigma blends, ToLogFont's charset, codec masks.
 
+## Protected configuration, the integrated pipeline and precompiled sites (30 Oct 2026)
+
+### DPAPI and protected configuration
+
+`WebFormsForCore.Security.LocalDataProtection` (in System.Configuration; `lift_project.py` copies it into Katana's
+Microsoft.Owin.Security through the new `fork_sources` setting) is DPAPI where Windows has it (`ProtectedData`) and its
+emulation elsewhere: one master key per scope, as DPAPI keeps one per machine and per user, in a file readable by its
+owner only. Keys live in `$WEBFORCORE_KEYS` if set; otherwise machine-scope keys go in `/var/lib/webforcore/keys` when
+it is writable, and everything else goes in `~/.webforcore/keys`. A key is created the first time it is needed.
+Payloads are AES-256-CBC with an HMAC-SHA256, keyed by HKDF from the master key, a salt and the entropy. As with DPAPI,
+the wrong key or the wrong entropy fails with "Key not valid for use in specified state."
+- **`DataProtectionConfigurationProvider`** (DPAPI) encrypts and decrypts with the emulation. A section encrypted by
+  Windows DPAPI is recognised (its blob header) and fails with an explanation: those keys never leave the machine.
+  Decrypt it there, and encrypt it again here or with RSA.
+- **`RsaProtectedConfigurationProvider`**: CAPI key containers are files, `<container>.rsakey.xml`, in the machine or
+  user key directory. The file holds the RSA key as XML; a bare `RSAKeyValue`, as `aspnet_regiis -px` exports it, is
+  accepted, so a key exported from Windows can be imported. Keys are created on first use (2048-bit) unless the key must
+  already exist, exportability is kept, and Add, Delete, Import and Export are supported.
+- **`webforcore-regiis`** (`src/WebFormsForCore.RegIIS`) is aspnet_regiis's configuration part: `-pef`/`-pdf` (encrypt or
+  decrypt a section of a site's web.config), `-pc` (create a container, `-exp` exportable, `-size`), `-pz` (delete one),
+  `-px` (export, `-pri` with the private key), `-pi` (import), `-prov`, and `-pku` (user scope). No IIS metabase:
+  `-pe`/`-pd` with `-app` are not supported.
+- Fork fix: in a PseudoAppDomain, `<configProtectedData>` failed with "does not inherit from
+  IConfigurationSectionHandler". `BaseConfigurationRecord` named the section types by their .NET Framework assembly
+  name, which resolves to the shared framework's System.Configuration, a different type. It now takes the names from
+  `typeof`.
+- Katana's `DpapiDataProtectionProvider` uses the emulation in user scope. With it, Identity's tests pass 311 of 311.
+
+Gate (`ProtectedConfigurationTests`): the sample's `protected/web.config` has an RSA-encrypted `<connectionStrings>` and
+a DPAPI-encrypted `<appSettings>`, read by a page. The sample's test keys are in `App_Data/keys`, which is not served.
+A section encrypted by Windows DPAPI gives the explanation. regiis round trip: encrypt with key directory A, fail to
+decrypt with B, export from A, import into B, then decrypt with B. A non-exportable key's export is refused.
+
+### Integrated-pipeline APIs in classic mode
+
+The fork runs ASP.NET's classic pipeline. The APIs that throw "This operation requires IIS integrated pipeline mode"
+on IIS classic mode now work on Kestrel instead, as they do in integrated mode:
+- **Notifications:** `HttpContext.CurrentNotification` and `IsPostNotification` report the step that is running. The
+  classic pipeline gains `MapRequestHandler`, `LogRequest` and `PostLogRequest` (raised in integrated mode's order, the
+  log events after the handler and before `EndRequest`). `Response.AddOnSendingHeaders` callbacks run when the headers
+  are written, with `CurrentNotification` set to `SendResponse`.
+- **Request changes:** `Request.Headers` and `Request.ServerVariables` can be set and removed. HTTP_ variables follow
+  the headers, and headers changed in a module are what later modules and the handler see. `Request.InsertEntityBody`
+  replaces the request body; `Request.Abort` aborts the connection.
+- **`Response.SubStatusCode`** sets the substatus `<httpErrors>` matches, so it picks the custom page for it (for
+  example 404.7). The W3C log does not have `sc-substatus`.
+- **`Server.TransferRequest`**: the current request ends, and a new request for the new URL runs through the whole
+  pipeline on the same Kestrel connection, with the method, headers, body and user, and with the changes the overloads
+  allow. A transfer chain deeper than 16 fails (a guard against loops).
+
+Gate (`IntegratedPipelineTests`), with a module in the sample (`App_Code/IntegratedModule.cs`) and pages in
+`integrated/`: notifications in order (including the log events), headers and server variables changed by the module,
+`AddOnSendingHeaders`, `TransferRequest` (to a new URL, and a POST with its form kept), a substatus that selects
+`<httpErrors>`' custom 404.7 page, and `Abort`.
+
+### Precompiled sites (aspnet_compiler)
+
+`src/WebFormsForCore.AspNetCompiler` (`aspnetcore_compiler`, aspnet_compiler's switches) now builds against the fork's
+projects instead of WebFormsForCore 1.7.0-rc3's packages. Two fork fixes made it precompile for .NET:
+- `AssemblyBuilder.FixUpCompilerParameters`: in the precompiler, the compiler's core library was the runtime's
+  `mscorlib.dll`, which only forwards to `System.Private.CoreLib`. Every compilation then failed ("Predefined type
+  'System.Void' is not defined"). When the target is the running runtime, the core library is `System.Private.CoreLib`.
+- `BuildManager.SetPrecompilationInfo`: the fork's BuildManagerHost calls it a second time, which found the marker file
+  the first call had just written and refused the target ("The target directory is not empty") unless `-f` was given.
+  The second call is now a no-op for the same target.
+
+The precompiled output goes into the folder that `-b` names. A deployment uses the host's output folder (`-b bin_dotnet`)
+and puts the host's build there too. The app then runs as usual (`dotnet bin_dotnet/<app>.dll` from the site folder).
+
+| Precompilation | What the target holds | On the fork |
+|---|---|---|
+| Fixed (no `-u`) | marker files for pages, `.compiled` maps, `App_Code.dll`, `App_global.asax.dll`, `App_GlobalResources.dll`, `App_Web_*.dll` | pages served from the precompiled assemblies; a page added later gets IIS's 500 "has not been pre-compiled, and cannot be requested" |
+| Updatable (`-u`) | pages' markup with `CodeFile` replaced by `inherits="Class, App_Web_x"`; no code files | markup compiled at run time against the precompiled code-behind; edits and new pages take effect |
+
+A compile error fails the precompilation (exit code 255; Windows' tool returns 1). The error is reported as
+aspnet_compiler reports it, `file(line): error CSxxxx: message`, with the physical path.
+
+Gate (`PrecompilationTests`), on `test/webForCore.Precompiled.Site` (CodeFile code-behind, a master page, a user control,
+App_Code, Global.asax, App_GlobalResources) and a minimal host, `test/webForCore.Precompiled.Host`. Fixed: the target's
+contents, the rendered page, and a page added later refused. Updatable: the markup rewritten, edits picked up, a new
+page compiled. A broken page fails the precompilation with its error.

@@ -1814,6 +1814,12 @@ namespace System.Web
         private void RejectRequestInternal(HttpWorkerRequest wr, bool silent) {
             // Construct the Context on HttpWorkerRequest, hook everything together
             HttpContext context = new HttpContext(wr, false /* initResponseWriter */);
+#if !NETFRAMEWORK
+            // webForCore: Server.TransferRequest(..., preserveUser: true) on the Kestrel host.
+            if (wr is AspNetCoreWorkerRequest transferred && transferred.TransferredUser != null) {
+                context.SetPrincipalNoDemand(transferred.TransferredUser);
+            }
+#endif
             wr.SetEndOfSendNotification(_asyncEndOfSendCallback, context);
 
             // Count active requests

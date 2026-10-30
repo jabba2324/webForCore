@@ -901,6 +901,12 @@ public class AssemblyBuilder
                 .OfType<string>()
                 .FirstOrDefault(name => name.EndsWith("mscorlib.dll") || name.EndsWith("System.Private.CoreLib.dll"));
             //AssemblyResolver.GetPathToReferenceAssembly(typeof(string).Assembly, out coreAssemblyFile);
+#if !NETFRAMEWORK
+            // The runtime directory's mscorlib.dll only forwards to System.Private.CoreLib: when targeting the running
+            // runtime (not .NET Framework reference assemblies), the core assembly is System.Private.CoreLib.
+            if (coreAssemblyFile != null && !System.Web.Hosting.AssemblyLoaderNetCore.UseNetFXGAC && AssemblyResolver.IsInRuntimeDirectory(coreAssemblyFile))
+                coreAssemblyFile = typeof(object).Assembly.Location;
+#endif
             compilParams.CoreAssemblyFileName = coreAssemblyFile;
         }
 

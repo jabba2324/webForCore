@@ -997,18 +997,22 @@ namespace System.Web
 		{
 			add
 			{
+#if NETFRAMEWORK // webForCore: the classic pipeline emulates these on .NET (ApplicationStepManager.BuildSteps)
 				if (!HttpRuntime.UseIntegratedPipeline)
 				{
 					throw new PlatformNotSupportedException(SR.GetString(SR.Requires_Iis_Integrated_Mode));
 				}
+#endif
 				AddSyncEventHookup(EventMapRequestHandler, value, RequestNotification.MapRequestHandler);
 			}
 			remove
 			{
+#if NETFRAMEWORK // webForCore: the classic pipeline emulates these on .NET (ApplicationStepManager.BuildSteps)
 				if (!HttpRuntime.UseIntegratedPipeline)
 				{
 					throw new PlatformNotSupportedException(SR.GetString(SR.Requires_Iis_Integrated_Mode));
 				}
+#endif
 				RemoveSyncEventHookup(EventMapRequestHandler, value, RequestNotification.MapRequestHandler);
 			}
 		}
@@ -1087,18 +1091,22 @@ namespace System.Web
 		{
 			add
 			{
+#if NETFRAMEWORK // webForCore: the classic pipeline emulates these on .NET (ApplicationStepManager.BuildSteps)
 				if (!HttpRuntime.UseIntegratedPipeline)
 				{
 					throw new PlatformNotSupportedException(SR.GetString(SR.Requires_Iis_Integrated_Mode));
 				}
+#endif
 				AddSyncEventHookup(EventLogRequest, value, RequestNotification.LogRequest);
 			}
 			remove
 			{
+#if NETFRAMEWORK // webForCore: the classic pipeline emulates these on .NET (ApplicationStepManager.BuildSteps)
 				if (!HttpRuntime.UseIntegratedPipeline)
 				{
 					throw new PlatformNotSupportedException(SR.GetString(SR.Requires_Iis_Integrated_Mode));
 				}
+#endif
 				RemoveSyncEventHookup(EventLogRequest, value, RequestNotification.LogRequest);
 			}
 		}
@@ -1107,18 +1115,22 @@ namespace System.Web
 		{
 			add
 			{
+#if NETFRAMEWORK // webForCore: the classic pipeline emulates these on .NET (ApplicationStepManager.BuildSteps)
 				if (!HttpRuntime.UseIntegratedPipeline)
 				{
 					throw new PlatformNotSupportedException(SR.GetString(SR.Requires_Iis_Integrated_Mode));
 				}
+#endif
 				AddSyncEventHookup(EventPostLogRequest, value, RequestNotification.LogRequest, true);
 			}
 			remove
 			{
+#if NETFRAMEWORK // webForCore: the classic pipeline emulates these on .NET (ApplicationStepManager.BuildSteps)
 				if (!HttpRuntime.UseIntegratedPipeline)
 				{
 					throw new PlatformNotSupportedException(SR.GetString(SR.Requires_Iis_Integrated_Mode));
 				}
+#endif
 				RemoveSyncEventHookup(EventPostLogRequest, value, RequestNotification.LogRequest, true);
 			}
 		}
@@ -1248,19 +1260,23 @@ namespace System.Web
 
 		public void AddOnMapRequestHandlerAsync(BeginEventHandler bh, EndEventHandler eh)
 		{
+#if NETFRAMEWORK // webForCore: the classic pipeline emulates these on .NET (ApplicationStepManager.BuildSteps)
 			if (!HttpRuntime.UseIntegratedPipeline)
 			{
 				throw new PlatformNotSupportedException(SR.GetString(SR.Requires_Iis_Integrated_Mode));
 			}
+#endif
 			AddOnMapRequestHandlerAsync(bh, eh, null);
 		}
 
 		public void AddOnMapRequestHandlerAsync(BeginEventHandler beginHandler, EndEventHandler endHandler, Object state)
 		{
+#if NETFRAMEWORK // webForCore: the classic pipeline emulates these on .NET (ApplicationStepManager.BuildSteps)
 			if (!HttpRuntime.UseIntegratedPipeline)
 			{
 				throw new PlatformNotSupportedException(SR.GetString(SR.Requires_Iis_Integrated_Mode));
 			}
+#endif
 			AsyncEvents.AddHandler(EventMapRequestHandler, beginHandler, endHandler, state,
 								   RequestNotification.MapRequestHandler, false, this);
 		}
@@ -1366,38 +1382,46 @@ namespace System.Web
 
 		public void AddOnLogRequestAsync(BeginEventHandler bh, EndEventHandler eh)
 		{
+#if NETFRAMEWORK // webForCore: the classic pipeline emulates these on .NET (ApplicationStepManager.BuildSteps)
 			if (!HttpRuntime.UseIntegratedPipeline)
 			{
 				throw new PlatformNotSupportedException(SR.GetString(SR.Requires_Iis_Integrated_Mode));
 			}
+#endif
 			AddOnLogRequestAsync(bh, eh, null);
 		}
 
 		public void AddOnLogRequestAsync(BeginEventHandler beginHandler, EndEventHandler endHandler, Object state)
 		{
+#if NETFRAMEWORK // webForCore: the classic pipeline emulates these on .NET (ApplicationStepManager.BuildSteps)
 			if (!HttpRuntime.UseIntegratedPipeline)
 			{
 				throw new PlatformNotSupportedException(SR.GetString(SR.Requires_Iis_Integrated_Mode));
 			}
+#endif
 			AsyncEvents.AddHandler(EventLogRequest, beginHandler, endHandler, state,
 								   RequestNotification.LogRequest, false, this);
 		}
 
 		public void AddOnPostLogRequestAsync(BeginEventHandler bh, EndEventHandler eh)
 		{
+#if NETFRAMEWORK // webForCore: the classic pipeline emulates these on .NET (ApplicationStepManager.BuildSteps)
 			if (!HttpRuntime.UseIntegratedPipeline)
 			{
 				throw new PlatformNotSupportedException(SR.GetString(SR.Requires_Iis_Integrated_Mode));
 			}
+#endif
 			AddOnPostLogRequestAsync(bh, eh, null);
 		}
 
 		public void AddOnPostLogRequestAsync(BeginEventHandler beginHandler, EndEventHandler endHandler, Object state)
 		{
+#if NETFRAMEWORK // webForCore: the classic pipeline emulates these on .NET (ApplicationStepManager.BuildSteps)
 			if (!HttpRuntime.UseIntegratedPipeline)
 			{
 				throw new PlatformNotSupportedException(SR.GetString(SR.Requires_Iis_Integrated_Mode));
 			}
+#endif
 			AsyncEvents.AddHandler(EventPostLogRequest, beginHandler, endHandler, state,
 								   RequestNotification.LogRequest, true, this);
 		}
@@ -2553,10 +2577,12 @@ namespace System.Web
 				throw new ArgumentNullException("callback");
 			}
 
+#if NETFRAMEWORK // webForCore: the classic pipeline emulates these on .NET (ApplicationStepManager.BuildSteps)
 			if (!HttpRuntime.UseIntegratedPipeline)
 			{
 				throw new PlatformNotSupportedException(SR.GetString(SR.Requires_Iis_Integrated_Mode));
 			}
+#endif
 
 			if (_initSpecialCompleted && _initInternalCompleted)
 			{
@@ -4556,6 +4582,9 @@ namespace System.Web
 			private int _numStepCalls;
 			private int _numSyncStepCalls;
 			private int _endRequestStepIndex;
+#if !NETFRAMEWORK
+			private (RequestNotification Notification, bool Post)[] _stepNotifications;
+#endif
 
 			internal ApplicationStepManager(HttpApplication app) : base(app)
 			{
@@ -4570,6 +4599,7 @@ namespace System.Web
 				UrlMappingsSection urlMappings = RuntimeConfig.GetConfig().UrlMappings;
 				urlMappingsEnabled = urlMappings.IsEnabled && (urlMappings.UrlMappings.Count > 0);
 
+#if NETFRAMEWORK
 				steps.Add(new ValidateRequestExecutionStep(app));
 				steps.Add(new ValidatePathExecutionStep(app));
 
@@ -4600,6 +4630,56 @@ namespace System.Web
 				_endRequestStepIndex = steps.Count;
 				app.CreateEventExecutionSteps(HttpApplication.EventEndRequest, steps);
 				steps.Add(new NoopExecutionStep()); // the last is always there
+#else
+				// webForCore: the classic pipeline with integrated mode's events and order (IIS 7+): MapRequestHandler before the
+				// handler is mapped, LogRequest and PostLogRequest before EndRequest (also for requests that end early, as IIS
+				// logs every request), and each step's notification for HttpContext.CurrentNotification/IsPostNotification.
+				var notifications = new List<(RequestNotification Notification, bool Post)>();
+				void Step(IExecutionStep step, RequestNotification notification, bool post = false)
+				{
+					steps.Add(step);
+					notifications.Add((notification, post));
+				}
+				void Event(object key, RequestNotification notification, bool post = false)
+				{
+					int before = steps.Count;
+					app.CreateEventExecutionSteps(key, steps);
+					for (int k = before; k < steps.Count; k++) notifications.Add((notification, post));
+				}
+
+				Step(new ValidateRequestExecutionStep(app), RequestNotification.BeginRequest);
+				Step(new ValidatePathExecutionStep(app), RequestNotification.BeginRequest);
+				if (urlMappingsEnabled)
+					Step(new UrlMappingsExecutionStep(app), RequestNotification.BeginRequest); // url mappings
+				Event(HttpApplication.EventBeginRequest, RequestNotification.BeginRequest);
+				Event(HttpApplication.EventAuthenticateRequest, RequestNotification.AuthenticateRequest);
+				Event(HttpApplication.EventDefaultAuthentication, RequestNotification.AuthenticateRequest);
+				Event(HttpApplication.EventPostAuthenticateRequest, RequestNotification.AuthenticateRequest, true);
+				Event(HttpApplication.EventAuthorizeRequest, RequestNotification.AuthorizeRequest);
+				Event(HttpApplication.EventPostAuthorizeRequest, RequestNotification.AuthorizeRequest, true);
+				Event(HttpApplication.EventResolveRequestCache, RequestNotification.ResolveRequestCache);
+				Event(HttpApplication.EventPostResolveRequestCache, RequestNotification.ResolveRequestCache, true);
+				Event(HttpApplication.EventMapRequestHandler, RequestNotification.MapRequestHandler);
+				Step(new MapHandlerExecutionStep(app), RequestNotification.MapRequestHandler); // map handler
+				Event(HttpApplication.EventPostMapRequestHandler, RequestNotification.MapRequestHandler, true);
+				Event(HttpApplication.EventAcquireRequestState, RequestNotification.AcquireRequestState);
+				Event(HttpApplication.EventPostAcquireRequestState, RequestNotification.AcquireRequestState, true);
+				Event(HttpApplication.EventPreRequestHandlerExecute, RequestNotification.PreExecuteRequestHandler);
+				Step(app.CreateImplicitAsyncPreloadExecutionStep(), RequestNotification.ExecuteRequestHandler); // implict async preload step
+				Step(new CallHandlerExecutionStep(app), RequestNotification.ExecuteRequestHandler);  // execute handler
+				Event(HttpApplication.EventPostRequestHandlerExecute, RequestNotification.ExecuteRequestHandler, true);
+				Event(HttpApplication.EventReleaseRequestState, RequestNotification.ReleaseRequestState);
+				Event(HttpApplication.EventPostReleaseRequestState, RequestNotification.ReleaseRequestState, true);
+				Step(new CallFilterExecutionStep(app), RequestNotification.ReleaseRequestState, true);  // filtering
+				Event(HttpApplication.EventUpdateRequestCache, RequestNotification.UpdateRequestCache);
+				Event(HttpApplication.EventPostUpdateRequestCache, RequestNotification.UpdateRequestCache, true);
+				_endRequestStepIndex = steps.Count;
+				Event(HttpApplication.EventLogRequest, RequestNotification.LogRequest);
+				Event(HttpApplication.EventPostLogRequest, RequestNotification.LogRequest, true);
+				Event(HttpApplication.EventEndRequest, RequestNotification.EndRequest);
+				Step(new NoopExecutionStep(), RequestNotification.EndRequest); // the last is always there
+				_stepNotifications = notifications.ToArray();
+#endif
 
 				_execSteps = new IExecutionStep[steps.Count];
 				steps.CopyTo(_execSteps);
@@ -4712,6 +4792,9 @@ namespace System.Web
 									// enable launching async operations before each new step
 									syncContext.Enable();
 
+#if !NETFRAMEWORK
+									context.SetClassicNotification(_stepNotifications[_currentStepIndex].Notification, _stepNotifications[_currentStepIndex].Post);
+#endif
 									// call to execute current step catching thread abort exception
 									error = app.ExecuteStep(_execSteps[_currentStepIndex], ref stepCompletedSynchronously);
 

@@ -489,7 +489,10 @@ namespace WebFormsForCore.Hosting.IIS
 		}
 
 		const string SubStatusKey = "webForCore.IIS.SubStatus";
-		static int SubStatus(HttpContext context) => context.Items.TryGetValue(SubStatusKey, out var value) && value is int sub ? sub : 0;
+		// The module's substatus, or the application's (Response.SubStatusCode).
+		static int SubStatus(HttpContext context) =>
+			context.Items.TryGetValue(SubStatusKey, out var value) && value is int sub ? sub
+			: context.Items.TryGetValue(AspNetCoreWorkerRequest.AppSubStatusKey, out var app) && app is int appSub ? appSub : 0;
 
 		static XElement FindError(XElement section, int status, int subStatus)
 		{
