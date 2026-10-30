@@ -32,6 +32,9 @@
 
     <ItemGroup Condition="$(TargetFramework) == 'net11.0'">
         <PackageReference Include="System.Configuration.ConfigurationManager" Version="11.0.0-rc.3.26522.148" Alias="NET" />
+        <!-- webForCore: the design-time FontNameConverter uses SystemEvents, which came with the NuGet System.Drawing.Common
+             before the fork lifted its own (src/webForCore.System.Drawing.Common). -->
+        <PackageReference Include="Microsoft.Win32.SystemEvents" Version="11.0.0-rc.3.26522.148" />
     </ItemGroup>
 
     <Import Project="..\..\lib\WebFormsForCore.Build\netstandard2.0\FakeStrongName.targets" />
