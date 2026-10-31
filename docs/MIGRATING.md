@@ -178,16 +178,16 @@ These came up migrating real applications; each names one that needed it.
   be found ... forwarded to assembly 'System.ServiceModel.Syndication'` (MiniBlog's feed handler). Among them:
   `System.ServiceModel.Syndication`, `System.Data.SqlClient`, `System.Data.OleDb`, `System.DirectoryServices`,
   `System.Runtime.Caching`, `System.ServiceModel.Http` and the other WCF client packages.
-- **Katana packages webForCore doesn't lift** (#14). webForCore provides `Microsoft.Owin`, its hosts, `Security`,
+- **Katana packages webForCore doesn't lift** (#14, #18). webForCore provides `Microsoft.Owin`, its hosts, `Security`,
   `Security.Cookies`, `Security.OAuth` and `Cors`. The social logins of the Visual Studio templates
   (`Microsoft.Owin.Security.Facebook`, `.Google`, `.MicrosoftAccount`, `.Twitter`) and `.WsFederation` are not: keep
-  the application's package, and keep its Katana dependencies out as above, so webForCore's `Microsoft.Owin` 4.2.3 is
-  the only one (MvcMovie, Bonobo Git Server). Every template app has `using Microsoft.Owin.Security.Google;` in
-  `Startup.Auth.cs`, even with the providers commented out.
+  the application's package (any version from 2.0). Its Katana dependencies lose to webForCore's `Microsoft.Owin`
+  4.2.3, and the `System.Net.Http.WebRequest` they create their back-channel handler from is in the "Always" set
+  (before 0.3.0 it wasn't, and registering a provider failed every request: OpenOrderFramework, SocialGoal). Every
+  template app has `using Microsoft.Owin.Security.Google;` in `Startup.Auth.cs`, even with the providers commented out
+  (MvcMovie, Bonobo Git Server).
   ```xml
   <PackageReference Include="Microsoft.Owin.Security.Google" Version="3.0.1" />
-  <PackageReference Include="Microsoft.Owin" Version="3.0.1" ExcludeAssets="all" />
-  <PackageReference Include="Microsoft.Owin.Security" Version="3.0.1" ExcludeAssets="all" />
   ```
 
 ## 4. Program.cs

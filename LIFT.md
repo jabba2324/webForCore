@@ -1820,3 +1820,20 @@ rest). It is in the "Always" set; the original package, which Unity.Mvc and othe
 (#23's `WebForCorePreferItsPackages`). New code, not Microsoft's. `docs/IIS-COMPATIBILITY.md` lists `Assembly.LoadFrom` as
 a difference. Test: `tools/ci/package-smoke-mvc`, where Unity.Mvc's activator registers the resolver that constructs
 `HomeController`, and a post-start method runs ("No parameterless constructor defined" on the 0.2.0 packages).
+
+### System.Net.Http.WebRequest for Katana's social providers (#18)
+
+0.2.0's guide said to keep the application's `Microsoft.Owin.Security.Google` (and Facebook, MicrosoftAccount, Twitter)
+package, which webForCore doesn't lift (#14). That builds, but each provider's middleware does
+`options.BackchannelHttpHandler ?? new WebRequestHandler()`, and `WebRequestHandler` is in .NET Framework's
+`System.Net.Http.WebRequest.dll`, which .NET doesn't have. As soon as a provider was registered, every request,
+static files included, failed in `OwinHttpModule.Init` with "Could not load file or assembly
+'System.Net.Http.WebRequest, Version=4.0.0.0'" (OpenOrderFramework and SocialGoal, which call
+`app.UseGoogleAuthentication()`). Rather than lift four providers, `src/WebFormsForCore.Net.Http.WebRequest` builds
+`System.Net.Http.WebRequest` 4.0.0.0 with .NET Framework's name and public key: a `WebRequestHandler` that is an
+`HttpClientHandler`, written from its documented API. It covers the original packages at every version from 2.0, and
+WS-Federation and third-party providers built the same way. `ServerCertificateValidationCallback`, which the providers
+set from `BackchannelCertificateValidator`, maps to `ServerCertificateCustomValidationCallback`; the settings only
+`HttpWebRequest` had are kept and ignored. New code, not Microsoft's, in the "Always" set. Test:
+`tools/ci/package-smoke-mvc`'s `Startup` registers Katana 3.0.1's Google provider, and `/challenge` must redirect to
+accounts.google.com (a 500 on the 0.2.0 packages).

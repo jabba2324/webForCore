@@ -63,5 +63,9 @@ curl -s http://127.0.0.1:5198/Plain | grep -q "plain view, rendered by Razor" ||
 home=$(curl -s http://127.0.0.1:5198/)
 echo "$home" | grep -q "hello from Unity, rendered by Razor" || { echo "/: unexpected response"; echo "$home" | head -20; fail=1; }
 echo "$home" | grep -q "post-start: True" || { echo "/: PostApplicationStartMethod didn't run"; fail=1; }
+# Katana 3.0.1's Google provider redirects a challenge to Google (issue #18: it needs System.Net.Http.WebRequest, and
+# every request failed).
+location=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' http://127.0.0.1:5198/challenge)
+case "$location" in "302 https://accounts.google.com/"*) ;; *) echo "/challenge: $location"; fail=1;; esac
 if [ $fail -ne 0 ]; then cat server.log; exit 1; fi
 echo "Package smoke test passed ($version)."

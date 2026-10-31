@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <!-- webForCore: System.Net.Http.WebRequest 4.0.0.0, the .NET Framework assembly with WebRequestHandler, which .NET
+         doesn't have. Katana's social providers (Google, Facebook, MicrosoftAccount, Twitter) and WS-Federation create
+         one (#18). Part of the "Always" set. -->
+    <PropertyGroup>
+        <TargetFrameworks>net11.0</TargetFrameworks>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+        <AssemblyOriginatorKeyFile>..\SigningKey\WebFormsForCore.snk</AssemblyOriginatorKeyFile>
+        <AssemblyName>System.Net.Http.WebRequest</AssemblyName>
+        <RootNamespace>System.Net.Http</RootNamespace>
+        <SignAssembly>True</SignAssembly>
+        <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+
+        <PackageId>webForCore.Net.Http.WebRequest</PackageId>
+        <Title>WebFormsForCore.Net.Http.WebRequest</Title>
+        <Product>WebFormsForCore.Net.Http.WebRequest</Product>
+        <Description>System.Net.Http.WebRequest for webForCore: .NET Framework's WebRequestHandler as an HttpClientHandler, for libraries built against it (Katana's social login providers)</Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageTags>webforms;aspnet;system.web;porting;net11</PackageTags>
+        <IncludeSymbols>true</IncludeSymbols>
+        <EmbedUntrackedSources>false</EmbedUntrackedSources>
+        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    </PropertyGroup>
+
+    <Import Project="..\..\lib\WebFormsForCore.Build\netstandard2.0\FakeStrongName.targets" />
+    <PropertyGroup>
+        <StrongNamePublicKey>002400000480000094000000060200000024000052534131000400000100010007D1FA57C4AED9F0A32E84AA0FAEFD0DE9E8FD6AEC8F87FB03766C834C99921EB23BE79AD9D5DCC1DD9AD236132102900B723CF980957FC4E177108FC607774F29E8320E92EA05ECE4E821C0A5EFE8F1645C4C0C93C1AB99285D622CAA652C1DFAD63D745D6F2DE5F17E5EAF0FC4963D261C8A12436518206DC093344D5AD293</StrongNamePublicKey>
+        <StrongNamePublicKeyToken>b03f5f7f11d50a3a</StrongNamePublicKeyToken>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\..\README.md">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+    </ItemGroup>
+
+</Project>

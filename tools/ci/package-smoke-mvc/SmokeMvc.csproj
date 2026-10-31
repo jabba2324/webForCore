@@ -36,5 +36,6 @@
     <!-- As the applications have them, with no ExcludeAssets. -->
     <PackageReference Include="Unity.Mvc" Version="5.11.1" />
     <PackageReference Include="WebActivatorEx" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Owin.Security.Google" Version="3.0.1" />
   </ItemGroup>
 </Project>
