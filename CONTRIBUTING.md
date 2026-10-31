@@ -39,7 +39,7 @@ a real application behave more like it did on .NET Framework 4.8 and IIS 10, and
 | What changed | Test |
 | --- | --- |
 | Behaviour of a running application (System.Web, the hosting layer, IIS modules, configuration) | A page in `test/webForCore.IIS.Sample` (problems found in applications go in `regressions/`) and a test in `test/webForCore.IIS.Gate.Tests` (`RegressionTests` for those), or the MVC, Web API and Web Pages gate suites |
-| How an application builds or what the packages contain | `tools/ci/package-smoke`: an application outside this repository's build files that uses only the packages |
+| How an application builds or what the packages contain | `tools/ci/package-smoke` (Web Forms) or `tools/ci/package-smoke-mvc` (MVC, OWIN and third-party packages): applications outside this repository's build files that use only the packages |
 | A lifted library | Its upstream test suite, lifted with it; add webForCore's test next to it if upstream has none |
 
 The suites and how to run them are in [`docs/TESTING.md`](docs/TESTING.md). Run at least the suites your change can
