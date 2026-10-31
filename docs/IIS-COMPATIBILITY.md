@@ -95,7 +95,7 @@ IIS hands ASP.NET a worker request (`HttpWorkerRequest`); on Kestrel this is `As
 | --- | --- | --- |
 | App pool worker process | Partial | One Kestrel process per app, supervised by systemd (`tools/deploy/webforcore@.service`) or a container runtime |
 | AppDomain per application | Works | `PseudoAppDomain`: the app runs in a collectible `AssemblyLoadContext`, with its own copy of System.Web and the app's assemblies, so static state is per domain |
-| Restart on web.config, `bin` or `App_Code` change; `HttpRuntime.UnloadAppDomain` | Works | A new domain starts while the old one drains (overlapped recycle); no requests fail |
+| Restart on web.config, `bin` or `App_Code` change; `HttpRuntime.UnloadAppDomain` | Works | A new domain starts while the old one drains (overlapped recycle); no requests fail. Requests still running in the old domain after `<hostingEnvironment shutdownTimeout>` (30 s) are aborted, as AppDomain.Unload did: long polls and WebSockets reconnect to the new domain |
 | Recycling by time, request count, private memory | Works | `Recycling(...)`, with IIS's defaults |
 | Freeing old domains | Works | An old domain is collected once its requests finish (gate tests restart the IIS, MVC and Web API samples and wait for it). What .NET keeps process-wide is released when it unloads; an app's own `MemoryCache` instances must be disposed in `Application_End`. A domain still referenced 5 minutes after shutdown is logged, and after 3 the process stops cleanly for systemd to restart it, as WAS recycled a worker |
 | Health monitoring, rapid-fail protection | Works | systemd unit: `Type=notify`, watchdog in place of WAS's ping, 5 failures in 5 minutes |

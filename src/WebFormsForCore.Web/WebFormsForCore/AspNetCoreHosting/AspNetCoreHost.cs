@@ -29,6 +29,10 @@ namespace System.Web.Hosting
         private string lowerCasedVirtualPathWithTrailingSlash;
 
         private volatile int pendingCallsCount;
+        // webForCore: the requests in progress, for Stop(immediate: true) to abort.
+        private readonly System.Collections.Concurrent.ConcurrentDictionary<Core.HttpContext, byte> requests =
+            new System.Collections.Concurrent.ConcurrentDictionary<Core.HttpContext, byte>();
+        private int unregistered;
 
         private string physicalClientScriptPath;
 
@@ -169,13 +173,36 @@ namespace System.Web.Hosting
             // webForCore: tell the middleware first, so that new requests go to a new domain while this one drains.
             Interlocked.Exchange(ref OnShutdown, null)?.Invoke();
 
-            // Make sure all the pending calls complete before this Object is unregistered.
-            WaitForPendingCallsToFinish();
+            // webForCore: the hosting environment calls Stop(false), waits up to <hostingEnvironment shutdownTimeout> (30 s)
+            // for registered objects to unregister, then calls Stop(true) and unloads the domain. This waited for the
+            // requests in progress here, without limit, so the timeout never applied and one long request (a WebSocket, a
+            // long poll) kept the old domain alive as long as its client stayed. Now Stop(false) unregisters once the
+            // requests finish, and Stop(true) aborts those left, as AppDomain.Unload did on IIS.
+            if (immediate)
+            {
+                foreach (var context in requests.Keys)
+                {
+                    try { context.Abort(); } catch { }
+                }
+                Unregister();
+            }
+            else if (pendingCallsCount <= 0) Unregister();
+            else
+            {
+                Task.Run(() =>
+                {
+                    WaitForPendingCallsToFinish();
+                    Unregister();
+                });
+            }
+        }
 
-            // webForCore: only unregister, as a registered object does (Cassini's Host). This called HttpRuntime.Close(),
-            // which marked the runtime as shutting down, so that the hosting environment's shutdown, which called Stop,
-            // then skipped releasing the runtime and unloading the domain (HttpRuntime.ShutdownAppDomain).
-            HostingEnvironment.UnregisterObject(this);
+        // webForCore: only unregister, as a registered object does (Cassini's Host). This called HttpRuntime.Close(),
+        // which marked the runtime as shutting down, so that the hosting environment's shutdown, which called Stop,
+        // then skipped releasing the runtime and unloading the domain (HttpRuntime.ShutdownAppDomain).
+        private void Unregister()
+        {
+            if (Interlocked.Exchange(ref unregistered, 1) == 0) HostingEnvironment.UnregisterObject(this);
         }
 
         #endregion
@@ -353,6 +380,7 @@ namespace System.Web.Hosting
         public async Task ProcessRequest(Core.HttpContext context)
         {
             AddPendingCall();
+            requests.TryAdd(context, 0);
             try
             {
                 if (UseClassicMode) HttpRuntime.SetClassicPipeline();
@@ -362,6 +390,7 @@ namespace System.Web.Hosting
             finally
             {
                 // webForCore: also when the request throws; Stop waits for the count to reach 0.
+                requests.TryRemove(context, out _);
                 RemovePendingCall();
             }
         }
@@ -392,7 +421,7 @@ namespace System.Web.Hosting
         {
             for (; ; )
             {
-                if (pendingCallsCount <= 0)
+                if (pendingCallsCount <= 0 || unregistered != 0)
                 {
                     break;
                 }

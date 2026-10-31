@@ -1508,3 +1508,14 @@ Both appeared once CI started running (on its fresh runners), and neither involv
   A test class running in parallel resetting the policy made the test see a `GenericPrincipal`. The attribute now lets
   one such test run at a time (fixup in `tools/lift/lift_project.py`); 5 consecutive runs pass.
 
+### Requests outlasting a restart: shutdownTimeout (31 Oct 2026)
+
+A WebSocket held open across a restart kept echoing from the old domain for as long as the client stayed (tested 100 s),
+and the domain was collected only when the client left. `AspNetCoreHost.Stop(immediate)` ignored `immediate` and
+waited for the requests in progress without limit, so the hosting environment's shutdown (`Stop(false)`, wait up to
+`<hostingEnvironment shutdownTimeout>`, `Stop(true)`, unload) never got past its first step. Now `Stop(false)`
+unregisters once the requests finish, and `Stop(true)` aborts those left (`HttpContext.Abort`), as AppDomain.Unload's
+thread aborts did on IIS. With the default 30 s, the socket was aborted 35 s after the restart and the domain collected.
+The IIS sample sets 5 s, and `AppDomainTests.RestartAbortsAWebSocketAfterTheShutdownTimeout` checks the abort comes
+after the timeout, not before or long after, and that the domain is collected.
+

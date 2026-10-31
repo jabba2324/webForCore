@@ -17,7 +17,7 @@ restore the old behaviour, the difference is documented.
 | --- | --- |
 | Target | .NET 11 (`net11.0`), Linux x64 (Windows builds too) |
 | Status | Pre-release. No production app has been migrated yet; NuGet packages aren't published yet |
-| Tests | 27,290 tests in 24 suites, almost all of them Microsoft's and Mono's; all pass except 151 known System.Drawing failures, 141 of them metafiles ([TESTING.md](docs/TESTING.md)) |
+| Tests | 27,294 tests in 24 suites, almost all of them Microsoft's and Mono's; all pass except 151 known System.Drawing failures, 141 of them metafiles ([TESTING.md](docs/TESTING.md)) |
 | Licence | MIT, Apache 2.0 and BSD 3-Clause, all of which allow commercial use; see [docs/LICENSING.md](docs/LICENSING.md) |
 
 ## What works

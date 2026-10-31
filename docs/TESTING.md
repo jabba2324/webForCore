@@ -6,7 +6,7 @@ where .NET's base class library behaves differently from .NET Framework's; those
 [lifted-changes.md](lifted-changes.md). On top of them, webForCore's own **gate suites** run real sample applications
 on Kestrel and check them over HTTP against IIS's documented behaviour.
 
-**Latest run (round 16, 30 Oct 2026, Linux x64, Release): 27,290 tests in 24 suites. 27,104 pass, 35 are skipped
+**Latest run (round 18, 31 Oct 2026, Linux x64, Release): 27,294 tests in 24 suites. 27,108 pass, 35 are skipped
 with a reason, and 151 fail, all of them known System.Drawing differences (141 are metafiles).**
 
 ## Running the tests
@@ -61,9 +61,9 @@ rounding difference; they are listed in `tools/lift/test-results/2026-10-30.md`.
 
 | Suite | Tests | What it checks |
 | --- | ---: | --- |
-| IIS.Gate.Tests | 71 | `test/webForCore.IIS.Sample` on Kestrel: each `<system.webServer>` feature against IIS 10's documented behaviour (request filtering, rewrite rules, redirects, default documents, errors, IP restrictions, directory browsing, compression, logging), the in-process restart, WebSockets, HTTPS and client certificates, timeouts, SignalR, bundling, protected configuration, integrated-pipeline APIs, precompiled sites (`aspnetcore_compiler`: fixed, updatable, compile errors, usage), ASMX (SOAP 1.1/1.2, faults, HTTP POST, WSDL, help page, JSON), ASP.NET AJAX (ScriptResource.axd, UpdatePanel partial postback, page methods), `System.Web.Mail` and `<DbProviderFactories>` |
-| WebApi.Gate.Tests | 66 | `test/webForCore.WebApi.Sample` (Visual Studio's Web API template and the "Getting Started" tutorial's controllers). Each request runs through System.Web and through OWIN, and is compared with an oracle: the same controllers in Web API's in-memory server, without System.Web. Status, media type, body, Location and Allow must match |
-| Mvc.Gate.Tests | 64 | `test/webForCore.Mvc.Sample` and `test/webForCore.WebPages.Sample`: model binding, validation, post-redirect-get with TempData, `Html.Serialize`/`[Deserialize]` state (and tampering), anti-forgery tokens, filters, error pages, layouts, display and editor templates, Razor features, MVC Futures, Web Pages, and that source files aren't served |
+| IIS.Gate.Tests | 73 | `test/webForCore.IIS.Sample` on Kestrel: each `<system.webServer>` feature against IIS 10's documented behaviour (request filtering, rewrite rules, redirects, default documents, errors, IP restrictions, directory browsing, compression, logging), the in-process restart, WebSockets, HTTPS and client certificates, timeouts, SignalR, bundling, protected configuration, integrated-pipeline APIs, precompiled sites (`aspnetcore_compiler`: fixed, updatable, compile errors, usage), ASMX (SOAP 1.1/1.2, faults, HTTP POST, WSDL, help page, JSON), ASP.NET AJAX (ScriptResource.axd, UpdatePanel partial postback, page methods), `System.Web.Mail`, `<DbProviderFactories>`, data binding over app types, and AppDomain restarts: the old domain is collected, and a WebSocket outlasting `shutdownTimeout` is aborted |
+| WebApi.Gate.Tests | 67 | `test/webForCore.WebApi.Sample` (Visual Studio's Web API template and the "Getting Started" tutorial's controllers). Each request runs through System.Web and through OWIN, and is compared with an oracle: the same controllers in Web API's in-memory server, without System.Web. Status, media type, body, Location and Allow must match. Also: a restart, after which the old domain must be collected |
+| Mvc.Gate.Tests | 65 | `test/webForCore.Mvc.Sample` and `test/webForCore.WebPages.Sample`: model binding, validation, post-redirect-get with TempData, `Html.Serialize`/`[Deserialize]` state (and tampering), anti-forgery tokens, filters, error pages, layouts, display and editor templates, Razor features, MVC Futures, Web Pages, that source files aren't served, and that the old domain is collected after a restart |
 | Serialization.Tests | 10 | `NameValueCollection` and its subclasses through the BinaryFormatter port, in .NET Framework's format |
 
 ## Code coverage

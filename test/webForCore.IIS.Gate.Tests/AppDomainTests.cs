@@ -1,4 +1,6 @@
 using System.Net;
+using System.Net.WebSockets;
+using System.Text;
 using System.Text.RegularExpressions;
 using Xunit;
 
@@ -23,6 +25,47 @@ namespace IISGate
             var match = Regex.Match(await response.Content.ReadAsStringAsync(), @"domain=([0-9a-f-]+);starts=(\d+)");
             Assert.True(match.Success);
             return (match.Groups[1].Value, int.Parse(match.Groups[2].Value));
+        }
+
+        // A WebSocket open across a restart: the old domain keeps serving it for <hostingEnvironment shutdownTimeout> (5 s
+        // in the sample), then the connection is aborted, as AppDomain.Unload did on IIS, and the domain is collected.
+        // Before, the old domain waited for its requests without limit, so a client that stayed kept it alive.
+        [Fact]
+        public async Task RestartAbortsAWebSocketAfterTheShutdownTimeout()
+        {
+            await Domain(); // the current start
+            int start = Regex.Matches(_server.Output, @"\(start (\d+), in a PseudoAppDomain\)").Select(m => int.Parse(m.Groups[1].Value)).Max();
+
+            using var socket = new ClientWebSocket();
+            await socket.ConnectAsync(new UriBuilder(_server.BaseAddress) { Scheme = "ws", Path = "/Echo.ashx" }.Uri, CancellationToken.None);
+            Assert.Equal(HttpStatusCode.OK, (await _server.Client.GetAsync("/Restart.aspx")).StatusCode);
+
+            var buffer = new byte[1024];
+            var restarted = DateTime.UtcNow;
+            bool aborted = false;
+            while (!aborted && DateTime.UtcNow - restarted < TimeSpan.FromSeconds(30))
+            {
+                try
+                {
+                    await socket.SendAsync(Encoding.UTF8.GetBytes("ping"), WebSocketMessageType.Text, true, CancellationToken.None);
+                    var result = await socket.ReceiveAsync(buffer, CancellationToken.None);
+                    aborted = result.MessageType == WebSocketMessageType.Close;
+                }
+                catch (WebSocketException)
+                {
+                    aborted = true;
+                }
+                if (!aborted) await Task.Delay(500);
+            }
+            var elapsed = DateTime.UtcNow - restarted;
+            Assert.True(aborted, "the WebSocket stayed open 30 s after the restart");
+            Assert.InRange(elapsed, TimeSpan.FromSeconds(4), TimeSpan.FromSeconds(20)); // served until the timeout, not beyond
+
+            for (int i = 0; i < 150 && !_server.Output.Contains($"(start {start}) unloaded."); i++)
+            {
+                await Task.Delay(200);
+            }
+            Assert.Contains($"(start {start}) unloaded.", _server.Output);
         }
 
         [Fact]
