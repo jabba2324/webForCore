@@ -159,7 +159,7 @@ namespace System.Web.Helpers
             {
                 SetPropertiesOnMessage(message, to, subject, body, from, cc, bcc, replyTo, contentEncoding, headerEncoding, priorityValue,
                                        filesToAttach, isBodyHtml, additionalHeaders);
-                using (SmtpClient client = new SmtpClient())
+                using (SmtpClient client = WebFormsForCore.Net.Configuration.NetConfiguration.CreateSmtpClient()) // webForCore: <mailSettings>
                 {
                     SetPropertiesOnClient(client);
                     client.Send(message);
@@ -178,7 +178,7 @@ namespace System.Web.Helpers
             try
             {
                 // Create a new SmtpClient object: this will read config & tell us what the default value is
-                using (SmtpClient client = new SmtpClient())
+                using (SmtpClient client = WebFormsForCore.Net.Configuration.NetConfiguration.CreateSmtpClient()) // webForCore: <mailSettings>
                 {
                     smtpDefaults[SmtpServerKey] = client.Host;
                     smtpDefaults[SmtpPortKey] = client.Port;
@@ -198,7 +198,7 @@ namespace System.Web.Helpers
                     }
                     using (MailMessage message = new MailMessage())
                     {
-                        smtpDefaults[FromKey] = (message.From != null) ? message.From.Address : null;
+                        smtpDefaults[FromKey] = (message.From ?? WebFormsForCore.Net.Configuration.NetConfiguration.DefaultFrom)?.Address; // webForCore: <smtp from>
                     }
                 }
             }

@@ -23,7 +23,7 @@ when a step refers to them.
    checks, authentication or authorization, and don't serve `bin_dotnet`, `App_Data` or source files.
 5. **Stop and ask the user** before any of these:
    - replacing an authentication scheme (Windows authentication);
-   - changing a data access technology (LINQ to SQL, EF 1–4, typed DataSets);
+   - changing a data access technology (LINQ to SQL, EF 1–4);
    - removing a feature;
    - dropping a third-party library;
    - committing, pushing or deploying.
@@ -47,7 +47,7 @@ Do this before changing anything, and present the findings to the user.
    | `.svc` files, `ServiceHost`, `<system.serviceModel><services>` | WCF hosting: not available (client proxies may work) |
    | `System.Data.Linq`, `DataContext`, `.dbml`, `LinqDataSource` | LINQ to SQL: not available |
    | `ObjectContext`, `.edmx` with EF < 6, `EntityDataSource` | EF 1–4: not available |
-   | `.xsd` in `App_Code`, `App_WebReferences` | Build providers that don't generate code |
+   | `App_WebReferences` | The build provider generates no proxy |
    | `Microsoft.Win32.Registry`, `[ComImport]`, `Marshal.GetActiveObject`, `System.Messaging`, `Microsoft.Office.Interop` | Windows only |
    | `Metafile`, `.emf`, `.wmf` | System.Drawing metafiles: not implemented |
    | `NetDataContractSerializer` (outside MVC Futures) | Not on .NET (`Html.Serialize`/`[Deserialize]` work) |
@@ -123,6 +123,7 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
    | `CultureNotFoundException` | Expected .NET Framework behaviour; check the culture name |
    | `PlatformNotSupportedException` | A Windows-only API: find it in `docs/NAMESPACES.md`; ask before replacing it |
    | Lost logins or view state errors after a restart | Add an explicit `<machineKey>` (ask the user for keys, or generate new ones and say so) |
+   | "The SMTP host was not specified" from the app's own mail code | .NET's `SmtpClient` ignores `<mailSettings>`: replace `new SmtpClient()` with `WebFormsForCore.Net.Configuration.NetConfiguration.CreateSmtpClient()` |
 
 **Check:** every page type renders without errors.
 

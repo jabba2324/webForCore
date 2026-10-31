@@ -177,7 +177,12 @@ namespace System.Web.UI.WebControls {
                         return;
                     }
 
+#if NETFRAMEWORK
                     SmtpClient smtp = new SmtpClient();
+#else
+                    // webForCore: .NET's SmtpClient doesn't read <system.net><mailSettings>.
+                    SmtpClient smtp = WebFormsForCore.Net.Configuration.NetConfiguration.CreateSmtpClient();
+#endif
                     smtp.Send(message);
                 }
             } catch (Exception e) {

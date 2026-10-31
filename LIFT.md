@@ -1521,3 +1521,86 @@ thread aborts did on IIS. With the default 30 s, the socket was aborted 35 s aft
 The IIS sample sets 5 s, and `AppDomainTests.RestartAbortsAWebSocketAfterTheShutdownTimeout` checks the abort comes
 after the timeout, not before or long after, and that the domain is collected.
 
+
+## Typed DataSets and `<system.net>` (31 Oct 2026)
+
+### Typed DataSets: `.xsd` in App_Code
+
+`XsdBuildProvider` threw `NotImplementedException`: it generates code with System.Design's
+`System.Data.Design.TypedDataSetGenerator`, which isn't open source. Now:
+- **DataSet, table and row classes:** the Reference Source's older `System.Data.TypedDataSetGenerator`
+  (`System.Data/System/Data/CodeGen/datacache.cs`, MIT), lifted by `tools/lift/lift_strb.py` into
+  `src/WebFormsForCore.Web/WebFormsForCore/ReferenceSource/datacache.cs`. Its fixups make it internal, drop its
+  HostProtection and Obsolete attributes, and replace the System.Data internals it used (`ColumnsReference`,
+  `FindParentRelation`, `ConvertXmlToObject`, `ShouldSerializeLocale`, `_columnUri`, ...) with public members or
+  `TypedDataSets/CodeGenSupport.cs`. .NET has no `TypedDataSetGeneratorException`; a `DataException` lists the errors.
+- **What the designer generates and the old generator doesn't** (`TypedDataSets/TypedDataSetGenerator.cs`, a CodeDOM
+  pass): partial classes, public table constructors and `XxxColumn` properties (App_Code and the pages compile into
+  different assemblies), tables deriving from `TypedTableBase<row>` (typed `foreach` and LINQ), and the designer's
+  names (`msprop:Generator_ColumnPropNameInRow`, `Generator_ChildPropName`, `Generator_ParentPropName`).
+- **TableAdapters** (`TypedDataSets/TableAdapterGenerator.cs`, webForCore's own): read from the designer's annotation
+  (`urn:schemas-microsoft-com:xml-msdatasource`). Per table: `Adapter`, `Connection`, `Transaction`,
+  `CommandCollection`, `ClearBeforeFill`; Fill and Get methods per Rowset query (`GenerateMethods`); scalar and
+  non-query methods; `Update` of a table, the DataSet, a row and rows; DB-direct `Insert`, `Update` and `Delete`
+  (`GenerateShortCommands`), with `IsNull_` parameters and the shorter `Update` that passes the original key for the
+  read-only key the statement refreshes. `QueriesTableAdapter` for the DataSet's own queries. `TableAdapterManager`
+  (`EnableTableAdapterManager`): `UpdateAll` in one transaction, inserts and updates parents first, deletes children
+  first, changes accepted after the commit, rows refreshed by their insert not updated again,
+  `BackupDataSetBeforeUpdate`. The classes the provider's factory creates are used (`SqlConnection`, `SqlCommand`,
+  `SqlDbType`), as the designer's code does; connection strings come from `<connectionStrings>`. CodeDOM only, so VB
+  sites work too (the generated VB was compiled and run against SQL Server).
+- Not generated: `GetTypedTableSchema` on the tables (a web service returning a typed DataTable),
+  `TableAdapterManager`'s ordering of self-referencing tables.
+
+Tests: the IIS sample has a designer DataSet (`App_Code/CatalogData.xsd`: two tables, a cascading relation, optimistic
+concurrency, a parameterized query, a scalar query, a non-query, a stored procedure with an output parameter) and
+`data/TypedDataSet.aspx`, which recreates the database on the CI's SQL Server and uses every kind of method, LINQ over
+a typed table, an ObjectDataSource bound to a TableAdapter (select, and insert by parameter names) and
+`TableAdapterManager.UpdateAll` (gate: `DataTests.TypedDataSetAndTableAdapters`). The restart test's workload includes
+it; the old domain is still collected.
+
+### `<system.net>`
+
+.NET's System.Net reads no configuration (checked: `new SmtpClient()` gets no host from `<mailSettings>`,
+`new MailMessage()` no From, `HttpClient.DefaultProxy` ignores `<defaultProxy>`). The fork's machine.config declared
+`<defaultProxy>` and four other sections as `IgnoreSection`; they now have their Reference Source types, as in .NET
+Framework's machine.config, so `GetSection` returns them. `WebFormsForCore.Net.Configuration.NetConfiguration`
+(System.Configuration, public, MIT):
+- `ApplyDefaultProxy()`: .NET Framework's `DefaultProxySectionInternal` (enabled, `proxyaddress`, `bypassonlocal`,
+  the bypass list, `<module>`, `usesystemdefault`, `useDefaultCredentials`) into `HttpClient.DefaultProxy`, which
+  HttpClient, WebClient, HttpWebRequest and SOAP client proxies use. Called by `HttpRuntime` when the application
+  starts; each start begins from the process's original proxy (kept in `AppContext`). The system's proxy on Linux is
+  .NET's default (`HTTP_PROXY`, `NO_PROXY`). WPAD and PAC scripts are ignored. A `<module>` proxy of the
+  application's own type is replaced by the original when the domain unloads (`PseudoAppDomain.ReleaseDefaultProxy`).
+- `CreateSmtpClient()`, `ApplyMailSettings(client)`, `DefaultFrom`: .NET Framework's `SmtpClient.Initialize` (host
+  and port, credentials or default credentials, SSL, target name, delivery method and format, pickup directory) and
+  the From of `new MailMessage()`. Used by `LoginUtil` (PasswordRecovery, CreateUserWizard, ChangePassword),
+  `MailWebEventProvider`, `SmtpMailSender` (`System.Web.Mail`) and Web Pages' `WebMail` (fixup in
+  `tools/lift/lift_project.py`). An application's own `new SmtpClient()` still gets nothing; MIGRATING.md says to use
+  `CreateSmtpClient()`.
+- `<connectionManagement>` is not applied: measured on .NET 11, `HttpWebRequest` opened 6 concurrent connections to one
+  server whatever `ServicePointManager.DefaultConnectionLimit` or the `ServicePoint`'s `ConnectionLimit` (1 or 100), so
+  .NET doesn't limit them, which is also what ASP.NET's `autoConfig` set (`DefaultConnectionLimit = Int32.MaxValue`).
+  `<settings>`, `<webRequestModules>`, `<authenticationModules>` and `<requestCaching>` are readable but not applied.
+
+A new holder of old domains came with it: `WebProxy` subscribes to `NetworkChange.NetworkAvailabilityChanged` the first
+time it checks whether an address is local, and `NetworkChange` keeps each subscriber with the `ExecutionContext` it was
+added in, here a request's, which carries the domain (heap dump: strong handle → `NetworkChange`'s subscriber dictionary
+→ `ExecutionContext` → `AsyncLocalValueMap` → `PseudoAppDomain`). The gate's full run showed it: with net/Proxy.aspx
+requested, the old domain was never collected. `PseudoAppDomain.ReleaseNetworkChangeSubscribers` drops those contexts
+(and removes handlers of the domain's types), as `ReleaseTimers` does for timers; the old domain is collected again.
+
+Tests (IIS gate, with a fake SMTP server and proxy in the test process): `MailTests.PasswordRecoveryMailsThroughMailSettings`
+(a membership provider in App_Code, a PasswordRecovery postback; the message reaches the configured server from
+`<smtp from>`), `NetTests.DefaultProxyFromConfiguration` (HttpClient and WebClient go through the configured proxy;
+the bypass list and local addresses don't).
+
+### Round 19 (31 Oct 2026)
+
+27,297 tests in 24 suites (IIS gate 76: typed DataSets, PasswordRecovery mail, default proxy). 27,111 pass, 35
+skipped, 151 known System.Drawing failures. The full run also failed
+`Microsoft.Web.Mvc.Test TypeConverterModelBinderTest.BindModel_Error_FormatExceptionsTurnedIntoStringsInModelState_ErrorNotAddedIfCallbackReturnsNull`
+(NotImplementedException from `ModelBinderConfigTest.DummyErrorSelector`): `ModelBinderConfigTest` sets
+`ModelBinderConfig`'s static error message providers while xunit runs the classes that read them in parallel.
+`ModelBinderConfigTest`, `TypeConverterModelBinderTest` and `MutableObjectModelBinderTest` now share a collection
+(regex transform in `tools/lift/lift_project.py`); the suite passed three runs in a row.

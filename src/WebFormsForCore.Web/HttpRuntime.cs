@@ -465,8 +465,10 @@ namespace System.Web
 
 #if !NETFRAMEWORK
                     // webForCore: .NET's DbProviderFactories doesn't read <system.data><DbProviderFactories>; register them.
+                    // Nor does System.Net read <system.net><defaultProxy>.
                     if (configInitException == null) {
                         System.Web.Configuration.DbProviderFactoriesConfiguration.Apply();
+                        WebFormsForCore.Net.Configuration.NetConfiguration.ApplyDefaultProxy();
                     }
 #endif
 

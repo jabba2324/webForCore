@@ -27,6 +27,23 @@ namespace IISGate
             Assert.Contains(">String/Book title<", body); // TypeDescriptor and the buddy class's [Display]
         }
 
+        // A Visual Studio DataSet in App_Code (CatalogData.xsd), compiled with the site: the typed DataSet and its
+        // TableAdapters against SQL Server (127.0.0.1,14333: tools/lift/sqlserver.sh locally, a service in CI).
+        [Fact]
+        public async Task TypedDataSetAndTableAdapters()
+        {
+            string body = await _server.Client.GetStringAsync("/data/TypedDataSet.aspx?reset=1");
+
+            Assert.Contains("linq=Chai,Chang;", body);              // LINQ over a typed table (TypedTableBase<ProductsRow>)
+            Assert.Contains("bycategory=Aniseed Syrup;", body);     // a query with a parameter
+            Assert.Contains("count=2;", body);                      // a scalar query
+            Assert.Contains("proc=3/4;", body);                     // QueriesTableAdapter: a stored procedure, an output parameter
+            Assert.Contains("insert=1;update=1;stale=0;delete=1;", body); // DB-direct methods, optimistic concurrency
+            Assert.Contains("ods=1;", body);                        // ObjectDataSource calling Insert by parameter names
+            Assert.Contains("updateall=4/False;apple=3/3;children=2;", body); // TableAdapterManager.UpdateAll
+            Assert.Contains("<td>Chai</td><td>20.00</td>", body);   // GridView over ObjectDataSource and GetProductsByCategoryID
+        }
+
         [Fact]
         public async Task ConfiguredProviderFactoriesAreRegistered()
         {

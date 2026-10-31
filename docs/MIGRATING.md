@@ -11,7 +11,7 @@ For an AI agent doing the migration, the same procedure is written as instructio
 
 1. **Check the blockers.** Search the solution for the APIs in the summary table of [NAMESPACES.md](NAMESPACES.md):
    `WindowsIdentity`, `<authentication mode="Windows">`, `System.ServiceModel` hosting (`.svc`), `System.Data.Linq`,
-   `ObjectContext`/EDMX (EF 1–4), registry and COM use, `.xsd` files in App_Code, `App_WebReferences`,
+   `ObjectContext`/EDMX (EF 1–4), registry and COM use, `App_WebReferences`,
    EMF/WMF metafiles. Each one needs a code change; plan these first.
 2. **Inventory the dependencies.** List NuGet packages and referenced DLLs:
    - Microsoft's ASP.NET packages (`Microsoft.AspNet.Mvc`, `.WebApi.*`, `.WebPages`, `.Razor`, `.Cors`,
@@ -160,7 +160,16 @@ reach System.Web, and ASP.NET Core serves everything else.
   [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md#deployment-tools).
 - **`<system.data><DbProviderFactories>`** entries are registered from configuration at application start, as on
   .NET Framework; the provider's assembly must be in `bin_dotnet`.
-- **`<system.net><mailSettings>`** is read by `System.Net.Mail.SmtpClient` and `System.Web.Mail.SmtpMail`.
+- **`<system.net><mailSettings>`** is used by ASP.NET's own mail senders (PasswordRecovery, CreateUserWizard,
+  ChangePassword, `SmtpMail`, `WebMail`, health monitoring's `MailWebEventProvider`). .NET's `SmtpClient` and
+  `MailMessage` don't read it: replace the application's `new SmtpClient()` with
+  `WebFormsForCore.Net.Configuration.NetConfiguration.CreateSmtpClient()`, and set `From` from
+  `NetConfiguration.DefaultFrom` where the code relied on `<smtp from>`.
+- **`<system.net><defaultProxy>`** is applied at application start to `HttpClient.DefaultProxy`. Without it, .NET
+  uses `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`. `<connectionManagement>` and the other `<system.net>` sections
+  have no effect.
+- **Typed DataSets** (`.xsd` in App_Code) and their TableAdapters are generated when the site compiles. The `.xsd`'s
+  provider must be registered; a TableAdapter's connection string comes from `<connectionStrings>`, as on IIS.
 
 ## 6. Code changes
 

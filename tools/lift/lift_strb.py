@@ -19,6 +19,10 @@ COPY = [
      "mcs/class/System.Design/System.Resources.Tools/StronglyTypedResourceBuilder.cs", "mono/StronglyTypedResourceBuilder.cs"),
     ("microsoft/referencesource", 2, "ec9fa9ae770d522a5b5f0607898044b7478574a3",
      "System.ComponentModel.DataAnnotations/DataAnnotations/BindableTypeAttribute.cs", "ReferenceSource/BindableTypeAttribute.cs"),
+    # System.Data's typed DataSet generator, which .NET dropped; XsdBuildProvider (.xsd files in App_Code) builds on it
+    # (TypedDataSets/TypedDataSetGenerator.cs).
+    ("microsoft/referencesource", 2, "ec9fa9ae770d522a5b5f0607898044b7478574a3",
+     "System.Data/System/Data/CodeGen/datacache.cs", "ReferenceSource/datacache.cs"),
 ]
 
 REMOVE = ["System.Resources/StronglyTypedResourceBuilder.cs", "System.Resources/ITargetAwareCodeDomProvider.cs",
@@ -29,6 +33,37 @@ FIXUPS = {
     "mcs/class/System.Design/System.Resources.Tools/StronglyTypedResourceBuilder.cs": [
         ("using System.CodeDom.Compiler;\n",
          "using System.CodeDom.Compiler;\nusing CodeDomProvider = WebFormsForCore.CodeDom.Compiler.CodeDomProvider; // webForCore: System.Web's provider type\n", 1),
+    ],
+    # Compiled into System.Web, where it is internal; System.Data internals it used are replaced by public members
+    # (TypedDataSets/CodeGenSupport.cs); its messages come from System.Data's resources (system.data.txt).
+    "System.Data/System/Data/CodeGen/datacache.cs": [
+        ("    public class TypedDataSetGenerator {",
+         "    // webForCore: internal, for XsdBuildProvider (TypedDataSets/TypedDataSetGenerator.cs); System.Data internals replaced\n"
+         "    // by public members (TypedDataSets/CodeGenSupport.cs).\n"
+         "    internal class TypedDataSetGenerator {", 1),
+        # HostProtection has no effect on .NET; Obsolete pointed to System.Design's generator.
+        ('    [\n    System.Security.Permissions.HostProtectionAttribute(SharedState=true, Synchronization=true),\n'
+         '    Obsolete("TypedDataSetGenerator class will be removed in a future release. Please use System.Data.Design.TypedDataSetGenerator in System.Design.dll.")\n'
+         '    ]\n', "", 1),
+        ("Res.GetString(Res.CodeGen_", "CodeGenSupport.GetString(CodeGenSupport.CodeGen_", 5),
+        ("Str(Res.GetString(arg))", "Str(CodeGenSupport.GetString(arg))", 1),
+        ("table.DataSet.Tables.InternalIndexOf(table.TableName) == -3", "CodeGenSupport.HasNamesake(table)", 1),
+        ("Common.ADP.IsEmpty(", "isEmpty(", 2),
+        ("column._columnUri != null", "CodeGenSupport.HasOwnNamespace(column)", 1),
+        ("table.ShouldSerializeCaseSensitive()", "CodeGenSupport.HasOwnCaseSensitive(table)", 1),
+        ("table.ShouldSerializeLocale()", "CodeGenSupport.HasOwnLocale(table)", 1),
+        ("table.tableNamespace != null", "CodeGenSupport.HasOwnNamespace(table)", 1),
+        ("table.displayExpression != null", "table.DisplayExpression.Length != 0", 1),
+        ("Str(table.DisplayExpressionInternal)", "Str(table.DisplayExpression)", 1),
+        ("ChildColumnsReference", "ChildColumns", 2),
+        ("ParentColumnsReference", "ParentColumns", 2),
+        ("RelatedColumnsReference", "RelatedColumns", 1),
+        (").ColumnsReference", ").Columns", 1),
+        ("uc.ColumnsReference", "uc.Columns", 1),
+        ("index[i].FindParentRelation()", "CodeGenSupport.FindParentRelation(index[i])", 2),
+        ("col.ConvertXmlToObject(nullValue)", "CodeGenSupport.ConvertXmlToObject(col, nullValue)", 1),
+        # .NET has no TypedDataSetGeneratorException.
+        ("throw new TypedDataSetGeneratorException(errorList);", "throw CodeGenSupport.GeneratorException(errorList);", 1),
     ],
 }
 

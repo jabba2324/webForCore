@@ -76,9 +76,10 @@ namespace IISGate
             Assert.Equal(1, starts); // Application_Start once per domain
 
             // Work in the old domain that leaves its types in the shared framework's caches: data binding over the app's
-            // types (TypeDescriptor, a TypeConverter, [MetadataType]), DbProviderFactories, ASMX (XmlSerializer, SOAP and
-            // JSON), ASP.NET AJAX.
+            // types (TypeDescriptor, a TypeConverter, [MetadataType]), DbProviderFactories, a typed DataSet and its
+            // TableAdapters, ASMX (XmlSerializer, SOAP and JSON), ASP.NET AJAX.
             Assert.Contains("Dune|size:L", await _server.Client.GetStringAsync("/data/Binding.aspx"));
+            Assert.Contains("updateall=4/False;", await _server.Client.GetStringAsync("/data/TypedDataSet.aspx?reset=1"));
             Assert.Equal(HttpStatusCode.OK, (await _server.Client.GetAsync("/data/Providers.aspx")).StatusCode);
             var soap = new StringContent("<?xml version=\"1.0\"?><soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body>"
                 + "<GetItem xmlns=\"http://example.com/catalog\"><id>3</id></GetItem></soap:Body></soap:Envelope>", System.Text.Encoding.UTF8, "text/xml");

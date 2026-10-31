@@ -5,10 +5,9 @@
 // the local SMTP service.
 #if !NETFRAMEWORK
 using System.Collections;
-using System.Configuration;
 using System.IO;
 using System.Net;
-using System.Net.Configuration;
+using WebFormsForCore.Net.Configuration;
 using NetMail = System.Net.Mail;
 
 namespace System.Web.Mail
@@ -51,31 +50,19 @@ namespace System.Web.Mail
 				mail.Attachments.Add(new NetMail.Attachment(attachment.Filename));
 
 			using var client = CreateClient(message.Fields);
-			if (mail.From == null)
-			{
-				string configured = SmtpSettings()?.From;
-				if (!string.IsNullOrEmpty(configured))
-					mail.From = new NetMail.MailAddress(configured);
-			}
+			mail.From ??= NetConfiguration.DefaultFrom;
 			client.Send(mail);
 		}
 
 		private static NetMail.SmtpClient CreateClient(IDictionary fields)
 		{
-			SmtpSection settings = SmtpSettings();
 			var client = new NetMail.SmtpClient();
 
 			string server = Field(fields, "smtpserver") ?? SmtpMail.SmtpServer;
-			if (string.IsNullOrEmpty(server) && settings != null)
+			if (string.IsNullOrEmpty(server))
 			{
-				client.DeliveryMethod = settings.DeliveryMethod;
-				if (settings.DeliveryMethod == NetMail.SmtpDeliveryMethod.SpecifiedPickupDirectory)
-					client.PickupDirectoryLocation = settings.SpecifiedPickupDirectory.PickupDirectoryLocation;
-				server = settings.Network.Host;
-				client.Port = settings.Network.Port;
-				client.EnableSsl = settings.Network.EnableSsl;
-				if (!string.IsNullOrEmpty(settings.Network.UserName))
-					client.Credentials = new NetworkCredential(settings.Network.UserName, settings.Network.Password);
+				NetConfiguration.ApplyMailSettings(client);
+				server = client.Host;
 			}
 			client.Host = string.IsNullOrEmpty(server) ? "localhost" : server;
 
@@ -100,18 +87,6 @@ namespace System.Web.Mail
 		{
 			object value = fields[Cdo + name];
 			return value == null ? null : Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture);
-		}
-
-		private static SmtpSection SmtpSettings()
-		{
-			try
-			{
-				return ConfigurationManager.GetSection("system.net/mailSettings/smtp") as SmtpSection;
-			}
-			catch (ConfigurationException)
-			{
-				return null;
-			}
 		}
 
 		// CDO accepted addresses separated by ';' or ','.

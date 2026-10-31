@@ -117,7 +117,17 @@ namespace System.Web.Hosting
 		// handlers its code added to process-wide events (AppDomain's AssemblyLoad, AssemblyResolve, UnhandledException,
 		// ProcessExit/DomainUnload, FirstChanceException...; on .NET these are static events of AppContext and
 		// AssemblyLoadContext), and the GC handles System.Web allocated (System.Web.Util.GCUtil). Returns the number released.
-		public int ReleaseProcessResources() => DisposeDefaultMemoryCache() + ReleaseTimers() + ReleaseProcessEventHandlers() + ReleaseSystemWebHandles() + ReleaseFrameworkCaches();
+		public int ReleaseProcessResources() => DisposeDefaultMemoryCache() + ReleaseDefaultProxy() + ReleaseTimers() + ReleaseNetworkChangeSubscribers() + ReleaseProcessEventHandlers() + ReleaseSystemWebHandles() + ReleaseFrameworkCaches();
+
+		// <system.net><defaultProxy><module> makes HttpClient.DefaultProxy, which is process-wide, an instance of the
+		// application's type (WebFormsForCore.Net.Configuration.NetConfiguration); .NET's default proxy is restored.
+		public int ReleaseDefaultProxy()
+		{
+			if (!References(System.Net.Http.HttpClient.DefaultProxy)
+				|| AppContext.GetData("WebFormsForCore.OriginalDefaultProxy") is not System.Net.IWebProxy original) return 0;
+			System.Net.Http.HttpClient.DefaultProxy = original;
+			return 1;
+		}
 
 		// System.Runtime.Caching is loaded into each domain, and a MemoryCache keeps its stores and statistics timer in strong
 		// GC handles that only Dispose frees. .NET Framework's MemoryCache disposed itself on DomainUnload; .NET's no longer
@@ -318,6 +328,40 @@ namespace System.Web.Hosting
 				{
 					contextField.SetValue(timer, null);
 					released++;
+				}
+			}
+			return released;
+		}
+
+		// NetworkChange keeps each NetworkAddressChanged and NetworkAvailabilityChanged handler with the ExecutionContext
+		// it was added in (WebProxy adds one the first time it checks for a local address, during a request): handlers of
+		// the domain are removed, and contexts that captured the domain are dropped (the handler then runs without one, as
+		// when flow is suppressed). Runtime internals, read by reflection; missing fields release nothing.
+		static readonly Type NetworkChangeType = Type.GetType("System.Net.NetworkInformation.NetworkChange, System.Net.NetworkInformation");
+
+		public int ReleaseNetworkChangeSubscribers()
+		{
+			var gate = NetworkChangeType?.GetField("s_gate", BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(null);
+			if (gate == null) return 0;
+			int released = 0;
+			lock (gate)
+			{
+				foreach (var name in new[] { "s_addressChangedSubscribers", "s_availabilityChangedSubscribers" })
+				{
+					if (NetworkChangeType.GetField(name, BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(null) is not System.Collections.IDictionary subscribers) continue;
+					foreach (var handler in subscribers.Keys.Cast<Delegate>().ToList())
+					{
+						if (IsInDomain(handler.Method.DeclaringType) || IsInDomain(handler.Target?.GetType()))
+						{
+							subscribers.Remove(handler);
+							released++;
+						}
+						else if (subscribers[handler] is ExecutionContext context && CapturesDomain(context))
+						{
+							subscribers[handler] = null;
+							released++;
+						}
+					}
 				}
 			}
 			return released;

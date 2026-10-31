@@ -28,7 +28,6 @@ in the code; the rest are from `LIFT.md`.
 | WCF | Hosting `.svc` services; `ApplicationServicesHostFactory` | CoreWCF, or ASMX (`.asmx` works) |
 | LINQ to SQL, Entity Framework 1–4 | `LinqDataSource`, MVC's `LinqBinaryModelBinder`, the `Binary` editor templates, `EntityDataSource` (not built), the DynamicData LINQ to SQL provider | EF 6.4+ or EF Core, with `ObjectDataSource`/model binding |
 | COM+ transactions | `<%@ Page Transaction=... %>`, `Transactions.InvokeTransacted` | `System.Transactions.TransactionScope` |
-| Typed DataSets in App_Code | `.xsd` build provider (throws at compile time) | Generate the DataSet class at design time and compile it into the app |
 | Web references | `App_WebReferences` (generates nothing) | Generate the proxy with `dotnet-svcutil` and compile it into the app |
 | Metafiles | EMF/WMF in System.Drawing | PNG/SVG |
 | `System.Runtime.Serialization.NetDataContractSerializer` in app code | Apps that use it directly (MVC Futures' `Html.Serialize` / `[Deserialize]` work: webForCore provides their serializer) | `DataContractSerializer` with a `DataContractResolver` |
@@ -76,14 +75,32 @@ Caveats:
   its code runs to the end.
 - **Windows-only APIs throw `PlatformNotSupportedException`:** `Util.WorkItem.Post`, `Util.Transactions.InvokeTransacted` (page transactions),
   `HttpRequest.HttpChannelBinding`, and `IisTraceListener`/`IisTraceWebEventProvider`.
-- **Build providers:** `.xsd` files in App_Code throw `NotImplementedException` when compiled
-  (`Compilation/XsdBuildProvider.cs`); `App_WebReferences` produce no proxy (`Compilation/WebReferencesBuildProvider.cs`).
+- **Typed DataSets** (`.xsd` files in App_Code) compile with the site, as on IIS: the DataSet, table and row classes
+  come from the Reference Source's `System.Data.TypedDataSetGenerator`, adjusted to what Visual Studio's designer
+  generates (partial classes, public table constructors and column properties, tables deriving from
+  `TypedTableBase<row>` for LINQ). The TableAdapters, `QueriesTableAdapter` and `TableAdapterManager` are generated
+  from the designer's annotation by webForCore's own generator (`WebFormsForCore/TypedDataSets`; Microsoft's
+  System.Data.Design isn't open source): Fill and Get queries, DB-direct Insert/Update/Delete, scalar and non-query
+  queries, stored procedures with output parameters, `UpdateAll` in one transaction. The provider named in the
+  `.xsd` must be registered (`System.Data.SqlClient` is). Not generated: the typed tables' `GetTypedTableSchema`
+  (a web service returning a typed DataTable, not a DataSet), `TableAdapterManager`'s handling of self-referencing
+  tables.
+- **Build providers:** `App_WebReferences` produce no proxy (`Compilation/WebReferencesBuildProvider.cs`).
 - **Windows authentication**, impersonation and `FileAuthorizationModule`'s ACL checks aren't available.
 - **`System.Web.Mail.SmtpMail.Send`** sends with `System.Net.Mail.SmtpClient` instead of Windows CDO
   (`WebFormsForCore/SmtpMailSender.cs`). The message's CDO fields (`smtpserver`, `smtpserverport`, `smtpusessl`,
   `smtpauthenticate` with `sendusername`/`sendpassword`, `sendusing` with a pickup directory) are honoured; without
   them, `SmtpMail.SmtpServer` and then `<system.net><mailSettings><smtp>` apply. CDO's other fields (NTLM
   authentication, proxy settings) are ignored.
+- **`<system.net>`:** .NET's System.Net reads no configuration. webForCore applies `<defaultProxy>` to
+  `HttpClient.DefaultProxy` at application start (HttpClient, WebClient, HttpWebRequest and SOAP client proxies use
+  it), and System.Web's mail senders (PasswordRecovery, CreateUserWizard, ChangePassword, `MailWebEventProvider`,
+  `SmtpMail`, Web Pages' `WebMail`) use `<mailSettings><smtp>`. An application's own `new SmtpClient()` and
+  `new MailMessage()` get nothing from configuration on .NET: use
+  `WebFormsForCore.Net.Configuration.NetConfiguration.CreateSmtpClient()` and `.DefaultFrom`. Not applied:
+  `<connectionManagement>` (.NET doesn't limit connections per server, which is also what ASP.NET's `autoConfig`
+  set), `<settings>`, `<webRequestModules>`, `<authenticationModules>`, `<requestCaching>`, and proxy
+  auto-detection or scripts (WPAD, PAC).
 - `<system.data><DbProviderFactories>` in the app's configuration (`<add>`, `<remove>`, `<clear>`) registers ADO.NET
   providers at application start, as on .NET Framework (`WebFormsForCore/DbProviderFactoriesSectionHandler.cs`).
 - `HttpUtility` follows .NET Framework 4.5+ (strict decoding); the 4.0 compatibility quirks of apps without
@@ -129,7 +146,7 @@ configuration, CodeDom compiler configuration), `.Internal`, `.Provider`, and `S
 
 The sources are Microsoft's Reference Source (System.Configuration.dll and the configuration parts of System.dll).
 
-Caveats: `<system.net>` sections (`SmtpSection`, `DefaultProxySection`, ...) can be read with `ConfigurationManager.GetSection`, but .NET's System.Net doesn't apply them, so settings such as the default proxy or connection limits have to be set in code. `DataProtectionConfigurationProvider` uses webForCore's DPAPI emulation, so a section Windows DPAPI encrypted
+Caveats: `<system.net>` sections (`SmtpSection`, `DefaultProxySection`, ...) can be read with `ConfigurationManager.GetSection`, but .NET's System.Net doesn't apply them. `WebFormsForCore.Net.Configuration.NetConfiguration` applies `<defaultProxy>` (`ApplyDefaultProxy`, which System.Web calls at start) and `<mailSettings>` (`CreateSmtpClient`, `ApplyMailSettings`, `DefaultFrom`); see System.Web's caveats for what isn't applied. `DataProtectionConfigurationProvider` uses webForCore's DPAPI emulation, so a section Windows DPAPI encrypted
 can't be read on Linux (the error says so). `RsaProtectedConfigurationProvider` keeps key containers as XML files in
 the key directory; containers exported with `aspnet_regiis -px` can be imported. The key directory is
 `$WEBFORCORE_KEYS`, `/var/lib/webforcore/keys` or `~/.webforcore/keys`.

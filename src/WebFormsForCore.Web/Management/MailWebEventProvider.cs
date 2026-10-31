@@ -76,7 +76,12 @@ namespace System.Web.Management {
         [SmtpPermission(SecurityAction.Assert, Access = "Connect")]
         [EnvironmentPermission(SecurityAction.Assert, Read = "USERNAME")]
         internal static SmtpClient CreateSmtpClientWithAssert() {
+#if NETFRAMEWORK
             return new SmtpClient();
+#else
+            // webForCore: .NET's SmtpClient doesn't read <system.net><mailSettings>.
+            return WebFormsForCore.Net.Configuration.NetConfiguration.CreateSmtpClient();
+#endif
         }
 
         internal string SubjectPrefix {

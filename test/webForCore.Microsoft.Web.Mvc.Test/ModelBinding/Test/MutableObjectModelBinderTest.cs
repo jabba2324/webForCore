@@ -12,6 +12,7 @@ using Moq;
 
 namespace Microsoft.Web.Mvc.ModelBinding.Test
 {
+    [Xunit.Collection("Uses ModelBinderConfig's error message providers")] // webForCore: a static the tests set
     public class MutableObjectModelBinderTest
     {
         [Fact]

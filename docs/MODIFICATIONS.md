@@ -34,17 +34,17 @@ and tested with the upstream project's own tests. This page explains the rules f
 
 | Component | Upstream (pinned commit) | Licence | Files lifted | Files changed |
 | --- | --- | --- | ---: | ---: |
-| ASP.NET Web API 2, Razor 3, Web Pages 3, MVC 5, MVC Futures, Helpers, CORS | [aspnet/AspNetWebStack@2106565](https://github.com/aspnet/AspNetWebStack/tree/2106565) | Apache 2.0 | 1,553 libraries · 1,266 tests | 25 · 119 |
+| ASP.NET Web API 2, Razor 3, Web Pages 3, MVC 5, MVC Futures, Helpers, CORS | [aspnet/AspNetWebStack@2106565](https://github.com/aspnet/AspNetWebStack/tree/2106565) | Apache 2.0 | 1,553 libraries · 1,266 tests | 26 · 121 |
 | Katana (Microsoft.Owin 4.2.3) | [aspnet/AspNetKatana@096e225](https://github.com/aspnet/AspNetKatana/tree/096e225) | Apache 2.0 | 324 · 55 | 8 · 3 |
 | ASP.NET SignalR 2.4.3 | [SignalR/SignalR@7f53f26](https://github.com/SignalR/SignalR/tree/7f53f26) | Apache 2.0 | 318 · 152 | 2 · 1 |
 | ASP.NET Identity 2 | [aspnet/AspNetIdentity@b7fc094](https://github.com/aspnet/AspNetIdentity/tree/b7fc094) | MIT | 75 · 26 | 0 · 4 |
 | System.Drawing.Common 6.0 | [dotnet/runtime@76b9680](https://github.com/dotnet/runtime/tree/76b9680) (release/6.0) | MIT | 199 | 4, plus the new engine |
 | System.Drawing.Common tests, TestUtilities | dotnet/runtime@76b9680, [dotnet/arcade@565a800](https://github.com/dotnet/arcade/tree/565a8005), [dotnet/runtime-assets@848e27e](https://github.com/dotnet/runtime-assets/tree/848e27e) | MIT | 233 | 2 |
 | System.Web tests | [mono/mono@0f53e9e](https://github.com/mono/mono/tree/0f53e9e) (`mcs/class/System.Web/Test`) | MIT | 188 | 30 |
-| System.Configuration, System.Web.ApplicationServices, aspnet_compiler, `BindableTypeAttribute` (replacing WebFormsForCore's decompiled copies) | [microsoft/referencesource@ec9fa9a](https://github.com/microsoft/referencesource/tree/ec9fa9ae770d522a5b5f0607898044b7478574a3) | MIT | 113 | 40 |
+| System.Configuration, System.Web.ApplicationServices, aspnet_compiler, `BindableTypeAttribute` (replacing WebFormsForCore's decompiled copies); System.Data's typed DataSet generator | [microsoft/referencesource@ec9fa9a](https://github.com/microsoft/referencesource/tree/ec9fa9ae770d522a5b5f0607898044b7478574a3) | MIT | 114 | 41 |
 | ResX classes (replacing decompiled copies) | [dotnet/winforms@8266870](https://github.com/dotnet/winforms/tree/8266870) (release/8.0) | MIT | 13 | 13 |
 | StronglyTypedResourceBuilder (replacing an API reconstruction) | mono/mono@0f53e9e (`mcs/class/System.Design`) | MIT | 1 | 1 |
-| **Total** | | | **4,516** | **252** |
+| **Total** | | | **4,517** | **256** |
 
 The fork itself starts from [webformsforcore/WebFormsForCore@52f4172](https://github.com/webformsforcore/WebFormsForCore/tree/52f4172dbc09b3ad0b849c97642720fa7a49aa22),
 whose System.Web, System.Configuration and related assemblies were ported from Microsoft's .NET Framework reference
@@ -58,7 +58,7 @@ webForCore's changes to the port are listed at the end of [lifted-changes.md](li
 | --- | --- | --- |
 | **APIs .NET doesn't have** | `AppDomain.DefineDynamicAssembly` → `AssemblyBuilder.DefineDynamicAssembly` (SignalR); `AppDomainSetup.PrivateBinPath` → scan the app base (Katana's loader); LINQ to SQL's `Binary` binding compiled out (MVC, Web Pages); `NetDataContractSerializer`, which MVC Futures' `MvcSerializer` uses, is replaced by a `DataContractSerializer` with a type-preserving resolver (`tools/lift/additions/Microsoft.Web.Mvc`), so `MvcSerializer.cs` itself is unchanged; Code Access Security policy removed | Web Stack, Katana, SignalR |
 | **Windows-only APIs** | The CryptoAPI certificate context → `PublicKey.ExportSubjectPublicKeyInfo()` (Katana); `DpapiDataProtector` → webForCore's DPAPI emulation (`LocalDataProtection`); the HttpListener host's private-field access → Katana's Mono path | Katana |
-| **.NET Framework behaviour restored** | `float`/`double` route constraints reject overflow; a whitespace multipart root path is rejected; `HttpResponseMessage.Content` is never null on .NET, so `ResponseContent.Get` treats `EmptyContent` as no content (11 call sites in the Web API hosts); a request body copied through the seekable stream; `HostString` keeps the host's case | Web Stack, Katana |
+| **.NET Framework behaviour restored** | Web Pages' `WebMail` takes its defaults from `<system.net><mailSettings>`, which .NET's `SmtpClient` ignores; `float`/`double` route constraints reject overflow; a whitespace multipart root path is rejected; `HttpResponseMessage.Content` is never null on .NET, so `ResponseContent.Get` treats `EmptyContent` as no content (11 call sites in the Web API hosts); a request body copied through the seekable stream; `HostString` keeps the host's case | Web Stack, Katana |
 | **Compiler and language** | A `(string)null` where .NET 11's `ArraySegment<T>` overloads made `null` ambiguous; `LangVersion` pinned to what Microsoft built with (C# 7.3 for SignalR) | SignalR, Web Stack |
 | **Linux and ICU** | Case-correct paths for files referenced with a different case; newline handling; IDN mapping | Web Stack tests, Katana |
 | **System.Drawing on SkiaSharp** | System.Drawing.Common 6.0's managed code is unchanged, except that the GDI+ P/Invokes are pointed at a managed GDI+ (`SkiaGdiPlus`, in `tools/lift/additions/System.Drawing.Common/`) instead of libgdiplus | dotnet/runtime |
@@ -90,7 +90,10 @@ These aren't lifts. They change WebFormsForCore's port, and each has a `webForCo
 - **Configuration:** protected configuration on Linux (DPAPI emulation, RSA key containers as files), section type
   identity inside a PseudoAppDomain, `machine.config` refreshed by content.
 - **Compilation:** the in-process compiler loads into the app's context; precompilation for .NET
-  (`System.Private.CoreLib` as the core library).
+  (`System.Private.CoreLib` as the core library); typed DataSets in App_Code (the Reference Source's
+  `System.Data.TypedDataSetGenerator` and webForCore's TableAdapter generator).
+- **`<system.net>`:** `<defaultProxy>` applied at application start, and `<mailSettings>` used by System.Web's mail
+  senders (`WebFormsForCore.Net.Configuration.NetConfiguration`).
 - **BinaryFormatter port:** surrogates for .NET Framework types .NET no longer serializes (`NameValueCollection`
   and others), so session state and view state round-trip.
 - **Security:** `bin`, `App_Data`, the build output folder and the other hidden segments return 404, as on IIS.

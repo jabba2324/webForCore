@@ -684,6 +684,12 @@ FIXUPS["System.Web.Helpers"] = [
      "            // webForCore: .NET's sort wraps the comparer's ArgumentException in an InvalidOperationException (\"Failed to\n"
      "            // compare two elements in the array\"); .NET Framework's LINQ sort let it through.\n"
      "            catch (Exception e) when (e is ArgumentException || (e is InvalidOperationException && e.InnerException is ArgumentException))\n", 1),
+    # .NET's SmtpClient and MailMessage don't read <system.net><mailSettings>: WebMail's defaults and the client it
+    # sends with come from NetConfiguration (System.Configuration), as .NET Framework's constructors read them.
+    ("WebMail.cs", "using (SmtpClient client = new SmtpClient())",
+     "using (SmtpClient client = WebFormsForCore.Net.Configuration.NetConfiguration.CreateSmtpClient()) // webForCore: <mailSettings>", 2),
+    ("WebMail.cs", "smtpDefaults[FromKey] = (message.From != null) ? message.From.Address : null;",
+     "smtpDefaults[FromKey] = (message.From ?? WebFormsForCore.Net.Configuration.NetConfiguration.DefaultFrom)?.Address; // webForCore: <smtp from>", 1),
 ]
 # Microsoft's suite races: the ScopeStorage tests reset the static ScopeStorage while xunit runs them in parallel with
 # the classes Microsoft put in the "Uses ScopeStorage or ViewEngines.Engines" collection (Html/ValidationHelperTest failed
@@ -786,6 +792,12 @@ RE_TRANSFORMS["Microsoft.Web.Mvc.Test"] = [
     # then appends the full name, which that form does not contain.
     ("ModelBinding/Test/*.cs", re.escape('NoParameterlessCtorBinder`1[[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]\\\'. Reason: No parameterless constructor defined.");'), lambda m: 'NoParameterlessCtorBinder`1[System.Int32]\\\'. Reason: No parameterless constructor defined. Object type \\\'" + typeof(NoParameterlessCtorBinder<int>).FullName + "\\\'."); // webForCore: .NET\'s message', 2),
 ]
+# Microsoft's suite races: ModelBinderConfigTest sets ModelBinderConfig's static error message providers (a dummy that
+# throws) while xunit runs TypeConverterModelBinderTest and MutableObjectModelBinderTest, which read them, in parallel
+# (TypeConverterModelBinderTest failed once in a full run). The three share a collection.
+RE_TRANSFORMS["Microsoft.Web.Mvc.Test"] += [
+    ("ModelBinding/Test/*.cs", r"(?m)^(    public class (?:ModelBinderConfigTest|TypeConverterModelBinderTest|MutableObjectModelBinderTest)\b)",
+     '    [Xunit.Collection("Uses ModelBinderConfig\'s error message providers")] // webForCore: a static the tests set\r\n\\1', 3)]
 TRANSFORMS["Microsoft.Web.Mvc.Test"] = [
     # .NET's frames: RuntimeType.ActivatorCache / CreateInstanceDefaultCtor (no System.Activator.CreateInstance frame).
     ("ModelBinding/Test/*.cs", 'Assert.Contains("System.Activator.CreateInstance(", exception.ToString());',
