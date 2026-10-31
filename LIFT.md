@@ -1623,3 +1623,34 @@ outside the repository's Directory.Build files that references only `webForCore`
 requests a page and an App_Code type: passed locally (0.1.0-ci.901). Packing the solution fails (its build
 dependencies on WebFormsForCore.Build make NuGet call GetTargetPath on that multi-targeted project; the first CI run
 stopped there), so `tools/ci/pack.sh` packs the solution's built `src/` projects one at a time.
+
+## Fixes from migrating real applications (31 Oct 2026)
+
+The smoke test bed ([jabba2324/webForCore-smoke-test](https://github.com/jabba2324/webForCore-smoke-test)) migrated
+open-source ASP.NET 4.x applications with the 0.1.0 packages and filed what failed as issues #1-#15. Each fix below has
+a regression test (most in `IIS.Gate.Tests`' `RegressionTests`, pages in `test/webForCore.IIS.Sample/regressions`) and
+names the applications that hit it.
+
+### HttpUtility and IHtmlString in application code (#7)
+
+Code compiled against the fork's System.Web got `CS0433: The type 'HttpUtility' exists in both
+'System.Web.HttpUtility' and 'System.Web'` (and the same for `IHtmlString`): the target that drops the shared
+framework's `System.Web.HttpUtility.dll` was only in this repository's `Directory.Build.targets`, which applications
+don't import. It is now in `src/webForCore.WebStack.targets` too (and so in the `webForCore.Web` package's
+buildTransitive targets), for a System.Web from a project reference or the `webForCore.Web` package. Hit by
+eShopLegacyWebForms and the Visual Studio Web Forms template (`ViewSwitcher.ascx.cs`), the Web API HelpPage area and
+Bonobo Git Server. Test: `tools/ci/package-smoke` compiles `Markup.cs`, which uses both types (CS0433 on the 0.1.0
+packages, passes on this branch's).
+
+### ConfigurationManager from .NET Framework libraries (#1)
+
+A library built for .NET Framework references `System.Configuration, Version=4.0.0.0`, the shared framework's facade,
+which forwards to `System.Configuration.ConfigurationManager`. The PseudoAppDomain left the facade to the default
+context, so its forwards resolved there too: a second ConfigurationManager, outside the domain, on the client
+configuration system (no web.config), whose `ConfigurationSection` isn't the one System.Web's sections derive from, so
+even `AppSettings` threw ("AppSettingsSection does not inherit from IConfigurationSectionHandler"). `System.Configuration`
+is now in `PseudoAppDomain.PerDomainFrameworkAssemblies`: the facade is loaded into each domain and forwards to the
+domain's ConfigurationManager. Hit by Microsoft.AspNet.SessionState.SessionStateModule (eShopLegacyMVC,
+eShopLegacyWebForms: every request) and WebActivatorEx (Bonobo Git Server: the site never started). Test:
+`RegressionTests.ConfigurationManagerThroughTheFrameworkFacadeReadsWebConfig` (`regressions/ConfigurationFacade.aspx`
+binds ConfigurationManager by the facade's name and reads web.config's appSettings and `system.web/sessionState`).

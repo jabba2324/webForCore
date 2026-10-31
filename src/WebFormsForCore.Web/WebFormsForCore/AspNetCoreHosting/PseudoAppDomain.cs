@@ -32,7 +32,10 @@ namespace System.Web.Hosting
 
 		// Shared-framework assemblies loaded into each domain all the same: their static caches hold the types they are
 		// used with (the C# dynamic binder's symbol table, the VB late binder), which would keep unloaded domains alive.
-		public static readonly List<string> PerDomainFrameworkAssemblies = new List<string> { "Microsoft.CSharp", "Microsoft.VisualBasic.Core" };
+		// System.Configuration is the framework's facade that .NET Framework libraries bind to (Version=4.0.0.0); it
+		// forwards to System.Configuration.ConfigurationManager, the fork's, which is per domain. Loaded in the default
+		// context, its forwards resolved there too, to a second ConfigurationManager that can't read web.config (#1).
+		public static readonly List<string> PerDomainFrameworkAssemblies = new List<string> { "Microsoft.CSharp", "Microsoft.VisualBasic.Core", "System.Configuration" };
 
 		static readonly string SharedFrameworkRoot = GetSharedFrameworkRoot();
 		static readonly Lazy<Dictionary<string, string>> TrustedPlatformAssemblies = new Lazy<Dictionary<string, string>>(() =>
