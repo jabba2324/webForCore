@@ -15,7 +15,6 @@
     <File Path="global.json" />
     <File Path="README.md" />
     <File Path="src/VersionInfo.cs" />
-    <File Path="www/index.html" />
   </Folder>
   <Project Path="src/WebFormsForCore.AspNetCompiler/WebFormsForCore.AspNetCompiler.csproj" />
   <Project Path="src/WebFormsForCore.RegIIS/WebFormsForCore.RegIIS.csproj" />
