@@ -34,5 +34,18 @@ namespace IISGate
             Assert.Contains("appSettings: from regressions/web.config", body);
             Assert.Contains("sessionState: System.Web.Configuration.SessionStateSection", body);
         }
+
+        // #2: two CacheDependency objects on one file under different spellings threw "Item has already been added" in
+        // FileChangesMonitor on Linux (eShopLegacyMVC: @Styles.Render when two first requests rendered the bundles), and
+        // a change to the file must reach both.
+        [Fact]
+        public async Task TwoDependenciesOnOneFileBothSeeItChange()
+        {
+            var (response, body) = await Get("/regressions/FileDependency.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("two dependencies: ok", body);
+            Assert.Contains("first changed: True", body);
+            Assert.Contains("second changed: True", body);
+        }
     }
 }

@@ -97,3 +97,7 @@ These aren't lifts. They change WebFormsForCore's port, and each has a `webForCo
 - **BinaryFormatter port:** surrogates for .NET Framework types .NET no longer serializes (`NameValueCollection`
   and others), so session state and view state round-trip.
 - **Security:** `bin`, `App_Data`, the build output folder and the other hidden segments return 404, as on IIS.
+- **File change notifications off Windows** (`FileChangesMonitor.cs`, `Util/FileUtil.cs`): `FindFileData` names a
+  file as `FindFirstFile` does (its name, or its path relative to the monitored root, without the Windows-only parent
+  walk), and the `FileSystemWatcher` that replaces `ReadDirectoryChangesW` reports names relative to the watched
+  directory, as `ReadDirectoryChangesW` does (#2).

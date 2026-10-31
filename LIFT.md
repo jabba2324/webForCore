@@ -1654,3 +1654,18 @@ domain's ConfigurationManager. Hit by Microsoft.AspNet.SessionState.SessionState
 eShopLegacyWebForms: every request) and WebActivatorEx (Bonobo Git Server: the site never started). Test:
 `RegressionTests.ConfigurationManagerThroughTheFrameworkFacadeReadsWebConfig` (`regressions/ConfigurationFacade.aspx`
 binds ConfigurationManager by the facade's name and reads web.config's appSettings and `system.web/sessionState`).
+
+### File change monitoring: one file under two spellings (#2)
+
+On Linux a second `CacheDependency` on a file already monitored, reached through a different spelling of its path,
+threw `ArgumentException: Item has already been added` from `DirectoryMonitor.AddFileMonitor`. The non-Windows branch
+of `FindFileData.FindFile` set `FileNameLong` to the full path, where `FindFirstFile` gives the file's name; the
+`DirectoryMonitor` keys its file monitors by `FileNameLong` but looks them up by name, so the second lookup missed and
+`Hashtable.Add` threw. Per-file change notifications still worked only because the `FileSystemWatcher` that stands in
+for `ReadDirectoryChangesW` also reported full paths. Both now use names as on Windows: `FindFile` returns the file
+name (and, in the overload relative to a root, the relative path, without the parent walk through `FindFirstFile`),
+and the watcher reports `FileSystemEventArgs.Name`, relative to the watched directory. That is also what
+`GetFileMonitorForSpecialDirectory` (App_Code, bin, App_GlobalResources) compares against. Hit by eShopLegacyMVC:
+`@Styles.Render`/`@Scripts.Render` when two first requests rendered the bundles. Test:
+`RegressionTests.TwoDependenciesOnOneFileBothSeeItChange` (two dependencies on one file, then a write that both must
+see).
