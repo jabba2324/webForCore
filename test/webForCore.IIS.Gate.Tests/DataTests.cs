@@ -14,6 +14,19 @@ namespace IISGate
             _server = server;
         }
 
+        // Web Forms data binding over the application's types: Eval, an auto-generated GridView from an ObjectDataSource
+        // and from a DataTable with columns of application types, a DetailsView, a TypeConverter and [MetadataType].
+        [Fact]
+        public async Task DataBindingOverApplicationTypes()
+        {
+            string body = await _server.Client.GetStringAsync("/data/Binding.aspx");
+
+            Assert.Contains("<span class=\"book\">Dune|size:L</span><span class=\"book\">Emma|size:M</span>", body);
+            Assert.Contains("<th scope=\"col\">Title</th>", body); // ObjectDataSource's columns
+            Assert.Contains("<td>Title</td><td>Dune</td>", body); // DetailsView
+            Assert.Contains(">String/Book title<", body); // TypeDescriptor and the buddy class's [Display]
+        }
+
         [Fact]
         public async Task ConfiguredProviderFactoriesAreRegistered()
         {

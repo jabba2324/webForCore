@@ -32,6 +32,19 @@ namespace IISGate
             Assert.Equal(before, (await Domain()).Domain);
             Assert.Equal(1, starts); // Application_Start once per domain
 
+            // Work in the old domain that leaves its types in the shared framework's caches: data binding over the app's
+            // types (TypeDescriptor, a TypeConverter, [MetadataType]), DbProviderFactories, ASMX (XmlSerializer, SOAP and
+            // JSON), ASP.NET AJAX.
+            Assert.Contains("Dune|size:L", await _server.Client.GetStringAsync("/data/Binding.aspx"));
+            Assert.Equal(HttpStatusCode.OK, (await _server.Client.GetAsync("/data/Providers.aspx")).StatusCode);
+            var soap = new StringContent("<?xml version=\"1.0\"?><soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body>"
+                + "<GetItem xmlns=\"http://example.com/catalog\"><id>3</id></GetItem></soap:Body></soap:Envelope>", System.Text.Encoding.UTF8, "text/xml");
+            soap.Headers.Add("SOAPAction", "\"http://example.com/catalog/GetItem\"");
+            Assert.Equal(HttpStatusCode.OK, (await _server.Client.PostAsync("/services/Catalog.asmx", soap)).StatusCode);
+            Assert.Equal(HttpStatusCode.OK, (await _server.Client.PostAsync("/services/Catalog.asmx/GetItem",
+                new StringContent("{\"id\":3}", System.Text.Encoding.UTF8, "application/json"))).StatusCode);
+            Assert.Equal(HttpStatusCode.OK, (await _server.Client.GetAsync("/ajax/Panel.aspx")).StatusCode);
+
             var restart = await _server.Client.GetAsync("/Restart.aspx");
             Assert.Equal(HttpStatusCode.OK, restart.StatusCode);
 
