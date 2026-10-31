@@ -195,6 +195,18 @@ These came up migrating real applications; each names one that needed it.
   ```xml
   <PackageReference Include="Microsoft.Owin.Security.Google" Version="3.0.1" />
   ```
+- **Libraries that don't run on .NET** (#22). Remove them or move to a version that does:
+  - **Glimpse 1.x** (`Glimpse`, `.AspNet`, `.Ado`, `.EF6`, `.Mvc5`, ...), a development diagnostics tool, can't run:
+    Glimpse.Ado's pre-start method reflects into .NET Framework's private `DbProviderFactories` table
+    (`NullReferenceException` in `FindDbProviderFactoryTable`), and `Glimpse.AspNet.HttpModule` needs
+    `AppDomainSetup.ShadowCopyFiles` (`MissingMethodException`). Remove the packages, the `glimpse` configuration
+    section, its module and handler in `<system.web>` and `<system.webServer>`, and the app's `GlimpseSecurityPolicy`
+    class (ReaLocate).
+  - **AutoMapper before 12** throws while configuring a map on .NET 11 (`The type or method has 3 generic parameter(s),
+    but 1 generic argument(s) were provided`, or `... violates the constraint of type 'T'` from `MaxFloat`/`MaxInteger`):
+    it scans `System.Linq.Enumerable`'s extension methods, non-public ones included. This isn't webForCore's: a .NET 11
+    console app does the same. AutoMapper 12 works; from 4.x the change is mostly `IMapperConfiguration` →
+    `IMapperConfigurationExpression` (ReaLocate). From 3.x's static `Mapper` it is a rewrite of the mapping code.
 
 ## 4. Program.cs
 
