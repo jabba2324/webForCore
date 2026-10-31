@@ -1777,3 +1777,15 @@ is now in `PerDomainFrameworkAssemblies`; its other forwards go to shared-framew
 shares. Test: `RegressionTests.SectionHandlerThroughTheSystemFacadeIsTheApplications`
 (`regressions/SystemFacadeSection.aspx` and a `SingleTagSectionHandler` section in `regressions/web.config`; a 500
 on 0.2.0).
+
+### The System.Web.Abstractions and System.Web.Routing facades (#20)
+
+On .NET Framework 4 the abstractions (`HttpContextBase` and the rest) and routing are in System.Web, and the 3.5
+assemblies that held them are facades in the GAC that forward there. web.configs from MVC 2-4 projects list both in
+`<compilation><assemblies>` (Version=4.0.0.0), and .NET 3.5 libraries reference them, so a missing facade is a
+Configuration Error on every request: Roadkill's web.config has both. Two new projects, `src/WebFormsForCore.Web.Abstractions`
+and `src/WebFormsForCore.Web.Routing`, build the facades with their names, version 4.0.0.0 and public key token, and
+type forwarders for the types of the 3.5 assemblies. They are new code, not Microsoft's, and part of the "Always" set (the
+`webForCore` package depends on `webForCore.Web.Abstractions` and `webForCore.Web.Routing`). Test:
+`RegressionTests.SystemWebAbstractionsAndRoutingFacadesLoad` (`regressions/facades/`, whose web.config lists both;
+it binds `HttpContextBase` and `RouteTable` by the 3.5 names).

@@ -205,5 +205,18 @@ namespace IISGate
             Assert.Contains("same type: True", body);
             Assert.Contains("section: from SingleTagSectionHandler", body);
         }
+
+        // #20: System.Web.Abstractions and System.Web.Routing, the .NET Framework 4 facades, in a web.config's
+        // <compilation><assemblies> and bound by .NET 3.5 libraries. Roadkill's web.config lists both, and every request
+        // was a Configuration Error ("Could not load file or assembly 'System.Web.Abstractions, Version=4.0.0.0'").
+        [Fact]
+        public async Task SystemWebAbstractionsAndRoutingFacadesLoad()
+        {
+            var (response, body) = await Get("/regressions/facades/");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("HttpContextBase: True", body);
+            Assert.Contains("RouteTable: True", body);
+            Assert.Contains("path: ~/regressions/facades/Default.aspx", body);
+        }
     }
 }

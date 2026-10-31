@@ -25,6 +25,10 @@
     <ProjectReference Include="..\WebFormsForCore.Web.Services\WebFormsForCore.Web.Services.csproj" />
     <ProjectReference Include="..\WebFormsForCore.Web.Extensions\WebFormsForCore.Web.Extensions.csproj" />
     <ProjectReference Include="..\WebFormsForCore.Web.Infrastructure\WebFormsForCore.Web.Infrastructure.csproj" />
+    <!-- .NET Framework 4's System.Web.Abstractions and System.Web.Routing facades (in the GAC), which web.configs and
+         .NET 3.5 libraries reference (#20). -->
+    <ProjectReference Include="..\WebFormsForCore.Web.Abstractions\WebFormsForCore.Web.Abstractions.csproj" />
+    <ProjectReference Include="..\WebFormsForCore.Web.Routing\WebFormsForCore.Web.Routing.csproj" />
     <ProjectReference Include="..\WebFormsForCore.Web.RegularExpressions\WebFormsForCore.Web.RegularExpressions.csproj" />
     <ProjectReference Include="..\WebFormsForCore.Serialization.Formatters\WebFormsForCore.Serialization.Formatters.csproj" />
     <ProjectReference Include="..\WebFormsForCore.Drawing\WebFormsForCore.Drawing.csproj" />
