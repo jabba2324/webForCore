@@ -13,8 +13,8 @@
 
         <IsPackable>true</IsPackable>
         <ToolCommandName>aspnetcore_compiler</ToolCommandName>
-        <PackageId Condition="$(PackAsTool) == 'true'">WebFormsForCore.AspNetCompiler</PackageId>
-        <PackageId Condition="$(PackAsTool) != 'true'">WebFormsForCore.AspNetCompiler.Library</PackageId>
+        <PackageId Condition="$(PackAsTool) == 'true'">webForCore.AspNetCompiler</PackageId>
+        <PackageId Condition="$(PackAsTool) != 'true'">webForCore.AspNetCompiler.Library</PackageId>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <Title>WebFormsForCore AspNetCompiler</Title>
         <Product>WebFormsForCore.AspNetCompiler</Product>

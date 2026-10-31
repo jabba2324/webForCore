@@ -69,7 +69,16 @@ recommendation. Wait for the user's go-ahead if there are blockers.
 
 ## Phase 1: Get webForCore
 
-Until NuGet packages exist, clone and build it next to the app (or use the path the user gives):
+If webForCore has a release, use its packages (they aren't on nuget.org): download them into `packages/` next to the
+app's solution and add that folder as a package source in `nuget.config` (`docs/MIGRATING.md` section 1):
+
+```bash
+gh release download --repo jabba2324/webForCore --pattern '*.nupkg' --dir packages   # latest release
+```
+
+The app then uses `PackageReference`s (`webForCore` and the framework packages) instead of project references, and
+no `<Import>` of `webForCore.WebStack.targets`. Otherwise, or if the user asks for source, clone and build it next to
+the app (or use the path the user gives):
 
 ```bash
 git clone https://github.com/jabba2324/webForCore ../webForCore
@@ -88,7 +97,7 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
    - `GenerateDependencyFile` true;
    - `PredefinedCulturesOnly` true;
    - for MVC/Web Pages, the three Razor SDK properties false;
-   - `<Import Project="<webForCore>/src/webForCore.WebStack.targets" />`;
+   - `<Import Project="<webForCore>/src/webForCore.WebStack.targets" />` (project references only);
    - `App_Code` and `bin_dotnet` removed from `Compile`.
 3. Keep every `.cs` file the old project compiled (code-behind with `CodeBehind=`, controllers, models, `Global.asax.cs`).
    Use the old project's `<Compile Include>` list as the source of truth: an SDK project globs all `*.cs`, so remove
@@ -96,8 +105,8 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
 4. Keep `Content` files as they are. Remove `packages.config`, `Properties/PublishProfiles` references to IIS, and
    the `system.codedom` compiler entries for `Microsoft.CodeDom.Providers.DotNetCompilerPlatform` in `web.config`
    (webForCore supplies the compiler). Leave everything else in `web.config` alone.
-5. Replace references using the tables in `docs/MIGRATING.md` section 3: every app gets the "Always" set, and then
-   one project reference per framework the app uses. Remove `<Reference Include="System.Web...">` and the Microsoft
+5. Replace references using the tables in `docs/MIGRATING.md` section 3: every app gets the "Always" set (with
+   packages: the `webForCore` package), and then one reference per framework the app uses. Remove `<Reference Include="System.Web...">` and the Microsoft
    ASP.NET packages. Keep other packages; where a package has a .NET Standard or .NET build, use it.
 6. Add `Program.cs` from `docs/MIGRATING.md` section 4. Include session state only if the app uses `Session`. Use
    `HandleAllRequestsWithWebForms()` unless the app serves only `.aspx`/`.asmx`/`.ashx`.

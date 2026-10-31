@@ -304,7 +304,7 @@ def lift(name, cfg, roots, fork):
     <SignAssembly>true</SignAssembly>
     <DelaySign>true</DelaySign>
     <AssemblyOriginatorKeyFile>{key}</AssemblyOriginatorKeyFile>
-    <IsPackable>false</IsPackable>
+    {"<IsPackable>false</IsPackable>" if cfg.get("test") else f"<PackageId>webForCore.{assembly}</PackageId>"}
     <IsTestProject>{str(bool(cfg.get("test")) and not cfg.get("library")).lower()}</IsTestProject>{run_settings}{"".join(f"{chr(10)}    <{k}>{v}</{k}>" for k, v in cfg.get("properties", {}).items())}
   </PropertyGroup>
 

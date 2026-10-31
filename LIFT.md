@@ -1604,3 +1604,20 @@ skipped, 151 known System.Drawing failures. The full run also failed
 `ModelBinderConfig`'s static error message providers while xunit runs the classes that read them in parallel.
 `ModelBinderConfigTest`, `TypeConverterModelBinderTest` and `MutableObjectModelBinderTest` now share a collection
 (regex transform in `tools/lift/lift_project.py`); the suite passed three runs in a row.
+
+## NuGet packages in CI and GitHub releases (31 Oct 2026)
+
+The `WebFormsForCore.*` IDs on nuget.org belong to the upstream project, so webForCore's packages are `webForCore.*`:
+the WebFormsForCore projects' PackageIds were renamed (`webForCore.Web` is System.Web), the lifted ones keep theirs,
+and SignalR, Identity and System.Drawing.Common became packable (`lift_aspnet.py` and `lift_drawing.py` emit
+PackageIds; before, `webForCore.Web` depended on a package named `System.Drawing.Common` at webForCore's version,
+which is Microsoft's ID). `webForCore` (`src/webForCore`) is a package without code that brings the "Always" set of
+MIGRATING.md. `webForCore.Web` carries `src/webForCore.WebStack.targets` as `buildTransitive/webForCore.Web.targets`, so
+an app that uses the packages needs no `<Import>`. `WebFormsForCore.Build` (this repository's build tools) isn't
+packed. Version 0.1.0 (was the upstream's 1.7.0-rc3); DataVisualization's README item had `Pack=" True"`.
+
+CI packs the 49 packages on every run as `<Version>-ci.<run number>` and keeps them as the `packages` artifact; a tag
+`v<Version>` (checked against Directory.Build.props) builds the release version and creates a GitHub release with the
+packages attached. Nothing is pushed to nuget.org. `tools/ci/package-smoke.sh` builds `tools/ci/package-smoke`, an app
+outside the repository's Directory.Build files that references only `webForCore` from the packed folder, runs it and
+requests a page and an App_Code type: passed locally (0.1.0-ci.900).

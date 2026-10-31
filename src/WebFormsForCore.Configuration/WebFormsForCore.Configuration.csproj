@@ -11,12 +11,12 @@
         <AssemblyOriginatorKeyFile>..\SigningKey\WebFormsForCore.snk</AssemblyOriginatorKeyFile>
         <AssemblyName>System.Configuration.ConfigurationManager</AssemblyName>
 
-        <PackageId>WebFormsForCore.Configuration</PackageId>
+        <PackageId>webForCore.Configuration</PackageId>
         <Title>WebFormsForCore.Configuration</Title>
         <Product>WebFormsForCore.Configuration</Product>
-        <Description>A port of ASP.NET WebForms to .NET 10</Description>
+        <Description>System.Configuration.ConfigurationManager for webForCore: ASP.NET 4.x applications (Web Forms, MVC 5, Web API 2) on .NET 11 and Kestrel.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageTags>WebForms;porting WebForms;NET Core;NET 10</PackageTags>
+        <PackageTags>webforms;aspnet;system.web;porting;net11</PackageTags>
         <IncludeSymbols>true</IncludeSymbols>
         <EmbedUntrackedSources>false</EmbedUntrackedSources>
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>

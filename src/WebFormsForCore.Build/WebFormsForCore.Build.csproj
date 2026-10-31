@@ -13,12 +13,14 @@
         <StartupObject>WebFormsForCore.Build.Program</StartupObject>
         <DefineConstants>$(DefineConstants);WebFormsForCore</DefineConstants>
 
-        <PackageId>WebFormsForCore.Build</PackageId>
+        <PackageId>webForCore.Build</PackageId>
+        <!-- webForCore: build-time tools for this repository (FakeStrongName, designer files); not released. -->
+        <IsPackable>false</IsPackable>
         <Title>WebFormsForCore.Build</Title>
         <Product>WebFormsForCore.Build</Product>
-        <Description>A port of ASP.NET WebForms to .NET 10</Description>
+        <Description>WebFormsForCore.Build for webForCore: ASP.NET 4.x applications (Web Forms, MVC 5, Web API 2) on .NET 11 and Kestrel.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageTags>WebForms;porting WebForms;NET Core;NET 10</PackageTags>
+        <PackageTags>webforms;aspnet;system.web;porting;net11</PackageTags>
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <IncludeSymbols>true</IncludeSymbols>
         <RestoreSources>$(RestoreSources);../../nupkg;https://api.nuget.org/v3/index.json</RestoreSources>

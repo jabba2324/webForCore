@@ -28,6 +28,11 @@ as a service container. A suite fails CI on any failing test, except System.Draw
 on a failure that isn't in `tools/ci/known-failures/System.Drawing.Common.Tests.txt`, and it reports known failures
 that now pass, so the list only shrinks.
 
+After the tests, CI packs the NuGet packages (version `<Version>-ci.<run number>`; a `v<Version>` tag builds the
+release version and attaches the packages to a GitHub release) and runs `tools/ci/package-smoke.sh`: a Web Forms app
+that references only the `webForCore` package from that folder is built, started, and must serve a page and code
+compiled from App_Code.
+
 ## The suites
 
 ### Lifted from Microsoft and Mono

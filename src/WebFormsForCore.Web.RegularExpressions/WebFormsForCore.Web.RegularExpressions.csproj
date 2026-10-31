@@ -10,12 +10,12 @@
         <AssemblyName>System.Web.RegularExpressions</AssemblyName>
         <AssemblyOriginatorKeyFile>..\SigningKey\WebFormsForCore.snk</AssemblyOriginatorKeyFile>
 
-        <PackageId>WebFormsForCore.Web.RegularExpressions</PackageId>
+        <PackageId>webForCore.Web.RegularExpressions</PackageId>
         <Title>WebFormsForCore.Web.RegularExpressions</Title>
         <Product>WebFormsForCore.Web.RegularExpressions</Product>
-        <Description>A port of ASP.NET WebForms to .NET 10</Description>
+        <Description>System.Web.RegularExpressions for webForCore: ASP.NET 4.x applications (Web Forms, MVC 5, Web API 2) on .NET 11 and Kestrel.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageTags>WebForms;porting WebForms;NET Core;NET 10</PackageTags>
+        <PackageTags>webforms;aspnet;system.web;porting;net11</PackageTags>
         <IncludeSymbols>true</IncludeSymbols>
         <EmbedUntrackedSources>false</EmbedUntrackedSources>
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>

@@ -22,7 +22,7 @@
     <SignAssembly>true</SignAssembly>
     <DelaySign>true</DelaySign>
     <AssemblyOriginatorKeyFile>../SigningKey/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
-    <IsPackable>false</IsPackable>
+    <PackageId>webForCore.Microsoft.AspNet.Identity.Core</PackageId>
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
 

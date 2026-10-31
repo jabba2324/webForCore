@@ -9,12 +9,12 @@
         <SignAssembly>True</SignAssembly>
         <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
 
-        <PackageId>WebFormsForCore.Web.Infrastructure</PackageId>
+        <PackageId>webForCore.Web.Infrastructure</PackageId>
         <Title>WebFormsForCore.Web.Infrastructure</Title>
         <Product>WebFormsForCore.Web.Infrastructure</Product>
         <Description>Microsoft.Web.Infrastructure for webForCore: dynamic module registration and granular request validation, written from the documented API</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageTags>WebForms;porting WebForms;NET Core;NET 10</PackageTags>
+        <PackageTags>webforms;aspnet;system.web;porting;net11</PackageTags>
         <IncludeSymbols>true</IncludeSymbols>
         <EmbedUntrackedSources>false</EmbedUntrackedSources>
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>

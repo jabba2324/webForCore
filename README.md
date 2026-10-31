@@ -16,7 +16,7 @@ restore the old behaviour, the difference is documented.
 | | |
 | --- | --- |
 | Target | .NET 11 (`net11.0`), Linux x64 (Windows builds too) |
-| Status | Pre-release. No production app has been migrated yet; NuGet packages aren't published yet |
+| Status | Pre-release (0.1.0). No production app has been migrated yet. NuGet packages are attached to [GitHub releases](https://github.com/jabba2324/webForCore/releases), not published on nuget.org |
 | Tests | 27,297 tests in 24 suites, almost all of them Microsoft's and Mono's; all pass except 151 known System.Drawing failures, 141 of them metafiles ([TESTING.md](docs/TESTING.md)) |
 | Licence | MIT, Apache 2.0 and BSD 3-Clause, all of which allow commercial use; see [docs/LICENSING.md](docs/LICENSING.md) |
 
@@ -56,7 +56,9 @@ Code Access Security).
 
 The full guide is [docs/MIGRATING.md](docs/MIGRATING.md). In outline:
 
-1. **Build webForCore** (until packages are published, apps reference the fork's projects):
+1. **Get webForCore:** download the packages from a [GitHub release](https://github.com/jabba2324/webForCore/releases)
+   into a folder, add it as a package source in `nuget.config`, and reference `webForCore` (see
+   [docs/MIGRATING.md](docs/MIGRATING.md#1-get-webforcore)). Or build it and reference its projects:
    ```bash
    git clone https://github.com/jabba2324/webForCore && cd webForCore
    dotnet build src/WebFormsForCore.Build/WebFormsForCore.Build.csproj -c Release   # build tasks the other projects import
@@ -77,6 +79,7 @@ The full guide is [docs/MIGRATING.md](docs/MIGRATING.md). In outline:
      <RazorCompileOnBuild>false</RazorCompileOnBuild>
      <RazorCompileOnPublish>false</RazorCompileOnPublish>
    </PropertyGroup>
+   <!-- With project references only; the packages bring it: -->
    <Import Project="path/to/webForCore/src/webForCore.WebStack.targets" />
    <ItemGroup>
      <Compile Remove="App_Code/**;bin_dotnet/**" />
@@ -84,8 +87,8 @@ The full guide is [docs/MIGRATING.md](docs/MIGRATING.md). In outline:
      <None Remove="bin_dotnet/**" />
    </ItemGroup>
    ```
-   Replace the .NET Framework references (System.Web, MVC, Web API, OWIN packages) with references to the fork's
-   projects: see the table in [docs/MIGRATING.md](docs/MIGRATING.md#3-references).
+   Replace the .NET Framework references (System.Web, MVC, Web API, OWIN packages) with webForCore's packages or
+   projects: see [docs/MIGRATING.md](docs/MIGRATING.md#3-references).
 3. **Add a `Program.cs`:**
    ```csharp
    var builder = WebApplication.CreateBuilder(args);

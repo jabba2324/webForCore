@@ -271,7 +271,7 @@ def main():
     <GenerateResourceUsePreserializedResources>false</GenerateResourceUsePreserializedResources>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <NoWarn>$(NoWarn);CS0618;CS8600;CS8601;CS8602;CS8603;CS8604;CS8618;CS8625;CS8765;CS8767;CA1416;SYSLIB0003;SYSLIB0011;SYSLIB0051;CS0649;CS0169;CS0414</NoWarn>
-    <IsPackable>false</IsPackable>
+    <PackageId>webForCore.Drawing.Common</PackageId>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>..\\SigningKey\\WebFormsForCore.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>

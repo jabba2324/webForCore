@@ -26,9 +26,26 @@ For an AI agent doing the migration, the same procedure is written as instructio
 4. **Set `targetFramework`.** `<httpRuntime targetFramework="4.5">` or later is the behaviour webForCore reproduces.
    If the app has no `targetFramework`, add one and test on IIS first.
 
-## 1. Build webForCore
+## 1. Get webForCore
 
-NuGet packages aren't published yet, so the app references webForCore's projects.
+**From the packages (simplest).** Each release on GitHub
+([Releases](https://github.com/jabba2324/webForCore/releases)) has webForCore's NuGet packages attached; they aren't
+on nuget.org. Download them into a folder (for example `packages/` next to the solution) and add it as a package
+source in the solution's `nuget.config`:
+
+```xml
+<configuration>
+  <packageSources>
+    <add key="webForCore" value="packages" />
+  </packageSources>
+</configuration>
+```
+
+Then reference `webForCore` (System.Web and the assemblies every app needs, plus the build targets) and the packages
+for the frameworks the app uses (section 3). The package route needs no `<Import>` of `webForCore.WebStack.targets`:
+`webForCore.Web` brings it.
+
+**From source**, to work on webForCore itself or use unreleased changes: the app references webForCore's projects.
 
 ```bash
 git clone https://github.com/jabba2324/webForCore
@@ -66,7 +83,8 @@ hand, and keep a copy of the old `.csproj`. Then use `Microsoft.NET.Sdk.Web` wit
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
   </PropertyGroup>
 
-  <!-- Fixes the shared framework's System.Web facade conflict; required. -->
+  <!-- Fixes the shared framework's System.Web facade conflict; required with project references (the packages bring
+       it themselves). -->
   <Import Project="..\webForCore\src\webForCore.WebStack.targets" />
 
   <ItemGroup>
@@ -85,8 +103,12 @@ Pages that use `CodeBehind=` are compiled into the project's assembly, as Visual
 
 ## 3. References
 
-Remove the .NET Framework references and Microsoft's ASP.NET NuGet packages, and add project references to the
-fork. Everything an app needs:
+Remove the .NET Framework references and Microsoft's ASP.NET NuGet packages. With the packages, add
+`<PackageReference Include="webForCore" Version="0.1.0" />` (the "Always" set below) and, for the frameworks the app
+uses, the package of the same name with the `src/` folder's `webForCore.System.`/`webForCore.` prefix replaced by
+`webForCore.` (`webForCore.Web.Mvc`, `webForCore.Web.Http.WebHost`, `webForCore.Microsoft.AspNet.SignalR.SystemWeb`,
+`webForCore.Microsoft.Owin.Security.Cookies`, `webForCore.Web.Optimization`, `webForCore.AjaxControlToolkit`, ...).
+From source, add project references to the fork. Everything an app needs:
 
 | Always | Project (under `webForCore/src/`) |
 | --- | --- |

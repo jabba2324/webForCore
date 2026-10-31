@@ -1,9 +1,12 @@
-# Linux build and every test suite (see docs/TESTING.md). Packaging to NuGet will be added as a later job.
+# Linux build, every test suite (see docs/TESTING.md), and the NuGet packages: every run packs them, checks that an
+# application builds and runs from them, and keeps them as the "packages" artifact. A version tag (v0.1.0, matching
+# <Version> in Directory.Build.props) also publishes them as a GitHub release.
 name: CI
 
 on:
   push:
     branches: [webforcore-lift, main]
+    tags: ['v*']
   pull_request:
   workflow_dispatch:
 
@@ -39,8 +42,27 @@ jobs:
           --health-cmd "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P 'webForCore-Test1!' -Q 'SELECT 1' -b"
           --health-interval 10s --health-timeout 5s --health-retries 20
 
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+
     steps:
       - uses: actions/checkout@v4
+
+      # The release version from Directory.Build.props; any other run builds a prerelease of it (0.1.0-ci.123).
+      - name: Version
+        id: version
+        run: |
+          base=$(grep -oP '(?<=<Version>)[^<]+' Directory.Build.props)
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            if [[ "${GITHUB_REF#refs/tags/v}" != "$base" ]]; then
+              echo "::error::Tag ${GITHUB_REF#refs/tags/} doesn't match <Version>$base</Version> in Directory.Build.props"; exit 1
+            fi
+            version=$base
+          else
+            version=$base-ci.$GITHUB_RUN_NUMBER
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Version: $version"
 
       - name: Set up .NET (global.json)
         uses: actions/setup-dotnet@v4
@@ -60,7 +82,7 @@ jobs:
         run: tools/ci/fetch-test-fonts.sh
 
       - name: Build
-        run: dotnet build WebFormsForCore.slnx -c Release -nodeReuse:false
+        run: dotnet build WebFormsForCore.slnx -c Release -nodeReuse:false -p:Version=${{ steps.version.outputs.version }}
 
       - name: Test
         run: tools/ci/run-tests.sh "$RUNNER_TEMP/TestResults"
@@ -76,3 +98,49 @@ jobs:
           name: test-results
           path: ${{ runner.temp }}/TestResults/*.trx
           if-no-files-found: warn
+
+      - name: Pack
+        run: dotnet pack WebFormsForCore.slnx -c Release --no-build -nodeReuse:false -p:Version=${{ steps.version.outputs.version }} -o "$RUNNER_TEMP/packages"
+
+      # An application that references the webForCore package (not the projects) builds, runs and serves pages.
+      - name: Package smoke test
+        run: tools/ci/package-smoke.sh "$RUNNER_TEMP/packages" ${{ steps.version.outputs.version }}
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages
+          path: |
+            ${{ runner.temp }}/packages/*.nupkg
+            ${{ runner.temp }}/packages/*.snupkg
+          if-no-files-found: error
+
+  # A version tag: the tested packages become a GitHub release (not published to nuget.org).
+  release:
+    needs: build-and-test
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: packages
+          path: packages
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.build-and-test.outputs.version }}
+        run: |
+          cat > notes.md <<NOTES
+          webForCore $VERSION as NuGet packages. They aren't on nuget.org: download them (all, or the ones you need with
+          their dependencies) into a folder and add it as a package source, for example in your nuget.config:
+
+              <add key="webForCore" value="path/to/folder" />
+
+          Then reference \`webForCore\` (System.Web and what every application needs) and the packages for the frameworks the
+          application uses (\`webForCore.Web.Mvc\`, \`webForCore.Web.Http.WebHost\`, ...). See docs/MIGRATING.md.
+          NOTES
+          gh release create "$GITHUB_REF_NAME" packages/*.nupkg packages/*.snupkg \
+            --repo "$GITHUB_REPOSITORY" --title "webForCore $VERSION" --notes-file notes.md --verify-tag

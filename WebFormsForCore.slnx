@@ -79,6 +79,7 @@
   <Project Path="src/WebFormsForCore.Web/WebFormsForCore.Web.csproj">
     <BuildDependency Project="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
   </Project>
+  <Project Path="src/webForCore/webForCore.csproj" />
   <Project Path="src/WebFormsForCore.WebGrease/WebFormsForCore.WebGrease.csproj">
     <BuildDependency Project="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
   </Project>
