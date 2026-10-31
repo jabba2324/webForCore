@@ -10,8 +10,7 @@ and tested with Microsoft's own test suites. The parts IIS used to provide (requ
 documents, custom errors, compression, logging, AppDomain recycling) run in front of the app on Kestrel and are
 configured from the app's existing `<system.webServer>` section.
 
-webForCore ships only Microsoft assemblies. Third-party libraries that need changes to run on it (WebActivatorEx,
-AjaxControlToolkit) are built and released by [webForCore-thirdparty](https://github.com/jabba2324/webForCore-thirdparty).
+webForCore ships only Microsoft assemblies, and nothing in it depends on a third-party build of a library.
 
 The reference behaviour is .NET Framework 4.8 on IIS 10. Where .NET 11 behaves differently and webForCore can't
 restore the old behaviour, the difference is documented.

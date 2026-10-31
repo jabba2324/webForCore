@@ -76,16 +76,6 @@ app's solution and add that folder as a package source in `nuget.config` (`docs/
 gh release download --repo jabba2324/webForCore --pattern '*.nupkg' --dir packages   # latest release
 ```
 
-webForCore ships only Microsoft assemblies. If the app uses WebActivatorEx (directly, or through Unity.Mvc,
-Ninject.MVC, StructureMap.MVC and the like) or AjaxControlToolkit, also download webForCore-thirdparty's packages into
-the same folder and reference `webForCore.WebActivatorEx` or `webForCore.AjaxControlToolkit` (`docs/MIGRATING.md`
-section 3); the original WebActivatorEx package's start methods never run on webForCore. From source, build that
-repository next to webForCore instead.
-
-```bash
-gh release download --repo jabba2324/webForCore-thirdparty --pattern '*.nupkg' --dir packages
-```
-
 The app then uses `PackageReference`s (`webForCore` and the framework packages) instead of project references, and
 no `<Import>` of `webForCore.WebStack.targets`. Otherwise, or if the user asks for source, clone and build it next to
 the app (or use the path the user gives):
@@ -145,6 +135,7 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
    | `CultureNotFoundException` | Expected .NET Framework behaviour; check the culture name |
    | `PlatformNotSupportedException` | A Windows-only API: find it in `docs/NAMESPACES.md`; ask before replacing it |
    | Lost logins or view state errors after a restart | Add an explicit `<machineKey>` (ask the user for keys, or generate new ones and say so) |
+   | "No parameterless constructor defined" for a controller, or a DI container (Unity, Ninject, StructureMap) that was never set up | WebActivatorEx's start methods don't run on webForCore: call them from `Application_Start` (`docs/MIGRATING.md` section 3) |
    | "The SMTP host was not specified" from the app's own mail code | .NET's `SmtpClient` ignores `<mailSettings>`: replace `new SmtpClient()` with `WebFormsForCore.Net.Configuration.NetConfiguration.CreateSmtpClient()` |
 
 **Check:** every page type renders without errors.

@@ -8,6 +8,7 @@ namespace SmokeMvc
     {
         protected void Application_Start()
         {
+            UnityMvcActivator.Start();
             RouteTable.Routes.MapRoute("Default", "{controller}/{action}/{id}",
                 new { controller = "Home", action = "Index", id = UrlParameter.Optional });
         }

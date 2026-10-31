@@ -7,11 +7,13 @@ a real application behave more like it did on .NET Framework 4.8 and IIS 10, and
 
 1. **Only Microsoft assemblies.** webForCore contains and ships Microsoft's assemblies only: Microsoft's source lifted
    from its repositories, the port of the .NET Framework reference source, and assemblies with Microsoft's names that
-   webForCore writes in their place (facades, `Microsoft.Web.Infrastructure`, `System.Net.Http.WebRequest`). A
-   third-party library that needs changes to run on webForCore (WebActivatorEx, AjaxControlToolkit) goes in
-   [webForCore-thirdparty](https://github.com/jabba2324/webForCore-thirdparty), which builds it against webForCore's released packages and
-   releases it separately; webForCore's own tests that need one pull it from there. Third-party code used only to
-   build webForCore, and NuGet dependencies of Microsoft's libraries (SkiaSharp, Newtonsoft.Json, ...), are fine.
+   webForCore writes in their place (facades, `Microsoft.Web.Infrastructure`, `System.Net.Http.WebRequest`). Builds
+   of third-party libraries for webForCore (WebActivatorEx, AjaxControlToolkit) are in
+   [webForCore-thirdparty](https://github.com/jabba2324/webForCore-thirdparty), which exists only to help the
+   [smoke test](https://github.com/jabba2324/webForCore-smoke-test) migrate applications that use them. Nothing in
+   webForCore depends on it: not its code, packages, tests, CI or documentation. A problem a third-party library has on
+   webForCore is fixed in webForCore's own code if it is webForCore's, and otherwise documented with a workaround.
+   NuGet dependencies of Microsoft's libraries (SkiaSharp, Newtonsoft.Json, ...) and build-only tools are fine.
 
 2. **Every change comes with a test.** A fix has a regression test that fails without it and passes with it; a feature
    has tests of its behaviour. Run the test against the code before your change and say in the pull request that it

@@ -158,9 +158,8 @@ can't be read on Linux (the error says so). `RsaProtectedConfigurationProvider` 
 the key directory; containers exported with `aspnet_regiis -px` can be imported. The key directory is
 `$WEBFORCORE_KEYS`, `/var/lib/webforcore/keys` or `~/.webforcore/keys`.
 
-Libraries that aren't Microsoft's aren't part of webForCore, which ships only Microsoft assemblies. Those that need
-changes to run on it, WebActivatorEx and AjaxControlToolkit (with its designers .NET Framework only), are built by
-[webForCore-thirdparty](https://github.com/jabba2324/webForCore-thirdparty) ([MIGRATING.md](MIGRATING.md#3-references)).
+webForCore ships only Microsoft assemblies. WebActivatorEx's start methods don't run on it, and AjaxControlToolkit
+isn't provided ([MIGRATING.md](MIGRATING.md#3-references)).
 
 ### Smaller companions
 

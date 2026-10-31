@@ -1851,18 +1851,21 @@ the repository and its packages:
   here), packed as `webForCore.AjaxControlToolkit`, `.StaticResources` and `.HtmlEditor.Sanitizer` since 0.1.0.
 
 Both moved to [jabba2324/webForCore-thirdparty](https://github.com/jabba2324/webForCore-thirdparty), keeping their
-package IDs, built against webForCore's released packages (0.3.0) for net11.0 only. Only AjaxControlToolkit's three
-shipped projects moved; its sample site, Jasmine tests, Visual Studio packages and tools stay in DevExpress's archived
-repository. There, WebActivatorEx is delay signed with the original's public key (a public-key-only `.snk`) instead of
-webForCore's FakeStrongName task, and each package declares its own `PackageConflictOverrides` over the original
-package (`WebActivatorEx`, `AjaxControlToolkit`), which `webForCore.WebStack.targets` no longer lists. Its
-`tools/smoke` app (Unity.Mvc started by a WebActivatorEx start method, and an AjaxControlToolkit `CalendarExtender`)
-passes on webForCore 0.3.0.
+package IDs, built against webForCore's released packages (0.3.0) for net11.0 only. That repository exists only to help
+the smoke test migrate applications that use them: **nothing in webForCore depends on it**, not its code, packages,
+tests, CI or user documentation. Only AjaxControlToolkit's three shipped projects moved; its sample site, Jasmine
+tests, Visual Studio packages and tools stay in DevExpress's archived repository. There, WebActivatorEx is delay signed
+with the original's public key (a public-key-only `.snk`) instead of webForCore's FakeStrongName task, and each package
+declares its own `PackageConflictOverrides` over the original package. Its `tools/smoke` app (Unity.Mvc started by a
+WebActivatorEx start method, and an AjaxControlToolkit `CalendarExtender`) passes on webForCore 0.3.0.
 
-Here: the projects, their solution entries, the `webForCore` package's reference to WebActivatorEx, the
-`Directory.Build.targets` item that gave AjaxControlToolkit webForCore's System.Drawing.Common, and the TestApp's
-AjaxControlToolkit page are removed; NOTICE, LICENSING.md, LICENSE-BSD-3-CLAUSE.txt, NAMESPACES.md, MIGRATING.md
-(section 3 now lists the webForCore-thirdparty packages) and IIS-COMPATIBILITY.md follow. `tools/ci/package-smoke-mvc`
-keeps checking #21 with `webForCore.WebActivatorEx` from webForCore-thirdparty's latest release (or
-`THIRDPARTY_PACKAGES`). The build-and-run steps above no longer fetch the AjaxControlToolkit submodule.
+Here: the projects, their solution entries, the `webForCore` package's reference to WebActivatorEx, their entries in
+`webForCore.WebStack.targets`' package overrides, the `Directory.Build.targets` item that gave AjaxControlToolkit
+webForCore's System.Drawing.Common, and the TestApp's AjaxControlToolkit page are removed. #21 is a documented
+difference again: MIGRATING.md section 3 and IIS-COMPATIBILITY.md say to call WebActivatorEx's start methods from
+`Application_Start`, and AGENT-MIGRATION.md lists the symptom. `tools/ci/package-smoke-mvc` keeps Unity.Mvc and the
+original WebActivatorEx package, as applications have them (for #23), and starts Unity from `Application_Start`; the
+original package's `ActivationManager` runs and finds nothing, and the app must still work. NOTICE, LICENSING.md,
+LICENSE-BSD-3-CLAUSE.txt and NAMESPACES.md follow. The build-and-run steps above no longer fetch the AjaxControlToolkit
+submodule.
 BundleTransformer had already been removed from the repository (LICENSING.md); a leftover checkout of it is ignored.
