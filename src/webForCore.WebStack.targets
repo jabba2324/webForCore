@@ -29,6 +29,24 @@
     </ItemGroup>
   </Target>
 
+  <!-- Packages built on MVC, Web API, Katana or WebActivatorEx (Unity.Mvc, Autofac.Mvc5, Swashbuckle, ...) bring
+       Microsoft's packages back transitively, with assemblies of the same names as webForCore's. The SDK keeps one of
+       each by assembly version, then file version, and Microsoft's win ties: System.Web.Razor and System.Web.WebPages are
+       3.0.0.0 in both, but Microsoft.AspNet.Razor 3.2.7's file version is 3.0.61128, so it replaced webForCore's in the
+       output with no build error, and every Razor view failed with a MissingMethodException (#23: Bonobo Git Server,
+       ApplicantTracking, ReaLocate, Roadkill). The webForCore packages in the build are preferred in those conflicts,
+       as the SDK's PackageConflictPreferredPackages provides for. -->
+  <Target Name="WebForCorePreferItsPackages" BeforeTargets="_HandlePackageFileConflicts;_HandlePackageFileConflictsForPublish" Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">
+    <ItemGroup>
+      <_WebForCorePackageItem Include="@(Reference)" Condition="'%(Reference.NuGetPackageId)' == 'webForCore' OR $([System.String]::Copy('%(Reference.NuGetPackageId)').StartsWith('webForCore.'))" />
+      <_WebForCorePackageItem Include="@(RuntimeCopyLocalItems)" Condition="'%(RuntimeCopyLocalItems.NuGetPackageId)' == 'webForCore' OR $([System.String]::Copy('%(RuntimeCopyLocalItems.NuGetPackageId)').StartsWith('webForCore.'))" />
+      <_WebForCorePackageId Include="@(_WebForCorePackageItem->'%(NuGetPackageId)'->Distinct())" />
+    </ItemGroup>
+    <PropertyGroup>
+      <PackageConflictPreferredPackages>@(_WebForCorePackageId);$(PackageConflictPreferredPackages)</PackageConflictPreferredPackages>
+    </PropertyGroup>
+  </Target>
+
   <!-- The shared framework also has System.Web, System.Drawing and System.Configuration facades. At startup the host
        keeps whichever copy has the higher assemblyVersion in deps.json, but the SDK writes no assemblyVersion for
        project references, so the framework facade won and the fork's System.Web failed to load ("conflicts with what

@@ -1789,3 +1789,17 @@ type forwarders for the types of the 3.5 assemblies. They are new code, not Micr
 `webForCore` package depends on `webForCore.Web.Abstractions` and `webForCore.Web.Routing`). Test:
 `RegressionTests.SystemWebAbstractionsAndRoutingFacadesLoad` (`regressions/facades/`, whose web.config lists both;
 it binds `HttpContextBase` and `RouteTable` by the 3.5 names).
+
+### webForCore's packages win the SDK's conflicts (#23)
+
+Packages built on MVC, Web API, Katana or WebActivatorEx bring Microsoft's packages back transitively (Unity.Mvc 5.11
+brings Microsoft.AspNet.Mvc 5.2.7, Razor 3.2.7 and Web Pages 3.2.7). The SDK's conflict resolution keeps one assembly of
+each name, by assembly version and then file version. MVC 5.3.1 beats 5.2.7, but webForCore's `System.Web.Razor` and
+`System.Web.WebPages` are 3.0.0.0 like Microsoft's, and Microsoft's file version (3.0.61128) is higher, so they replaced
+webForCore's in the output. The build succeeded and every Razor view failed with `MissingMethodException:
+CodeGeneratorContext.get_GeneratedClass()` (Bonobo Git Server, ApplicantTracking, ReaLocate, Roadkill). The
+`WebForCorePreferItsPackages` target in `src/webForCore.WebStack.targets` (the packages' buildTransitive targets) adds
+the webForCore packages in the build to `PackageConflictPreferredPackages`, which the SDK provides for this. It makes
+the `ExcludeAssets` step in MIGRATING.md unnecessary for applications on the packages. Test: `tools/ci/package-smoke-mvc`,
+an MVC application with `Unity.Mvc` 5.11.1 as applications have it, whose `/Plain` view failed with that exception on the
+0.2.0 packages.

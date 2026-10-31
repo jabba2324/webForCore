@@ -5,9 +5,10 @@
 # Usage: tools/ci/package-smoke.sh <package folder> <version>
 set -euo pipefail
 packages=$(cd "$1" && pwd); version=$2
+here=$(cd "$(dirname "$0")" && pwd)
 base=$(mktemp -d); work=$base/site; mkdir "$work"
 trap 'kill $server 2>/dev/null || true; rm -rf "$base"' EXIT
-cp -r "$(dirname "$0")/package-smoke/." "$work"
+cp -r "$here/package-smoke/." "$work"
 cd "$work"
 cat > nuget.config <<CONFIG
 <?xml version="1.0" encoding="utf-8"?>
@@ -41,5 +42,20 @@ ls "$base"/logs/site/W3SVC1/u_ex*.txt > /dev/null 2>&1 || { echo "W3C log: not i
 [ ! -e "$work/logs" ] || { echo "W3C log: written in the site ($work/logs)"; fail=1; }
 log=$(ls "$base"/logs/site/W3SVC1/ 2>/dev/null | head -1 || true)
 [ "$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:5199/logs/W3SVC1/${log:-u_ex.txt}")" = 404 ] || { echo "W3C log: served"; fail=1; }
+if [ $fail -ne 0 ]; then cat server.log; exit 1; fi
+kill $server; wait $server 2>/dev/null || true
+
+# tools/ci/package-smoke-mvc: MVC 5 and OWIN with the third-party packages applications have, as they have them.
+mvc=$base/mvc; mkdir "$mvc"
+cp -r "$here/package-smoke-mvc/." "$mvc"
+cp nuget.config "$mvc"
+cd "$mvc"
+dotnet build SmokeMvc.csproj -c Release -p:WebForCoreVersion="$version" -nodeReuse:false
+dotnet bin_dotnet/SmokeMvc.dll --urls http://127.0.0.1:5198 > server.log 2>&1 &
+server=$!
+for i in $(seq 120); do curl -s -o /dev/null http://127.0.0.1:5198/ && break; sleep 1; done
+# A Razor view renders although Unity.Mvc brings Microsoft.AspNet.Razor 3.2.7 (issue #23: it replaced webForCore's in
+# the output, and every view failed with a MissingMethodException).
+curl -s http://127.0.0.1:5198/Plain | grep -q "plain view, rendered by Razor" || { echo "/Plain: unexpected response"; curl -s http://127.0.0.1:5198/Plain | grep -i -m2 '<title>'; fail=1; }
 if [ $fail -ne 0 ]; then cat server.log; exit 1; fi
 echo "Package smoke test passed ($version)."

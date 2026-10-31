@@ -144,12 +144,17 @@ projects in this repository are working examples for Web Forms, MVC, Web API and
 
 These came up migrating real applications; each names one that needed it.
 
-- **Packages built on MVC, Web API or OWIN bring Microsoft's packages back** (#4). `Autofac.Mvc5`, `Autofac.WebApi2`,
-  `Unity.Mvc`, Ninject's and Glimpse's MVC packages, `Microsoft.Owin.Security.WsFederation` and others depend on
-  `Microsoft.AspNet.Mvc`, `Microsoft.AspNet.WebApi.Core`, `Microsoft.Owin` and so on, and NuGet restores those, so the
-  compiler sees two `System.Web.Mvc`s: `CS0433: The type 'Controller' exists in both 'System.Web.Mvc, Version=5.1.0.0'
-  and 'System.Web.Mvc, Version=5.3.1.0'`. Reference each one that `obj/project.assets.json` lists, at the version
-  restored, with no assets, so the direct reference wins and contributes nothing (eShopLegacyMVC, Bonobo Git Server):
+- **Packages built on MVC, Web API or OWIN bring Microsoft's packages back** (#4, #23). `Autofac.Mvc5`, `Autofac.WebApi2`,
+  `Unity.Mvc`, Ninject's and Glimpse's MVC packages, Swashbuckle, `Microsoft.Owin.Security.WsFederation` and others
+  depend on `Microsoft.AspNet.Mvc`, `Microsoft.AspNet.WebApi.Core`, `Microsoft.Owin` and so on, and NuGet restores
+  those, with assemblies of the same names as webForCore's. With webForCore's packages nothing needs doing: its build
+  targets prefer them in the SDK's conflict resolution (before 0.3.0, Microsoft's `System.Web.Razor` and
+  `System.Web.WebPages` won the tie on file version and every Razor view failed with `MissingMethodException: ...
+  CodeGeneratorContext.get_GeneratedClass()`: Bonobo Git Server, ApplicantTracking, ReaLocate, Roadkill). An
+  application built against webForCore's projects instead (a source build) gets both, so the compiler sees two
+  `System.Web.Mvc`s: `CS0433: The type 'Controller' exists in both 'System.Web.Mvc, Version=5.1.0.0' and
+  'System.Web.Mvc, Version=5.3.1.0'`. There, reference each one that `obj/project.assets.json` lists, at the version
+  restored, with no assets, so the direct reference wins and contributes nothing (eShopLegacyMVC):
   ```xml
   <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.1.0" ExcludeAssets="all" />
   <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.0" ExcludeAssets="all" />
