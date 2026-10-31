@@ -104,7 +104,7 @@ Pages that use `CodeBehind=` are compiled into the project's assembly, as Visual
 ## 3. References
 
 Remove the .NET Framework references and Microsoft's ASP.NET NuGet packages. With the packages, add
-`<PackageReference Include="webForCore" Version="0.1.0" />` (the "Always" set below) and, for the frameworks the app
+`<PackageReference Include="webForCore" Version="0.2.0" />` (the "Always" set below) and, for the frameworks the app
 uses, the package of the same name with the `src/` folder's `webForCore.System.`/`webForCore.` prefix replaced by
 `webForCore.` (`webForCore.Web.Mvc`, `webForCore.Web.Http.WebHost`, `webForCore.Microsoft.AspNet.SignalR.SystemWeb`,
 `webForCore.Microsoft.Owin.Security.Cookies`, `webForCore.Web.Optimization`, `webForCore.AjaxControlToolkit`, ...).

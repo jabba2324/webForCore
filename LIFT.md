@@ -1624,6 +1624,9 @@ requests a page and an App_Code type: passed locally (0.1.0-ci.901). Packing the
 dependencies on WebFormsForCore.Build make NuGet call GetTargetPath on that multi-targeted project; the first CI run
 stopped there), so `tools/ci/pack.sh` packs the solution's built `src/` projects one at a time.
 
+A release's notes are the install instructions plus `docs/release-notes/<version>.md` when it exists (from 0.2.0: what
+changed, and behaviour changes when upgrading).
+
 ## Fixes from migrating real applications (31 Oct 2026)
 
 The smoke test bed ([jabba2324/webForCore-smoke-test](https://github.com/jabba2324/webForCore-smoke-test)) migrated

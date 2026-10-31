@@ -123,6 +123,10 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: docs/release-notes
+
       - uses: actions/download-artifact@v4
         with:
           name: packages
@@ -142,5 +146,7 @@ jobs:
           Then reference \`webForCore\` (System.Web and what every application needs) and the packages for the frameworks the
           application uses (\`webForCore.Web.Mvc\`, \`webForCore.Web.Http.WebHost\`, ...). See docs/MIGRATING.md.
           NOTES
+          # The version's own notes (docs/release-notes/<version>.md), when there are some.
+          if [ -f "docs/release-notes/$VERSION.md" ]; then printf '\n' >> notes.md; cat "docs/release-notes/$VERSION.md" >> notes.md; fi
           gh release create "$GITHUB_REF_NAME" packages/*.nupkg packages/*.snupkg \
             --repo "$GITHUB_REPOSITORY" --title "webForCore $VERSION" --notes-file notes.md --verify-tag
