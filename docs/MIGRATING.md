@@ -121,6 +121,7 @@ From source, add project references to the fork. Everything an app needs:
 | BinaryFormatter port (session, view state) | `WebFormsForCore.Serialization.Formatters/...` |
 | System.Drawing | `WebFormsForCore.Drawing/...` |
 | Run-time compiler | `WebFormsForCore.Compilers/...` |
+| System.Web.DynamicData (data controls with `ItemType` load it) | `WebFormsForCore.Web.DynamicData/...` |
 
 | If the app uses | Add |
 | --- | --- |
@@ -138,6 +139,51 @@ From source, add project references to the fork. Everything an app needs:
 
 Keep other NuGet packages, preferring versions that target .NET Standard or .NET. The `test/webForCore.*.Sample`
 projects in this repository are working examples for Web Forms, MVC, Web API and Web Pages.
+
+### Packages that need more than a reference
+
+These came up migrating real applications; each names one that needed it.
+
+- **Packages built on MVC, Web API or OWIN bring Microsoft's packages back** (#4). `Autofac.Mvc5`, `Autofac.WebApi2`,
+  `Unity.Mvc`, Ninject's and Glimpse's MVC packages, `Microsoft.Owin.Security.WsFederation` and others depend on
+  `Microsoft.AspNet.Mvc`, `Microsoft.AspNet.WebApi.Core`, `Microsoft.Owin` and so on, and NuGet restores those, so the
+  compiler sees two `System.Web.Mvc`s: `CS0433: The type 'Controller' exists in both 'System.Web.Mvc, Version=5.1.0.0'
+  and 'System.Web.Mvc, Version=5.3.1.0'`. Reference each one that `obj/project.assets.json` lists, at the version
+  restored, with no assets, so the direct reference wins and contributes nothing (eShopLegacyMVC, Bonobo Git Server):
+  ```xml
+  <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.1.0" ExcludeAssets="all" />
+  <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.0" ExcludeAssets="all" />
+  ```
+- **A `lib/net45`-only package with a `build/` folder restores without its assembly** (#5). NuGet counts `build/`
+  as compatible, so `AssetTargetFallback` doesn't apply, and the DLL isn't copied: `Could not load file or assembly
+  'Microsoft.AI.Web'` for a module web.config names (Application Insights 2.x in eShopLegacyMVC). Reference the DLL
+  from the package (packages with only `lib/net45`, such as `Autofac.Mvc5`, restore normally):
+  ```xml
+  <PackageReference Include="Microsoft.ApplicationInsights.Web" Version="2.9.1" GeneratePathProperty="true" />
+  <Reference Include="Microsoft.AI.Web" HintPath="$(PkgMicrosoft_ApplicationInsights_Web)/lib/net45/Microsoft.AI.Web.dll" />
+  ```
+- **Versions webForCore requires** (#6). Restoring fails with `NU1605: Detected package downgrade` below these:
+  `Newtonsoft.Json` 13.0.4 (Web API's formatters, bundling) and `Microsoft.IdentityModel.Tokens` 8.19.1 (through
+  System.Web.Extensions' CoreWCF client support). Raise the application's reference, or remove it if the package was
+  only there as another package's dependency. `EntityFramework` before 6.4 has no .NET build: use 6.4 or later
+  (6.5.1 works with `System.Data.SqlClient`).
+- **.NET Framework assemblies that are packages on .NET** (#9). The root web.config of .NET Framework referenced its
+  framework assemblies for every page, so App_Code and pages used them freely. On .NET some are NuGet packages the
+  application must reference, or code compiled at run time fails with `CS1069: The type name 'SyndicationItem' could not
+  be found ... forwarded to assembly 'System.ServiceModel.Syndication'` (MiniBlog's feed handler). Among them:
+  `System.ServiceModel.Syndication`, `System.Data.SqlClient`, `System.Data.OleDb`, `System.DirectoryServices`,
+  `System.Runtime.Caching`, `System.ServiceModel.Http` and the other WCF client packages.
+- **Katana packages webForCore doesn't lift** (#14). webForCore provides `Microsoft.Owin`, its hosts, `Security`,
+  `Security.Cookies`, `Security.OAuth` and `Cors`. The social logins of the Visual Studio templates
+  (`Microsoft.Owin.Security.Facebook`, `.Google`, `.MicrosoftAccount`, `.Twitter`) and `.WsFederation` are not: keep
+  the application's package, and keep its Katana dependencies out as above, so webForCore's `Microsoft.Owin` 4.2.3 is
+  the only one (MvcMovie, Bonobo Git Server). Every template app has `using Microsoft.Owin.Security.Google;` in
+  `Startup.Auth.cs`, even with the providers commented out.
+  ```xml
+  <PackageReference Include="Microsoft.Owin.Security.Google" Version="3.0.1" />
+  <PackageReference Include="Microsoft.Owin" Version="3.0.1" ExcludeAssets="all" />
+  <PackageReference Include="Microsoft.Owin.Security" Version="3.0.1" ExcludeAssets="all" />
+  ```
 
 ## 4. Program.cs
 
@@ -200,6 +246,11 @@ Fix what the blocker search found (see [NAMESPACES.md](NAMESPACES.md) for replac
 - **File paths:** Linux paths are case-sensitive and use `/`. Fix string-built paths (`"~\\Images\\Logo.PNG"`,
   `Path.Combine` with `\`) and file names whose case differs from the references to them. `Server.MapPath` and
   virtual paths work as before.
+- **The site's folder:** `AppDomain.CurrentDomain.BaseDirectory` (and `AppContext.BaseDirectory`) is the build output,
+  `bin_dotnet/`, not the site root as in IIS's per-application AppDomain. Find the site's files with
+  `HttpRuntime.AppDomainAppPath`, `HostingEnvironment.ApplicationPhysicalPath` or `Server.MapPath("~/...")` instead
+  ([NAMESPACES.md](NAMESPACES.md)). Search for `BaseDirectory` and `ApplicationBase`: eShopLegacyMVC's database seed read
+  its SQL scripts that way.
 - **Newlines:** `Environment.NewLine` is `\n`.
 - **Fonts and drawing:** install the fonts the app uses, or fontconfig's metric-compatible substitutes for Windows
   fonts (Liberation, Carlito, Caladea).

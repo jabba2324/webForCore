@@ -97,3 +97,11 @@ These aren't lifts. They change WebFormsForCore's port, and each has a `webForCo
 - **BinaryFormatter port:** surrogates for .NET Framework types .NET no longer serializes (`NameValueCollection`
   and others), so session state and view state round-trip.
 - **Security:** `bin`, `App_Data`, the build output folder and the other hidden segments return 404, as on IIS.
+- **File change notifications off Windows** (`FileChangesMonitor.cs`, `Util/FileUtil.cs`): `FindFileData` names a
+  file as `FindFirstFile` does (its name, or its path relative to the monitored root, without the Windows-only parent
+  walk), and the `FileSystemWatcher` that replaces `ReadDirectoryChangesW` reports names relative to the watched
+  directory, as `ReadDirectoryChangesW` does (#2).
+- **System.Web.DynamicData** (`src/WebFormsForCore.Web.DynamicData`, now built and in the "Always" set): the Entity
+  Framework 1–4 and LINQ to SQL model providers, `LinqDataSource`/`EntityDataSource` hookups and EF 5 spatial column
+  types are compiled out (`#if NETFRAMEWORK`); `AssemblyRef.cs` and `ScaffoldTableAttribute` (which .NET dropped) are
+  added (#8).

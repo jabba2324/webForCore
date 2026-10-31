@@ -51,6 +51,7 @@ Code Access Security).
 | [docs/lifted-changes.md](docs/lifted-changes.md) | Generated list of every lifted file that differs from upstream |
 | [docs/LICENSING.md](docs/LICENSING.md) | Which parts have which licence, commercial use, and what was replaced to get there |
 | [LIFT.md](LIFT.md) | The engineering log: every change, decision and test result, in order |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute: a test and a real application for every change, Microsoft's code left alone |
 
 ## Migrating an app: the short version
 

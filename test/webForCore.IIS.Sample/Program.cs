@@ -16,8 +16,9 @@ namespace IISSample
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            // IIS's compression and W3C logging (App_Data is a hidden segment, so the logs are not served).
-            builder.Services.AddWebForms(o => o.LogDirectory = Path.Combine(builder.Environment.ContentRootPath, "App_Data", "logs"));
+            // IIS's compression and W3C logging. The logs are in a plain folder of the site on purpose: webForCore must not
+            // serve them (RegressionTests, #15).
+            builder.Services.AddWebForms(o => o.LogDirectory = Path.Combine(builder.Environment.ContentRootPath, "w3c-logs", "W3SVC1"));
             // GATE_HTTPS_PORT: also listen with TLS, a generated certificate, and client certificates accepted (as IIS's
             // SSL settings "Accept"), for Request.ClientCertificate and the HTTPS/CERT_ server variables.
             if (int.TryParse(Environment.GetEnvironmentVariable("GATE_HTTPS_PORT"), out int httpsPort))

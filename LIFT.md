@@ -1623,3 +1623,135 @@ outside the repository's Directory.Build files that references only `webForCore`
 requests a page and an App_Code type: passed locally (0.1.0-ci.901). Packing the solution fails (its build
 dependencies on WebFormsForCore.Build make NuGet call GetTargetPath on that multi-targeted project; the first CI run
 stopped there), so `tools/ci/pack.sh` packs the solution's built `src/` projects one at a time.
+
+## Fixes from migrating real applications (31 Oct 2026)
+
+The smoke test bed ([jabba2324/webForCore-smoke-test](https://github.com/jabba2324/webForCore-smoke-test)) migrated
+open-source ASP.NET 4.x applications with the 0.1.0 packages and filed what failed as issues #1-#15. Each fix below has
+a regression test (most in `IIS.Gate.Tests`' `RegressionTests`, pages in `test/webForCore.IIS.Sample/regressions`) and
+names the applications that hit it.
+
+### HttpUtility and IHtmlString in application code (#7)
+
+Code compiled against the fork's System.Web got `CS0433: The type 'HttpUtility' exists in both
+'System.Web.HttpUtility' and 'System.Web'` (and the same for `IHtmlString`): the target that drops the shared
+framework's `System.Web.HttpUtility.dll` was only in this repository's `Directory.Build.targets`, which applications
+don't import. It is now in `src/webForCore.WebStack.targets` too (and so in the `webForCore.Web` package's
+buildTransitive targets), for a System.Web from a project reference or the `webForCore.Web` package. Hit by
+eShopLegacyWebForms and the Visual Studio Web Forms template (`ViewSwitcher.ascx.cs`), the Web API HelpPage area and
+Bonobo Git Server. Test: `tools/ci/package-smoke` compiles `Markup.cs`, which uses both types (CS0433 on the 0.1.0
+packages, passes on this branch's).
+
+### ConfigurationManager from .NET Framework libraries (#1)
+
+A library built for .NET Framework references `System.Configuration, Version=4.0.0.0`, the shared framework's facade,
+which forwards to `System.Configuration.ConfigurationManager`. The PseudoAppDomain left the facade to the default
+context, so its forwards resolved there too: a second ConfigurationManager, outside the domain, on the client
+configuration system (no web.config), whose `ConfigurationSection` isn't the one System.Web's sections derive from, so
+even `AppSettings` threw ("AppSettingsSection does not inherit from IConfigurationSectionHandler"). `System.Configuration`
+is now in `PseudoAppDomain.PerDomainFrameworkAssemblies`: the facade is loaded into each domain and forwards to the
+domain's ConfigurationManager. Hit by Microsoft.AspNet.SessionState.SessionStateModule (eShopLegacyMVC,
+eShopLegacyWebForms: every request) and WebActivatorEx (Bonobo Git Server: the site never started). Test:
+`RegressionTests.ConfigurationManagerThroughTheFrameworkFacadeReadsWebConfig` (`regressions/ConfigurationFacade.aspx`
+binds ConfigurationManager by the facade's name and reads web.config's appSettings and `system.web/sessionState`).
+
+### File change monitoring: one file under two spellings (#2)
+
+On Linux a second `CacheDependency` on a file already monitored, reached through a different spelling of its path,
+threw `ArgumentException: Item has already been added` from `DirectoryMonitor.AddFileMonitor`. The non-Windows branch
+of `FindFileData.FindFile` set `FileNameLong` to the full path, where `FindFirstFile` gives the file's name; the
+`DirectoryMonitor` keys its file monitors by `FileNameLong` but looks them up by name, so the second lookup missed and
+`Hashtable.Add` threw. Per-file change notifications still worked only because the `FileSystemWatcher` that stands in
+for `ReadDirectoryChangesW` also reported full paths. Both now use names as on Windows: `FindFile` returns the file
+name (and, in the overload relative to a root, the relative path, without the parent walk through `FindFirstFile`),
+and the watcher reports `FileSystemEventArgs.Name`, relative to the watched directory. That is also what
+`GetFileMonitorForSpecialDirectory` (App_Code, bin, App_GlobalResources) compares against. Hit by eShopLegacyMVC:
+`@Styles.Render`/`@Scripts.Render` when two first requests rendered the bundles. Test:
+`RegressionTests.TwoDependenciesOnOneFileBothSeeItChange` (two dependencies on one file, then a write that both must
+see).
+
+### `<handlers>` paths that start with `/` (#12)
+
+`WebServerModules.FindHandler` compared a handler path containing `/` with the request path without its leading `/`,
+but kept the pattern's own, so `path="/metaweblog"` never matched `metaweblog`. Both sides are now compared without the
+leading `/` (still anchored at the application root). Hit by MiniBlog: its XML-RPC endpoint (`/metaweblog`), feeds
+(`/feed/*`), comment and post handlers (`/comment.ashx`, `/post.ashx`) were 404. Tests:
+`RegressionTests.HandlerPathWithLeadingSlashMatches` (a wildcard and an exact path) and
+`HandlerPathWithLeadingSlashDoesNotMatchDeeper`.
+
+### URL Rewrite: Wildcard and ExactMatch, `{CACHE_URL}`, failing closed, query-only rewrites (#10, #11)
+
+webForCore hands each level's `<rewrite><rules>` to ASP.NET Core's IIS rewrite parser, which has only ECMAScript
+patterns and a fixed list of server variables. IIS's own "Remove WWW" template (`patternSyntax="Wildcard"`,
+`{CACHE_URL}`) made it throw, and webForCore then skipped every rule of the level, so a rule that blocked a path
+stopped blocking it. `InboundRewrite.TranslateRule` now rewrites each rule before parsing: Wildcard and ExactMatch
+patterns become the equivalent regular expressions (as `OutboundRewrite` already did), `{CACHE_URL}` becomes a variable
+the parser knows and webForCore otherwise doesn't serve (`{HTTP_PROXY_CONNECTION}`), which a server-variables feature
+answers with IIS's CACHE_URL while the level's rules run, and a Rewrite to a query string alone (`?slug={R:1}`) gets the
+level's root in front, where ASP.NET Core's `RewriteAction` threw `IndexOutOfRangeException` (#11). A redirect URL that
+is absolute only once evaluated (`{C:1}://{C:2}`) no longer gets the level's path base in front. Rules that still can't
+be parsed fail closed: every request below the level gets 500 (the error is logged), as IIS refuses configuration it
+can't apply. Hit by MiniBlog: its ten rules, among them the one answering `posts/*.xml` with 403, were all skipped, so
+the post files (commenters' e-mail addresses, drafts) were served; with the template working, its slug, paging and
+category rewrites crashed (#11). Tests: `RegressionTests.WildcardRuleWithCacheUrlRedirects`,
+`RulesNextToAWildcardRuleStillApply` (Wildcard and ExactMatch), `FilesTheRulesDontBlockAreServed`,
+`UnusableRulesFailClosed` and `RewriteToAQueryStringRunsTheLevelsDefaultDocument` (`regressions/rewrite` and
+`regressions/rewrite-unusable`); the 35 IISModuleTests still pass.
+
+### The directory redirect and routes (#13)
+
+The default-document step in front of the application answered every existing directory without a trailing slash
+with IIS's courtesy 301, before System.Web's routing had seen the request. On IIS, `UrlRoutingModule` maps the request
+to its route's handler first, and with `RouteExistingFiles` a route can take a URL that is also a directory; the
+native redirect runs only for the static file handler. The host now passes the middleware a `RouteClaims` entry point
+(`AspNetCoreHost.RouteClaims`, run in the application's domain: `RouteTable.Routes.GetRouteData` on the URL), and the
+redirect is skipped when a route takes the URL. Also, a directory with rewrite rules of its own got its trailing slash
+without a redirect (`InboundRewrite` ran `/dir` as the level's `/` and gave it back as `/dir/`); an unrewritten URL
+now keeps its spelling. Hit by Clean Architecture in ASP.NET MVC 5: its controllers share their feature folders'
+names (`Products/`, `Contact/`), so every link got a 301. Tests: `RegressionTests.RouteTakesADirectoryUrlWithRouteExistingFiles`
+(the IIS sample's `Application_Start` sets `RouteExistingFiles` with one page route for an existing folder) and
+`DirectoryWithoutARouteStillRedirects` (a plain folder and one with rewrite rules).
+
+### W3C logs outside the site (#15)
+
+`AddWebForms()`'s default `LogDirectory`, `Path.Combine(AppContext.BaseDirectory, "..", "logs", "W3SVC1")`, resolved
+inside the site (the build output is a direct subfolder of it), and `logs` isn't hidden, so the site served its own
+access log: client addresses and every URL with its query string. The default is now `$LOGS_DIRECTORY/W3SVC1` when
+systemd sets it (`tools/deploy/webforcore@.service` gains `LogsDirectory=webforcore/%i`, which its `ReadWritePaths`
+also needed: the old default wasn't writable under the unit), otherwise `logs/<site>/W3SVC1` next to the site folder.
+A log folder an application chooses inside the site is added to the site's excluded directories, which now take
+paths as well as names, and answers 404.8. Hit by every application the smoke test ran with the default
+`AddWebForms()` (ten). Tests: `RegressionTests.W3CLogsInTheSiteAreNotServed` (the IIS sample now logs to a plain folder
+of its own, `w3c-logs/W3SVC1`) and the package smoke test (the default: the log is next to the site, nothing is written
+in it, and the old URL is 404).
+
+### System.Web.DynamicData built and in the "Always" set (#8)
+
+As on .NET Framework 4.5+, `GridView`, `ListView`, `Repeater`, `FormView`, `DetailsView`, `CheckBoxList` and
+`RadioButtonList` call `DataControlExtensions.EnableDynamicData` in `OnInit` whenever `ItemType` is set, so every
+strongly-typed data control loads System.Web.DynamicData. It wasn't built (`<Build Project="false" />` in the
+solution), and every such control failed with `FileNotFoundException`. It builds now: the Entity Framework 1–4 model
+providers (`EF*Provider.cs`, on System.Data.Entity's `ObjectContext`) are compiled out as the LINQ to SQL ones already
+were, and so are the matching branches of `SchemaCreator`, `DynamicDataManager` (`LinqDataSource`, `EntityDataSource`),
+`DynamicDataExtensions.LoadWith`, and the EF 5 spatial column types in `MetaColumn` and `FieldTemplateFactory`
+(`#if NETFRAMEWORK`). `AssemblyRef.cs` names the designer assembly its attributes refer to (as System.Web.Mobile's
+does), and `ScaffoldTableAttribute`, which .NET dropped from System.ComponentModel.DataAnnotations, is supplied with the
+Reference Source's members. The unused `Microsoft.EntityFrameworkCore` package reference is gone. The `webForCore`
+package (and MIGRATING.md's "Always" table) includes it. Hit by eShopLegacyWebForms (its catalog is a ListView with
+`ItemType`) and the Visual Studio 2012+ Web Forms templates' model-bound pages. Tests:
+`RegressionTests.DataControlsWithItemTypeRender` (Repeater, ListView and GridView with `ItemType`, the last two through
+`SelectMethod` over a type with a `[MetadataType]` buddy class) and the package smoke test's `Typed.aspx`.
+
+### `AppDomain.CurrentDomain.BaseDirectory` (#3): documented, not changed
+
+On IIS each application runs in its own AppDomain, created with `ApplicationBase` set to the site's folder and `bin` as
+its private bin path, so `AppDomain.CurrentDomain.BaseDirectory` is the site root. .NET has one AppDomain per process:
+`BaseDirectory` is `AppContext.BaseDirectory`, the entry assembly's folder, `bin_dotnet/`. A PseudoAppDomain is an
+`AssemblyLoadContext` and has no base directory of its own. Making it the site root would mean setting
+`APP_CONTEXT_BASE_DIRECTORY` for the whole process, which moves what .NET libraries rely on (native libraries, data files
+next to the assemblies) and what eighteen places in webForCore use to find the build output, Microsoft's
+`HttpRuntime` and `ClientConfigurationHost` among them. So the difference is kept and documented (NAMESPACES.md,
+MIGRATING.md section 6), with the APIs that are the site root as on IIS: `HttpRuntime.AppDomainAppPath`,
+`HostingEnvironment.ApplicationPhysicalPath`, `Server.MapPath("~/")`. Hit by eShopLegacyMVC, whose database seed read
+its SQL scripts through `BaseDirectory`. Test: `RegressionTests.BaseDirectoryIsTheBuildOutputAndTheSiteApisAreTheSite`
+pins both, so the documentation can't silently go out of date.

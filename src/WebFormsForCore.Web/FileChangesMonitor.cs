@@ -520,6 +520,9 @@ namespace System.Web {
             _managedWatcher = null;
         }
 
+        // webForCore: names are relative to the watched directory (FileSystemEventArgs.Name), as ReadDirectoryChangesW
+        // reports them and as DirectoryMonitor keys its file monitors (FindFileData.FileNameLong); full paths matched
+        // only while FileNameLong was a full path off Windows (#2).
         void ForwardManagedNotification(FileAction action, string fileName) {
             long ticks = DateTime.UtcNow.ToFileTimeUtc();
             OnFileChange(action, fileName, ticks);
@@ -532,8 +535,8 @@ namespace System.Web {
                 }
             }
 
-            if (!String.IsNullOrEmpty(e.FullPath)) {
-                ForwardManagedNotification(FileAction.Added, e.FullPath);
+            if (!String.IsNullOrEmpty(e.Name)) {
+                ForwardManagedNotification(FileAction.Added, e.Name);
             }
         }
 
@@ -544,8 +547,8 @@ namespace System.Web {
                 }
             }
 
-            if (!String.IsNullOrEmpty(e.FullPath)) {
-                ForwardManagedNotification(FileAction.Removed, e.FullPath);
+            if (!String.IsNullOrEmpty(e.Name)) {
+                ForwardManagedNotification(FileAction.Removed, e.Name);
             }
         }
 
@@ -556,8 +559,8 @@ namespace System.Web {
                 }
             }
 
-            if (!String.IsNullOrEmpty(e.FullPath)) {
-                ForwardManagedNotification(FileAction.Modified, e.FullPath);
+            if (!String.IsNullOrEmpty(e.Name)) {
+                ForwardManagedNotification(FileAction.Modified, e.Name);
             }
         }
 
@@ -573,8 +576,8 @@ namespace System.Web {
                 OnFileChange(FileAction.RenamedOldName, e.OldName, ticks);
             }
 
-            if (!String.IsNullOrEmpty(e.FullPath)) {
-                OnFileChange(FileAction.RenamedNewName, e.FullPath, ticks);
+            if (!String.IsNullOrEmpty(e.Name)) {
+                OnFileChange(FileAction.RenamedNewName, e.Name, ticks);
             }
         }
 

@@ -22,7 +22,7 @@ namespace IISGate
                 dir = Path.GetDirectoryName(dir);
             }
             SampleDirectory = Path.Combine(dir ?? throw new InvalidOperationException("repo root not found"), "test", sample);
-            var logs = Path.Combine(SampleDirectory, "App_Data", "logs");
+            var logs = Path.Combine(SampleDirectory, "w3c-logs");
             if (Directory.Exists(logs))
             {
                 Directory.Delete(logs, recursive: true);

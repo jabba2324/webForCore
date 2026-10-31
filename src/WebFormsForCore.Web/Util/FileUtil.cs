@@ -571,9 +571,11 @@ namespace System.Web.Util
 			{
 				if (File.Exists(path))
 				{
+					// webForCore: the file's name, as FindFirstFile's cFileName (it was the full path, so DirectoryMonitor,
+					// which keys its monitors by FileNameLong and looks them up by name, added the same file twice: #2).
 					data = new FindFileData()
 					{
-						FileNameLong = path,
+						FileNameLong = Path.GetFileName(path),
 						FileNameShort = null,
 						FileAttributesData = new FileAttributesData(new FileInfo(path))
 					};
@@ -603,6 +605,19 @@ namespace System.Web.Util
 			int hr = FindFileData.FindFile(fullPath, out data);
 			if (hr != HResults.S_OK || String.IsNullOrEmpty(rootDirectoryPath))
 			{
+				return hr;
+			}
+
+			// webForCore: off Windows there are no short names, and the loop below walks the parents with FindFirstFile.
+			// The relative path is the same thing: prepend its directory to the file's name.
+			if (!OSInfo.IsWindows)
+			{
+				string relativeDirectory = Path.GetDirectoryName(Path.GetRelativePath(FileUtil.RemoveTrailingDirectoryBackSlash(rootDirectoryPath), fullPath));
+				if (!String.IsNullOrEmpty(relativeDirectory))
+				{
+					relativeDirectory += Path.DirectorySeparatorChar;
+					data.PrependRelativePath(relativeDirectory, relativeDirectory);
+				}
 				return hr;
 			}
 

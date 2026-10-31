@@ -1,3 +1,5 @@
+﻿#if NETFRAMEWORK
+// webForCore: Entity Framework 1-4 (System.Data.Entity's ObjectContext) and LINQ to SQL aren't on .NET (docs/NAMESPACES.md).
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Metadata.Edm;
@@ -71,3 +73,4 @@ namespace System.Web.DynamicData.ModelProviders {
         }
     }
 }
+#endif

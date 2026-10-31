@@ -1,6 +1,8 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Data.Spatial;
+#if NETFRAMEWORK
+using System.Data.Spatial; // webForCore: System.Data.Entity's spatial types (EF 5), not on .NET
+#endif
 using System.Diagnostics;
 using System.Globalization;
 using System.Web.Compilation;
@@ -86,8 +88,10 @@ namespace System.Web.DynamicData {
             _typesFallBacks[typeof(DateTime)] = typeof(string);
             _typesFallBacks[typeof(DateTimeOffset)] = typeof(string);
             _typesFallBacks[typeof(TimeSpan)] = typeof(string);
+#if NETFRAMEWORK
             _typesFallBacks[typeof(DbGeography)] = typeof(string);
             _typesFallBacks[typeof(DbGeometry)] = typeof(string);
+#endif
 
             // 
         }

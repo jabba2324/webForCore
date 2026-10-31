@@ -27,7 +27,7 @@ app.Run();
 | `UseWebForms(o => o.IsolateApplication(false))` | isolated | Runs the app in the default load context, so there's no in-process restart (see [Process model](#process-model)) |
 | `UseWebForms(o => o.Recycling(r => ...))` | IIS's defaults | `Time` (1740 min), `Requests`, `PrivateMemory` (KB), `MaxStuckDomains` (3), `CheckInterval` (30 s) |
 | `AddWebForms(o => o.Compression = false)` | on | IIS's static and dynamic compression |
-| `AddWebForms(o => o.LogDirectory = ...)` | `../logs/W3SVC1` | W3C log folder |
+| `AddWebForms(o => o.LogDirectory = ...)` | `$LOGS_DIRECTORY/W3SVC1` (systemd's `LogsDirectory=`), otherwise `logs/<site>/W3SVC1` next to the site folder | W3C log folder; never served, even if it is inside the site |
 | `AddWebForms(o => o.Systemd = false)` | on | `sd_notify` readiness and a watchdog |
 
 ## How configuration is read
@@ -49,12 +49,12 @@ There's no `applicationHost.config`, so locking sections (`overrideMode`, `allow
 | **Concurrent request limit** (`serverRuntime appConcurrentRequestLimit`) | Works | 503.2 above the limit (5000) |
 | **Custom headers** (`<httpProtocol>`) | Works | `customHeaders` on every response, including IIS's `X-Powered-By: ASP.NET`; `redirectHeaders` on 3xx; `removeServerHeader` |
 | **HTTP redirection** (`<httpRedirect>`) | Works | Destination with the rest of the URL appended, `exactDestination`, `childOnly`, wildcards, status Permanent/Found/Temporary/PermRedirect |
-| **URL Rewrite, inbound** (`<rewrite><rules>`) | Works | Rules at every level (web.config files and `<location>`s), applied as IIS distributes them: a level's rules apply below it, matched relative to that level, parents' rules first. `stopProcessing`, redirects, rewrites, conditions, rewrite maps, `isFile`/`isDirectory` |
+| **URL Rewrite, inbound** (`<rewrite><rules>`) | Works | Rules at every level (web.config files and `<location>`s), applied as IIS distributes them: a level's rules apply below it, matched relative to that level, parents' rules first. `stopProcessing`, redirects, rewrites (a rewrite to `?query` alone is to the level's root), conditions, rewrite maps, `isFile`/`isDirectory`, the ECMAScript, Wildcard and ExactMatch syntaxes, `{CACHE_URL}` (`scheme://host:port/path?query`). Rules ASP.NET Core's parser can't read (some server variables, such as request headers other than Accept, Connection, Cookie, Forwarded, Host, Referer and User-Agent) fail closed: requests below their level get 500, and the error is logged |
 | **URL Rewrite, outbound** (`<outboundRules>`) | Works | `RESPONSE_*` headers, and HTML bodies by `filterByTags` (A, Area, Base, Form, Frame, Head, IFrame, Img, Input, Link, Script, `<customTags>`) or the whole body. preConditions, conditions, `{R:n}`/`{C:n}`, rewrite maps, `{ToLower:}`/`{UrlEncode:}`/`{UrlDecode:}`. A compressed body isn't rewritten (IIS: 500.52) |
 | URL Rewrite: rules that set server variables (`<serverVariables>`) | Not built | The rule's other actions apply; the variables aren't set |
 | **IP and domain restrictions** (`<ipSecurity>`) | Works | First matching `<add>` decides (address with mask or prefix, or `domainName` with `enableReverseDns`), else `allowUnlisted`; `enableProxyMode` checks `X-Forwarded-For`; deny actions Forbidden (403.6, 403.8), Unauthorized, NotFound, AbortRequest |
 | **Dynamic IP restrictions** (`<dynamicIpSecurity>`) | Works | `denyByConcurrentRequests` (403.501), `denyByRequestRate` (403.502), logging-only mode, proxy mode |
-| **Default documents** (`<defaultDocument>`) | Works | IIS's list or yours, case-insensitive; 301 to add a missing trailing slash |
+| **Default documents** (`<defaultDocument>`) | Works | IIS's list or yours, case-insensitive; 301 to add a missing trailing slash, unless one of the application's routes takes the URL (`RouteExistingFiles`), as `UrlRoutingModule` does on IIS. The routes are known once the application has started (`Application_Start` runs with its first request) |
 | **Directory browsing** (`<directoryBrowse>`) | Works | IIS's listing format and `showFlags`; hidden segments, the output folder and dot files are left out |
 | Directory without a default document, browsing off | Partial | The request goes on to the application, as an extensionless URL does in integrated mode; IIS answers 403.14 |
 | **Static content** (`<staticContent>`) | Works | `<mimeMap>` over IIS's default map, 404.3 for an unmapped file, `<clientCache>` (max-age, expires, no-cache, custom `Cache-Control`) |
@@ -63,7 +63,7 @@ There's no `applicationHost.config`, so locking sections (`overrideMode`, `allow
 | **Managed handlers** (`<handlers>`) | Works | Managed entries are mapped before `<system.web><httpHandlers>`; `TransferRequestHandler` is skipped |
 | **URL authorization** (`<security><authorization>`) | Works | Any matching deny denies, then allow, otherwise 401 |
 | **Compression** (`<urlCompression>`, `<httpCompression>`) | Works | Through `AddWebForms()`: static on and dynamic off (IIS's defaults), MIME types, `minFileSizeForComp` (2,700 bytes), gzip |
-| **W3C logging** | Works | Daily files with IIS's fields, in ASP.NET Core's field order; `cs-uri-query` keeps its `?`. No `sc-substatus`, `sc-win32-status` or `cs-username` |
+| **W3C logging** | Works | Daily files with IIS's fields, in ASP.NET Core's field order; `cs-uri-query` keeps its `?`. No `sc-substatus`, `sc-win32-status` or `cs-username`. Outside the site by default, as IIS keeps them; a log folder inside the site answers 404.8. Entries are flushed every second; those not yet flushed when the process stops are lost |
 | Output caching (`<caching>`, kernel cache) | Partial | ASP.NET's output cache works; IIS's kernel and user-mode caches aren't there |
 | Server-side includes | Not built | |
 | Failed request tracing, request monitor | Not built | Use ASP.NET Core logging and `dotnet-trace` |

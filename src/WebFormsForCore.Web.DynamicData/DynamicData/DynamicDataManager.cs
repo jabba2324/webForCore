@@ -1,4 +1,4 @@
-namespace System.Web.DynamicData {
+﻿namespace System.Web.DynamicData {
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -13,7 +13,9 @@ namespace System.Web.DynamicData {
     using System.Web.UI;
     using System.Web.UI.WebControls;
     using System.Web.DynamicData.Util;
+#if NETFRAMEWORK
     using System.Data.Objects;
+#endif
     using IDataBoundControlInterface = System.Web.UI.WebControls.IDataBoundControl;
 
     /// <summary>
@@ -201,12 +203,15 @@ namespace System.Web.DynamicData {
             if (fieldControl != null) {
                 fieldControl.FieldsGenerator = new DefaultAutoFieldGenerator(table);
             }
+#if NETFRAMEWORK
             var linqDataSource = dataSource as LinqDataSource;
             var entityDataSource = dataSource as EntityDataSource;
+#endif
             // If the context type is not set, we need to set it
             if (dataSource.ContextType == null) {
                 dataSource.ContextType = table.DataContextType;
 
+#if NETFRAMEWORK
                 // If it's a LinqDataSurce, register for ContextCreating so the context gets created using the correct ctor
                 // Ideally, this would work with other datasource, but we just don't have the right abstraction
                 if (linqDataSource != null) {
@@ -220,6 +225,7 @@ namespace System.Web.DynamicData {
                         e.Context = (ObjectContext)table.CreateContext();
                     };
                 }
+#endif
             }
 
             // If the datasource doesn't have an EntitySetName (aka TableName), set it from the meta table
@@ -232,10 +238,12 @@ namespace System.Web.DynamicData {
                 dataSource.AutoGenerateWhereClause = true;
             }
 
+#if NETFRAMEWORK
             // If it's a LinqDataSource and the flag is set, pre load the foreign keys
             if (AutoLoadForeignKeys && linqDataSource != null) {
                 linqDataSource.LoadWithForeignKeys(table.EntityType);
             }
+#endif
 
             if (!isPostBack) {
                 if (table.HasPrimaryKey) {

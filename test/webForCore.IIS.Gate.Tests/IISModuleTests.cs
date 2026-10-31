@@ -288,7 +288,7 @@ namespace IISGate
         public async Task W3CLog()
         {
             await Get("/Default.aspx?w3c=1");
-            var logs = Path.Combine(_server.SampleDirectory, "App_Data", "logs");
+            var logs = Path.Combine(_server.SampleDirectory, "w3c-logs", "W3SVC1");
             string text = "";
             // ASP.NET Core's W3C logger writes cs-uri-query with its '?' (IIS without) and its own field order.
             for (int i = 0; i < 50 && !text.Contains("GET /Default.aspx ?w3c=1 200"); i++)
