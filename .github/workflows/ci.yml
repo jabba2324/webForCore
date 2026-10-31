@@ -55,11 +55,12 @@ jobs:
       - name: Build the build tasks
         run: dotnet build src/WebFormsForCore.Build/WebFormsForCore.Build.csproj -c Release
 
-      - name: Build
-        run: dotnet build WebFormsForCore.slnx -c Release -nodeReuse:false
-
+      # Before the build, which copies them next to System.Drawing.Common.Tests.
       - name: Test fonts
         run: tools/ci/fetch-test-fonts.sh
+
+      - name: Build
+        run: dotnet build WebFormsForCore.slnx -c Release -nodeReuse:false
 
       - name: Test
         run: tools/ci/run-tests.sh "$RUNNER_TEMP/TestResults"

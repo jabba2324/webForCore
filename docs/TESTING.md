@@ -12,9 +12,9 @@ with a reason, and 151 fail, all of them known System.Drawing differences (141 a
 ## Running the tests
 
 ```bash
+tools/ci/fetch-test-fonts.sh     # System.Drawing's test fonts (not redistributable, so not committed); before the build
 dotnet build src/WebFormsForCore.Build/WebFormsForCore.Build.csproj -c Release
 dotnet build WebFormsForCore.slnx -c Release
-tools/ci/fetch-test-fonts.sh     # System.Drawing's test fonts (not redistributable, so not committed)
 tools/lift/sqlserver.sh          # SQL Server in a container for Identity.Test (podman or docker)
 tools/ci/run-tests.sh            # every suite; .trx files and summary.md in ./TestResults
 ```
