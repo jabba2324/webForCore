@@ -68,6 +68,10 @@ namespace WebFormsForCore.Hosting.IIS
 
 		public WebServerConfiguration Configuration => config;
 
+		// Whether a route of the application takes a virtual path (set by WebFormsMiddleware: AspNetCoreHost.RouteClaims in
+		// the application's domain).
+		public Func<string, bool> RouteClaims { get; set; }
+
 		public async Task Invoke(HttpContext context, RequestDelegate application)
 		{
 			if (!options.Enabled)
@@ -264,6 +268,8 @@ namespace WebFormsForCore.Hosting.IIS
 			if (!Directory.Exists(mapped)) return false;
 			if (!path.EndsWith("/"))
 			{
+				// A route of the application takes it first (RouteExistingFiles), as UrlRoutingModule does on IIS (#13).
+				if (RouteClaims?.Invoke(context.Request.PathBase + path) == true) return false;
 				var location = context.Request.PathBase + path + "/" + context.Request.QueryString;
 				context.Response.StatusCode = 301;
 				context.Response.Headers.Location = location;

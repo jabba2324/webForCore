@@ -117,6 +117,9 @@ namespace WebFormsForCore.Hosting.IIS
 				var rewritten = request.Path.Value ?? "/";
 				request.PathBase = originalBase;
 				if (rewritten.StartsWith(SiteRoot, StringComparison.Ordinal)) rewritten = rewritten.Length > SiteRoot.Length ? rewritten.Substring(SiteRoot.Length) : "/";
+				// The level's own URL without its trailing slash ran as "/"; unrewritten, it stays as it was, so the default
+				// document's courtesy redirect still adds the slash (it was added silently: #13).
+				else if (prefix.Length > 0 && rewritten == "/" && path.Length == prefix.Length) rewritten = path;
 				else if (prefix.Length > 0) rewritten = prefix + rewritten;
 				request.Path = rewritten;
 				var location = context.Response.Headers.Location.ToString();

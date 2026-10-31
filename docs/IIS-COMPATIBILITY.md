@@ -54,7 +54,7 @@ There's no `applicationHost.config`, so locking sections (`overrideMode`, `allow
 | URL Rewrite: rules that set server variables (`<serverVariables>`) | Not built | The rule's other actions apply; the variables aren't set |
 | **IP and domain restrictions** (`<ipSecurity>`) | Works | First matching `<add>` decides (address with mask or prefix, or `domainName` with `enableReverseDns`), else `allowUnlisted`; `enableProxyMode` checks `X-Forwarded-For`; deny actions Forbidden (403.6, 403.8), Unauthorized, NotFound, AbortRequest |
 | **Dynamic IP restrictions** (`<dynamicIpSecurity>`) | Works | `denyByConcurrentRequests` (403.501), `denyByRequestRate` (403.502), logging-only mode, proxy mode |
-| **Default documents** (`<defaultDocument>`) | Works | IIS's list or yours, case-insensitive; 301 to add a missing trailing slash |
+| **Default documents** (`<defaultDocument>`) | Works | IIS's list or yours, case-insensitive; 301 to add a missing trailing slash, unless one of the application's routes takes the URL (`RouteExistingFiles`), as `UrlRoutingModule` does on IIS. The routes are known once the application has started (`Application_Start` runs with its first request) |
 | **Directory browsing** (`<directoryBrowse>`) | Works | IIS's listing format and `showFlags`; hidden segments, the output folder and dot files are left out |
 | Directory without a default document, browsing off | Partial | The request goes on to the application, as an extensionless URL does in integrated mode; IIS answers 403.14 |
 | **Static content** (`<staticContent>`) | Works | `<mimeMap>` over IIS's default map, 404.3 for an unmapped file, `<clientCache>` (max-age, expires, no-cache, custom `Cache-Control`) |

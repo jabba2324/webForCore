@@ -120,5 +120,28 @@ namespace IISGate
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Contains("rewrite default page, slug=hello-world", body);
         }
+
+        // #13: with RouteExistingFiles, a route takes a URL that is also a directory, before IIS's courtesy redirect to
+        // the trailing slash. Clean Architecture in ASP.NET MVC 5 (feature folders Products/ and Contact/ named like their
+        // controllers) got a 301 to /Products/ for every link.
+        [Fact]
+        public async Task RouteTakesADirectoryUrlWithRouteExistingFiles()
+        {
+            var (response, body) = await Get("/regressions/routed");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("routed page for /regressions/routed", body);
+        }
+
+        // A directory no route takes still gets the courtesy redirect, also one with its own rewrite rules (where the
+        // slash used to be added without a redirect).
+        [Theory]
+        [InlineData("/regressions/unrouted")]
+        [InlineData("/regressions/rewrite")]
+        public async Task DirectoryWithoutARouteStillRedirects(string url)
+        {
+            var (response, _) = await Get(url);
+            Assert.Equal(HttpStatusCode.MovedPermanently, response.StatusCode);
+            Assert.Equal(url + "/", response.Headers.Location?.OriginalString);
+        }
     }
 }

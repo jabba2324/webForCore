@@ -64,6 +64,7 @@ namespace Microsoft.AspNetCore.Builder
 			public Func<Core.HttpContext, bool> IsLegacyRequest;
 			public Func<Core.HttpContext, Task> ProcessRequest;
 			public Action Shutdown;
+			public Func<string, bool> RouteClaims;
 			public DateTime Started = DateTime.UtcNow;
 			public long Requests;
 			public int Generation;
@@ -114,6 +115,7 @@ namespace Microsoft.AspNetCore.Builder
 				webServer.ExcludedDirectories.Add(Path.GetFileName(path));
 				webServer.ExcludedDirectories.Add("obj");
 				iisModules = new IISModules(webServer, IIS, loggerFactory, environment);
+				iisModules.RouteClaims = virtualPath => GetApplication().RouteClaims?.Invoke(virtualPath) ?? false;
 				if (webServerAccessor != null) webServerAccessor.Configuration = webServer;
 			}
 			lifetime?.ApplicationStopping.Register(() =>
@@ -171,6 +173,7 @@ namespace Microsoft.AspNetCore.Builder
 			app.IsLegacyRequest = (Func<Core.HttpContext, bool>)host[0];
 			app.ProcessRequest = (Func<Core.HttpContext, Task>)host[1];
 			app.Shutdown = (Action)host[2];
+			app.RouteClaims = (Func<string, bool>)host[3];
 			logger.LogInformation("Started application {AppId} (start {Generation}{Domain}).", AppId, app.Generation,
 				app.Domain != null ? ", in a PseudoAppDomain" : "");
 			return app;

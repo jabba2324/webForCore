@@ -163,7 +163,29 @@ namespace System.Web.Hosting
                 new Func<Core.HttpContext, bool>(host.IsLegacyRequest),
                 new Func<Core.HttpContext, Task>(host.ProcessRequest),
                 new Action(host.Shutdown),
+                new Func<string, bool>(host.RouteClaims),
             };
+        }
+
+        // webForCore: whether one of the application's routes takes the URL, for the IIS modules in front of it. On IIS,
+        // UrlRoutingModule maps a request to its route's handler before the native modules' courtesy redirect of a
+        // directory to its trailing slash, which runs only for the static file handler; RouteTable.GetRouteData skips
+        // existing files and directories unless RouteExistingFiles is set, as on IIS (#13). The routes are those of the
+        // started application: Application_Start runs with the first request it processes.
+        public bool RouteClaims(string virtualPath)
+        {
+            var routes = System.Web.Routing.RouteTable.Routes;
+            if (!routes.RouteExistingFiles || routes.Count == 0) return false;
+            try
+            {
+                var request = new HttpRequest(string.Empty, "http://localhost" + virtualPath, string.Empty);
+                var context = new HttpContextWrapper(new HttpContext(request, new HttpResponse(System.IO.TextWriter.Null)));
+                return routes.GetRouteData(context) != null;
+            }
+            catch (Exception)
+            {
+                return false; // a route that can't be evaluated outside a request leaves the URL to IIS's behaviour
+            }
         }
 
         #region IRegisteredObject Members

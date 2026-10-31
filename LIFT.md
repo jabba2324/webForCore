@@ -1697,3 +1697,17 @@ category rewrites crashed (#11). Tests: `RegressionTests.WildcardRuleWithCacheUr
 `RulesNextToAWildcardRuleStillApply` (Wildcard and ExactMatch), `FilesTheRulesDontBlockAreServed`,
 `UnusableRulesFailClosed` and `RewriteToAQueryStringRunsTheLevelsDefaultDocument` (`regressions/rewrite` and
 `regressions/rewrite-unusable`); the 35 IISModuleTests still pass.
+
+### The directory redirect and routes (#13)
+
+The default-document step in front of the application answered every existing directory without a trailing slash
+with IIS's courtesy 301, before System.Web's routing had seen the request. On IIS, `UrlRoutingModule` maps the request
+to its route's handler first, and with `RouteExistingFiles` a route can take a URL that is also a directory; the
+native redirect runs only for the static file handler. The host now passes the middleware a `RouteClaims` entry point
+(`AspNetCoreHost.RouteClaims`, run in the application's domain: `RouteTable.Routes.GetRouteData` on the URL), and the
+redirect is skipped when a route takes the URL. Also, a directory with rewrite rules of its own got its trailing slash
+without a redirect (`InboundRewrite` ran `/dir` as the level's `/` and gave it back as `/dir/`); an unrewritten URL
+now keeps its spelling. Hit by Clean Architecture in ASP.NET MVC 5: its controllers share their feature folders'
+names (`Products/`, `Contact/`), so every link got a 301. Tests: `RegressionTests.RouteTakesADirectoryUrlWithRouteExistingFiles`
+(the IIS sample's `Application_Start` sets `RouteExistingFiles` with one page route for an existing folder) and
+`DirectoryWithoutARouteStillRedirects` (a plain folder and one with rewrite rules).
