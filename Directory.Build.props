@@ -4,7 +4,7 @@
         <netlatest>net11.0</netlatest>
 
         <LangVersion>14</LangVersion>
-        <Version>0.3.0</Version>
+        <Version>0.4.0</Version>
         <AssemblyVersion>11.0.0.0</AssemblyVersion>
         <AssemblyFileVersion>11.0.0.0</AssemblyFileVersion>
         <FileVersion>11.0.0.0</FileVersion>
