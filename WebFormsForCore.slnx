@@ -13,9 +13,6 @@
     <File Path=".gitignore" />
     <File Path="Directory.Build.props" />
     <File Path="global.json" />
-    <File Path="NugetApiKey.txt" />
-    <File Path="pack.bat" />
-    <File Path="PushToNuget.bat" />
     <File Path="README.md" />
     <File Path="src/VersionInfo.cs" />
     <File Path="www/index.html" />
