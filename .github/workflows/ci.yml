@@ -102,8 +102,11 @@ jobs:
       - name: Pack
         run: tools/ci/pack.sh ${{ steps.version.outputs.version }} "$RUNNER_TEMP/packages"
 
-      # An application that references the webForCore package (not the projects) builds, runs and serves pages.
+      # An application that references the webForCore package (not the projects) builds, runs and serves pages; the MVC
+      # one also uses webForCore-thirdparty's WebActivatorEx.
       - name: Package smoke test
+        env:
+          GH_TOKEN: ${{ github.token }}  # webForCore-thirdparty's release (webForCore.WebActivatorEx)
         run: tools/ci/package-smoke.sh "$RUNNER_TEMP/packages" ${{ steps.version.outputs.version }}
 
       - name: Upload packages

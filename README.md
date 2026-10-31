@@ -10,6 +10,9 @@ and tested with Microsoft's own test suites. The parts IIS used to provide (requ
 documents, custom errors, compression, logging, AppDomain recycling) run in front of the app on Kestrel and are
 configured from the app's existing `<system.webServer>` section.
 
+webForCore ships only Microsoft assemblies. Third-party libraries that need changes to run on it (WebActivatorEx,
+AjaxControlToolkit) are built and released by [webForCore-thirdparty](https://github.com/jabba2324/webForCore-thirdparty).
+
 The reference behaviour is .NET Framework 4.8 on IIS 10. Where .NET 11 behaves differently and webForCore can't
 restore the old behaviour, the difference is documented.
 
@@ -32,7 +35,7 @@ restore the old behaviour, the difference is documented.
 | ASP.NET Identity 2 | Core, EntityFramework (EF 6.5), Owin | |
 | Configuration | System.Configuration (web.config, machine.config, protected sections) | DPAPI and RSA key containers work on Linux |
 | Drawing | System.Drawing.Common 6.0 | Microsoft's managed code over a GDI+ engine written on SkiaSharp; no libgdiplus |
-| Optimization | System.Web.Optimization, WebGrease, AjaxControlToolkit | |
+| Optimization | System.Web.Optimization, WebGrease | |
 
 What doesn't work, and why, is in [docs/NAMESPACES.md](docs/NAMESPACES.md). The main gaps are Windows
 authentication and impersonation, WCF service hosting, metafiles (EMF/WMF), and Windows-only APIs (registry, COM,

@@ -2,8 +2,6 @@ BSD 3-Clause License
 
 This licence applies to the components below (see NOTICE), each under its own copyright notice:
 
-  * AjaxControlToolkit (src/WebFormsForCore.AjaxControlToolkit):
-    Copyright (c) 2012-2020, CodePlex Foundation. All rights reserved.
   * Redesigner (src/WebFormsForCore.Build/Redesigner):
     Copyright (c) 2012-2013 by Sean Werkema. All rights reserved.
     (Released under the "New BSD License", which has the first two conditions below.)

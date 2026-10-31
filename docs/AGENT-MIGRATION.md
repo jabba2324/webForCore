@@ -76,6 +76,16 @@ app's solution and add that folder as a package source in `nuget.config` (`docs/
 gh release download --repo jabba2324/webForCore --pattern '*.nupkg' --dir packages   # latest release
 ```
 
+webForCore ships only Microsoft assemblies. If the app uses WebActivatorEx (directly, or through Unity.Mvc,
+Ninject.MVC, StructureMap.MVC and the like) or AjaxControlToolkit, also download webForCore-thirdparty's packages into
+the same folder and reference `webForCore.WebActivatorEx` or `webForCore.AjaxControlToolkit` (`docs/MIGRATING.md`
+section 3); the original WebActivatorEx package's start methods never run on webForCore. From source, build that
+repository next to webForCore instead.
+
+```bash
+gh release download --repo jabba2324/webForCore-thirdparty --pattern '*.nupkg' --dir packages
+```
+
 The app then uses `PackageReference`s (`webForCore` and the framework packages) instead of project references, and
 no `<Import>` of `webForCore.WebStack.targets`. Otherwise, or if the user asks for source, clone and build it next to
 the app (or use the path the user gives):

@@ -24,7 +24,6 @@ legal advice: for a product decision, have counsel review NOTICE and this page.
 | StronglyTypedResourceBuilder (from Mono); Mono code in System.Web, WebGrease and the SoapFormatter | `src/WebFormsForCore.Web/WebFormsForCore/mono` and others | MIT (© Novell and others) | ✅ Yes |
 | BinaryFormatter port, FontConverter (from .NET) | `src/WebFormsForCore.Serialization.Formatters`, `src/WebFormsForCore.Drawing` | MIT (© .NET Foundation) | ✅ Yes |
 | ASP.NET Web Optimization, WebGrease, Microsoft Ajax Minifier | `src/WebFormsForCore.Web.Optimization*`, `src/WebFormsForCore.WebGrease` | Apache 2.0 (© Microsoft) | ✅ Yes |
-| AjaxControlToolkit | `src/WebFormsForCore.AjaxControlToolkit` | BSD 3-Clause (© CodePlex Foundation) | ✅ Yes |
 | Redesigner (build-time designer file generator) | `src/WebFormsForCore.Build/Redesigner` | BSD 3-Clause (© Sean Werkema) | ✅ Yes |
 | Roslyn compilers (binaries) | `src/WebFormsForCore.Compilers` | MIT (© .NET Foundation) | ✅ Yes |
 | Dependencies from NuGet: SkiaSharp, EntityFramework 6, Newtonsoft.Json, CoreWCF, System.Data.SqlClient, ... | restored at build time | MIT or Apache 2.0, each package's own | ✅ Yes |

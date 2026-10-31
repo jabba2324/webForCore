@@ -1,11 +1,4 @@
 <Project>
-  <!-- webForCore: System.Drawing.Common with GDI+ on SkiaSharp (src/webForCore.System.Drawing.Common) in place of the
-       Windows-only package, also for the AjaxControlToolkit submodule (its repository is upstream's, so the change is
-       made here rather than in its project file). -->
-  <ItemGroup Condition="'$(MSBuildProjectName)' == 'AjaxControlToolkit' AND '$(TargetFramework)' != 'net48'">
-    <PackageReference Remove="System.Drawing.Common" />
-    <ProjectReference Include="$(MSBuildThisFileDirectory)src/webForCore.System.Drawing.Common/webForCore.System.Drawing.Common.csproj" Aliases="Legacy" />
-  </ItemGroup>
   <!-- webForCore: the fork's System.Web contains Microsoft's System.Web.HttpUtility (as on .NET Framework). The shared
        framework also has a System.Web.HttpUtility.dll with a System.Web.HttpUtility type, so in projects that reference
        the fork's System.Web the compiler would see two (CS0433). Drop the framework copy there, as the projects already

@@ -53,11 +53,8 @@ Summary
                                               .Web.Optimization.WebForms
   WebGrease, Microsoft Ajax Minifier          src/WebFormsForCore.WebGrease                 Apache-2.0 (Microsoft);
                                                                                             Mono parts MIT
-  AjaxControlToolkit                          src/WebFormsForCore.AjaxControlToolkit        BSD-3-Clause (CodePlex
-                                                                                            Foundation)
   Redesigner                                  src/WebFormsForCore.Build/Redesigner          BSD-3-Clause (Sean Werkema)
-  JavaScript libraries in the TestApp and     Bootstrap, jQuery, Modernizr, Jasmine,        MIT (their authors)
-    AjaxControlToolkit test site              Detect.js (MIT option of MIT/GPL)
+  JavaScript libraries in the TestApp         Bootstrap, jQuery, Modernizr                  MIT (their authors)
   SkiaSharp (NuGet), Skia                     package dependency of System.Drawing.Common   MIT (Microsoft, Xamarin);
                                                                                             BSD-3-Clause (Google)
 
@@ -163,12 +160,6 @@ Minifier (https://github.com/Licshee/WebGrease, a mirror of Microsoft's WebGreas
 License, Version 2.0, Copyright (c) Microsoft Corporation. They live in src/WebFormsForCore.Web.Optimization,
 src/WebFormsForCore.Web.Optimization.WebForms and src/WebFormsForCore.WebGrease. WebGrease's System.Resources files
 come from Mono (MIT License, Copyright (c) Novell, Inc. and Xamarin Inc.).
-
-AjaxControlToolkit (https://github.com/DevExpress/AjaxControlToolkit, through
-https://github.com/simonegli8/WebFormsForCore.AjaxControlToolkit commit 0c5b111, with webForCore's changes) is
-licensed under the BSD 3-Clause License, Copyright (c) 2012-2020, CodePlex Foundation (see LICENSE-BSD-3-CLAUSE.txt
-and src/WebFormsForCore.AjaxControlToolkit/LICENSE.txt). Its Jasmine test site includes Jasmine (MIT, Pivotal Labs),
-jQuery (MIT, jQuery Foundation) and Detect.js (MIT/GPL dual licence, used under MIT, Darcy Clarke).
 
 Redesigner (https://github.com/seanofw/Redesigner, through https://github.com/simonegli8/Redesigner), in
 src/WebFormsForCore.Build/Redesigner, is licensed under the New BSD License, Copyright (c) 2012-2013 by Sean Werkema

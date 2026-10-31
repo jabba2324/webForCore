@@ -29,9 +29,6 @@
          .NET 3.5 libraries reference (#20). -->
     <ProjectReference Include="..\WebFormsForCore.Web.Abstractions\WebFormsForCore.Web.Abstractions.csproj" />
     <ProjectReference Include="..\WebFormsForCore.Web.Routing\WebFormsForCore.Web.Routing.csproj" />
-    <!-- WebActivatorEx, which finds its attributes in the application's load context (#21); packages that bring the
-         original (Unity.Mvc, Ninject.MVC, ...) get this one. -->
-    <ProjectReference Include="..\WebFormsForCore.WebActivatorEx\WebFormsForCore.WebActivatorEx.csproj" />
     <!-- .NET Framework's System.Net.Http.WebRequest (WebRequestHandler), which Katana's social providers create (#18). -->
     <ProjectReference Include="..\WebFormsForCore.Net.Http.WebRequest\WebFormsForCore.Net.Http.WebRequest.csproj" />
     <ProjectReference Include="..\WebFormsForCore.Web.RegularExpressions\WebFormsForCore.Web.RegularExpressions.csproj" />

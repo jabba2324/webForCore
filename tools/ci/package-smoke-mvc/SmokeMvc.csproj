@@ -2,7 +2,8 @@
 
   <!-- An MVC 5 and OWIN application that uses webForCore through its packages only (tools/ci/package-smoke.sh), with
        the third-party packages real applications have: Unity.Mvc and WebActivatorEx (which bring Microsoft.AspNet.Mvc,
-       Razor and Web Pages back transitively, #23, and start Unity, #21) and Katana's Google provider (#18). -->
+       Razor and Web Pages back transitively, #23, and start Unity, #21) and Katana's Google provider (#18). WebActivatorEx
+       starts nothing on .NET (#21); webForCore-thirdparty's webForCore.WebActivatorEx replaces it. -->
   <PropertyGroup>
     <TargetFramework>net11.0</TargetFramework>
     <OutputType>Exe</OutputType>
@@ -30,6 +31,7 @@
     <PackageReference Include="webForCore.Web.Mvc" Version="$(WebForCoreVersion)" />
     <PackageReference Include="webForCore.Microsoft.Owin.Host.SystemWeb" Version="$(WebForCoreVersion)" />
     <PackageReference Include="webForCore.Microsoft.Owin.Security.Cookies" Version="$(WebForCoreVersion)" />
+    <PackageReference Include="webForCore.WebActivatorEx" Version="$(ThirdPartyVersion)" />
   </ItemGroup>
 
   <ItemGroup>

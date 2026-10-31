@@ -38,7 +38,9 @@ release version and attaches the packages to a GitHub release, with `docs/releas
 that references only the `webForCore` package from that folder is built, started, and must serve a page and code
 compiled from App_Code. Then `tools/ci/package-smoke-mvc`, an MVC 5 and OWIN app with the third-party packages real
 applications have (Unity.Mvc, WebActivatorEx, Katana's Google provider) as they have them, must render Razor views,
-construct a controller through Unity registered by a WebActivatorEx start method, and redirect a Google challenge.
+construct a controller through Unity registered by a WebActivatorEx start method, and redirect a Google challenge. Its
+`webForCore.WebActivatorEx` comes from [webForCore-thirdparty](https://github.com/jabba2324/webForCore-thirdparty)'s latest release (`gh release download`; or
+`THIRDPARTY_PACKAGES`, a folder of its packages), since webForCore ships only Microsoft assemblies.
 
 ## The suites
 

@@ -45,14 +45,39 @@ log=$(ls "$base"/logs/site/W3SVC1/ 2>/dev/null | head -1 || true)
 if [ $fail -ne 0 ]; then cat server.log; exit 1; fi
 kill $server; wait $server 2>/dev/null || true
 
-# tools/ci/package-smoke-mvc: MVC 5 and OWIN with the third-party packages applications have, as they have them.
+# tools/ci/package-smoke-mvc: MVC 5 and OWIN with the third-party packages applications have, as they have them, and
+# webForCore.WebActivatorEx from webForCore-thirdparty's latest release (webForCore ships only Microsoft assemblies), or
+# from $THIRDPARTY_PACKAGES, a folder of its packages.
 mvc=$base/mvc; mkdir "$mvc"
 cp -r "$here/package-smoke-mvc/." "$mvc"
-cp nuget.config "$mvc"
 cd "$mvc"
-dotnet build SmokeMvc.csproj -c Release -p:WebForCoreVersion="$version" -nodeReuse:false
-# The output has webForCore's MVC, Razor, Web Pages and WebActivatorEx, not the .NET Framework ones that Unity.Mvc and
-# WebActivatorEx bring (issue #23: Microsoft.AspNet.Razor and WebPages won the SDK's conflict resolution on file version).
+thirdparty=${THIRDPARTY_PACKAGES:-}
+if [ -z "$thirdparty" ]; then
+  thirdparty=$base/thirdparty
+  gh release download --repo jabba2324/webForCore-thirdparty --pattern 'webForCore.WebActivatorEx.*.nupkg' --dir "$thirdparty"
+fi
+thirdparty=$(cd "$thirdparty" && pwd)
+thirdpartyversion=$(ls "$thirdparty" | sed -n 's/^webForCore\.WebActivatorEx\.\(.*\)\.nupkg$/\1/p' | sort -V | tail -1)
+cat > nuget.config <<CONFIG
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <packageSources>
+    <clear />
+    <add key="thirdparty" value="$thirdparty" />
+    <add key="webForCore" value="$packages" />
+    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+  </packageSources>
+  <packageSourceMapping>
+    <packageSource key="thirdparty"><package pattern="webForCore.WebActivatorEx" /></packageSource>
+    <packageSource key="webForCore"><package pattern="webForCore" /><package pattern="webForCore.*" /></packageSource>
+    <packageSource key="nuget.org"><package pattern="*" /></packageSource>
+  </packageSourceMapping>
+</configuration>
+CONFIG
+dotnet build SmokeMvc.csproj -c Release -p:WebForCoreVersion="$version" -p:ThirdPartyVersion="$thirdpartyversion" -nodeReuse:false
+# The output has webForCore's MVC, Razor and Web Pages, and webForCore-thirdparty's WebActivatorEx, not the .NET
+# Framework ones that Unity.Mvc and WebActivatorEx bring (issue #23: Microsoft.AspNet.Razor and WebPages won the SDK's
+# conflict resolution on file version).
 if grep -q -E '"lib/net4[0-9]*/(System\.Web\.(Mvc|Razor|WebPages[A-Za-z.]*)|WebActivatorEx)\.dll"' bin_dotnet/SmokeMvc.deps.json; then
   echo "deps.json: .NET Framework assemblies replaced webForCore's:"
   grep -o -E '"lib/net4[0-9]*/(System\.Web\.(Mvc|Razor|WebPages[A-Za-z.]*)|WebActivatorEx)\.dll"' bin_dotnet/SmokeMvc.deps.json | sort -u
@@ -75,4 +100,4 @@ echo "$home" | grep -q "post-start: True" || { echo "/: PostApplicationStartMeth
 location=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' http://127.0.0.1:5198/challenge)
 case "$location" in "302 https://accounts.google.com/"*) ;; *) echo "/challenge: $location"; fail=1;; esac
 if [ $fail -ne 0 ]; then cat server.log; exit 1; fi
-echo "Package smoke test passed ($version)."
+echo "Package smoke test passed ($version; webForCore.WebActivatorEx $thirdpartyversion)."

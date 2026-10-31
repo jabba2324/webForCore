@@ -1,1 +1,0 @@
-﻿// Localization.Resources.js mock
