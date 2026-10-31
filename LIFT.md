@@ -1492,9 +1492,11 @@ Results: 3 restarts each, every old domain collected: IIS sample 3/3, MVC 3/3, W
 tests now assert it (IIS, MVC and Web API: restart, then "(start 1) unloaded." within a minute; the samples check every
 2 seconds through `GATE_RECYCLE_CHECK`).
 
-Not covered yet: caches that hold app types only on paths the samples don't use (`TypeDescriptor.AddProvider` from
-DynamicData's `MetaModel`, `LicenseManager`, Hashtable-based caches that need their owner's lock). The stuck-domain
-report and `MaxStuckDomains` remain as the safety net.
+`TypeDescriptor` needs nothing: .NET 11 keeps its tables by collectible-aware keys, and a provider registered for an
+application type (`TypeDescriptor.AddProviderTransparent`, as MVC apps and DynamicData's `MetaModel` do) does not keep
+the domain (data/Binding.aspx registers one; 2 of 2 old domains collected). Not covered yet: caches that hold app types
+only on paths the samples don't use (`LicenseManager`, Hashtable-based caches that need their owner's lock). The
+stuck-domain report and `MaxStuckDomains` remain as the safety net.
 
 ### Two intermittent test failures fixed (31 Oct 2026)
 

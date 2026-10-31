@@ -8,6 +8,8 @@
         Books.DataBind();
         Table.DataSource = IISSample.Shelf.Table();
         Table.DataBind();
+        // As MVC and DynamicData apps register buddy-class providers (usually in Application_Start).
+        TypeDescriptor.AddProviderTransparent(new AssociatedMetadataTypeTypeDescriptionProvider(typeof(IISSample.Book), typeof(IISSample.BookMetadata)), typeof(IISSample.Book));
         var title = TypeDescriptor.GetProperties(typeof(IISSample.Book))["Title"];
         var provider = new AssociatedMetadataTypeTypeDescriptionProvider(typeof(IISSample.Book));
         var display = provider.GetTypeDescriptor(typeof(IISSample.Book)).GetProperties()["Title"].Attributes[typeof(DisplayAttribute)] as DisplayAttribute;
