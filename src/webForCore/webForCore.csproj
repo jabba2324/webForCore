@@ -29,6 +29,9 @@
          .NET 3.5 libraries reference (#20). -->
     <ProjectReference Include="..\WebFormsForCore.Web.Abstractions\WebFormsForCore.Web.Abstractions.csproj" />
     <ProjectReference Include="..\WebFormsForCore.Web.Routing\WebFormsForCore.Web.Routing.csproj" />
+    <!-- WebActivatorEx, which finds its attributes in the application's load context (#21); packages that bring the
+         original (Unity.Mvc, Ninject.MVC, ...) get this one. -->
+    <ProjectReference Include="..\WebFormsForCore.WebActivatorEx\WebFormsForCore.WebActivatorEx.csproj" />
     <ProjectReference Include="..\WebFormsForCore.Web.RegularExpressions\WebFormsForCore.Web.RegularExpressions.csproj" />
     <ProjectReference Include="..\WebFormsForCore.Serialization.Formatters\WebFormsForCore.Serialization.Formatters.csproj" />
     <ProjectReference Include="..\WebFormsForCore.Drawing\WebFormsForCore.Drawing.csproj" />

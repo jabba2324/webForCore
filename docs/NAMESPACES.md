@@ -236,6 +236,7 @@ Caveats:
 | Assembly | Purpose |
 | --- | --- |
 | WebFormsForCore.Serialization.Formatters | A port of BinaryFormatter (and SoapFormatter) in the `WebFormsForCore.Serialization.Formatters.Binary` namespace, with surrogates for .NET Framework types .NET no longer serializes. System.Web uses it for out-of-process session state, view state and the output cache. Subclasses of `NameObjectCollectionBase` that override `GetObjectData` aren't handled |
+| WebActivatorEx (2.0.0.0) | WebActivatorEx's `PreApplicationStartMethod`, `PostApplicationStartMethod` and `ApplicationShutdownMethod` attributes and `ActivationManager`, written from its documented API with the original's name, version and public key. Part of the "Always" set, and preferred over the original package that Unity.Mvc, Ninject.MVC and others bring. It finds the attributes in the application's load context; the original's `Assembly.LoadFrom` returned copies in the default context, and no start method ran (#21). The `webactivator:assembliesToScan` setting isn't read: only assemblies that reference WebActivatorEx are scanned |
 | WebFormsForCore.Compilers | Roslyn `csc`/`vbc` for run-time compilation |
 | aspnetcore_compiler | aspnet_compiler for .NET (precompiled sites) |
 | webforcore-regiis | aspnet_regiis's protected-configuration commands |

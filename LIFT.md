@@ -1803,3 +1803,20 @@ the webForCore packages in the build to `PackageConflictPreferredPackages`, whic
 the `ExcludeAssets` step in MIGRATING.md unnecessary for applications on the packages. Test: `tools/ci/package-smoke-mvc`,
 an MVC application with `Unity.Mvc` 5.11.1 as applications have it, whose `/Plain` view failed with that exception on the
 0.2.0 packages.
+
+### WebActivatorEx (#21)
+
+WebActivatorEx (by David Ebbo, Apache 2.0; used by Unity.Mvc, Ninject.MVC, StructureMap.MVC, Glimpse and many
+application templates) finds its `PreApplicationStartMethod`, `PostApplicationStartMethod` and
+`ApplicationShutdownMethod` attributes with `Assembly.LoadFrom` on every DLL in `HttpRuntime.BinDirectory`. On .NET,
+`LoadFrom` always loads into the default `AssemblyLoadContext`. In a PseudoAppDomain it returned second copies of the
+application's assemblies, whose attributes are the default context's WebActivatorEx types, so none matched and no
+method ran, with no error. ApplicantTracking's Unity resolver was never registered ("No parameterless constructor
+defined" for every controller); Roadkill's StructureMap container stayed null. .NET has no hook for `LoadFrom`, so
+webForCore ships its own WebActivatorEx: `src/WebFormsForCore.WebActivatorEx`, written from the documented API, with the
+original's name, version 2.0.0.0 and public key. It loads the assemblies by name into its own context (the
+application's), and scans only those that reference WebActivatorEx (read from their metadata, without loading the
+rest). It is in the "Always" set; the original package, which Unity.Mvc and others bring, loses the conflict to it
+(#23's `WebForCorePreferItsPackages`). New code, not Microsoft's. `docs/IIS-COMPATIBILITY.md` lists `Assembly.LoadFrom` as
+a difference. Test: `tools/ci/package-smoke-mvc`, where Unity.Mvc's activator registers the resolver that constructs
+`HomeController`, and a post-start method runs ("No parameterless constructor defined" on the 0.2.0 packages).

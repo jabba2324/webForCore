@@ -57,5 +57,11 @@ for i in $(seq 120); do curl -s -o /dev/null http://127.0.0.1:5198/ && break; sl
 # A Razor view renders although Unity.Mvc brings Microsoft.AspNet.Razor 3.2.7 (issue #23: it replaced webForCore's in
 # the output, and every view failed with a MissingMethodException).
 curl -s http://127.0.0.1:5198/Plain | grep -q "plain view, rendered by Razor" || { echo "/Plain: unexpected response"; curl -s http://127.0.0.1:5198/Plain | grep -i -m2 '<title>'; fail=1; }
+# Unity, registered by WebActivatorEx's PreApplicationStartMethod, constructs the controller (issue #21: the activators
+# never ran), and its Razor view renders although Unity.Mvc brings Microsoft.AspNet.Razor 3.2.7 (issue #23: it replaced
+# webForCore's, MissingMethodException). PostApplicationStartMethod ran too.
+home=$(curl -s http://127.0.0.1:5198/)
+echo "$home" | grep -q "hello from Unity, rendered by Razor" || { echo "/: unexpected response"; echo "$home" | head -20; fail=1; }
+echo "$home" | grep -q "post-start: True" || { echo "/: PostApplicationStartMethod didn't run"; fail=1; }
 if [ $fail -ne 0 ]; then cat server.log; exit 1; fi
 echo "Package smoke test passed ($version)."

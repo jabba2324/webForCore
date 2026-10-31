@@ -65,6 +65,9 @@
   <Project Path="src/WebFormsForCore.Web.Routing/WebFormsForCore.Web.Routing.csproj">
     <BuildDependency Project="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
   </Project>
+  <Project Path="src/WebFormsForCore.WebActivatorEx/WebFormsForCore.WebActivatorEx.csproj">
+    <BuildDependency Project="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
+  </Project>
   <Project Path="src/WebFormsForCore.Web.Mobile/WebFormsForCore.Web.Mobile.csproj">
     <BuildDependency Project="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
   </Project>

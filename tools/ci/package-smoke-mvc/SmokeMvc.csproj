@@ -35,5 +35,6 @@
   <ItemGroup>
     <!-- As the applications have them, with no ExcludeAssets. -->
     <PackageReference Include="Unity.Mvc" Version="5.11.1" />
+    <PackageReference Include="WebActivatorEx" Version="2.2.0" />
   </ItemGroup>
 </Project>
