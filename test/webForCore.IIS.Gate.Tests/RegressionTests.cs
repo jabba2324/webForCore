@@ -47,5 +47,26 @@ namespace IISGate
             Assert.Contains("first changed: True", body);
             Assert.Contains("second changed: True", body);
         }
+
+        // #12: <handlers> entries whose path starts with '/' never matched. MiniBlog maps its XML-RPC endpoint
+        // (path="/metaweblog"), feeds ("/feed/*") and comment posting ("/comment.ashx") that way: all were 404.
+        [Theory]
+        [InlineData("/regressions/handler/rss")]
+        [InlineData("/regressions/exact-handler")]
+        public async Task HandlerPathWithLeadingSlashMatches(string url)
+        {
+            var (response, body) = await Get(url);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("gate handler", body);
+        }
+
+        // The pattern is still anchored at the application root.
+        [Fact]
+        public async Task HandlerPathWithLeadingSlashDoesNotMatchDeeper()
+        {
+            var (response, body) = await Get("/other/regressions/exact-handler");
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            Assert.DoesNotContain("gate handler", body);
+        }
     }
 }

@@ -1669,3 +1669,12 @@ and the watcher reports `FileSystemEventArgs.Name`, relative to the watched dire
 `@Styles.Render`/`@Scripts.Render` when two first requests rendered the bundles. Test:
 `RegressionTests.TwoDependenciesOnOneFileBothSeeItChange` (two dependencies on one file, then a write that both must
 see).
+
+### `<handlers>` paths that start with `/` (#12)
+
+`WebServerModules.FindHandler` compared a handler path containing `/` with the request path without its leading `/`,
+but kept the pattern's own, so `path="/metaweblog"` never matched `metaweblog`. Both sides are now compared without the
+leading `/` (still anchored at the application root). Hit by MiniBlog: its XML-RPC endpoint (`/metaweblog`), feeds
+(`/feed/*`), comment and post handlers (`/comment.ashx`, `/post.ashx`) were 404. Tests:
+`RegressionTests.HandlerPathWithLeadingSlashMatches` (a wildcard and an exact path) and
+`HandlerPathWithLeadingSlashDoesNotMatchDeeper`.

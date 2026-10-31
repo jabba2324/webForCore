@@ -72,7 +72,9 @@ namespace WebFormsForCore.Hosting.IIS
 			{
 				var pattern = Attr(handler, "path");
 				if (pattern == null || !VerbMatches(Attr(handler, "verb", "*"), verb)) continue;
-				if (!PathMatches(pattern, pattern.Contains('/') ? path.TrimStart('/') : fileName)) continue;
+				// A path with a '/' is matched against the URL relative to the application, with or without its leading
+				// '/' ("/feed/*" as "feed/*", as IIS does: #12); one without, against the file name.
+				if (!(pattern.Contains('/') ? PathMatches(pattern.TrimStart('/'), path.TrimStart('/')) : PathMatches(pattern, fileName))) continue;
 				var type = Attr(handler, "type");
 				// The first match decides; a native handler (StaticFile, ISAPI) leaves it to system.web's mappings.
 				if (type == null || type.StartsWith("System.Web.Handlers.TransferRequestHandler", StringComparison.Ordinal)) return null;
