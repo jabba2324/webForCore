@@ -179,5 +179,19 @@ namespace IISGate
             Assert.Contains("[listview Second book]", body);
             Assert.Contains("[gridview 1 First book]", body);
         }
+
+        // #3, documented: AppDomain.CurrentDomain.BaseDirectory is the build output (there is one AppDomain per process on
+        // .NET), and the APIs docs/MIGRATING.md points to are the site root. eShopLegacyMVC's seed read its SQL scripts
+        // through BaseDirectory. If this changes, update docs/NAMESPACES.md and MIGRATING.md.
+        [Fact]
+        public async Task BaseDirectoryIsTheBuildOutputAndTheSiteApisAreTheSite()
+        {
+            var (response, body) = await Get("/regressions/SiteFolder.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("AppDomain.CurrentDomain.BaseDirectory: bin_dotnet", body);
+            Assert.Contains("HttpRuntime.AppDomainAppPath: webForCore.IIS.Sample", body);
+            Assert.Contains("HostingEnvironment.ApplicationPhysicalPath: webForCore.IIS.Sample", body);
+            Assert.Contains("Server.MapPath: webForCore.IIS.Sample", body);
+        }
     }
 }

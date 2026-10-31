@@ -201,6 +201,11 @@ Fix what the blocker search found (see [NAMESPACES.md](NAMESPACES.md) for replac
 - **File paths:** Linux paths are case-sensitive and use `/`. Fix string-built paths (`"~\\Images\\Logo.PNG"`,
   `Path.Combine` with `\`) and file names whose case differs from the references to them. `Server.MapPath` and
   virtual paths work as before.
+- **The site's folder:** `AppDomain.CurrentDomain.BaseDirectory` (and `AppContext.BaseDirectory`) is the build output,
+  `bin_dotnet/`, not the site root as in IIS's per-application AppDomain. Find the site's files with
+  `HttpRuntime.AppDomainAppPath`, `HostingEnvironment.ApplicationPhysicalPath` or `Server.MapPath("~/...")` instead
+  ([NAMESPACES.md](NAMESPACES.md)). Search for `BaseDirectory` and `ApplicationBase`: eShopLegacyMVC's database seed read
+  its SQL scripts that way.
 - **Newlines:** `Environment.NewLine` is `\n`.
 - **Fonts and drawing:** install the fonts the app uses, or fontconfig's metric-compatible substitutes for Windows
   fonts (Liberation, Carlito, Caladea).

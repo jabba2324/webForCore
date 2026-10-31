@@ -1741,3 +1741,17 @@ package (and MIGRATING.md's "Always" table) includes it. Hit by eShopLegacyWebFo
 `ItemType`) and the Visual Studio 2012+ Web Forms templates' model-bound pages. Tests:
 `RegressionTests.DataControlsWithItemTypeRender` (Repeater, ListView and GridView with `ItemType`, the last two through
 `SelectMethod` over a type with a `[MetadataType]` buddy class) and the package smoke test's `Typed.aspx`.
+
+### `AppDomain.CurrentDomain.BaseDirectory` (#3): documented, not changed
+
+On IIS each application runs in its own AppDomain, created with `ApplicationBase` set to the site's folder and `bin` as
+its private bin path, so `AppDomain.CurrentDomain.BaseDirectory` is the site root. .NET has one AppDomain per process:
+`BaseDirectory` is `AppContext.BaseDirectory`, the entry assembly's folder, `bin_dotnet/`. A PseudoAppDomain is an
+`AssemblyLoadContext` and has no base directory of its own. Making it the site root would mean setting
+`APP_CONTEXT_BASE_DIRECTORY` for the whole process, which moves what .NET libraries rely on (native libraries, data files
+next to the assemblies) and what eighteen places in webForCore use to find the build output, Microsoft's
+`HttpRuntime` and `ClientConfigurationHost` among them. So the difference is kept and documented (NAMESPACES.md,
+MIGRATING.md section 6), with the APIs that are the site root as on IIS: `HttpRuntime.AppDomainAppPath`,
+`HostingEnvironment.ApplicationPhysicalPath`, `Server.MapPath("~/")`. Hit by eShopLegacyMVC, whose database seed read
+its SQL scripts through `BaseDirectory`. Test: `RegressionTests.BaseDirectoryIsTheBuildOutputAndTheSiteApisAreTheSite`
+pins both, so the documentation can't silently go out of date.

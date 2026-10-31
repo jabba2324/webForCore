@@ -111,6 +111,13 @@ Caveats:
   Framework disposed it on `DomainUnload`; .NET's no longer does): dispose it in `Application_End`.
 - `ApplicationHost.CreateApplicationHost` returns an object in a PseudoAppDomain without remoting; call it through
   `dynamic` or reflection.
+- **`AppDomain.CurrentDomain.BaseDirectory` is the build output (`bin_dotnet/`), not the site.** On IIS each
+  application ran in its own AppDomain whose `ApplicationBase` was the site's folder (with `bin` as its private bin
+  path), so `BaseDirectory` and `AppContext.BaseDirectory` were the site root. .NET has one AppDomain per process, whose
+  base directory is the entry assembly's folder; a PseudoAppDomain (an `AssemblyLoadContext`) has none of its own, and
+  .NET libraries rely on it being the build output. Code that reads files next to the site through it should use
+  `HttpRuntime.AppDomainAppPath`, `HostingEnvironment.ApplicationPhysicalPath` or `Server.MapPath("~/...")`, which are
+  the site root as on IIS (#3). `AppDomain.CurrentDomain.SetupInformation.ApplicationBase` is the same as `BaseDirectory`.
 - **Behaviour .NET changes everywhere:** `ArgumentException.Message` ends with `(Parameter 'name')`; ICU cultures
   (set `<PredefinedCulturesOnly>true` to keep .NET Framework's `CultureNotFoundException`); `\n` newlines; paths are
   case-sensitive and `\` isn't a separator.
