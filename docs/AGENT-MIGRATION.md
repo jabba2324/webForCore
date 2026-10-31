@@ -107,7 +107,10 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
    (webForCore supplies the compiler). Leave everything else in `web.config` alone.
 5. Replace references using the tables in `docs/MIGRATING.md` section 3: every app gets the "Always" set (with
    packages: the `webForCore` package), and then one reference per framework the app uses. Remove `<Reference Include="System.Web...">` and the Microsoft
-   ASP.NET packages. Keep other packages; where a package has a .NET Standard or .NET build, use it.
+   ASP.NET packages. Keep other packages; where a package has a .NET Standard or .NET build, use it. Then go through
+   "Packages that need more than a reference" in the same section: packages that bring Microsoft's ASP.NET packages
+   back (`CS0433`), `lib/net45` packages with a `build/` folder, the versions webForCore requires (`NU1605`), .NET
+   Framework assemblies that are packages on .NET (`CS1069` in App_Code), and Katana packages webForCore doesn't lift.
 6. Add `Program.cs` from `docs/MIGRATING.md` section 4. Include session state only if the app uses `Session`. Use
    `HandleAllRequestsWithWebForms()` unless the app serves only `.aspx`/`.asmx`/`.ashx`.
 
