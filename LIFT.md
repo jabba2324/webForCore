@@ -1793,16 +1793,19 @@ it binds `HttpContextBase` and `RouteTable` by the 3.5 names).
 ### webForCore's packages win the SDK's conflicts (#23)
 
 Packages built on MVC, Web API, Katana or WebActivatorEx bring Microsoft's packages back transitively (Unity.Mvc 5.11
-brings Microsoft.AspNet.Mvc 5.2.7, Razor 3.2.7 and Web Pages 3.2.7). The SDK's conflict resolution keeps one assembly of
-each name, by assembly version and then file version. MVC 5.3.1 beats 5.2.7, but webForCore's `System.Web.Razor` and
-`System.Web.WebPages` are 3.0.0.0 like Microsoft's, and Microsoft's file version (3.0.61128) is higher, so they replaced
-webForCore's in the output. The build succeeded and every Razor view failed with `MissingMethodException:
-CodeGeneratorContext.get_GeneratedClass()` (Bonobo Git Server, ApplicantTracking, ReaLocate, Roadkill). The
-`WebForCorePreferItsPackages` target in `src/webForCore.WebStack.targets` (the packages' buildTransitive targets) adds
-the webForCore packages in the build to `PackageConflictPreferredPackages`, which the SDK provides for this. It makes
-the `ExcludeAssets` step in MIGRATING.md unnecessary for applications on the packages. Test: `tools/ci/package-smoke-mvc`,
-an MVC application with `Unity.Mvc` 5.11.1 as applications have it, whose `/Plain` view failed with that exception on the
-0.2.0 packages.
+brings Microsoft.AspNet.Mvc 5.2.7, Razor 3.2.7 and Web Pages 3.2.7; Autofac.Mvc5 3.3 brings 5.1.0 and 3.1.0). The SDK's
+conflict resolution keeps one assembly of each name, by assembly version and then file version. MVC 5.3.1 beats 5.2.7,
+but webForCore's `System.Web.Razor` and `System.Web.WebPages` are 3.0.0.0 like Microsoft's, and Microsoft's file
+versions (3.0.20110, 3.0.61128) are higher, so they replaced webForCore's in the output with no build error. MVC views
+then failed with a `MissingMethodException` (Bonobo Git Server, ApplicantTracking, ReaLocate, Roadkill; eShopLegacyMVC
+without its `ExcludeAssets` workaround). The SDK's preferred packages only break ties after the file version, but its
+package overrides come first (they are how the shared framework wins over the System.* packages). So the
+`WebForCoreOverrideReplacedPackages` target in `src/webForCore.WebStack.targets` (the packages' buildTransitive
+targets) makes each webForCore package in the build override the Microsoft packages webForCore replaces, at any
+version. It makes the `ExcludeAssets` step in MIGRATING.md unnecessary for applications on the packages. Test:
+`tools/ci/package-smoke-mvc`, an MVC application with `Unity.Mvc` 5.11.1 as applications have it. The package smoke
+test checks that its `deps.json` has none of the .NET Framework assemblies; on the 0.2.0 packages it has Razor 3.2.7's
+and Web Pages 3.2.7's.
 
 ### WebActivatorEx (#21)
 
@@ -1817,7 +1820,7 @@ webForCore ships its own WebActivatorEx: `src/WebFormsForCore.WebActivatorEx`, w
 original's name, version 2.0.0.0 and public key. It loads the assemblies by name into its own context (the
 application's), and scans only those that reference WebActivatorEx (read from their metadata, without loading the
 rest). It is in the "Always" set; the original package, which Unity.Mvc and others bring, loses the conflict to it
-(#23's `WebForCorePreferItsPackages`). New code, not Microsoft's. `docs/IIS-COMPATIBILITY.md` lists `Assembly.LoadFrom` as
+(#23's `WebForCoreOverrideReplacedPackages`). New code, not Microsoft's. `docs/IIS-COMPATIBILITY.md` lists `Assembly.LoadFrom` as
 a difference. Test: `tools/ci/package-smoke-mvc`, where Unity.Mvc's activator registers the resolver that constructs
 `HomeController`, and a post-start method runs ("No parameterless constructor defined" on the 0.2.0 packages).
 

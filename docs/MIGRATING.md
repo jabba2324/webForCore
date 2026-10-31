@@ -154,9 +154,9 @@ These came up migrating real applications; each names one that needed it.
   `Unity.Mvc`, Ninject's and Glimpse's MVC packages, Swashbuckle, `Microsoft.Owin.Security.WsFederation` and others
   depend on `Microsoft.AspNet.Mvc`, `Microsoft.AspNet.WebApi.Core`, `Microsoft.Owin` and so on, and NuGet restores
   those, with assemblies of the same names as webForCore's. With webForCore's packages nothing needs doing: its build
-  targets prefer them in the SDK's conflict resolution (before 0.3.0, Microsoft's `System.Web.Razor` and
-  `System.Web.WebPages` won the tie on file version and every Razor view failed with `MissingMethodException: ...
-  CodeGeneratorContext.get_GeneratedClass()`: Bonobo Git Server, ApplicantTracking, ReaLocate, Roadkill). An
+  targets make its packages override Microsoft's in the SDK's conflict resolution (before 0.3.0, Microsoft's
+  `System.Web.Razor` and `System.Web.WebPages` won on file version, and MVC views failed with a `MissingMethodException`:
+  Bonobo Git Server, ApplicantTracking, ReaLocate, Roadkill). An
   application built against webForCore's projects instead (a source build) gets both, so the compiler sees two
   `System.Web.Mvc`s: `CS0433: The type 'Controller' exists in both 'System.Web.Mvc, Version=5.1.0.0' and
   'System.Web.Mvc, Version=5.3.1.0'`. There, reference each one that `obj/project.assets.json` lists, at the version

@@ -51,6 +51,13 @@ cp -r "$here/package-smoke-mvc/." "$mvc"
 cp nuget.config "$mvc"
 cd "$mvc"
 dotnet build SmokeMvc.csproj -c Release -p:WebForCoreVersion="$version" -nodeReuse:false
+# The output has webForCore's MVC, Razor, Web Pages and WebActivatorEx, not the .NET Framework ones that Unity.Mvc and
+# WebActivatorEx bring (issue #23: Microsoft.AspNet.Razor and WebPages won the SDK's conflict resolution on file version).
+if grep -q -E '"lib/net4[0-9]*/(System\.Web\.(Mvc|Razor|WebPages[A-Za-z.]*)|WebActivatorEx)\.dll"' bin_dotnet/SmokeMvc.deps.json; then
+  echo "deps.json: .NET Framework assemblies replaced webForCore's:"
+  grep -o -E '"lib/net4[0-9]*/(System\.Web\.(Mvc|Razor|WebPages[A-Za-z.]*)|WebActivatorEx)\.dll"' bin_dotnet/SmokeMvc.deps.json | sort -u
+  fail=1
+fi
 dotnet bin_dotnet/SmokeMvc.dll --urls http://127.0.0.1:5198 > server.log 2>&1 &
 server=$!
 for i in $(seq 120); do curl -s -o /dev/null http://127.0.0.1:5198/ && break; sleep 1; done

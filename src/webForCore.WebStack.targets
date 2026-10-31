@@ -31,20 +31,35 @@
 
   <!-- Packages built on MVC, Web API, Katana or WebActivatorEx (Unity.Mvc, Autofac.Mvc5, Swashbuckle, ...) bring
        Microsoft's packages back transitively, with assemblies of the same names as webForCore's. The SDK keeps one of
-       each by assembly version, then file version, and Microsoft's win ties: System.Web.Razor and System.Web.WebPages are
-       3.0.0.0 in both, but Microsoft.AspNet.Razor 3.2.7's file version is 3.0.61128, so it replaced webForCore's in the
-       output with no build error, and every Razor view failed with a MissingMethodException (#23: Bonobo Git Server,
-       ApplicantTracking, ReaLocate, Roadkill). The webForCore packages in the build are preferred in those conflicts,
-       as the SDK's PackageConflictPreferredPackages provides for. -->
-  <Target Name="WebForCorePreferItsPackages" BeforeTargets="_HandlePackageFileConflicts;_HandlePackageFileConflictsForPublish" Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">
+       each by assembly version, then file version, so Microsoft's won where the assembly versions tie:
+       System.Web.Razor and System.Web.WebPages are 3.0.0.0 in both, and Microsoft.AspNet.WebPages 3.1.0's file version
+       is 3.0.20110. They replaced webForCore's in the output with no build error, and MVC views failed with a
+       MissingMethodException (#23: Bonobo Git Server, ApplicantTracking, ReaLocate, Roadkill, eShopLegacyMVC). Package
+       overrides come before versions in the SDK's conflict resolution (they are how the shared framework wins over the
+       System.* packages): each webForCore package in the build overrides the Microsoft packages webForCore replaces,
+       at any version. -->
+  <PropertyGroup>
+    <_WebForCoreReplacedPackages>
+      Microsoft.AspNet.Mvc|99.0.0;Microsoft.AspNet.Mvc.Futures|99.0.0;Microsoft.AspNet.Razor|99.0.0;
+      Microsoft.AspNet.WebPages|99.0.0;Microsoft.AspNet.WebApi.Core|99.0.0;Microsoft.AspNet.WebApi.WebHost|99.0.0;
+      Microsoft.AspNet.WebApi.Owin|99.0.0;Microsoft.AspNet.WebApi.Cors|99.0.0;Microsoft.AspNet.WebApi.Client|99.0.0;
+      Microsoft.AspNet.Cors|99.0.0;Microsoft.AspNet.Web.Optimization|99.0.0;Microsoft.AspNet.Web.Optimization.WebForms|99.0.0;
+      WebGrease|99.0.0;Microsoft.Web.Infrastructure|99.0.0;Microsoft.AspNet.Identity.Core|99.0.0;
+      Microsoft.AspNet.Identity.EntityFramework|99.0.0;Microsoft.AspNet.Identity.Owin|99.0.0;
+      Microsoft.AspNet.SignalR.Core|99.0.0;Microsoft.AspNet.SignalR.SystemWeb|99.0.0;Microsoft.AspNet.SignalR.Client|99.0.0;
+      Microsoft.Owin|99.0.0;Microsoft.Owin.Host.SystemWeb|99.0.0;Microsoft.Owin.Host.HttpListener|99.0.0;
+      Microsoft.Owin.Hosting|99.0.0;Microsoft.Owin.Security|99.0.0;Microsoft.Owin.Security.Cookies|99.0.0;
+      Microsoft.Owin.Security.OAuth|99.0.0;Microsoft.Owin.Cors|99.0.0;Microsoft.Owin.Testing|99.0.0;
+      AjaxControlToolkit|99.0.0;WebActivatorEx|99.0.0
+    </_WebForCoreReplacedPackages>
+  </PropertyGroup>
+  <Target Name="WebForCoreOverrideReplacedPackages" BeforeTargets="_HandlePackageFileConflicts;_HandlePackageFileConflictsForPublish" Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">
     <ItemGroup>
       <_WebForCorePackageItem Include="@(Reference)" Condition="'%(Reference.NuGetPackageId)' == 'webForCore' OR $([System.String]::Copy('%(Reference.NuGetPackageId)').StartsWith('webForCore.'))" />
       <_WebForCorePackageItem Include="@(RuntimeCopyLocalItems)" Condition="'%(RuntimeCopyLocalItems.NuGetPackageId)' == 'webForCore' OR $([System.String]::Copy('%(RuntimeCopyLocalItems.NuGetPackageId)').StartsWith('webForCore.'))" />
       <_WebForCorePackageId Include="@(_WebForCorePackageItem->'%(NuGetPackageId)'->Distinct())" />
+      <PackageConflictOverrides Include="@(_WebForCorePackageId)" OverriddenPackages="$(_WebForCoreReplacedPackages)" />
     </ItemGroup>
-    <PropertyGroup>
-      <PackageConflictPreferredPackages>@(_WebForCorePackageId);$(PackageConflictPreferredPackages)</PackageConflictPreferredPackages>
-    </PropertyGroup>
   </Target>
 
   <!-- The shared framework also has System.Web, System.Drawing and System.Configuration facades. At startup the host
