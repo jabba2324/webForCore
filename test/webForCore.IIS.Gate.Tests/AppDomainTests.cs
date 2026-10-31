@@ -45,14 +45,15 @@ namespace IISGate
             Assert.NotEqual(before, after);
             Assert.Equal(1, afterStarts); // the new domain's own static state
 
-            // The old domain shut down and started unloading. Whether it is then collected is not asserted: in this run
-            // old domains stay referenced (LIFT.md, "PseudoAppDomain: open issue"); the hosting layer reports it and stops
-            // the process after Recycling.MaxStuckDomains.
-            for (int i = 0; i < 50 && !_server.Output.Contains("(start 1) is unloading."); i++)
+            // The old domain shut down, started unloading and is collected: nothing outside it references it any more
+            // (the sample checks every 2 seconds; GATE_RECYCLE_CHECK).
+            for (int i = 0; i < 300 && !_server.Output.Contains("(start 1) unloaded."); i++)
             {
                 await Task.Delay(200);
             }
             Assert.Contains("(start 1) is unloading.", _server.Output);
+            Assert.Contains("(start 1) unloaded.", _server.Output);
+            Assert.DoesNotContain("has not unloaded", _server.Output);
         }
     }
 }

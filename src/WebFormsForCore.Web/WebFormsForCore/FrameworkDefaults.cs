@@ -15,6 +15,9 @@ namespace System.Web
             // Without it, globalization requestEncoding/responseEncoding and Encoding.GetEncoding(1252) fail.
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
+            // An earlier start of the application in this process (a PseudoAppDomain) may have left its instances.
+            System.Web.Configuration.DbProviderFactoriesConfiguration.ResetRegistrations(System.Web.Configuration.DbProviderFactoriesConfiguration.IsFromOtherDomain);
+
             // .NET Framework registers these providers in machine.config (<system.data><DbProviderFactories>); .NET's
             // DbProviderFactories starts empty, so SqlDataSource with ProviderName="System.Data.SqlClient" threw.
             // Registered by type name: nothing loads until a provider is requested; Microsoft.Data.SqlClient only if the

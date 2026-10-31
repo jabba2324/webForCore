@@ -35,7 +35,13 @@ namespace IISSample
                 });
             }
             var app = builder.Build();
-            app.UseWebForms(options => options.HandleAllRequestsWithWebForms());
+            app.UseWebForms(options =>
+            {
+                options.HandleAllRequestsWithWebForms();
+                // GATE_RECYCLE_CHECK: seconds between unload checks, so a test sees an old domain collected sooner.
+                if (int.TryParse(Environment.GetEnvironmentVariable("GATE_RECYCLE_CHECK"), out int seconds))
+                    options.Recycling(r => r.CheckInterval = TimeSpan.FromSeconds(seconds));
+            });
             app.Run();
         }
 

@@ -33,6 +33,7 @@ namespace MvcGate
     public abstract class SampleServerBase : IDisposable
     {
         private readonly Process _process;
+        private readonly System.Text.StringBuilder _output = new System.Text.StringBuilder();
 
         protected SampleServerBase(string sample)
         {
@@ -55,9 +56,10 @@ namespace MvcGate
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
             };
+            start.Environment["GATE_RECYCLE_CHECK"] = "2";
             _process = Process.Start(start);
-            _process.OutputDataReceived += (s, e) => { };
-            _process.ErrorDataReceived += (s, e) => { };
+            _process.OutputDataReceived += (s, e) => { lock (_output) _output.AppendLine(e.Data); };
+            _process.ErrorDataReceived += (s, e) => { lock (_output) _output.AppendLine(e.Data); };
             _process.BeginOutputReadLine();
             _process.BeginErrorReadLine();
 
@@ -83,6 +85,12 @@ namespace MvcGate
         public Uri BaseAddress { get; }
 
         public HttpClient Client { get; }
+
+        // The host's console log (application starts, shutdowns, unloads).
+        public string Output
+        {
+            get { lock (_output) return _output.ToString(); }
+        }
 
         public void Dispose()
         {

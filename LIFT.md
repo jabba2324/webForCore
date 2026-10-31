@@ -984,7 +984,7 @@ Releasing an unloading domain is what AppDomain.Unload used to do. These all run
 - **GC handles:** System.Web's strong GC handles (`GCUtil.Alloc`) are cleared.
 - **Other references:** the `Resolving` handler is removed. The inotify watcher no longer captures a request's ExecutionContext. The domain's `ApplicationManager` context data lives in a static of its own copy, not in a table keyed by the domain.
 
-**Open issue: old domains are not collected.** After all of the above, gcroot finds no strong root for an old domain's `LoaderAllocator` or for instances of its types, and the finalizer queue is empty. Yet the runtime keeps the domains: one of 9 old domains across three runs was collected. The holder is not visible to SOS (a native or thread-static reference is likely). Tiered compilation off made no difference. The middleware checks every 30 seconds and logs "unloaded" or "has not unloaded". After `Recycling.MaxStuckDomains` (3) stuck domains it stops the process gracefully, so memory stays bounded and the service manager restarts it, as WAS recycled a worker. Each domain costs its own copy of System.Web, the app and Roslyn (tens of MB).
+**Old domains are collected** (fixed 31 Oct 2026, see "Old domains collected" below). This was open: SOS found no root, one of 9 old domains was collected, and the hosting layer stopped the process after `Recycling.MaxStuckDomains` stuck domains. That safety net stays.
 
 Tests: the 9 AppDomain tests that were skipped now run:
 - Mono's `SimpleWorkerRequestTest` (5), using `dynamic`. `SimpleWorkerRequest.MapPath` of a path outside the app throws `ArgumentNullException` again; .NET's `FileIOPermission` stub accepts null, so `InternalSecurityPermissions.PathDiscovery` now checks.
@@ -1462,3 +1462,36 @@ The full regression (round 16) caught one regression from the CS0012 fix: `netst
 .NET's `System.Web.HttpUtility.dll`, and referencing it as well made `HttpUtility` ambiguous with System.Web's
 (CS0433 on any page using it). Forward targets whose types System.Web defines are now left out. Round 16: 27,290
 tests in 24 suites; 27,104 pass, 35 skipped, 151 known System.Drawing failures. IIS gate 71 (13 new).
+
+## Old domains collected (31 Oct 2026)
+
+Old PseudoAppDomains were never collected after a restart (the "open issue" above). Method: a harness restarts a
+sample N times under a workload (the IIS sample's pages, ASMX, AJAX, mail, data; the MVC, Web API and Web Pages
+samples' gate URLs), waits for the middleware's unload check, and takes a heap dump; `gcroot` of each old domain's
+`LoaderAllocator`, ignoring handle type 10 (.NET 9+'s weak interior-pointer handles, which SOS lists as roots); where
+SOS showed nothing, bisecting the workload. Ten holders, each released when the domain unloads
+(`AspNetCoreHosting/PseudoAppDomain.cs`, `ReleaseProcessResources`):
+
+| Holder | Why | Release |
+| --- | --- | --- |
+| `PseudoAppDomain`'s own fields | Once unloading starts, the runtime holds the context with a strong handle until its LoaderAllocator is collected (`AssemblyLoadContext.InitiateUnload`). A field referencing the domain's System.Web assembly (and failure exceptions, whose stack traces keep their methods) closed a cycle through that handle. This was the holder SOS could not explain. | The assembly is held weakly; failures are kept as text |
+| `AppDomain.DomainUnload` | An instance field of the process's AppDomain on .NET (never raised); `HostingEnvironment` subscribes | Process-wide events now include the instance events of `AppDomain.CurrentDomain` and `AssemblyLoadContext.Default` |
+| `AttributeCollection.s_defaultAttributes` | Default attribute per attribute type; System.Web's attribute types are per domain | `FrameworkCaches` |
+| `DbProviderFactories` registrations | A registration keeps the factory instance once requested. `FrameworkDefaults` did not replace an existing registration, so every later start used the first domain's `SqlClientFactory` (also wrong: a stale assembly copy) | Registrations with an instance from another domain go back to their type name, at domain start and at unload |
+| `MemoryCache.Default` (System.Runtime.Caching, per domain) | Its stores and statistics timer sit in strong GC handles freed only by `Dispose`; .NET Framework disposed it on `DomainUnload`, .NET's no longer subscribes. MVC's model metadata and output cache use it | Disposed when the domain unloads; caches the app creates itself are its own to dispose |
+| DataAnnotations `TypeDescriptorCache` (3 dictionaries) | `[MetadataType]` lookups by type, from MVC, Web API and System.Web model metadata; two keyed by tuples | `FrameworkCaches`; tuple keys are looked into |
+| DataContractSerializer `s_typeToBuiltInContract` | `ContextAwareDictionary` keeps collectible types weakly but tests the type's assembly, so `IEnumerable<Product>` (a CoreLib generic over a domain type) lands in the strong half | `FrameworkCaches` (its `_fastDictionary`) |
+| DataContractSerializer `s_dataContractCache` | The same test in the contract table by type number | Slots of domain types cleared and their numbers dropped from `s_typeToIDCache`, under the serializer's locks |
+| `SerializationEventsCache`, `DataStorage`, `SqlUdtStorage` | Per-type `ConcurrentDictionary`s (BinaryFormatter events, DataTable column types) found by an inventory of the shared framework's static `Type`-keyed dictionaries; not seen as roots yet | `FrameworkCaches` |
+
+`IsInDomain` now also counts generic instantiations and arrays over the domain's types, which are collectible with it.
+The middleware's unload check interval is `Recycling.CheckInterval` (30 s); a domain is reported stuck 5 minutes after
+its shutdown, whatever the interval.
+
+Results: 3 restarts each, every old domain collected: IIS sample 3/3, MVC 3/3, Web API 3/3, Web Pages 3/3. Gate
+tests now assert it (IIS, MVC and Web API: restart, then "(start 1) unloaded." within a minute; the samples check every
+2 seconds through `GATE_RECYCLE_CHECK`).
+
+Not covered yet: caches that hold app types only on paths the samples don't use (`TypeDescriptor.AddProvider` from
+DynamicData's `MetaModel`, `LicenseManager`, Hashtable-based caches that need their owner's lock). The stuck-domain
+report and `MaxStuckDomains` remain as the safety net.

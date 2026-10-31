@@ -54,7 +54,7 @@ namespace Microsoft.AspNetCore.Builder
 		private volatile bool stopping;
 		private int generation;
 		// Domains shutting down, until they are collected: (start, domain, checks so far).
-		private readonly List<(int Generation, WeakReference Domain, int Checks)> unloading = new List<(int, WeakReference, int)>();
+		private readonly List<(int Generation, WeakReference Domain, int Checks, DateTime Since)> unloading = new List<(int, WeakReference, int, DateTime)>();
 		private int stuckDomains;
 
 		// One start of the application: its domain (null without isolation) and the host's entry points in it.
@@ -83,7 +83,12 @@ namespace Microsoft.AspNetCore.Builder
 			// the process itself is stopped, for the service manager to start it again (tools/deploy/webforcore@.service);
 			// 0 never stops it.
 			public int MaxStuckDomains { get; set; } = 3;
+			// webForCore: how often recycling conditions are checked and unloading domains collected, released and reported.
+			public TimeSpan CheckInterval { get; set; } = TimeSpan.FromSeconds(30);
 		}
+
+		// An earlier start still referenced this long after its shutdown is reported, and counts towards MaxStuckDomains.
+		static readonly TimeSpan StuckAfter = TimeSpan.FromMinutes(5);
 
 		public WebFormsMiddleware(Core.RequestDelegate next, Action<WebFormsOptions> optionsBuilder,
 			IHostApplicationLifetime lifetime = null, ILoggerFactory loggerFactory = null, IWebHostEnvironment environment = null,
@@ -118,7 +123,7 @@ namespace Microsoft.AspNetCore.Builder
 				if (app != null) InDomain(app, app.Shutdown);
 			});
 			GetApplication();
-			recycleTimer = new Timer(_ => CheckRecycling(), null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
+			recycleTimer = new Timer(_ => CheckRecycling(), null, Recycling.CheckInterval, Recycling.CheckInterval);
 		}
 
 		Application GetApplication()
@@ -182,7 +187,7 @@ namespace Microsoft.AspNetCore.Builder
 			logger.LogInformation("Application {AppId} (start {Generation}) is shutting down.", AppId, app.Generation);
 			if (stopping) return;
 			if (app.Domain != null)
-				lock (unloading) unloading.Add((app.Generation, new WeakReference(app.Domain), 0));
+				lock (unloading) unloading.Add((app.Generation, new WeakReference(app.Domain), 0, DateTime.UtcNow));
 			if (app.Domain == null)
 			{
 				// No domain to replace it with: the process is the unit of restart, as a worker process is for IIS.
@@ -208,7 +213,7 @@ namespace Microsoft.AspNetCore.Builder
 		// The number of earlier starts whose domain is not collected yet.
 		public int UnloadingDomains { get { lock (unloading) return unloading.Count; } }
 
-		// A domain unloads once nothing references it; one still referenced after 10 checks (5 minutes) is reported.
+		// A domain unloads once nothing references it; one still referenced StuckAfter its shutdown is reported.
 		void CheckUnloading()
 		{
 			lock (unloading)
@@ -219,13 +224,14 @@ namespace Microsoft.AspNetCore.Builder
 				GC.Collect();
 				for (int i = unloading.Count - 1; i >= 0; i--)
 				{
-					var (start, domain, checks) = unloading[i];
+					var (start, domain, checks, since) = unloading[i];
 					if (domain.Target is PseudoAppDomain pseudo)
 					{
-						int timers = pseudo.ReleaseTimers(), handlers = pseudo.ReleaseProcessEventHandlers(), handles = pseudo.ReleaseSystemWebHandles();
-						if (timers + handlers + handles > 0)
-							logger.LogDebug("Application {AppId} (start {Generation}): released {Timers} timers, {Handlers} event handlers, {Handles} GC handles.",
-								AppId, start, timers, handlers, handles);
+						int timers = pseudo.ReleaseTimers(), handlers = pseudo.ReleaseProcessEventHandlers(), handles = pseudo.ReleaseSystemWebHandles(),
+							caches = pseudo.ReleaseFrameworkCaches();
+						if (timers + handlers + handles + caches > 0)
+							logger.LogDebug("Application {AppId} (start {Generation}): released {Timers} timers, {Handlers} event handlers, {Handles} GC handles, {Caches} cache entries.",
+								AppId, start, timers, handlers, handles, caches);
 						if (checks == 0)
 							foreach (var error in pseudo.UnloadErrors)
 								logger.LogWarning(error, "Application {AppId} (start {Generation}): releasing its resources failed.", AppId, start);
@@ -235,7 +241,7 @@ namespace Microsoft.AspNetCore.Builder
 						logger.LogInformation("Application {AppId} (start {Generation}) unloaded.", AppId, start);
 						unloading.RemoveAt(i);
 					}
-					else if (++checks == 10)
+					else if (++checks > 0 && DateTime.UtcNow - since >= StuckAfter)
 					{
 						logger.LogWarning("Application {AppId} (start {Generation}) has not unloaded: objects outside its domain still reference it.", AppId, start);
 						unloading.RemoveAt(i);
@@ -245,7 +251,7 @@ namespace Microsoft.AspNetCore.Builder
 							lifetime?.StopApplication();
 						}
 					}
-					else unloading[i] = (start, domain, checks);
+					else unloading[i] = (start, domain, checks, since);
 				}
 			}
 		}

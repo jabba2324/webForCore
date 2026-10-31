@@ -79,11 +79,16 @@ namespace System.Web.Hosting
 			catch (Exception e)
 			{
 				// The domain object is this assembly's PseudoAppDomain type only in the creating context; reach the list by name.
+				// Kept as text: an exception's stack trace keeps the domain's code alive (see "Fields" below).
 				var errors = domain.GetType().GetField(nameof(unloadErrors), BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(domain) as List<Exception>;
-				if (errors != null) lock (errors) errors.Add(e);
+				if (errors != null) lock (errors) errors.Add(new Exception(e.ToString()));
 			}
 		}
 
+		// Fields: once unloading starts, the runtime holds the context through a strong handle until the domain's code is
+		// collected (AssemblyLoadContext.InitiateUnload). A field of the context that references anything of the domain (an
+		// assembly, a type, an object, an exception thrown by its code) closes that cycle and the domain is never
+		// collected, so the fields below hold only shared-framework objects, or the domain's weakly.
 		readonly List<Exception> unloadErrors = new List<Exception>();
 		public IReadOnlyList<Exception> UnloadErrors { get { lock (unloadErrors) return unloadErrors.ToArray(); } }
 
@@ -112,21 +117,150 @@ namespace System.Web.Hosting
 		// handlers its code added to process-wide events (AppDomain's AssemblyLoad, AssemblyResolve, UnhandledException,
 		// ProcessExit/DomainUnload, FirstChanceException...; on .NET these are static events of AppContext and
 		// AssemblyLoadContext), and the GC handles System.Web allocated (System.Web.Util.GCUtil). Returns the number released.
-		public int ReleaseProcessResources() => ReleaseTimers() + ReleaseProcessEventHandlers() + ReleaseSystemWebHandles();
+		public int ReleaseProcessResources() => DisposeDefaultMemoryCache() + ReleaseTimers() + ReleaseProcessEventHandlers() + ReleaseSystemWebHandles() + ReleaseFrameworkCaches();
 
-		static readonly Type[] ProcessEventTypes = { typeof(AppContext), typeof(AssemblyLoadContext) };
+		// System.Runtime.Caching is loaded into each domain, and a MemoryCache keeps its stores and statistics timer in strong
+		// GC handles that only Dispose frees. .NET Framework's MemoryCache disposed itself on DomainUnload; .NET's no longer
+		// subscribes, so the domain's MemoryCache.Default (MVC's model metadata and output cache, ObjectCache users) is
+		// disposed here if it was created. Caches the application creates itself must be disposed by it (Application_End).
+		// Only while the domain still lists its assemblies (when it starts unloading).
+		public int DisposeDefaultMemoryCache()
+		{
+			var caching = Assemblies.FirstOrDefault(a => a.GetName().Name == "System.Runtime.Caching");
+			var field = caching?.GetType("System.Runtime.Caching.MemoryCache")?.GetField("s_defaultCache", BindingFlags.Static | BindingFlags.NonPublic);
+			if (field?.GetValue(null) is not IDisposable cache) return 0;
+			cache.Dispose();
+			return 1;
+		}
+
+		// Static caches of the shared framework that hold types (or objects) they were used with, strongly: entries for the
+		// domain's types are removed, as AppDomain.Unload discarded the domain's copy of the cache. (declaring type, cache
+		// field (a static field, then instance fields separated by '.'), lock field or null for a ConcurrentDictionary).
+		// Runtime internals, read by reflection; a missing field is skipped.
+		static readonly (string Type, string Cache, string Lock)[] FrameworkCaches = {
+			// GetDefaultAttribute's cache of each attribute type's default (TypeDescriptor attribute lookups).
+			("System.ComponentModel.AttributeCollection, System.ComponentModel.TypeConverter", "s_defaultAttributes", "s_internalSyncObject"),
+			// [MetadataType] (buddy classes): DataAnnotations' caches of metadata types, member attributes and validation.
+			("System.ComponentModel.DataAnnotations.AssociatedMetadataTypeTypeDescriptor+TypeDescriptorCache, System.ComponentModel.Annotations", "s_metadataTypeCache", null),
+			("System.ComponentModel.DataAnnotations.AssociatedMetadataTypeTypeDescriptor+TypeDescriptorCache, System.ComponentModel.Annotations", "s_typeMemberCache", null),
+			("System.ComponentModel.DataAnnotations.AssociatedMetadataTypeTypeDescriptor+TypeDescriptorCache, System.ComponentModel.Annotations", "s_validatedMetadataTypeCache", null),
+			// DataContractSerializer (Web API's XML formatter, WCF clients): built-in contract lookups of every type. Its
+			// ContextAwareDictionary keeps collectible types weakly, but tells them by their assembly, so a generic type of
+			// the framework over a domain type (IEnumerable<Product>) is kept in the strong half.
+			("System.Runtime.Serialization.DataContracts.DataContract+DataContractCriticalHelper, System.Private.DataContractSerialization", "s_typeToBuiltInContract._fastDictionary", null),
+			// [OnSerializing]/[OnDeserialized] methods of each serialized type.
+			("System.Runtime.Serialization.SerializationEventsCache, System.Runtime.Serialization.Formatters", "s_cache", null),
+			// DataTable columns of application types.
+			("System.Data.Common.DataStorage, System.Data.Common", "s_typeImplementsInterface", null),
+			("System.Data.Common.SqlUdtStorage, System.Data.Common", "s_typeToNull", null),
+		};
+
+		public int ReleaseFrameworkCaches()
+		{
+			int released = 0;
+			foreach (var (typeName, cacheName, lockName) in FrameworkCaches)
+			{
+				const BindingFlags AnyStatic = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+				var type = Type.GetType(typeName, throwOnError: false);
+				var path = cacheName.Split('.');
+				object value = type?.GetField(path[0], AnyStatic)?.GetValue(null);
+				for (int i = 1; i < path.Length && value != null; i++)
+					value = value.GetType().GetField(path[i], AnyInstance)?.GetValue(value);
+				if (value is not System.Collections.IDictionary cache) continue;
+				var sync = lockName != null ? type.GetField(lockName, AnyStatic)?.GetValue(null) ?? cache : cache;
+				lock (sync)
+				{
+					var keys = new List<object>();
+					foreach (System.Collections.DictionaryEntry entry in cache)
+					{
+						if (References(entry.Key) || References(entry.Value)) keys.Add(entry.Key);
+					}
+					foreach (var key in keys) cache.Remove(key);
+					released += keys.Count;
+				}
+			}
+			released += ReleaseDataContracts();
+			// DbProviderFactories' registrations keep the factory instance the domain resolved.
+			released += System.Web.Configuration.DbProviderFactoriesConfiguration.ResetRegistrations(factory => References(factory));
+			return released;
+		}
+
+		// DataContractSerializer numbers each type it meets (s_typeToIDCache, by type handle) and keeps its contract in a
+		// table by that number, weakly for collectible types; but the same assembly test as above keeps the contracts of
+		// generic types over domain types (List<Product>) strongly. Their slots are cleared, and their numbers forgotten
+		// so that a type handle reused after the domain is collected cannot find a slot. Locks taken in the serializer's order.
+		int ReleaseDataContracts()
+		{
+			const BindingFlags AnyStatic = BindingFlags.Static | BindingFlags.NonPublic;
+			var helper = Type.GetType("System.Runtime.Serialization.DataContracts.DataContract+DataContractCriticalHelper, System.Private.DataContractSerialization", throwOnError: false);
+			var index = helper?.GetField("s_dataContractCache", AnyStatic)?.GetValue(null);
+			var contracts = index?.GetType().GetField("_contracts", AnyInstance)?.GetValue(index) as Array;
+			var ids = helper?.GetField("s_typeToIDCache", AnyStatic)?.GetValue(null) as System.Collections.IDictionary;
+			var createLock = helper?.GetField("s_createDataContractLock", AnyStatic)?.GetValue(null);
+			var cacheLock = helper?.GetField("s_cacheLock", AnyStatic)?.GetValue(null);
+			var underlyingType = typeof(System.Runtime.Serialization.DataContracts.DataContract).GetProperty("UnderlyingType");
+			var elementType = contracts?.GetType().GetElementType();
+			var strong = elementType?.GetField("Item1");
+			if (contracts == null || ids == null || createLock == null || cacheLock == null || underlyingType == null || strong == null) return 0;
+			var released = new HashSet<int>();
+			lock (createLock)
+			{
+				lock (cacheLock)
+				{
+					// The table grows by replacement: read it again under the lock.
+					contracts = (Array)index.GetType().GetField("_contracts", AnyInstance).GetValue(index);
+					for (int i = 0; i < contracts.Length; i++)
+					{
+						if (strong.GetValue(contracts.GetValue(i)) is object contract && References(underlyingType.GetValue(contract)))
+						{
+							contracts.SetValue(Activator.CreateInstance(elementType), i);
+							released.Add(i);
+						}
+					}
+					if (released.Count > 0)
+					{
+						var keys = new List<object>();
+						foreach (System.Collections.DictionaryEntry entry in ids)
+							if (released.Contains((int)entry.Value)) keys.Add(entry.Key);
+						foreach (var key in keys) ids.Remove(key);
+					}
+				}
+			}
+			return released.Count;
+		}
+
+		// An object of the domain or one of its types, or a tuple (a composite cache key) with one.
+		bool References(object value)
+		{
+			if (value is Type type) return IsInDomain(type);
+			if (value is MemberInfo member) return IsInDomain(member.DeclaringType);
+			if (value is System.Runtime.CompilerServices.ITuple tuple)
+			{
+				for (int i = 0; i < tuple.Length; i++)
+					if (References(tuple[i])) return true;
+			}
+			return value != null && IsInDomain(value.GetType());
+		}
+
+		// The process-wide event holders: static events of AppContext and AssemblyLoadContext, and the events stored on the
+		// process's AppDomain (DomainUnload, which .NET never raises, ...) and on the default load context (Resolving, ...).
+		static (Type Type, object Instance)[] ProcessEventHolders => new (Type, object)[] {
+			(typeof(AppContext), null), (typeof(AssemblyLoadContext), null),
+			(typeof(AppDomain), AppDomain.CurrentDomain), (typeof(AssemblyLoadContext), Default),
+		};
 
 		public int ReleaseProcessEventHandlers()
 		{
 			int released = 0;
-			foreach (var type in ProcessEventTypes)
+			foreach (var (type, instance) in ProcessEventHolders)
 			{
-				foreach (var field in type.GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
+				var flags = (instance == null ? BindingFlags.Static : BindingFlags.Instance) | BindingFlags.Public | BindingFlags.NonPublic;
+				foreach (var field in type.GetFields(flags))
 				{
 					if (!typeof(Delegate).IsAssignableFrom(field.FieldType)) continue;
 					for (int attempt = 0; attempt < 10; attempt++)
 					{
-						var current = (Delegate)field.GetValue(null);
+						var current = (Delegate)field.GetValue(instance);
 						if (current == null) break;
 						var handlers = current.GetInvocationList();
 						var kept = handlers.Where(h => !IsInDomain(h.Method.DeclaringType) && !IsInDomain(h.Target?.GetType())).ToArray();
@@ -135,8 +269,8 @@ namespace System.Web.Hosting
 						// The events are updated with Interlocked.CompareExchange; do the same.
 						lock (field)
 						{
-							if (field.GetValue(null) != (object)current) continue;
-							field.SetValue(null, replacement);
+							if (field.GetValue(instance) != (object)current) continue;
+							field.SetValue(instance, replacement);
 						}
 						released += handlers.Length - kept.Length;
 						break;
@@ -148,7 +282,7 @@ namespace System.Web.Hosting
 
 		public int ReleaseSystemWebHandles()
 		{
-			var release = systemWeb?.GetType("System.Web.Util.GCUtil")?.GetMethod("ReleaseDomainHandles", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+			var release = SystemWeb?.GetType("System.Web.Util.GCUtil")?.GetMethod("ReleaseDomainHandles", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
 			return release != null ? (int)release.Invoke(null, null) : 0;
 		}
 
@@ -189,7 +323,16 @@ namespace System.Web.Hosting
 			return released;
 		}
 
-		bool IsInDomain(Type type) => type != null && GetLoadContext(type.Assembly) == this;
+		// A type of the domain, or a type built from one (a generic instantiation over it, an array of it): those are
+		// collectible with the domain although their definition (IEnumerable<T>, T[]) is the shared framework's.
+		bool IsInDomain(Type type)
+		{
+			if (type == null) return false;
+			if (GetLoadContext(type.Assembly) == this) return true;
+			if (!type.IsCollectible) return false;
+			if (type.HasElementType) return IsInDomain(type.GetElementType());
+			return type.IsGenericType && type.GetGenericArguments().Any(IsInDomain);
+		}
 
 		bool CapturesDomain(ExecutionContext context)
 		{
@@ -227,12 +370,13 @@ namespace System.Web.Hosting
 		public Type GetDomainType(Type type)
 		{
 			var assembly = LoadFromAssemblyName(type.Assembly.GetName());
-			if (type.Assembly == typeof(PseudoAppDomain).Assembly) systemWeb = assembly;
+			if (type.Assembly == typeof(PseudoAppDomain).Assembly) systemWeb = new WeakReference<Assembly>(assembly);
 			return assembly.GetType(type.FullName, throwOnError: true);
 		}
 
-		// The domain's System.Web (an unloading context no longer lists its assemblies).
-		Assembly systemWeb;
+		// The domain's System.Web (an unloading context no longer lists its assemblies); weak, see "Fields" above.
+		WeakReference<Assembly> systemWeb;
+		Assembly SystemWeb => systemWeb != null && systemWeb.TryGetTarget(out var assembly) ? assembly : null;
 
 		// Calls a static method of the domain's copy of a type; arguments and result cross the boundary unchanged, so they
 		// must be types the two sides share (the shared framework's) or types already taken from the domain.

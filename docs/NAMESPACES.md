@@ -89,6 +89,9 @@ Caveats:
 - `HttpUtility` follows .NET Framework 4.5+ (strict decoding); the 4.0 compatibility quirks of apps without
   `targetFramework` aren't emulated.
 - A `.resx` file reference to an icon (`ResXFileRef` of type `Icon`) throws off Windows.
+- **Restarts and `MemoryCache`:** an old application domain is collected after a restart. `MemoryCache.Default` is
+  disposed with it, but a `new MemoryCache(...)` the application creates holds the domain until it is disposed (.NET
+  Framework disposed it on `DomainUnload`; .NET's no longer does): dispose it in `Application_End`.
 - `ApplicationHost.CreateApplicationHost` returns an object in a PseudoAppDomain without remoting; call it through
   `dynamic` or reflection.
 - **Behaviour .NET changes everywhere:** `ArgumentException.Message` ends with `(Parameter 'name')`; ICU cultures

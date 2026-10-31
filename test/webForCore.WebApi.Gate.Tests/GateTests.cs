@@ -81,6 +81,34 @@ namespace WebApiGate
             return new object[] { method, path, body, accept, body == null ? null : contentType };
         }
 
+        // A web.config change restarts the application in a new PseudoAppDomain, and the old one is collected: nothing
+        // outside it (DataContractSerializer's and DataAnnotations' caches of the sample's types) keeps referencing it.
+        // The sample's state is static and read-only, so the restart does not change the other cases' results.
+        [Fact]
+        public async Task OldDomainUnloadsAfterARestart()
+        {
+            foreach (string path in new[] { "/api/products", "/api/products/1", "/api/status/item/7", "/owin/api/products" })
+            {
+                foreach (string accept in new[] { "application/json", "application/xml" })
+                {
+                    var request = new HttpRequestMessage(HttpMethod.Get, path);
+                    request.Headers.Accept.ParseAdd(accept);
+                    Assert.True((await _server.Client.SendAsync(request)).IsSuccessStatusCode, path + " " + accept);
+                }
+            }
+
+            File.SetLastWriteTimeUtc(Path.Combine(_server.SampleDirectory, "Web.config"), DateTime.UtcNow);
+
+            for (int i = 0; i < 300 && !_server.Output.Contains("(start 1) unloaded."); i++)
+            {
+                await Task.Delay(200);
+                if (i % 10 == 0) await _server.Client.GetAsync("/api/values"); // the next start
+            }
+            Assert.Contains("(start 1) is unloading.", _server.Output);
+            Assert.Contains("(start 1) unloaded.", _server.Output);
+            Assert.DoesNotContain("has not unloaded", _server.Output);
+        }
+
         [Theory]
         [MemberData(nameof(HostsAndCases))]
         public async Task SampleOnKestrelMatchesWebApi(string host, string method, string path, string body, string accept, string contentType)

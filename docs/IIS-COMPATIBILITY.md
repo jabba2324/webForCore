@@ -25,7 +25,7 @@ app.Run();
 | --- | --- | --- |
 | `UseWebForms(o => o.IIS(i => i.Enabled = false))` | on | Turns off the `<system.webServer>` modules |
 | `UseWebForms(o => o.IsolateApplication(false))` | isolated | Runs the app in the default load context, so there's no in-process restart (see [Process model](#process-model)) |
-| `UseWebForms(o => o.Recycling(r => ...))` | IIS's defaults | `Time` (1740 min), `Requests`, `PrivateMemory` (KB), `MaxStuckDomains` (3) |
+| `UseWebForms(o => o.Recycling(r => ...))` | IIS's defaults | `Time` (1740 min), `Requests`, `PrivateMemory` (KB), `MaxStuckDomains` (3), `CheckInterval` (30 s) |
 | `AddWebForms(o => o.Compression = false)` | on | IIS's static and dynamic compression |
 | `AddWebForms(o => o.LogDirectory = ...)` | `../logs/W3SVC1` | W3C log folder |
 | `AddWebForms(o => o.Systemd = false)` | on | `sd_notify` readiness and a watchdog |
@@ -97,7 +97,7 @@ IIS hands ASP.NET a worker request (`HttpWorkerRequest`); on Kestrel this is `As
 | AppDomain per application | Works | `PseudoAppDomain`: the app runs in a collectible `AssemblyLoadContext`, with its own copy of System.Web and the app's assemblies, so static state is per domain |
 | Restart on web.config, `bin` or `App_Code` change; `HttpRuntime.UnloadAppDomain` | Works | A new domain starts while the old one drains (overlapped recycle); no requests fail |
 | Recycling by time, request count, private memory | Works | `Recycling(...)`, with IIS's defaults |
-| Freeing old domains | Partial | Old domains aren't always collected (1 of 9 in tests). After 3 stuck domains the process stops cleanly, and systemd restarts it, as WAS recycled a worker |
+| Freeing old domains | Works | An old domain is collected once its requests finish (gate tests restart the IIS, MVC and Web API samples and wait for it). What .NET keeps process-wide is released when it unloads; an app's own `MemoryCache` instances must be disposed in `Application_End`. A domain still referenced 5 minutes after shutdown is logged, and after 3 the process stops cleanly for systemd to restart it, as WAS recycled a worker |
 | Health monitoring, rapid-fail protection | Works | systemd unit: `Type=notify`, watchdog in place of WAS's ping, 5 failures in 5 minutes |
 | Request queue, 503 on overflow | Partial | `appConcurrentRequestLimit` (503.2); no HTTP.sys queue |
 | Idle timeout, AlwaysRunning, preload | Not built | The app starts on its first request |
