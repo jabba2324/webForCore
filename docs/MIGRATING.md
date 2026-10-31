@@ -16,7 +16,13 @@ For an AI agent doing the migration, the same procedure is written as instructio
 2. **Inventory the dependencies.** List NuGet packages and referenced DLLs:
    - Microsoft's ASP.NET packages (`Microsoft.AspNet.Mvc`, `.WebApi.*`, `.WebPages`, `.Razor`, `.Cors`,
      `Microsoft.Owin.*`, `.SignalR.*`, `.Identity.*`, `Microsoft.AspNet.Web.Optimization`, `AjaxControlToolkit`) are
-     replaced by webForCore's projects.
+     replaced by webForCore's projects. Each is one version: MVC 5.3, Web API 5.3, Web Pages and Razor 3.3,
+     Katana 4.2.3, SignalR 2.4.3, Identity 2.2. An application on an older version gets the upgrade with the
+     migration, and the types the newer version added can be ambiguous with the application's own (#17): the Identity
+     2.0 samples define `SignInStatus`, which Identity 2.1 added to `Microsoft.AspNet.Identity.Owin`, so a file with
+     both namespaces gets `CS0104: 'SignInStatus' is an ambiguous reference` (OpenOrderFramework). Keep the
+     application's type with an alias in that file:
+     `using SignInStatus = OpenOrderFramework.Models.SignInStatus;`.
    - Pure managed libraries that target .NET Standard or .NET usually work as they are. Newtonsoft.Json, Autofac,
      EntityFramework 6.4+ and log4net are examples.
    - Libraries built only for .NET Framework that reference System.Web often load, because webForCore's assemblies
