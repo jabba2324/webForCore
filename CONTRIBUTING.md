@@ -5,26 +5,36 @@ a real application behave more like it did on .NET Framework 4.8 and IIS 10, and
 
 ## The principles
 
-1. **Every change comes with a test.** A fix has a regression test that fails without it and passes with it; a feature
+1. **Only Microsoft assemblies.** webForCore contains and ships Microsoft's assemblies only: Microsoft's source lifted
+   from its repositories, the port of the .NET Framework reference source, and assemblies with Microsoft's names that
+   webForCore writes in their place (facades, `Microsoft.Web.Infrastructure`, `System.Net.Http.WebRequest`). Builds
+   of third-party libraries for webForCore (WebActivatorEx, AjaxControlToolkit) are in
+   [webForCore-thirdparty](https://github.com/jabba2324/webForCore-thirdparty), which exists only to help the
+   [smoke test](https://github.com/jabba2324/webForCore-smoke-test) migrate applications that use them. Nothing in
+   webForCore depends on it: not its code, packages, tests, CI or documentation. A problem a third-party library has on
+   webForCore is fixed in webForCore's own code if it is webForCore's, and otherwise documented with a workaround.
+   NuGet dependencies of Microsoft's libraries (SkiaSharp, Newtonsoft.Json, ...) and build-only tools are fine.
+
+2. **Every change comes with a test.** A fix has a regression test that fails without it and passes with it; a feature
    has tests of its behaviour. Run the test against the code before your change and say in the pull request that it
    failed there. A documentation change that records a difference webForCore keeps (rather than fixing it) pins that
    behaviour with a test too, so the documentation can't silently become wrong. A new step in the migration guide is
    the one exception: its test is the application that needed it, so link that application's migration.
 
-2. **Every change names a real application it affects.** Say which open-source (or otherwise describable) application
+3. **Every change names a real application it affects.** Say which open-source (or otherwise describable) application
    hit the problem, what it did there, and what the user saw: "eShopLegacyMVC: every request failed with ...", not
    "ConfigurationManager could be wrong". Synthetic edge cases are fine as extra tests, but the reason for a change is an
    application that needs it. The [webForCore smoke test](https://github.com/jabba2324/webForCore-smoke-test) migrates
    open-source applications and files what breaks; its issues and `FINDINGS.md` are a good source.
 
-3. **Avoid changing Microsoft's code at all costs.** Most of webForCore is Microsoft's own source, lifted unchanged
+4. **Avoid changing Microsoft's code at all costs.** Most of webForCore is Microsoft's own source, lifted unchanged
    (ASP.NET Web Stack, Katana, SignalR, Identity, System.Drawing) or ported from the .NET Framework reference source
    (System.Web, System.Configuration). Its value is that it *is* Microsoft's behaviour. Before touching those files,
    look for a fix in webForCore's own code: the hosting layer (`src/WebFormsForCore.Web/WebFormsForCore/AspNetCoreHosting`,
    the PseudoAppDomain, the IIS modules), the build targets (`src/webForCore.WebStack.targets`), the lift scripts'
    additions (`tools/lift/additions/`), or configuration. Most problems found so far were fixed there.
 
-4. **When Microsoft's code must change, keep the documentation current.** Keep the change as small as it can be (an
+5. **When Microsoft's code must change, keep the documentation current.** Keep the change as small as it can be (an
    `#if`, a guarded branch for Linux, not a rewrite) and:
    - mark it with a `// webForCore:` comment saying why, and the issue number;
    - for lifted code, make the change a fixup in the lift script (`tools/lift/`), not an edit of the lifted file, and

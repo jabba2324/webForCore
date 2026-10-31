@@ -52,8 +52,7 @@
         <ProjectReference Include="..\WebFormsForCore.Web.Extensions\WebFormsForCore.Web.Extensions.csproj" />
         <ProjectReference Include="..\WebFormsForCore.Web.Optimization.WebForms\WebFormsForCore.Web.Optimization.WebForms.csproj" />
         <ProjectReference Include="..\WebFormsForCore.Web.Optimization\WebFormsForCore.Web.Optimization.csproj" />
-        <ProjectReference Include="..\WebFormsForCore.WebGrease\WebFormsForCore.WebGrease.csproj" />
-        <ProjectReference Include="..\WebFormsForCore.AjaxControlToolkit\AjaxControlToolkit\AjaxControlToolkit.csproj" />-->
+        <ProjectReference Include="..\WebFormsForCore.WebGrease\WebFormsForCore.WebGrease.csproj" />-->
         <PackageReference Include="WebFormsForCore.Build" Version="1.7.0-rc3" ExcludeAssets="runtime" />
     </ItemGroup>
 
@@ -72,8 +71,6 @@
         <ProjectReference Include="..\WebFormsForCore.Web.Optimization.WebForms\WebFormsForCore.Web.Optimization.WebForms.csproj" />
         <ProjectReference Include="..\WebFormsForCore.Web.Optimization\WebFormsForCore.Web.Optimization.csproj" />
         <ProjectReference Include="..\WebFormsForCore.WebGrease\WebFormsForCore.WebGrease.csproj" />
-        <ProjectReference Include="..\WebFormsForCore.AjaxControlToolkit\AjaxControlToolkit\AjaxControlToolkit.csproj" />
-        <ProjectReference Include="..\WebFormsForCore.AjaxControlToolkit\AjaxControlToolkit.StaticResources\AjaxControlToolkit.StaticResources.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' != 'net48' AND '$(UseLocalBuild)' != 'true'">
@@ -85,8 +82,6 @@
         <PackageReference Include="WebFormsForCore.Web.Optimization" Version="1.7.0-rc3" />
         <PackageReference Include="WebFormsForCore.Web.Optimization.WebForms" Version="1.7.0-rc3" />
         <PackageReference Include="WebFormsForCore.WebGrease" Version="1.7.0-rc3" />
-        <PackageReference Include="WebFormsForCore.AjaxControlToolkit" Version="1.7.0-rc3" />
-        <PackageReference Include="WebFormsForCore.AjaxControlToolkit.StaticResources" Version="1.7.0-rc3" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
@@ -95,7 +90,6 @@
         <Reference Include="System.Web" />
         <Reference Include="System.Web.Services" />
         <Reference Include="System.Web.ApplicationServices" />
-        <PackageReference Include="AjaxControlToolkit" Version="20.1.0" />
         <PackageReference Include="Antlr3.Runtime" Version="3.5.1" />
         <PackageReference Include="Microsoft.Web.Infrastructure" Version="2.0.0" />
         <PackageReference Include="Microsoft.AspNet.Web.Optimization" Version="1.1.3" />
@@ -114,7 +108,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <!--<PackageReference Include="AjaxControlToolkit" Version="20.1.0" />-->
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
         <PackageReference Include="AspNet.ScriptManager.jQuery" Version="3.7.1" />
         <PackageReference Include="bootstrap" Version="5.3.8" />
@@ -130,9 +123,6 @@
     </ItemGroup>
 
    <ItemGroup>
-      <Compile Update="AjaxTest.aspx.cs">
-        <SubType>ASPXCodeBehind</SubType>
-      </Compile>
        <Compile Update="Test.aspx.cs">
            <SubType>ASPXCodeBehind</SubType>
        </Compile>

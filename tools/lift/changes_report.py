@@ -92,8 +92,8 @@ def fork_changes(fork):
         f"Changed since [webformsforcore/WebFormsForCore@{UPSTREAM_FORK_POINT[:7]}]"
         f"(https://github.com/webformsforcore/WebFormsForCore/tree/{UPSTREAM_FORK_POINT}), the commit webForCore forked from: "
         f"{len(rows)} source and project files, {added} of them new. Line counts are against that commit; the links go "
-        "to the file there. AjaxControlToolkit, a submodule upstream and vendored here, is left out: its one change is "
-        "upstream's commit 92be3f03 (\"Build on Linux and target net11.0 only\").",
+        "to the file there. AjaxControlToolkit, a submodule upstream, is left out: it isn't Microsoft's, and moved to "
+        "[webForCore-thirdparty](https://github.com/jabba2324/webForCore-thirdparty).",
         "",
         "| File | Lines | webForCore's note |",
         "| --- | --- | --- |"] + rows)

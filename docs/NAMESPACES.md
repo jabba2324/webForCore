@@ -158,6 +158,9 @@ can't be read on Linux (the error says so). `RsaProtectedConfigurationProvider` 
 the key directory; containers exported with `aspnet_regiis -px` can be imported. The key directory is
 `$WEBFORCORE_KEYS`, `/var/lib/webforcore/keys` or `~/.webforcore/keys`.
 
+webForCore ships only Microsoft assemblies. WebActivatorEx's start methods don't run on it, and AjaxControlToolkit
+isn't provided ([MIGRATING.md](MIGRATING.md#3-references)).
+
 ### Smaller companions
 
 | Assembly | Namespaces | Caveats |
@@ -169,7 +172,6 @@ the key directory; containers exported with `aspnet_regiis -px` can be imported.
 | Microsoft.Web.Infrastructure | `Microsoft.Web.Infrastructure`, `.DynamicModuleHelper`, `.DynamicValidationHelper` | webForCore's implementation of the documented API: `DynamicModuleUtility.RegisterModule` (on `HttpApplication.RegisterModule`), `HttpContextHelper`, `InfrastructureHelper`, `ValidationUtility` (granular request validation) |
 | System.Web.Abstractions, System.Web.Routing (4.0.0.0) | (type forwarders) | The .NET Framework 4 facades: `HttpContextBase` and the other abstractions, and routing, are in System.Web, and these forward there, as in the GAC. Part of the "Always" set, for web.configs from MVC 2-4 projects that list them in `<compilation><assemblies>` and .NET 3.5 libraries that reference them |
 | System.Web.Optimization, WebGrease | `System.Web.Optimization`, `Microsoft.AspNet.Web.Optimization.WebForms`, `WebGrease`, `Microsoft.Ajax.Utilities` | Bundling and minification |
-| AjaxControlToolkit | `AjaxControlToolkit`, `.HtmlEditor`, `.Bundling` | Designers are .NET Framework only |
 | System.Web.DynamicData | `System.Web.DynamicData` (+ `.ModelProviders`), and `System.ComponentModel.DataAnnotations.ScaffoldTableAttribute`, which .NET dropped | Part of the "Always" set: System.Web loads it for every data control with `ItemType`. The LINQ to SQL and Entity Framework 1–4 model providers aren't built (`RegisterContext` needs a `DataModelProvider`), nor are the EF 5 spatial types (`DbGeography`, `DbGeometry`) as column types. Designers are .NET Framework only |
 | System.Web.Entity | | Not built by the solution |
 
@@ -236,7 +238,6 @@ Caveats:
 | Assembly | Purpose |
 | --- | --- |
 | WebFormsForCore.Serialization.Formatters | A port of BinaryFormatter (and SoapFormatter) in the `WebFormsForCore.Serialization.Formatters.Binary` namespace, with surrogates for .NET Framework types .NET no longer serializes. System.Web uses it for out-of-process session state, view state and the output cache. Subclasses of `NameObjectCollectionBase` that override `GetObjectData` aren't handled |
-| WebActivatorEx (2.0.0.0) | WebActivatorEx's `PreApplicationStartMethod`, `PostApplicationStartMethod` and `ApplicationShutdownMethod` attributes and `ActivationManager`, written from its documented API with the original's name, version and public key. Part of the "Always" set, and preferred over the original package that Unity.Mvc, Ninject.MVC and others bring. It finds the attributes in the application's load context; the original's `Assembly.LoadFrom` returned copies in the default context, and no start method ran (#21). The `webactivator:assembliesToScan` setting isn't read: only assemblies that reference WebActivatorEx are scanned |
 | System.Net.Http.WebRequest (4.0.0.0) | .NET Framework's `WebRequestHandler`, written from its documented API as an `HttpClientHandler`, for libraries built against it: Katana's social providers and WS-Federation create one as their back-channel handler (#18). Part of the "Always" set. `ServerCertificateValidationCallback` is passed to `ServerCertificateCustomValidationCallback` (its sender is the `HttpRequestMessage`); the settings only `HttpWebRequest` had (`AllowPipelining`, `CachePolicy`, `ReadWriteTimeout`, `ContinueTimeout`, ...) are kept but have no effect |
 | WebFormsForCore.Compilers | Roslyn `csc`/`vbc` for run-time compilation |
 | aspnetcore_compiler | aspnet_compiler for .NET (precompiled sites) |

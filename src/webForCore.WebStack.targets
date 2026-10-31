@@ -29,7 +29,7 @@
     </ItemGroup>
   </Target>
 
-  <!-- Packages built on MVC, Web API, Katana or WebActivatorEx (Unity.Mvc, Autofac.Mvc5, Swashbuckle, ...) bring
+  <!-- Packages built on MVC, Web API or Katana (Unity.Mvc, Autofac.Mvc5, Swashbuckle, ...) bring
        Microsoft's packages back transitively, with assemblies of the same names as webForCore's. The SDK keeps one of
        each by assembly version, then file version, so Microsoft's won where the assembly versions tie:
        System.Web.Razor and System.Web.WebPages are 3.0.0.0 in both, and Microsoft.AspNet.WebPages 3.1.0's file version
@@ -37,7 +37,7 @@
        MissingMethodException (#23: Bonobo Git Server, ApplicantTracking, ReaLocate, Roadkill, eShopLegacyMVC). Package
        overrides come before versions in the SDK's conflict resolution (they are how the shared framework wins over the
        System.* packages): each webForCore package in the build overrides the Microsoft packages webForCore replaces,
-       at any version. -->
+       at any version. The packages of webForCore-thirdparty (WebActivatorEx, AjaxControlToolkit) declare their own. -->
   <PropertyGroup>
     <_WebForCoreReplacedPackages>
       Microsoft.AspNet.Mvc|99.0.0;Microsoft.AspNet.Mvc.Futures|99.0.0;Microsoft.AspNet.Razor|99.0.0;
@@ -49,8 +49,7 @@
       Microsoft.AspNet.SignalR.Core|99.0.0;Microsoft.AspNet.SignalR.SystemWeb|99.0.0;Microsoft.AspNet.SignalR.Client|99.0.0;
       Microsoft.Owin|99.0.0;Microsoft.Owin.Host.SystemWeb|99.0.0;Microsoft.Owin.Host.HttpListener|99.0.0;
       Microsoft.Owin.Hosting|99.0.0;Microsoft.Owin.Security|99.0.0;Microsoft.Owin.Security.Cookies|99.0.0;
-      Microsoft.Owin.Security.OAuth|99.0.0;Microsoft.Owin.Cors|99.0.0;Microsoft.Owin.Testing|99.0.0;
-      AjaxControlToolkit|99.0.0;WebActivatorEx|99.0.0
+      Microsoft.Owin.Security.OAuth|99.0.0;Microsoft.Owin.Cors|99.0.0;Microsoft.Owin.Testing|99.0.0
     </_WebForCoreReplacedPackages>
   </PropertyGroup>
   <Target Name="WebForCoreOverrideReplacedPackages" BeforeTargets="_HandlePackageFileConflicts;_HandlePackageFileConflictsForPublish" Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">

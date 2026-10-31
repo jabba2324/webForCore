@@ -15,8 +15,9 @@ For an AI agent doing the migration, the same procedure is written as instructio
    EMF/WMF metafiles. Each one needs a code change; plan these first.
 2. **Inventory the dependencies.** List NuGet packages and referenced DLLs:
    - Microsoft's ASP.NET packages (`Microsoft.AspNet.Mvc`, `.WebApi.*`, `.WebPages`, `.Razor`, `.Cors`,
-     `Microsoft.Owin.*`, `.SignalR.*`, `.Identity.*`, `Microsoft.AspNet.Web.Optimization`, `AjaxControlToolkit`) are
-     replaced by webForCore's projects. Each is one version: MVC 5.3, Web API 5.3, Web Pages and Razor 3.3,
+     `Microsoft.Owin.*`, `.SignalR.*`, `.Identity.*`, `Microsoft.AspNet.Web.Optimization`) are
+     replaced by webForCore's projects. webForCore ships only Microsoft assemblies: WebActivatorEx and
+     AjaxControlToolkit aren't replaced (below). Each is one version: MVC 5.3, Web API 5.3, Web Pages and Razor 3.3,
      Katana 4.2.3, SignalR 2.4.3, Identity 2.2. An application on an older version gets the upgrade with the
      migration, and the types the newer version added can be ambiguous with the application's own (#17): the Identity
      2.0 samples define `SignInStatus`, which Identity 2.1 added to `Microsoft.AspNet.Identity.Owin`, so a file with
@@ -113,7 +114,7 @@ Remove the .NET Framework references and Microsoft's ASP.NET NuGet packages. Wit
 `<PackageReference Include="webForCore" Version="0.3.0" />` (the "Always" set below) and, for the frameworks the app
 uses, the package of the same name with the `src/` folder's `webForCore.System.`/`webForCore.` prefix replaced by
 `webForCore.` (`webForCore.Web.Mvc`, `webForCore.Web.Http.WebHost`, `webForCore.Microsoft.AspNet.SignalR.SystemWeb`,
-`webForCore.Microsoft.Owin.Security.Cookies`, `webForCore.Web.Optimization`, `webForCore.AjaxControlToolkit`, ...).
+`webForCore.Microsoft.Owin.Security.Cookies`, `webForCore.Web.Optimization`, ...).
 From source, add project references to the fork. Everything an app needs:
 
 | Always | Project (under `webForCore/src/`) |
@@ -141,7 +142,15 @@ From source, add project references to the fork. Everything an app needs:
 | ASP.NET Identity 2 | `webForCore.Microsoft.AspNet.Identity.Owin`, `webForCore.Microsoft.AspNet.Identity.EntityFramework` |
 | Bundling | `WebFormsForCore.Web.Optimization` (+ `.Optimization.WebForms` for `<webopt:BundleReference>`) |
 | Chart control | `WebFormsForCore.Web.DataVisualization` |
-| AjaxControlToolkit | `WebFormsForCore.AjaxControlToolkit/AjaxControlToolkit/AjaxControlToolkit.csproj` |
+
+webForCore ships only Microsoft assemblies, so two libraries apps commonly have need attention:
+
+- **WebActivatorEx** (Unity.Mvc, Ninject.MVC, StructureMap.MVC and others bring it): its start methods never run on
+  webForCore. It finds its attributes with `Assembly.LoadFrom`, which on .NET loads second copies of the application's
+  assemblies outside the application (#21; [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md)). Keep the package, and call
+  each `[assembly: WebActivatorEx.PreApplicationStartMethod(typeof(X), "Start")]` method from `Application_Start` in
+  Global.asax (`X.Start()`), post-start methods after it, and shutdown methods from `Application_End`.
+- **AjaxControlToolkit** isn't provided. The original package is built for .NET Framework.
 
 Keep other NuGet packages, preferring versions that target .NET Standard or .NET. The `test/webForCore.*.Sample`
 projects in this repository are working examples for Web Forms, MVC, Web API and Web Pages.

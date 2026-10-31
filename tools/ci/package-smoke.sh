@@ -51,11 +51,11 @@ cp -r "$here/package-smoke-mvc/." "$mvc"
 cp nuget.config "$mvc"
 cd "$mvc"
 dotnet build SmokeMvc.csproj -c Release -p:WebForCoreVersion="$version" -nodeReuse:false
-# The output has webForCore's MVC, Razor, Web Pages and WebActivatorEx, not the .NET Framework ones that Unity.Mvc and
-# WebActivatorEx bring (issue #23: Microsoft.AspNet.Razor and WebPages won the SDK's conflict resolution on file version).
-if grep -q -E '"lib/net4[0-9]*/(System\.Web\.(Mvc|Razor|WebPages[A-Za-z.]*)|WebActivatorEx)\.dll"' bin_dotnet/SmokeMvc.deps.json; then
+# The output has webForCore's MVC, Razor and Web Pages, not the .NET Framework ones that Unity.Mvc brings (issue #23:
+# Microsoft.AspNet.Razor and WebPages won the SDK's conflict resolution on file version).
+if grep -q -E '"lib/net4[0-9]*/System\.Web\.(Mvc|Razor|WebPages[A-Za-z.]*)\.dll"' bin_dotnet/SmokeMvc.deps.json; then
   echo "deps.json: .NET Framework assemblies replaced webForCore's:"
-  grep -o -E '"lib/net4[0-9]*/(System\.Web\.(Mvc|Razor|WebPages[A-Za-z.]*)|WebActivatorEx)\.dll"' bin_dotnet/SmokeMvc.deps.json | sort -u
+  grep -o -E '"lib/net4[0-9]*/System\.Web\.(Mvc|Razor|WebPages[A-Za-z.]*)\.dll"' bin_dotnet/SmokeMvc.deps.json | sort -u
   fail=1
 fi
 dotnet bin_dotnet/SmokeMvc.dll --urls http://127.0.0.1:5198 > server.log 2>&1 &
@@ -64,12 +64,11 @@ for i in $(seq 120); do curl -s -o /dev/null http://127.0.0.1:5198/ && break; sl
 # A Razor view renders although Unity.Mvc brings Microsoft.AspNet.Razor 3.2.7 (issue #23: it replaced webForCore's in
 # the output, and every view failed with a MissingMethodException).
 curl -s http://127.0.0.1:5198/Plain | grep -q "plain view, rendered by Razor" || { echo "/Plain: unexpected response"; curl -s http://127.0.0.1:5198/Plain | grep -i -m2 '<title>'; fail=1; }
-# Unity, registered by WebActivatorEx's PreApplicationStartMethod, constructs the controller (issue #21: the activators
-# never ran), and its Razor view renders although Unity.Mvc brings Microsoft.AspNet.Razor 3.2.7 (issue #23: it replaced
-# webForCore's, MissingMethodException). PostApplicationStartMethod ran too.
+# Unity, started from Application_Start (WebActivatorEx's start methods don't run on webForCore, issue #21; the original
+# package is in the build all the same and must not break it), constructs the controller, and its Razor view renders
+# although Unity.Mvc brings Microsoft.AspNet.Razor 3.2.7 (issue #23: it replaced webForCore's, MissingMethodException).
 home=$(curl -s http://127.0.0.1:5198/)
 echo "$home" | grep -q "hello from Unity, rendered by Razor" || { echo "/: unexpected response"; echo "$home" | head -20; fail=1; }
-echo "$home" | grep -q "post-start: True" || { echo "/: PostApplicationStartMethod didn't run"; fail=1; }
 # Katana 3.0.1's Google provider redirects a challenge to Google (issue #18: it needs System.Net.Http.WebRequest, and
 # every request failed).
 location=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' http://127.0.0.1:5198/challenge)
