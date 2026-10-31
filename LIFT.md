@@ -1758,3 +1758,22 @@ MIGRATING.md section 6), with the APIs that are the site root as on IIS: `HttpRu
 `HostingEnvironment.ApplicationPhysicalPath`, `Server.MapPath("~/")`. Hit by eShopLegacyMVC, whose database seed read
 its SQL scripts through `BaseDirectory`. Test: `RegressionTests.BaseDirectoryIsTheBuildOutputAndTheSiteApisAreTheSite`
 pins both, so the documentation can't silently go out of date.
+
+## Fixes from the smoke test's second round (31 Oct 2026)
+
+The smoke test bed's second round ran on the 0.2.0 packages. All 14 applications from the first round now pass, and
+five more were migrated (ApplicantTracking, OpenOrderFramework, ReaLocate, Roadkill, SocialGoal). What failed was
+filed as issues #17-#23. As before, each fix has a regression test and names the applications that hit it.
+
+### Configuration types through the System facade (#19)
+
+The first round's fix for #1 loads the `System.Configuration` facade per domain. The configuration types that were in
+`System.dll` on .NET Framework (`IConfigurationSectionHandler`, `SingleTagSectionHandler`, `NameValueSectionHandler`,
+`ConfigurationException`, ...) are reached through the `System` facade instead, and that was still shared from the
+default context, so its forwards resolved to the host's ConfigurationManager. ELMAH 1.2's section handlers derive from
+`SingleTagSectionHandler` in `System, Version=2.0.0.0`, and SocialGoal failed on every request with "Type
+'Elmah.ErrorMailSectionHandler' does not inherit from 'System.Configuration.IConfigurationSectionHandler'". `System`
+is now in `PerDomainFrameworkAssemblies`; its other forwards go to shared-framework assemblies, which the domain still
+shares. Test: `RegressionTests.SectionHandlerThroughTheSystemFacadeIsTheApplications`
+(`regressions/SystemFacadeSection.aspx` and a `SingleTagSectionHandler` section in `regressions/web.config`; a 500
+on 0.2.0).

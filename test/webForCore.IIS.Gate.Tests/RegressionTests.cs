@@ -193,5 +193,17 @@ namespace IISGate
             Assert.Contains("HostingEnvironment.ApplicationPhysicalPath: webForCore.IIS.Sample", body);
             Assert.Contains("Server.MapPath: webForCore.IIS.Sample", body);
         }
+
+        // #19: configuration types reached through System.dll (a facade on .NET) must be the application's. SocialGoal's
+        // ELMAH 1.2 section handlers derive from SingleTagSectionHandler in System, Version=2.0.0.0, and every request
+        // failed with "Type 'Elmah.ErrorMailSectionHandler' does not inherit from IConfigurationSectionHandler".
+        [Fact]
+        public async Task SectionHandlerThroughTheSystemFacadeIsTheApplications()
+        {
+            var (response, body) = await Get("/regressions/SystemFacadeSection.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("same type: True", body);
+            Assert.Contains("section: from SingleTagSectionHandler", body);
+        }
     }
 }
