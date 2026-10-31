@@ -99,6 +99,10 @@ namespace WebFormsForCore.Hosting.IIS
 				Logger = logger,
 				Result = RuleResult.ContinueRules,
 			};
+			// {CACHE_URL} is answered by a server-variables feature for the rules' duration (see Rules).
+			bool cacheUrl = UsesCacheUrl(group);
+			var serverVariables = context.Features.Get<IServerVariablesFeature>();
+			if (cacheUrl) context.Features.Set<IServerVariablesFeature>(new CacheUrlVariable(serverVariables, CacheUrl(request, originalBase, path)));
 			try
 			{
 				foreach (var rule in compiled)
@@ -109,6 +113,7 @@ namespace WebFormsForCore.Hosting.IIS
 			}
 			finally
 			{
+				if (cacheUrl) context.Features.Set(serverVariables);
 				var rewritten = request.Path.Value ?? "/";
 				request.PathBase = originalBase;
 				if (rewritten.StartsWith(SiteRoot, StringComparison.Ordinal)) rewritten = rewritten.Length > SiteRoot.Length ? rewritten.Substring(SiteRoot.Length) : "/";
@@ -117,8 +122,92 @@ namespace WebFormsForCore.Hosting.IIS
 				var location = context.Response.Headers.Location.ToString();
 				if (location.Contains(SiteRoot, StringComparison.Ordinal))
 					context.Response.Headers.Location = location.Replace(prefix + SiteRoot, "").Replace(SiteRoot, "");
+				// A redirect URL that is absolute only once evaluated ("{C:1}://{C:2}") got the level's path base in front;
+				// IIS uses an absolute URL as it is (#10).
+				else if (prefix.Length > 0 && location.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
+					&& AbsoluteUrl.IsMatch(location.Substring(prefix.Length)))
+					context.Response.Headers.Location = location.Substring(prefix.Length);
 			}
 			return rewriteContext.Result;
+		}
+
+		// ASP.NET Core's parser doesn't know {CACHE_URL}, so the rules name a variable it does know and webForCore otherwise
+		// doesn't serve, {HTTP_PROXY_CONNECTION}; while the level's rules run, a server-variables feature (which ASP.NET
+		// Core asks before its own values) answers it with IIS's CACHE_URL: scheme, host, port, path and query (#10).
+		const string CacheUrlStandIn = "HTTP_PROXY_CONNECTION";
+
+		static readonly Regex AbsoluteUrl = new Regex("^[a-zA-Z][a-zA-Z0-9+.-]*://", RegexOptions.CultureInvariant);
+
+		sealed class CacheUrlVariable : IServerVariablesFeature
+		{
+			readonly IServerVariablesFeature inner;
+			readonly string value;
+
+			public CacheUrlVariable(IServerVariablesFeature inner, string value)
+			{
+				this.inner = inner;
+				this.value = value;
+			}
+
+			public string this[string variableName]
+			{
+				get => string.Equals(variableName, CacheUrlStandIn, StringComparison.OrdinalIgnoreCase) ? value : inner?[variableName];
+				set { if (inner != null) inner[variableName] = value; }
+			}
+		}
+
+		static bool UsesCacheUrl(List<XElement> group) =>
+			group.Any(rule => rule.ToString().Contains("{CACHE_URL}", StringComparison.OrdinalIgnoreCase));
+
+		static string CacheUrl(HttpRequest request, PathString pathBase, string path)
+		{
+			int port = request.Host.Port ?? (request.IsHttps ? 443 : 80);
+			return request.Scheme + "://" + request.Host.Host + ":" + port + pathBase.Add(path).ToUriComponent() + request.QueryString.ToUriComponent();
+		}
+
+		// IIS's other pattern syntaxes, as the equivalent regular expressions (ASP.NET Core's parser has ECMAScript only):
+		// in Wildcard, '*' matches and captures any characters and '?' one; ExactMatch is the whole string (#10).
+		static string ToRegex(string syntax, string pattern) =>
+			string.Equals(syntax, "Wildcard", StringComparison.OrdinalIgnoreCase)
+				? "^" + Regex.Escape(pattern).Replace("\\*", "(.*)").Replace("\\?", "(.)") + "$"
+				: "^" + Regex.Escape(pattern) + "$";
+
+		static void TranslateRule(XElement rule, string level)
+		{
+			var syntax = Attr(rule, "patternSyntax");
+			if (syntax != null && !string.Equals(syntax, "ECMAScript", StringComparison.OrdinalIgnoreCase))
+			{
+				rule.Attribute("patternSyntax").Remove();
+				var match = rule.Element("match");
+				if (Attr(match, "url") is string url) match.SetAttributeValue("url", ToRegex(syntax, url));
+				foreach (var condition in rule.Element("conditions")?.Elements("add") ?? Enumerable.Empty<XElement>())
+				{
+					if (Attr(condition, "pattern") is string pattern) condition.SetAttributeValue("pattern", ToRegex(syntax, pattern));
+				}
+			}
+			foreach (var attribute in rule.DescendantsAndSelf().Attributes())
+			{
+				if (attribute.Value.Contains("{CACHE_URL}", StringComparison.OrdinalIgnoreCase))
+					attribute.Value = Regex.Replace(attribute.Value, Regex.Escape("{CACHE_URL}"), "{" + CacheUrlStandIn + "}", RegexOptions.IgnoreCase);
+			}
+			var action = rule.Element("action");
+			var actionUrl = Attr(action, "url");
+			// A rewrite to a query string alone ("?slug={R:1}") is to the level's root with that query, as IIS resolves it;
+			// ASP.NET Core's RewriteAction expects a path first and threw IndexOutOfRangeException (#11).
+			if (actionUrl != null && actionUrl.StartsWith("?") && string.Equals(Attr(action, "type"), "Rewrite", StringComparison.OrdinalIgnoreCase))
+				action.SetAttributeValue("url", "/" + actionUrl);
+			else if (level != "/" && actionUrl != null && actionUrl.StartsWith("/")) action.SetAttributeValue("url", SiteRoot + actionUrl);
+		}
+
+		// The rules of a level that can't be used fail closed, as IIS does with configuration it can't apply: every
+		// request below the level gets a 500 (it used to run without them, so a rule that blocked a path stopped blocking).
+		sealed class UnusableRules : Microsoft.AspNetCore.Rewrite.IRule
+		{
+			public void ApplyRule(RewriteContext context)
+			{
+				context.HttpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+				context.Result = RuleResult.EndResponse;
+			}
 		}
 
 		IList<Microsoft.AspNetCore.Rewrite.IRule> Rules(string level, List<XElement> group, XElement maps)
@@ -127,9 +216,7 @@ namespace WebFormsForCore.Hosting.IIS
 			{
 				var copy = new XElement(rule);
 				copy.Attribute(LevelPathAttribute)?.Remove();
-				var action = copy.Element("action");
-				var url = Attr(action, "url");
-				if (level != "/" && url != null && url.StartsWith("/")) action.SetAttributeValue("url", SiteRoot + url);
+				TranslateRule(copy, level);
 				return copy;
 			}));
 			var rewrite = new XElement("rewrite", rulesElement);
@@ -143,8 +230,8 @@ namespace WebFormsForCore.Hosting.IIS
 				}
 				catch (Exception e) when (e is FormatException || e is NotSupportedException || e is InvalidOperationException || e is ArgumentException)
 				{
-					logger.LogError(e, "The <rewrite> rules for {Level} cannot be used.", level);
-					return Array.Empty<Microsoft.AspNetCore.Rewrite.IRule>();
+					logger.LogError(e, "The <rewrite> rules for {Level} cannot be used; requests below it get 500.", level);
+					return new Microsoft.AspNetCore.Rewrite.IRule[] { new UnusableRules() };
 				}
 			});
 		}

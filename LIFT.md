@@ -1678,3 +1678,22 @@ leading `/` (still anchored at the application root). Hit by MiniBlog: its XML-R
 (`/feed/*`), comment and post handlers (`/comment.ashx`, `/post.ashx`) were 404. Tests:
 `RegressionTests.HandlerPathWithLeadingSlashMatches` (a wildcard and an exact path) and
 `HandlerPathWithLeadingSlashDoesNotMatchDeeper`.
+
+### URL Rewrite: Wildcard and ExactMatch, `{CACHE_URL}`, failing closed, query-only rewrites (#10, #11)
+
+webForCore hands each level's `<rewrite><rules>` to ASP.NET Core's IIS rewrite parser, which has only ECMAScript
+patterns and a fixed list of server variables. IIS's own "Remove WWW" template (`patternSyntax="Wildcard"`,
+`{CACHE_URL}`) made it throw, and webForCore then skipped every rule of the level, so a rule that blocked a path
+stopped blocking it. `InboundRewrite.TranslateRule` now rewrites each rule before parsing: Wildcard and ExactMatch
+patterns become the equivalent regular expressions (as `OutboundRewrite` already did), `{CACHE_URL}` becomes a variable
+the parser knows and webForCore otherwise doesn't serve (`{HTTP_PROXY_CONNECTION}`), which a server-variables feature
+answers with IIS's CACHE_URL while the level's rules run, and a Rewrite to a query string alone (`?slug={R:1}`) gets the
+level's root in front, where ASP.NET Core's `RewriteAction` threw `IndexOutOfRangeException` (#11). A redirect URL that
+is absolute only once evaluated (`{C:1}://{C:2}`) no longer gets the level's path base in front. Rules that still can't
+be parsed fail closed: every request below the level gets 500 (the error is logged), as IIS refuses configuration it
+can't apply. Hit by MiniBlog: its ten rules, among them the one answering `posts/*.xml` with 403, were all skipped, so
+the post files (commenters' e-mail addresses, drafts) were served; with the template working, its slug, paging and
+category rewrites crashed (#11). Tests: `RegressionTests.WildcardRuleWithCacheUrlRedirects`,
+`RulesNextToAWildcardRuleStillApply` (Wildcard and ExactMatch), `FilesTheRulesDontBlockAreServed`,
+`UnusableRulesFailClosed` and `RewriteToAQueryStringRunsTheLevelsDefaultDocument` (`regressions/rewrite` and
+`regressions/rewrite-unusable`); the 35 IISModuleTests still pass.
