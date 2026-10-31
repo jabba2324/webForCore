@@ -26,7 +26,7 @@ in the code; the rest are from `LIFT.md`.
 | --- | --- | --- |
 | Windows authentication | `<authentication mode="Windows">`, `WindowsIdentity`, impersonation, file ACL authorization | Forms, cookie or OpenID Connect authentication |
 | WCF | Hosting `.svc` services; `ApplicationServicesHostFactory` | CoreWCF, or ASMX (`.asmx` works) |
-| LINQ to SQL, Entity Framework 1–4 | `LinqDataSource`, MVC's `LinqBinaryModelBinder`, the `Binary` editor templates, `EntityDataSource` (not built), the DynamicData LINQ to SQL provider | EF 6.4+ or EF Core, with `ObjectDataSource`/model binding |
+| LINQ to SQL, Entity Framework 1–4 | `LinqDataSource`, MVC's `LinqBinaryModelBinder`, the `Binary` editor templates, `EntityDataSource` (not built), Dynamic Data's LINQ to SQL and Entity Framework model providers (`MetaModel.RegisterContext` with a `DataContext` or `ObjectContext`) | EF 6.4+ or EF Core, with `ObjectDataSource`/model binding; Dynamic Data through a `DataModelProvider` |
 | COM+ transactions | `<%@ Page Transaction=... %>`, `Transactions.InvokeTransacted` | `System.Transactions.TransactionScope` |
 | Web references | `App_WebReferences` (generates nothing) | Generate the proxy with `dotnet-svcutil` and compile it into the app |
 | Metafiles | EMF/WMF in System.Drawing | PNG/SVG |
@@ -162,7 +162,8 @@ the key directory; containers exported with `aspnet_regiis -px` can be imported.
 | Microsoft.Web.Infrastructure | `Microsoft.Web.Infrastructure`, `.DynamicModuleHelper`, `.DynamicValidationHelper` | webForCore's implementation of the documented API: `DynamicModuleUtility.RegisterModule` (on `HttpApplication.RegisterModule`), `HttpContextHelper`, `InfrastructureHelper`, `ValidationUtility` (granular request validation) |
 | System.Web.Optimization, WebGrease | `System.Web.Optimization`, `Microsoft.AspNet.Web.Optimization.WebForms`, `WebGrease`, `Microsoft.Ajax.Utilities` | Bundling and minification |
 | AjaxControlToolkit | `AjaxControlToolkit`, `.HtmlEditor`, `.Bundling` | Designers are .NET Framework only |
-| System.Web.DynamicData, System.Web.Entity | | Not built by the solution |
+| System.Web.DynamicData | `System.Web.DynamicData` (+ `.ModelProviders`), and `System.ComponentModel.DataAnnotations.ScaffoldTableAttribute`, which .NET dropped | Part of the "Always" set: System.Web loads it for every data control with `ItemType`. The LINQ to SQL and Entity Framework 1–4 model providers aren't built (`RegisterContext` needs a `DataModelProvider`), nor are the EF 5 spatial types (`DbGeography`, `DbGeometry`) as column types. Designers are .NET Framework only |
+| System.Web.Entity | | Not built by the solution |
 
 ## ASP.NET MVC, Web Pages, Razor (lifted)
 

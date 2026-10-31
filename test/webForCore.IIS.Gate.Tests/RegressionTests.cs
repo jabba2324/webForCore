@@ -167,5 +167,17 @@ namespace IISGate
                 Assert.DoesNotContain("#Fields:", body);
             }
         }
+
+        // #8: Repeater, ListView and GridView with ItemType load System.Web.DynamicData (EnableDynamicData) in OnInit;
+        // it wasn't built, so eShopLegacyWebForms' catalog (a ListView with ItemType) failed with FileNotFoundException.
+        [Fact]
+        public async Task DataControlsWithItemTypeRender()
+        {
+            var (response, body) = await Get("/regressions/TypedDataControls.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("[repeater alpha]", body);
+            Assert.Contains("[listview Second book]", body);
+            Assert.Contains("[gridview 1 First book]", body);
+        }
     }
 }

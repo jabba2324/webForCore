@@ -29,5 +29,8 @@
     <ProjectReference Include="..\WebFormsForCore.Serialization.Formatters\WebFormsForCore.Serialization.Formatters.csproj" />
     <ProjectReference Include="..\WebFormsForCore.Drawing\WebFormsForCore.Drawing.csproj" />
     <ProjectReference Include="..\WebFormsForCore.Compilers\WebFormsForCore.Compilers.csproj" />
+    <!-- System.Web loads System.Web.DynamicData for every data control with ItemType (EnableDynamicData), as on .NET
+         Framework, where it is in the GAC (#8). -->
+    <ProjectReference Include="..\WebFormsForCore.Web.DynamicData\WebFormsForCore.Web.DynamicData.csproj" />
   </ItemGroup>
 </Project>

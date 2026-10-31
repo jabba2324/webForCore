@@ -1724,3 +1724,20 @@ paths as well as names, and answers 404.8. Hit by every application the smoke te
 `AddWebForms()` (ten). Tests: `RegressionTests.W3CLogsInTheSiteAreNotServed` (the IIS sample now logs to a plain folder
 of its own, `w3c-logs/W3SVC1`) and the package smoke test (the default: the log is next to the site, nothing is written
 in it, and the old URL is 404).
+
+### System.Web.DynamicData built and in the "Always" set (#8)
+
+As on .NET Framework 4.5+, `GridView`, `ListView`, `Repeater`, `FormView`, `DetailsView`, `CheckBoxList` and
+`RadioButtonList` call `DataControlExtensions.EnableDynamicData` in `OnInit` whenever `ItemType` is set, so every
+strongly-typed data control loads System.Web.DynamicData. It wasn't built (`<Build Project="false" />` in the
+solution), and every such control failed with `FileNotFoundException`. It builds now: the Entity Framework 1–4 model
+providers (`EF*Provider.cs`, on System.Data.Entity's `ObjectContext`) are compiled out as the LINQ to SQL ones already
+were, and so are the matching branches of `SchemaCreator`, `DynamicDataManager` (`LinqDataSource`, `EntityDataSource`),
+`DynamicDataExtensions.LoadWith`, and the EF 5 spatial column types in `MetaColumn` and `FieldTemplateFactory`
+(`#if NETFRAMEWORK`). `AssemblyRef.cs` names the designer assembly its attributes refer to (as System.Web.Mobile's
+does), and `ScaffoldTableAttribute`, which .NET dropped from System.ComponentModel.DataAnnotations, is supplied with the
+Reference Source's members. The unused `Microsoft.EntityFrameworkCore` package reference is gone. The `webForCore`
+package (and MIGRATING.md's "Always" table) includes it. Hit by eShopLegacyWebForms (its catalog is a ListView with
+`ItemType`) and the Visual Studio 2012+ Web Forms templates' model-bound pages. Tests:
+`RegressionTests.DataControlsWithItemTypeRender` (Repeater, ListView and GridView with `ItemType`, the last two through
+`SelectMethod` over a type with a `[MetadataType]` buddy class) and the package smoke test's `Typed.aspx`.

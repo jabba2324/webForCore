@@ -1,6 +1,8 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Data.Spatial;
+#if NETFRAMEWORK
+using System.Data.Spatial; // webForCore: System.Data.Entity's spatial types (EF 5), not on .NET
+#endif
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -335,8 +337,10 @@ namespace System.Web.DynamicData {
                 if (this.IsEnumType(out enumType)) return true;
 
                 //Include spatial types
+#if NETFRAMEWORK
                 if (ColumnType == typeof(DbGeography)) return true;
                 if (ColumnType == typeof(DbGeometry)) return true;
+#endif
 
                 return false;
             }

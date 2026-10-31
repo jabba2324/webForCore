@@ -41,10 +41,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\WebFormsForCore.Drawing\WebFormsForCore.Drawing.csproj" />
       <ProjectReference Include="..\WebFormsForCore.Web.Extensions\WebFormsForCore.Web.Extensions.csproj" />
       <ProjectReference Include="..\WebFormsForCore.Web\WebFormsForCore.Web.csproj" />

@@ -32,6 +32,8 @@ curl -s http://127.0.0.1:5199/Default.aspx | grep -q "webForCore package smoke t
 curl -s http://127.0.0.1:5199/Greet.aspx | grep -q "hello from App_Code" || { echo "Greet.aspx: unexpected response"; fail=1; }
 # Markup.cs is compiled into the app against the packages' System.Web (issue #7: HttpUtility and IHtmlString, CS0433).
 curl -s http://127.0.0.1:5199/Encode.aspx | grep -q "<b>&lt;compiled&gt;</b>" || { echo "Encode.aspx: unexpected response"; fail=1; }
+# A Repeater with ItemType needs System.Web.DynamicData, which the webForCore package brings (issue #8).
+curl -s http://127.0.0.1:5199/Typed.aspx | grep -q "\[typed\]\[repeater\]" || { echo "Typed.aspx: unexpected response"; fail=1; }
 # The W3C log (AddWebForms' defaults) is next to the site, in logs/<site>/W3SVC1, never in it (issue #15: the site
 # served it at /logs/W3SVC1/u_ex<date>.0000.txt). The logger flushes every second.
 sleep 2

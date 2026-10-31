@@ -121,6 +121,7 @@ From source, add project references to the fork. Everything an app needs:
 | BinaryFormatter port (session, view state) | `WebFormsForCore.Serialization.Formatters/...` |
 | System.Drawing | `WebFormsForCore.Drawing/...` |
 | Run-time compiler | `WebFormsForCore.Compilers/...` |
+| System.Web.DynamicData (data controls with `ItemType` load it) | `WebFormsForCore.Web.DynamicData/...` |
 
 | If the app uses | Add |
 | --- | --- |
