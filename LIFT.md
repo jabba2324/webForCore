@@ -1620,4 +1620,6 @@ CI packs the 49 packages on every run as `<Version>-ci.<run number>` and keeps t
 `v<Version>` (checked against Directory.Build.props) builds the release version and creates a GitHub release with the
 packages attached. Nothing is pushed to nuget.org. `tools/ci/package-smoke.sh` builds `tools/ci/package-smoke`, an app
 outside the repository's Directory.Build files that references only `webForCore` from the packed folder, runs it and
-requests a page and an App_Code type: passed locally (0.1.0-ci.900).
+requests a page and an App_Code type: passed locally (0.1.0-ci.901). Packing the solution fails (its build
+dependencies on WebFormsForCore.Build make NuGet call GetTargetPath on that multi-targeted project; the first CI run
+stopped there), so `tools/ci/pack.sh` packs the solution's built `src/` projects one at a time.

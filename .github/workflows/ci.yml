@@ -100,7 +100,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Pack
-        run: dotnet pack WebFormsForCore.slnx -c Release --no-build -nodeReuse:false -p:Version=${{ steps.version.outputs.version }} -o "$RUNNER_TEMP/packages"
+        run: tools/ci/pack.sh ${{ steps.version.outputs.version }} "$RUNNER_TEMP/packages"
 
       # An application that references the webForCore package (not the projects) builds, runs and serves pages.
       - name: Package smoke test
