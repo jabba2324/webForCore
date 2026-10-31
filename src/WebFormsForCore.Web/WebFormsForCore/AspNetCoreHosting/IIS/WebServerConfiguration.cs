@@ -128,7 +128,9 @@ namespace WebFormsForCore.Hosting.IIS
 		readonly ConcurrentDictionary<string, XElement> effective = new ConcurrentDictionary<string, XElement>(StringComparer.OrdinalIgnoreCase);
 		int version;
 
-		// Directories (relative, '/'-separated) that are not part of the site: the application's output folder.
+		// Directories (relative, '/'-separated) that are not part of the site: the application's output folder. A name is
+		// hidden as a segment anywhere in a URL, as hiddenSegments are; an entry with a '/' (a trailing one included) is a
+		// path from the site root: the W3C log folder when an application puts it in the site (#15).
 		public ICollection<string> ExcludedDirectories { get; } = new List<string>();
 
 		public WebServerConfiguration(string physicalRoot)

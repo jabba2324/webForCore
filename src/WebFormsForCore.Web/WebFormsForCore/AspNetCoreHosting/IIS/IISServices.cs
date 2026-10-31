@@ -30,8 +30,20 @@ namespace WebFormsForCore.Hosting.IIS
 	{
 		public bool Compression { get; set; } = true;
 		public bool W3CLogging { get; set; } = true;
-		public string LogDirectory { get; set; } = Path.Combine(AppContext.BaseDirectory, "..", "logs", "W3SVC1");
+		// Outside the site, as IIS keeps its logs (#15): systemd's LogsDirectory= ($LOGS_DIRECTORY), otherwise logs/<site>
+		// next to the site folder (the parent of the build output, bin_dotnet). It used to be <site>/logs/W3SVC1, which
+		// the site served: client addresses and every URL with its query string.
+		public string LogDirectory { get; set; } = DefaultLogDirectory();
 		public bool Systemd { get; set; } = true;
+
+		internal static string DefaultLogDirectory()
+		{
+			var systemd = Environment.GetEnvironmentVariable("LOGS_DIRECTORY");
+			if (!string.IsNullOrEmpty(systemd)) return Path.Combine(systemd.Split(Path.PathSeparator)[0], "W3SVC1");
+			var site = Path.GetDirectoryName(Path.TrimEndingDirectorySeparator(AppContext.BaseDirectory));
+			var parent = Path.GetDirectoryName(site) ?? site;
+			return Path.Combine(parent, "logs", Path.GetFileName(site), "W3SVC1");
+		}
 	}
 
 	// The application's <system.webServer> configuration, for the services (set by WebFormsMiddleware).

@@ -198,6 +198,10 @@ namespace WebFormsForCore.Hosting.IIS
 			var hidden = Items(section, "security/requestFiltering/hiddenSegments").Select(e => Attr(e, "segment")).Concat(config.ExcludedDirectories);
 			if (segments.Any(segment => hidden.Any(h => string.Equals(h, segment, StringComparison.OrdinalIgnoreCase))))
 				return await Reject(context, 8, "The request filtering module is configured to deny a path in the URL that contains a hiddenSegment section.");
+			var relative = string.Join("/", segments);
+			foreach (var excluded in config.ExcludedDirectories.Where(d => d.Contains('/')).Select(d => d.Trim('/')).Where(d => d.Length > 0))
+				if (relative.Equals(excluded, StringComparison.OrdinalIgnoreCase) || relative.StartsWith(excluded + "/", StringComparison.OrdinalIgnoreCase))
+					return await Reject(context, 8, "The request filtering module is configured to deny a path in the URL that contains a hiddenSegment section.");
 
 			var fileExtensions = Element(section, "security/requestFiltering/fileExtensions");
 			var last = segments.LastOrDefault() ?? "";

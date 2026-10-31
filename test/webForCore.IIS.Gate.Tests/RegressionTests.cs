@@ -143,5 +143,29 @@ namespace IISGate
             Assert.Equal(HttpStatusCode.MovedPermanently, response.StatusCode);
             Assert.Equal(url + "/", response.Headers.Location?.OriginalString);
         }
+
+        // #15: W3C logs (client addresses, every URL with its query string) were written in the site and served: every
+        // app the smoke test ran showed them at /logs/W3SVC1/u_ex<date>.0000.txt. The default is now outside the site
+        // (tools/ci/package-smoke checks that); a folder an application chooses inside the site, as this sample does
+        // (w3c-logs/W3SVC1, a plain folder), is never served.
+        [Fact]
+        public async Task W3CLogsInTheSiteAreNotServed()
+        {
+            await Get("/Default.aspx?w3c-regression=1");
+            var folder = Path.Combine(_server.SampleDirectory, "w3c-logs", "W3SVC1");
+            string file = null;
+            for (int i = 0; i < 50 && file == null; i++)
+            {
+                await Task.Delay(100);
+                file = Directory.Exists(folder) ? Directory.GetFiles(folder, "u_ex*").FirstOrDefault() : null;
+            }
+            Assert.NotNull(file);
+            foreach (var url in new[] { "/w3c-logs/W3SVC1/" + Path.GetFileName(file), "/w3c-logs/W3SVC1/", "/w3c-logs/" })
+            {
+                var (response, body) = await Get(url);
+                Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+                Assert.DoesNotContain("#Fields:", body);
+            }
+        }
     }
 }

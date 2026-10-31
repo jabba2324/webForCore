@@ -409,6 +409,9 @@ bin_dotnet
 test/*/App_Data/machine.config
 # ... and System.Web.Services the ASMX help page next to it
 test/*/App_Data/DefaultWsdlHelpGenerator.aspx
+# ... and W3C logs: the IIS sample's own folder, and the default next to a site (logs/<site>/W3SVC1)
+test/webForCore.IIS.Sample/w3c-logs/
+test/logs/
 
 # webForCore: extracted from System.Configuration at run time
 src/WebFormsForCore.TestApp/App_Data/machine.config

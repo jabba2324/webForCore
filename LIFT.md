@@ -1711,3 +1711,16 @@ now keeps its spelling. Hit by Clean Architecture in ASP.NET MVC 5: its controll
 names (`Products/`, `Contact/`), so every link got a 301. Tests: `RegressionTests.RouteTakesADirectoryUrlWithRouteExistingFiles`
 (the IIS sample's `Application_Start` sets `RouteExistingFiles` with one page route for an existing folder) and
 `DirectoryWithoutARouteStillRedirects` (a plain folder and one with rewrite rules).
+
+### W3C logs outside the site (#15)
+
+`AddWebForms()`'s default `LogDirectory`, `Path.Combine(AppContext.BaseDirectory, "..", "logs", "W3SVC1")`, resolved
+inside the site (the build output is a direct subfolder of it), and `logs` isn't hidden, so the site served its own
+access log: client addresses and every URL with its query string. The default is now `$LOGS_DIRECTORY/W3SVC1` when
+systemd sets it (`tools/deploy/webforcore@.service` gains `LogsDirectory=webforcore/%i`, which its `ReadWritePaths`
+also needed: the old default wasn't writable under the unit), otherwise `logs/<site>/W3SVC1` next to the site folder.
+A log folder an application chooses inside the site is added to the site's excluded directories, which now take
+paths as well as names, and answers 404.8. Hit by every application the smoke test ran with the default
+`AddWebForms()` (ten). Tests: `RegressionTests.W3CLogsInTheSiteAreNotServed` (the IIS sample now logs to a plain folder
+of its own, `w3c-logs/W3SVC1`) and the package smoke test (the default: the log is next to the site, nothing is written
+in it, and the old URL is 404).

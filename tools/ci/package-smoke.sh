@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # Builds and runs tools/ci/package-smoke, an application that uses webForCore through its packages only, against the
-# packages in <package folder> (and nuget.org for everything else), then requests two pages.
+# packages in <package folder> (and nuget.org for everything else), then requests its pages and checks where the W3C
+# log went.
 # Usage: tools/ci/package-smoke.sh <package folder> <version>
 set -euo pipefail
 packages=$(cd "$1" && pwd); version=$2
-work=$(mktemp -d)
-trap 'kill $server 2>/dev/null || true; rm -rf "$work"' EXIT
+base=$(mktemp -d); work=$base/site; mkdir "$work"
+trap 'kill $server 2>/dev/null || true; rm -rf "$base"' EXIT
 cp -r "$(dirname "$0")/package-smoke/." "$work"
 cd "$work"
 cat > nuget.config <<CONFIG
@@ -31,5 +32,12 @@ curl -s http://127.0.0.1:5199/Default.aspx | grep -q "webForCore package smoke t
 curl -s http://127.0.0.1:5199/Greet.aspx | grep -q "hello from App_Code" || { echo "Greet.aspx: unexpected response"; fail=1; }
 # Markup.cs is compiled into the app against the packages' System.Web (issue #7: HttpUtility and IHtmlString, CS0433).
 curl -s http://127.0.0.1:5199/Encode.aspx | grep -q "<b>&lt;compiled&gt;</b>" || { echo "Encode.aspx: unexpected response"; fail=1; }
+# The W3C log (AddWebForms' defaults) is next to the site, in logs/<site>/W3SVC1, never in it (issue #15: the site
+# served it at /logs/W3SVC1/u_ex<date>.0000.txt). The logger flushes every second.
+sleep 2
+ls "$base"/logs/site/W3SVC1/u_ex*.txt > /dev/null 2>&1 || { echo "W3C log: not in logs/site/W3SVC1 next to the site"; fail=1; }
+[ ! -e "$work/logs" ] || { echo "W3C log: written in the site ($work/logs)"; fail=1; }
+log=$(ls "$base"/logs/site/W3SVC1/ 2>/dev/null | head -1 || true)
+[ "$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:5199/logs/W3SVC1/${log:-u_ex.txt}")" = 404 ] || { echo "W3C log: served"; fail=1; }
 if [ $fail -ne 0 ]; then cat server.log; exit 1; fi
 echo "Package smoke test passed ($version)."

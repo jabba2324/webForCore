@@ -27,7 +27,7 @@ app.Run();
 | `UseWebForms(o => o.IsolateApplication(false))` | isolated | Runs the app in the default load context, so there's no in-process restart (see [Process model](#process-model)) |
 | `UseWebForms(o => o.Recycling(r => ...))` | IIS's defaults | `Time` (1740 min), `Requests`, `PrivateMemory` (KB), `MaxStuckDomains` (3), `CheckInterval` (30 s) |
 | `AddWebForms(o => o.Compression = false)` | on | IIS's static and dynamic compression |
-| `AddWebForms(o => o.LogDirectory = ...)` | `../logs/W3SVC1` | W3C log folder |
+| `AddWebForms(o => o.LogDirectory = ...)` | `$LOGS_DIRECTORY/W3SVC1` (systemd's `LogsDirectory=`), otherwise `logs/<site>/W3SVC1` next to the site folder | W3C log folder; never served, even if it is inside the site |
 | `AddWebForms(o => o.Systemd = false)` | on | `sd_notify` readiness and a watchdog |
 
 ## How configuration is read
@@ -63,7 +63,7 @@ There's no `applicationHost.config`, so locking sections (`overrideMode`, `allow
 | **Managed handlers** (`<handlers>`) | Works | Managed entries are mapped before `<system.web><httpHandlers>`; `TransferRequestHandler` is skipped |
 | **URL authorization** (`<security><authorization>`) | Works | Any matching deny denies, then allow, otherwise 401 |
 | **Compression** (`<urlCompression>`, `<httpCompression>`) | Works | Through `AddWebForms()`: static on and dynamic off (IIS's defaults), MIME types, `minFileSizeForComp` (2,700 bytes), gzip |
-| **W3C logging** | Works | Daily files with IIS's fields, in ASP.NET Core's field order; `cs-uri-query` keeps its `?`. No `sc-substatus`, `sc-win32-status` or `cs-username` |
+| **W3C logging** | Works | Daily files with IIS's fields, in ASP.NET Core's field order; `cs-uri-query` keeps its `?`. No `sc-substatus`, `sc-win32-status` or `cs-username`. Outside the site by default, as IIS keeps them; a log folder inside the site answers 404.8. Entries are flushed every second; those not yet flushed when the process stops are lost |
 | Output caching (`<caching>`, kernel cache) | Partial | ASP.NET's output cache works; IIS's kernel and user-mode caches aren't there |
 | Server-side includes | Not built | |
 | Failed request tracing, request monitor | Not built | Use ASP.NET Core logging and `dotnet-trace` |
