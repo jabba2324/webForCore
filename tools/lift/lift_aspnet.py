@@ -127,6 +127,15 @@ FIXUPS = [
     # .NET's ArgumentException message ends "(Parameter 'name')"; .NET Framework's "\r\nParameter name: name" (BCL).
     ("Identity.Test", "ExceptionHelper.cs", r'"Value cannot be null or empty.\r\nParameter name: " + paramName',
      '"Value cannot be null or empty. (Parameter \'" + paramName + "\')" /* webForCore: .NET\'s message format */', 1),
+    # EnsureDefaultSchemaWithInt opened the database without creating it, so it passed only when an earlier test had
+    # created it; first in a run on a new server (CI's container) it failed. It creates it, as its sibling tests do.
+    ("Identity.Test", "CustomIntKeyTest.cs",
+     "            IdentityDbContextTest.VerifyDefaultSchema(new CustomUserContext());\n",
+     "            // webForCore: create the database first; the test relied on an earlier test having created it.\n"
+     "            Database.SetInitializer(new DropCreateDatabaseAlways<CustomUserContext>());\n"
+     "            var db = new CustomUserContext();\n"
+     "            db.Database.Initialize(true);\n"
+     "            IdentityDbContextTest.VerifyDefaultSchema(db);\n", 1),
     # The tests' database: LocalDB is Windows-only; tools/lift/sqlserver.sh runs SQL Server 2022 in a container.
     ("Identity.Test", "App.config",
      r'connectionString="Data Source=(LocalDb)\v11.0;Initial Catalog=TestIdentityDb2.0-beta1;Integrated Security=SSPI"',

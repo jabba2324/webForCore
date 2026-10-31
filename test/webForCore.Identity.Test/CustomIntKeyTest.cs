@@ -44,7 +44,11 @@ namespace Identity.Test
         [Fact]
         public void EnsureDefaultSchemaWithInt()
         {
-            IdentityDbContextTest.VerifyDefaultSchema(new CustomUserContext());
+            // webForCore: create the database first; the test relied on an earlier test having created it.
+            Database.SetInitializer(new DropCreateDatabaseAlways<CustomUserContext>());
+            var db = new CustomUserContext();
+            db.Database.Initialize(true);
+            IdentityDbContextTest.VerifyDefaultSchema(db);
         }
 
         [Fact]

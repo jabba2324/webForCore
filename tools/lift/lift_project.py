@@ -265,6 +265,20 @@ FIXUPS["Microsoft.TestCommon"] = [
      "                if (!partialMatch)\n                {\n                    Equal(expectedMessage, actualMessage);\n                }\n"
      "                else\n                {\n                    Contains(expectedMessage, actualMessage);\n                }\n            }", 1),
 ]
+# The attribute sets the process-wide principal policy around each test. On .NET, Thread.CurrentPrincipal = null falls
+# back to that policy (.NET Framework kept the null), so one test class's After (UnauthenticatedPrincipal) made a test of
+# another class, running in parallel, see a GenericPrincipal where it set null (HttpServerTest, intermittently). The
+# tests that use the attribute run one at a time.
+FIXUPS["Microsoft.TestCommon"] += [
+    ("RestoreThreadPrincipalAttribute.cs", "        private IPrincipal _originalPrincipal;\n",
+     "        private IPrincipal _originalPrincipal;\n"
+     "        // webForCore: the policy is process-wide and decides what a null principal reads as on .NET; one test at a time.\n"
+     "        private static readonly SemaphoreSlim s_policy = new SemaphoreSlim(1, 1);\n", 1),
+    ("RestoreThreadPrincipalAttribute.cs", "            _originalPrincipal = Thread.CurrentPrincipal;\n",
+     "            s_policy.Wait();\n            _originalPrincipal = Thread.CurrentPrincipal;\n", 1),
+    ("RestoreThreadPrincipalAttribute.cs", "            AppDomain.CurrentDomain.SetPrincipalPolicy(PrincipalPolicy.UnauthenticatedPrincipal);\n",
+     "            AppDomain.CurrentDomain.SetPrincipalPolicy(PrincipalPolicy.UnauthenticatedPrincipal);\n\n            s_policy.Release();\n", 1),
+]
 FIXUPS["System.Net.Http.Formatting.Test"] = [
     (f"Formatting/{f}", 'serializedString.Contains("\\r\\n")',
      'serializedString.Contains("\\n") /* webForCore: indentation uses the platform newline */', n)

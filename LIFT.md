@@ -1495,3 +1495,16 @@ tests now assert it (IIS, MVC and Web API: restart, then "(start 1) unloaded." w
 Not covered yet: caches that hold app types only on paths the samples don't use (`TypeDescriptor.AddProvider` from
 DynamicData's `MetaModel`, `LicenseManager`, Hashtable-based caches that need their owner's lock). The stuck-domain
 report and `MaxStuckDomains` remain as the safety net.
+
+### Two intermittent test failures fixed (31 Oct 2026)
+
+Both appeared once CI started running (on its fresh runners), and neither involves webForCore's code:
+- **Identity.Test `CustomIntKeyTest.EnsureDefaultSchemaWithInt`** opened the test database without creating it, so it
+  passed only when an earlier test had created it. Run first against CI's new SQL Server container it failed ("Cannot
+  open database ... The login failed"). It now creates it, as its sibling tests do (fixup in `tools/lift/lift_aspnet.py`).
+- **System.Web.Http.Test `HttpServerTest.SendAsync_SetsGenericPrincipalWhenThreadPrincipalIsNullAndCleansUpAfterward`**
+  (and the other `[RestoreThreadPrincipal]` tests): the attribute sets the process-wide principal policy around each
+  test, and on .NET a null `Thread.CurrentPrincipal` reads as whatever that policy gives (.NET Framework kept the null).
+  A test class running in parallel resetting the policy made the test see a `GenericPrincipal`. The attribute now lets
+  one such test run at a time (fixup in `tools/lift/lift_project.py`); 5 consecutive runs pass.
+
