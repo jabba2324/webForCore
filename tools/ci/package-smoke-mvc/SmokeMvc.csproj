@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- An MVC 5 and OWIN application that uses webForCore through its packages only (tools/ci/package-smoke.sh), with
+       the third-party packages real applications have: Unity.Mvc and WebActivatorEx (which bring Microsoft.AspNet.Mvc,
+       Razor and Web Pages back transitively, #23, and start Unity, #21) and Katana's Google provider (#18). -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <OutputPath>bin_dotnet</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <GenerateDependencyFile>true</GenerateDependencyFile>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+    <PredefinedCulturesOnly>true</PredefinedCulturesOnly>
+    <EnableDefaultRazorGenerateItems>false</EnableDefaultRazorGenerateItems>
+    <RazorCompileOnBuild>false</RazorCompileOnBuild>
+    <RazorCompileOnPublish>false</RazorCompileOnPublish>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="bin_dotnet\**;obj\**" />
+    <Content Remove="bin_dotnet\**" />
+    <None Remove="bin_dotnet\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="webForCore" Version="$(WebForCoreVersion)" />
+    <PackageReference Include="webForCore.Web.Mvc" Version="$(WebForCoreVersion)" />
+    <PackageReference Include="webForCore.Microsoft.Owin.Host.SystemWeb" Version="$(WebForCoreVersion)" />
+    <PackageReference Include="webForCore.Microsoft.Owin.Security.Cookies" Version="$(WebForCoreVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- As the applications have them, with no ExcludeAssets. -->
+    <PackageReference Include="Unity.Mvc" Version="5.11.1" />
+    <PackageReference Include="WebActivatorEx" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Owin.Security.Google" Version="3.0.1" />
+  </ItemGroup>
+</Project>

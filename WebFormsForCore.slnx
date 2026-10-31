@@ -59,6 +59,18 @@
   <Project Path="src/WebFormsForCore.Web.Infrastructure/WebFormsForCore.Web.Infrastructure.csproj">
     <BuildDependency Project="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
   </Project>
+  <Project Path="src/WebFormsForCore.Web.Abstractions/WebFormsForCore.Web.Abstractions.csproj">
+    <BuildDependency Project="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
+  </Project>
+  <Project Path="src/WebFormsForCore.Web.Routing/WebFormsForCore.Web.Routing.csproj">
+    <BuildDependency Project="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
+  </Project>
+  <Project Path="src/WebFormsForCore.WebActivatorEx/WebFormsForCore.WebActivatorEx.csproj">
+    <BuildDependency Project="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
+  </Project>
+  <Project Path="src/WebFormsForCore.Net.Http.WebRequest/WebFormsForCore.Net.Http.WebRequest.csproj">
+    <BuildDependency Project="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
+  </Project>
   <Project Path="src/WebFormsForCore.Web.Mobile/WebFormsForCore.Web.Mobile.csproj">
     <BuildDependency Project="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
   </Project>

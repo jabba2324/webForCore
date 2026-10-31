@@ -40,6 +40,8 @@
     <ProjectReference Include="..\..\src\WebFormsForCore.Web.Services\WebFormsForCore.Web.Services.csproj" />
     <ProjectReference Include="..\..\src\WebFormsForCore.Web.Extensions\WebFormsForCore.Web.Extensions.csproj" />
     <ProjectReference Include="..\..\src\WebFormsForCore.Web.Infrastructure\WebFormsForCore.Web.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Abstractions\WebFormsForCore.Web.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Routing\WebFormsForCore.Web.Routing.csproj" />
     <ProjectReference Include="..\..\src\WebFormsForCore.Compilers\WebFormsForCore.Compilers.csproj" />
     <ProjectReference Include="..\..\src\WebFormsForCore.Web.DynamicData\WebFormsForCore.Web.DynamicData.csproj" />
     <!-- System.Web.Optimization (Global.asax's bundles). -->

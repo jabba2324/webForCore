@@ -1758,3 +1758,85 @@ MIGRATING.md section 6), with the APIs that are the site root as on IIS: `HttpRu
 `HostingEnvironment.ApplicationPhysicalPath`, `Server.MapPath("~/")`. Hit by eShopLegacyMVC, whose database seed read
 its SQL scripts through `BaseDirectory`. Test: `RegressionTests.BaseDirectoryIsTheBuildOutputAndTheSiteApisAreTheSite`
 pins both, so the documentation can't silently go out of date.
+
+## Fixes from the smoke test's second round (31 Oct 2026)
+
+The smoke test bed's second round ran on the 0.2.0 packages. All 14 applications from the first round now pass, and
+five more were migrated (ApplicantTracking, OpenOrderFramework, ReaLocate, Roadkill, SocialGoal). What failed was
+filed as issues #17-#23. As before, each fix has a regression test and names the applications that hit it.
+
+### Configuration types through the System facade (#19)
+
+The first round's fix for #1 loads the `System.Configuration` facade per domain. The configuration types that were in
+`System.dll` on .NET Framework (`IConfigurationSectionHandler`, `SingleTagSectionHandler`, `NameValueSectionHandler`,
+`ConfigurationException`, ...) are reached through the `System` facade instead, and that was still shared from the
+default context, so its forwards resolved to the host's ConfigurationManager. ELMAH 1.2's section handlers derive from
+`SingleTagSectionHandler` in `System, Version=2.0.0.0`, and SocialGoal failed on every request with "Type
+'Elmah.ErrorMailSectionHandler' does not inherit from 'System.Configuration.IConfigurationSectionHandler'". `System`
+is now in `PerDomainFrameworkAssemblies`; its other forwards go to shared-framework assemblies, which the domain still
+shares. Test: `RegressionTests.SectionHandlerThroughTheSystemFacadeIsTheApplications`
+(`regressions/SystemFacadeSection.aspx` and a `SingleTagSectionHandler` section in `regressions/web.config`; a 500
+on 0.2.0).
+
+### The System.Web.Abstractions and System.Web.Routing facades (#20)
+
+On .NET Framework 4 the abstractions (`HttpContextBase` and the rest) and routing are in System.Web, and the 3.5
+assemblies that held them are facades in the GAC that forward there. web.configs from MVC 2-4 projects list both in
+`<compilation><assemblies>` (Version=4.0.0.0), and .NET 3.5 libraries reference them, so a missing facade is a
+Configuration Error on every request: Roadkill's web.config has both. Two new projects, `src/WebFormsForCore.Web.Abstractions`
+and `src/WebFormsForCore.Web.Routing`, build the facades with their names, version 4.0.0.0 and public key token, and
+type forwarders for the types of the 3.5 assemblies. They are new code, not Microsoft's, and part of the "Always" set (the
+`webForCore` package depends on `webForCore.Web.Abstractions` and `webForCore.Web.Routing`). Test:
+`RegressionTests.SystemWebAbstractionsAndRoutingFacadesLoad` (`regressions/facades/`, whose web.config lists both;
+it binds `HttpContextBase` and `RouteTable` by the 3.5 names).
+
+### webForCore's packages win the SDK's conflicts (#23)
+
+Packages built on MVC, Web API, Katana or WebActivatorEx bring Microsoft's packages back transitively (Unity.Mvc 5.11
+brings Microsoft.AspNet.Mvc 5.2.7, Razor 3.2.7 and Web Pages 3.2.7; Autofac.Mvc5 3.3 brings 5.1.0 and 3.1.0). The SDK's
+conflict resolution keeps one assembly of each name, by assembly version and then file version. MVC 5.3.1 beats 5.2.7,
+but webForCore's `System.Web.Razor` and `System.Web.WebPages` are 3.0.0.0 like Microsoft's, and Microsoft's file
+versions (3.0.20110, 3.0.61128) are higher, so they replaced webForCore's in the output with no build error. MVC views
+then failed with a `MissingMethodException` (Bonobo Git Server, ApplicantTracking, ReaLocate, Roadkill; eShopLegacyMVC
+without its `ExcludeAssets` workaround). The SDK's preferred packages only break ties after the file version, but its
+package overrides come first (they are how the shared framework wins over the System.* packages). So the
+`WebForCoreOverrideReplacedPackages` target in `src/webForCore.WebStack.targets` (the packages' buildTransitive
+targets) makes each webForCore package in the build override the Microsoft packages webForCore replaces, at any
+version. It makes the `ExcludeAssets` step in MIGRATING.md unnecessary for applications on the packages. Test:
+`tools/ci/package-smoke-mvc`, an MVC application with `Unity.Mvc` 5.11.1 as applications have it. The package smoke
+test checks that its `deps.json` has none of the .NET Framework assemblies; on the 0.2.0 packages it has Razor 3.2.7's
+and Web Pages 3.2.7's.
+
+### WebActivatorEx (#21)
+
+WebActivatorEx (by David Ebbo, Apache 2.0; used by Unity.Mvc, Ninject.MVC, StructureMap.MVC, Glimpse and many
+application templates) finds its `PreApplicationStartMethod`, `PostApplicationStartMethod` and
+`ApplicationShutdownMethod` attributes with `Assembly.LoadFrom` on every DLL in `HttpRuntime.BinDirectory`. On .NET,
+`LoadFrom` always loads into the default `AssemblyLoadContext`. In a PseudoAppDomain it returned second copies of the
+application's assemblies, whose attributes are the default context's WebActivatorEx types, so none matched and no
+method ran, with no error. ApplicantTracking's Unity resolver was never registered ("No parameterless constructor
+defined" for every controller); Roadkill's StructureMap container stayed null. .NET has no hook for `LoadFrom`, so
+webForCore ships its own WebActivatorEx: `src/WebFormsForCore.WebActivatorEx`, written from the documented API, with the
+original's name, version 2.0.0.0 and public key. It loads the assemblies by name into its own context (the
+application's), and scans only those that reference WebActivatorEx (read from their metadata, without loading the
+rest). It is in the "Always" set; the original package, which Unity.Mvc and others bring, loses the conflict to it
+(#23's `WebForCoreOverrideReplacedPackages`). New code, not Microsoft's. `docs/IIS-COMPATIBILITY.md` lists `Assembly.LoadFrom` as
+a difference. Test: `tools/ci/package-smoke-mvc`, where Unity.Mvc's activator registers the resolver that constructs
+`HomeController`, and a post-start method runs ("No parameterless constructor defined" on the 0.2.0 packages).
+
+### System.Net.Http.WebRequest for Katana's social providers (#18)
+
+0.2.0's guide said to keep the application's `Microsoft.Owin.Security.Google` (and Facebook, MicrosoftAccount, Twitter)
+package, which webForCore doesn't lift (#14). That builds, but each provider's middleware does
+`options.BackchannelHttpHandler ?? new WebRequestHandler()`, and `WebRequestHandler` is in .NET Framework's
+`System.Net.Http.WebRequest.dll`, which .NET doesn't have. As soon as a provider was registered, every request,
+static files included, failed in `OwinHttpModule.Init` with "Could not load file or assembly
+'System.Net.Http.WebRequest, Version=4.0.0.0'" (OpenOrderFramework and SocialGoal, which call
+`app.UseGoogleAuthentication()`). Rather than lift four providers, `src/WebFormsForCore.Net.Http.WebRequest` builds
+`System.Net.Http.WebRequest` 4.0.0.0 with .NET Framework's name and public key: a `WebRequestHandler` that is an
+`HttpClientHandler`, written from its documented API. It covers the original packages at every version from 2.0, and
+WS-Federation and third-party providers built the same way. `ServerCertificateValidationCallback`, which the providers
+set from `BackchannelCertificateValidator`, maps to `ServerCertificateCustomValidationCallback`; the settings only
+`HttpWebRequest` had are kept and ignored. New code, not Microsoft's, in the "Always" set. Test:
+`tools/ci/package-smoke-mvc`'s `Startup` registers Katana 3.0.1's Google provider, and `/challenge` must redirect to
+accounts.google.com (a 500 on the 0.2.0 packages).

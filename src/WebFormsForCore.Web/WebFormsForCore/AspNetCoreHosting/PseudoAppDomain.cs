@@ -35,7 +35,10 @@ namespace System.Web.Hosting
 		// System.Configuration is the framework's facade that .NET Framework libraries bind to (Version=4.0.0.0); it
 		// forwards to System.Configuration.ConfigurationManager, the fork's, which is per domain. Loaded in the default
 		// context, its forwards resolved there too, to a second ConfigurationManager that can't read web.config (#1).
-		public static readonly List<string> PerDomainFrameworkAssemblies = new List<string> { "Microsoft.CSharp", "Microsoft.VisualBasic.Core", "System.Configuration" };
+		// System is the same for the configuration types that were in System.dll on .NET Framework (IConfigurationSectionHandler,
+		// SingleTagSectionHandler, ConfigurationException...): ELMAH's section handlers derive from them (#19). Its other
+		// forwards go to the shared framework, which the domain still shares.
+		public static readonly List<string> PerDomainFrameworkAssemblies = new List<string> { "Microsoft.CSharp", "Microsoft.VisualBasic.Core", "System.Configuration", "System" };
 
 		static readonly string SharedFrameworkRoot = GetSharedFrameworkRoot();
 		static readonly Lazy<Dictionary<string, string>> TrustedPlatformAssemblies = new Lazy<Dictionary<string, string>>(() =>

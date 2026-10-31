@@ -16,7 +16,13 @@ For an AI agent doing the migration, the same procedure is written as instructio
 2. **Inventory the dependencies.** List NuGet packages and referenced DLLs:
    - Microsoft's ASP.NET packages (`Microsoft.AspNet.Mvc`, `.WebApi.*`, `.WebPages`, `.Razor`, `.Cors`,
      `Microsoft.Owin.*`, `.SignalR.*`, `.Identity.*`, `Microsoft.AspNet.Web.Optimization`, `AjaxControlToolkit`) are
-     replaced by webForCore's projects.
+     replaced by webForCore's projects. Each is one version: MVC 5.3, Web API 5.3, Web Pages and Razor 3.3,
+     Katana 4.2.3, SignalR 2.4.3, Identity 2.2. An application on an older version gets the upgrade with the
+     migration, and the types the newer version added can be ambiguous with the application's own (#17): the Identity
+     2.0 samples define `SignInStatus`, which Identity 2.1 added to `Microsoft.AspNet.Identity.Owin`, so a file with
+     both namespaces gets `CS0104: 'SignInStatus' is an ambiguous reference` (OpenOrderFramework). Keep the
+     application's type with an alias in that file:
+     `using SignInStatus = OpenOrderFramework.Models.SignInStatus;`.
    - Pure managed libraries that target .NET Standard or .NET usually work as they are. Newtonsoft.Json, Autofac,
      EntityFramework 6.4+ and log4net are examples.
    - Libraries built only for .NET Framework that reference System.Web often load, because webForCore's assemblies
@@ -144,12 +150,17 @@ projects in this repository are working examples for Web Forms, MVC, Web API and
 
 These came up migrating real applications; each names one that needed it.
 
-- **Packages built on MVC, Web API or OWIN bring Microsoft's packages back** (#4). `Autofac.Mvc5`, `Autofac.WebApi2`,
-  `Unity.Mvc`, Ninject's and Glimpse's MVC packages, `Microsoft.Owin.Security.WsFederation` and others depend on
-  `Microsoft.AspNet.Mvc`, `Microsoft.AspNet.WebApi.Core`, `Microsoft.Owin` and so on, and NuGet restores those, so the
-  compiler sees two `System.Web.Mvc`s: `CS0433: The type 'Controller' exists in both 'System.Web.Mvc, Version=5.1.0.0'
-  and 'System.Web.Mvc, Version=5.3.1.0'`. Reference each one that `obj/project.assets.json` lists, at the version
-  restored, with no assets, so the direct reference wins and contributes nothing (eShopLegacyMVC, Bonobo Git Server):
+- **Packages built on MVC, Web API or OWIN bring Microsoft's packages back** (#4, #23). `Autofac.Mvc5`, `Autofac.WebApi2`,
+  `Unity.Mvc`, Ninject's and Glimpse's MVC packages, Swashbuckle, `Microsoft.Owin.Security.WsFederation` and others
+  depend on `Microsoft.AspNet.Mvc`, `Microsoft.AspNet.WebApi.Core`, `Microsoft.Owin` and so on, and NuGet restores
+  those, with assemblies of the same names as webForCore's. With webForCore's packages nothing needs doing: its build
+  targets make its packages override Microsoft's in the SDK's conflict resolution (before 0.3.0, Microsoft's
+  `System.Web.Razor` and `System.Web.WebPages` won on file version, and MVC views failed with a `MissingMethodException`:
+  Bonobo Git Server, ApplicantTracking, ReaLocate, Roadkill). An
+  application built against webForCore's projects instead (a source build) gets both, so the compiler sees two
+  `System.Web.Mvc`s: `CS0433: The type 'Controller' exists in both 'System.Web.Mvc, Version=5.1.0.0' and
+  'System.Web.Mvc, Version=5.3.1.0'`. There, reference each one that `obj/project.assets.json` lists, at the version
+  restored, with no assets, so the direct reference wins and contributes nothing (eShopLegacyMVC):
   ```xml
   <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.1.0" ExcludeAssets="all" />
   <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.0" ExcludeAssets="all" />
@@ -173,17 +184,29 @@ These came up migrating real applications; each names one that needed it.
   be found ... forwarded to assembly 'System.ServiceModel.Syndication'` (MiniBlog's feed handler). Among them:
   `System.ServiceModel.Syndication`, `System.Data.SqlClient`, `System.Data.OleDb`, `System.DirectoryServices`,
   `System.Runtime.Caching`, `System.ServiceModel.Http` and the other WCF client packages.
-- **Katana packages webForCore doesn't lift** (#14). webForCore provides `Microsoft.Owin`, its hosts, `Security`,
+- **Katana packages webForCore doesn't lift** (#14, #18). webForCore provides `Microsoft.Owin`, its hosts, `Security`,
   `Security.Cookies`, `Security.OAuth` and `Cors`. The social logins of the Visual Studio templates
   (`Microsoft.Owin.Security.Facebook`, `.Google`, `.MicrosoftAccount`, `.Twitter`) and `.WsFederation` are not: keep
-  the application's package, and keep its Katana dependencies out as above, so webForCore's `Microsoft.Owin` 4.2.3 is
-  the only one (MvcMovie, Bonobo Git Server). Every template app has `using Microsoft.Owin.Security.Google;` in
-  `Startup.Auth.cs`, even with the providers commented out.
+  the application's package (any version from 2.0). Its Katana dependencies lose to webForCore's `Microsoft.Owin`
+  4.2.3, and the `System.Net.Http.WebRequest` they create their back-channel handler from is in the "Always" set
+  (before 0.3.0 it wasn't, and registering a provider failed every request: OpenOrderFramework, SocialGoal). Every
+  template app has `using Microsoft.Owin.Security.Google;` in `Startup.Auth.cs`, even with the providers commented out
+  (MvcMovie, Bonobo Git Server).
   ```xml
   <PackageReference Include="Microsoft.Owin.Security.Google" Version="3.0.1" />
-  <PackageReference Include="Microsoft.Owin" Version="3.0.1" ExcludeAssets="all" />
-  <PackageReference Include="Microsoft.Owin.Security" Version="3.0.1" ExcludeAssets="all" />
   ```
+- **Libraries that don't run on .NET** (#22). Remove them or move to a version that does:
+  - **Glimpse 1.x** (`Glimpse`, `.AspNet`, `.Ado`, `.EF6`, `.Mvc5`, ...), a development diagnostics tool, can't run:
+    Glimpse.Ado's pre-start method reflects into .NET Framework's private `DbProviderFactories` table
+    (`NullReferenceException` in `FindDbProviderFactoryTable`), and `Glimpse.AspNet.HttpModule` needs
+    `AppDomainSetup.ShadowCopyFiles` (`MissingMethodException`). Remove the packages, the `glimpse` configuration
+    section, its module and handler in `<system.web>` and `<system.webServer>`, and the app's `GlimpseSecurityPolicy`
+    class (ReaLocate).
+  - **AutoMapper before 12** throws while configuring a map on .NET 11 (`The type or method has 3 generic parameter(s),
+    but 1 generic argument(s) were provided`, or `... violates the constraint of type 'T'` from `MaxFloat`/`MaxInteger`):
+    it scans `System.Linq.Enumerable`'s extension methods, non-public ones included. This isn't webForCore's: a .NET 11
+    console app does the same. AutoMapper 12 works; from 4.x the change is mostly `IMapperConfiguration` →
+    `IMapperConfigurationExpression` (ReaLocate). From 3.x's static `Mapper` it is a rewrite of the mapping code.
 
 ## 4. Program.cs
 
