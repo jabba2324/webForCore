@@ -29,5 +29,7 @@ for i in $(seq 120); do curl -s -o /dev/null http://127.0.0.1:5199/Default.aspx 
 fail=0
 curl -s http://127.0.0.1:5199/Default.aspx | grep -q "webForCore package smoke test: 11/4.8" || { echo "Default.aspx: unexpected response"; fail=1; }
 curl -s http://127.0.0.1:5199/Greet.aspx | grep -q "hello from App_Code" || { echo "Greet.aspx: unexpected response"; fail=1; }
+# Markup.cs is compiled into the app against the packages' System.Web (issue #7: HttpUtility and IHtmlString, CS0433).
+curl -s http://127.0.0.1:5199/Encode.aspx | grep -q "<b>&lt;compiled&gt;</b>" || { echo "Encode.aspx: unexpected response"; fail=1; }
 if [ $fail -ne 0 ]; then cat server.log; exit 1; fi
 echo "Package smoke test passed ($version)."

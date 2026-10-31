@@ -11,6 +11,24 @@
     </ItemGroup>
   </Target>
 
+  <!-- The fork's System.Web contains Microsoft's System.Web.HttpUtility and System.Web.IHtmlString, as on .NET Framework.
+       The shared framework's System.Web.HttpUtility.dll defines the same types, so code compiled against both gets
+       CS0433 ("The type 'HttpUtility' exists in both ..."). Drop the framework copy wherever the fork's System.Web is
+       referenced: as a project reference or from the webForCore.Web package. Upstream's NuGet WebFormsForCore.Web
+       forwards HttpUtility to .NET's, so projects on that package keep .NET's. The repository's Directory.Build.targets
+       defines the same target for its projects that don't import this file (the later definition wins; they agree). -->
+  <Target Name="WebForCoreDropFrameworkHttpUtility" AfterTargets="ResolveAssemblyReferences" BeforeTargets="FindReferenceAssembliesForReferences" Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">
+    <ItemGroup>
+      <_WebForCoreSystemWeb Include="@(ReferencePath)" Condition="'%(FileName)' == 'System.Web' AND ('%(ReferencePath.ReferenceSourceTarget)' == 'ProjectReference' OR '%(ReferencePath.NuGetPackageId)' == 'webForCore.Web')" />
+    </ItemGroup>
+    <PropertyGroup>
+      <_WebForCoreHasSystemWeb Condition="'@(_WebForCoreSystemWeb)' != ''">true</_WebForCoreHasSystemWeb>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(_WebForCoreHasSystemWeb)' == 'true'">
+      <ReferencePath Remove="@(ReferencePath)" Condition="'%(FileName)' == 'System.Web.HttpUtility' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(FullPath),'[\\/]packs[\\/]Microsoft\.(NETCore|AspNetCore)\.App\.Ref[\\/]'))" />
+    </ItemGroup>
+  </Target>
+
   <!-- The shared framework also has System.Web, System.Drawing and System.Configuration facades. At startup the host
        keeps whichever copy has the higher assemblyVersion in deps.json, but the SDK writes no assemblyVersion for
        project references, so the framework facade won and the fork's System.Web failed to load ("conflicts with what
