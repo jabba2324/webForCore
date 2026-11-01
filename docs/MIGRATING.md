@@ -108,6 +108,19 @@ Pages that use `CodeBehind=` are compiled into the project's assembly, as Visual
 `CodeFile=` are compiled at run time, as on IIS. Remove the old `bin` folder, `packages.config` and the
 `Microsoft.CodeDom.Providers.DotNetCompilerPlatform` settings; webForCore brings its own compiler.
 
+Two differences from .NET Framework projects come up when converting:
+
+- **A `.resx` with non-string resources** (images, icons) fails with `MSB3822: Non-string resources require the
+  System.Resources.Extensions assembly at runtime` (#36, Subtext). Add
+  `<GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>` and a reference to the
+  `System.Resources.Extensions` package.
+- **Project references are transitive.** A project now sees the packages and projects its references use.
+  - Packages pinned at different versions in different projects fail with `NU1605: Detected package downgrade`.
+    Use the highest version everywhere (#39, FunnelWeb's Iesi.Collections).
+  - A namespace from an indirect reference can hide a type: `CS0118: 'X' is a namespace but is used like a type`. Put
+    `PrivateAssets="all"` on the `ProjectReference` whose types its dependants shouldn't see (#39, mojoPortal's data
+    layer).
+
 ## 3. References
 
 Remove the .NET Framework references and Microsoft's ASP.NET NuGet packages. With the packages, add
@@ -149,7 +162,9 @@ webForCore ships only Microsoft assemblies, so two libraries apps commonly have 
   webForCore. It finds its attributes with `Assembly.LoadFrom`, which on .NET loads second copies of the application's
   assemblies outside the application (#21; [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md)). Keep the package, and call
   each `[assembly: WebActivatorEx.PreApplicationStartMethod(typeof(X), "Start")]` method from `Application_Start` in
-  Global.asax (`X.Start()`), post-start methods after it, and shutdown methods from `Application_End`.
+  Global.asax (`X.Start()`), post-start methods after it, and shutdown methods from `Application_End`. WebActivator 1.x
+  (`[assembly: WebActivator.PreApplicationStartMethod]`, which MVC 3 era packages such as Ninject.MVC3 bring) is the
+  same (#38, Subtext).
 - **AjaxControlToolkit** isn't provided. The original package is built for .NET Framework.
 
 Keep other NuGet packages, preferring versions that target .NET Standard or .NET. The `test/webForCore.*.Sample`
@@ -183,8 +198,10 @@ These came up migrating real applications; each names one that needed it.
   <Reference Include="Microsoft.AI.Web" HintPath="$(PkgMicrosoft_ApplicationInsights_Web)/lib/net45/Microsoft.AI.Web.dll" />
   ```
 - **Versions webForCore requires** (#6). Restoring fails with `NU1605: Detected package downgrade` below these:
-  `Newtonsoft.Json` 13.0.4 (Web API's formatters, bundling) and `Microsoft.IdentityModel.Tokens` 8.19.1 (through
-  System.Web.Extensions' CoreWCF client support). Raise the application's reference, or remove it if the package was
+  `Newtonsoft.Json` 13.0.4 (Web API's formatters, bundling), `Microsoft.IdentityModel.Tokens` 8.19.1 (through
+  System.Web.Extensions' CoreWCF client support) and `Humanizer.Core` 2.14.1 (through Roslyn in `webForCore.Compilers`;
+  aspnet-mvc5-starter had 2.6.2, #30). `System.Configuration.ConfigurationManager` and `System.Runtime.Caching` come
+  with webForCore at 11.0: remove the application's references to them (MVCForum had 4.5 previews). Raise the application's reference, or remove it if the package was
   only there as another package's dependency. `EntityFramework` before 6.4 has no .NET build: use 6.4 or later
   (6.5.1 works with `System.Data.SqlClient`).
 - **.NET Framework assemblies that are packages on .NET** (#9). The root web.config of .NET Framework referenced its
@@ -193,6 +210,24 @@ These came up migrating real applications; each names one that needed it.
   be found ... forwarded to assembly 'System.ServiceModel.Syndication'` (MiniBlog's feed handler). Among them:
   `System.ServiceModel.Syndication`, `System.Data.SqlClient`, `System.Data.OleDb`, `System.DirectoryServices`,
   `System.Runtime.Caching`, `System.ServiceModel.Http` and the other WCF client packages.
+- **A library's own types named like System.Web.ApplicationServices' become ambiguous** (#29). On .NET Framework a
+  library that references only `System.Web` doesn't see the membership types (`MembershipUser`, `MembershipCreateStatus`,
+  `MembershipProvider`, `Roles`, ...), which `System.Web` forwards to `System.Web.ApplicationServices`. The `webForCore`
+  package references `System.Web.ApplicationServices` for every project, so a library that defines its own
+  `MembershipUser` and has `using System.Web.Security;` gets `CS0104: 'MembershipUser' is an ambiguous reference`
+  (MVCForum). Keep it out of that library's compilation, as it was:
+  ```xml
+  <PackageReference Include="webForCore.Web.ApplicationServices" Version="0.4.0" ExcludeAssets="compile" />
+  ```
+- **A package's .NET Standard build can have less than its `net45` build** (#31). NuGet picks the .NET Standard build
+  for .NET 11, and some packages built it with a smaller API. WindowsAzure.Storage 9.x has no synchronous blob methods
+  there (`Exists`, `OpenRead`, ...: aspnet-mvc5-starter). Hangfire 1.6's has no OWIN extensions (`app.UseHangfireServer`),
+  and its SqlServer storage can't look a connection string name up in web.config (MVCForum). Use the version's `net45`
+  build, in every project that gets the package, the web project included:
+  ```xml
+  <PackageReference Include="Hangfire.Core" Version="1.6.17" GeneratePathProperty="true" ExcludeAssets="compile;runtime" />
+  <Reference Include="Hangfire.Core" HintPath="$(PkgHangfire_Core)/lib/net45/Hangfire.Core.dll" />
+  ```
 - **Katana packages webForCore doesn't lift** (#14, #18). webForCore provides `Microsoft.Owin`, its hosts, `Security`,
   `Security.Cookies`, `Security.OAuth` and `Cors`. The social logins of the Visual Studio templates
   (`Microsoft.Owin.Security.Facebook`, `.Google`, `.MicrosoftAccount`, `.Twitter`) and `.WsFederation` are not: keep
@@ -251,6 +286,9 @@ reach System.Web, and ASP.NET Core serves everything else.
 - **Keep `web.config`**, including `<system.webServer>`: webForCore reads its modules, handlers, rewrite rules,
   request filtering, default documents, custom errors and static content settings. See
   [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md) for what's covered.
+- **Remove `<compilation><assemblies>` entries for assemblies .NET doesn't have**, such as System.Design and
+  System.Data.Linq ([NAMESPACES.md](NAMESPACES.md)). Each one is a Configuration Error on every page ("Could not load
+  file or assembly 'System.Design, Version=4.0.0.0'"), even when no page uses it (#37, Subtext and mojoPortal).
 - **Set an explicit `<machineKey>`** (validation and decryption keys). Generated keys change with every process, so
   forms authentication cookies, view state and anti-forgery tokens wouldn't survive a restart or work across servers.
 - **Connection strings:** `System.Data.SqlClient` is used, as on .NET Framework. Add `TrustServerCertificate=True` or

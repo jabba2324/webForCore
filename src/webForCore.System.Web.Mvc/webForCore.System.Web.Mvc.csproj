@@ -479,6 +479,7 @@
     <ProjectReference Include="../webForCore.System.Web.Razor/webForCore.System.Web.Razor.csproj" />
     <ProjectReference Include="../webForCore.System.Web.WebPages.Razor/webForCore.System.Web.WebPages.Razor.csproj" />
     <ProjectReference Include="../webForCore.System.Web.WebPages/webForCore.System.Web.WebPages.csproj" />
+    <ProjectReference Include="../webForCore.System.Web.Helpers/webForCore.System.Web.Helpers.csproj" />
     <PackageReference Include="System.CodeDom" Version="11.0.0-rc.3.26522.148" />
     <PackageReference Include="System.Runtime.Caching" Version="11.0.0-rc.3.26522.148" />
   </ItemGroup>

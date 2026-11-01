@@ -101,6 +101,9 @@ These aren't lifts. They change WebFormsForCore's port, and each has a `webForCo
   file as `FindFirstFile` does (its name, or its path relative to the monitored root, without the Windows-only parent
   walk), and the `FileSystemWatcher` that replaces `ReadDirectoryChangesW` reports names relative to the watched
   directory, as `ReadDirectoryChangesW` does (#2).
+- **Paths with `/` as the separator:** `configSource` paths written with `\` resolve on Linux
+  (`InternalConfigHost.StaticGetStreamNameForConfigSource`, #26), and `/` no longer makes a mapped physical path invalid
+  under `relaxedUrlToFileSystemMapping` (`HttpRuntime.s_InvalidPhysicalPathChars`, #27).
 - **System.Web.DynamicData** (`src/WebFormsForCore.Web.DynamicData`, now built and in the "Always" set): the Entity
   Framework 1–4 and LINQ to SQL model providers, `LinqDataSource`/`EntityDataSource` hookups and EF 5 spatial column
   types are compiled out (`#if NETFRAMEWORK`); `AssemblyRef.cs` and `ScaffoldTableAttribute` (which .NET dropped) are

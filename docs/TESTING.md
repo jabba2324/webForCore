@@ -6,7 +6,7 @@ where .NET's base class library behaves differently from .NET Framework's; those
 [lifted-changes.md](lifted-changes.md). On top of them, webForCore's own **gate suites** run real sample applications
 on Kestrel and check them over HTTP against IIS's documented behaviour.
 
-**Latest run (round 19, 31 Oct 2026, Linux x64, Release): 27,297 tests in 24 suites. 27,111 pass, 35 are skipped
+**Latest run (round 19, 31 Oct 2026, Linux x64, Release): 27,299 tests in 24 suites. 27,113 pass, 35 are skipped
 with a reason, and 151 fail, all of them known System.Drawing differences (141 are metafiles).** In the full run one
 more test failed, a race between three of Microsoft's MVC Futures test classes over a static setting; they now share an
 xUnit collection, and Microsoft.Web.Mvc.Test passed in three runs since.
@@ -36,8 +36,8 @@ only after a maintainer approves the run.
 After the tests, CI packs the NuGet packages (version `<Version>-ci.<run number>`; a `v<Version>` tag builds the
 release version and attaches the packages to a GitHub release, with `docs/release-notes/<version>.md` as its notes) and runs `tools/ci/package-smoke.sh`: a Web Forms app
 that references only the `webForCore` package from that folder is built, started, and must serve a page and code
-compiled from App_Code. Then `tools/ci/package-smoke-mvc`, an MVC 5 and OWIN app with the third-party packages real
-applications have (Unity.Mvc, WebActivatorEx, Katana's Google provider) as they have them, must render Razor views,
+compiled from App_Code, and with `relaxedUrlToFileSystemMapping` on, map a path (`MapPath.aspx`). Then `tools/ci/package-smoke-mvc`, an MVC 5 and OWIN app with the third-party packages real
+applications have (Unity.Mvc, WebActivatorEx, Katana's Google provider) as they have them, must render Razor views with webForCore's MVC, Razor, Web Pages and Helpers in its `deps.json`,
 construct a controller through Unity (started from `Application_Start`, since WebActivatorEx's start methods don't
 run on webForCore), and redirect a Google challenge.
 
@@ -76,7 +76,7 @@ rounding difference; they are listed in `tools/lift/test-results/2026-10-30.md`.
 
 | Suite | Tests | What it checks |
 | --- | ---: | --- |
-| IIS.Gate.Tests | 96 | `test/webForCore.IIS.Sample` on Kestrel: `RegressionTests` (20) for problems real applications hit (`regressions/`, one test per issue, each naming the application); each `<system.webServer>` feature against IIS 10's documented behaviour (request filtering, rewrite rules, redirects, default documents, errors, IP restrictions, directory browsing, compression, logging), the in-process restart, WebSockets, HTTPS and client certificates, timeouts, SignalR, bundling, protected configuration, integrated-pipeline APIs, precompiled sites (`aspnetcore_compiler`: fixed, updatable, compile errors, usage), ASMX (SOAP 1.1/1.2, faults, HTTP POST, WSDL, help page, JSON), ASP.NET AJAX (ScriptResource.axd, UpdatePanel partial postback, page methods), `System.Web.Mail`, `<system.net>` (mail settings through a PasswordRecovery postback to a fake SMTP server, the default proxy through a fake proxy), `<DbProviderFactories>`, data binding over app types, a Visual Studio typed DataSet with TableAdapters against SQL Server, and AppDomain restarts: the old domain is collected, and a WebSocket outlasting `shutdownTimeout` is aborted |
+| IIS.Gate.Tests | 98 | `test/webForCore.IIS.Sample` on Kestrel: `RegressionTests` (22) for problems real applications hit (`regressions/`, one test per issue, each naming the application); each `<system.webServer>` feature against IIS 10's documented behaviour (request filtering, rewrite rules, redirects, default documents, errors, IP restrictions, directory browsing, compression, logging), the in-process restart, WebSockets, HTTPS and client certificates, timeouts, SignalR, bundling, protected configuration, integrated-pipeline APIs, precompiled sites (`aspnetcore_compiler`: fixed, updatable, compile errors, usage), ASMX (SOAP 1.1/1.2, faults, HTTP POST, WSDL, help page, JSON), ASP.NET AJAX (ScriptResource.axd, UpdatePanel partial postback, page methods), `System.Web.Mail`, `<system.net>` (mail settings through a PasswordRecovery postback to a fake SMTP server, the default proxy through a fake proxy), `<DbProviderFactories>`, data binding over app types, a Visual Studio typed DataSet with TableAdapters against SQL Server, and AppDomain restarts: the old domain is collected, and a WebSocket outlasting `shutdownTimeout` is aborted |
 | WebApi.Gate.Tests | 67 | `test/webForCore.WebApi.Sample` (Visual Studio's Web API template and the "Getting Started" tutorial's controllers). Each request runs through System.Web and through OWIN, and is compared with an oracle: the same controllers in Web API's in-memory server, without System.Web. Status, media type, body, Location and Allow must match. Also: a restart, after which the old domain must be collected |
 | Mvc.Gate.Tests | 65 | `test/webForCore.Mvc.Sample` and `test/webForCore.WebPages.Sample`: model binding, validation, post-redirect-get with TempData, `Html.Serialize`/`[Deserialize]` state (and tampering), anti-forgery tokens, filters, error pages, layouts, display and editor templates, Razor features, MVC Futures, Web Pages, that source files aren't served, and that the old domain is collected after a restart |
 | Serialization.Tests | 10 | `NameValueCollection` and its subclasses through the BinaryFormatter port, in .NET Framework's format |

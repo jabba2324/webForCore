@@ -218,5 +218,27 @@ namespace IISGate
             Assert.Contains("RouteTable: True", body);
             Assert.Contains("path: ~/regressions/facades/Default.aspx", body);
         }
+
+        // #26: a configSource file in a subfolder, written with '\' as web.configs have it. MVCForum's ImageProcessor
+        // sections (configSource="Config\imageprocessor\processing.config") were a Configuration Error on every request:
+        // on Linux '\' isn't a separator, and '/' is rejected, as on .NET Framework.
+        [Fact]
+        public async Task ConfigSourceInASubfolderIsRead()
+        {
+            var (response, body) = await Get("/regressions/configsource/");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains(@"setting: from Config\settings.config", body);
+        }
+
+        // #35: types a shared-framework facade forwards to an assembly the application deploys must be the application's.
+        // Subtext's Microsoft.ApplicationBlocks.Data (a .NET Framework 1.1 library) names SqlDataReader in System.Data, and
+        // every request failed with "Method not found: 'System.Data.SqlClient.SqlDataReader ...SqlHelper.ExecuteReader(...)'".
+        [Fact]
+        public async Task SqlClientTypesThroughTheSystemDataFacadeAreTheApplications()
+        {
+            var (response, body) = await Get("/regressions/DataFacadeForwards.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("same type: True", body);
+        }
     }
 }

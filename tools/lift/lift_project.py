@@ -52,7 +52,11 @@ PROJECTS = {
     "System.Web.WebPages": dict(source="spike:System.Web.WebPages", tfm="net11.0", roots=["src/System.Web.WebPages"]),
     "System.Web.WebPages.Razor": dict(source="spike:System.Web.WebPages.Razor", tfm="net11.0", roots=["src/System.Web.WebPages.Razor"]),
     "System.Web.Mvc": dict(source="spike:System.Web.Mvc", tfm="net11.0", roots=["src/System.Web.Mvc"],
-                           exclude=["LinqBinaryModelBinder.cs"]),  # System.Data.Linq: see the FIXUPS
+                           exclude=["LinqBinaryModelBinder.cs"],  # System.Data.Linq: see the FIXUPS
+                           # Microsoft.AspNet.Mvc depends on Microsoft.AspNet.WebPages, which contains System.Web.Helpers,
+                           # so MVC 5 applications have it and web.configs list it (#28, MVCForum). The reference makes
+                           # the webForCore.Web.Mvc package depend on webForCore.Web.Helpers.
+                           fork_refs=["src/webForCore.System.Web.Helpers/webForCore.System.Web.Helpers.csproj"]),
     "System.Web.Mvc.Test": dict(source="spike:System.Web.Mvc.Test", tfm="net11.0", roots=["test/System.Web.Mvc.Test"], test=True,
                                 fork_refs=["src/WebFormsForCore.Serialization.Formatters/WebFormsForCore.Serialization.Formatters.csproj"],
                                 exclude=["Test/LinqBinaryModelBinderTest.cs"]),  # System.Data.Linq: see the FIXUPS
@@ -1299,7 +1303,9 @@ def lift(name, cfg, roots, spike, fork, commits):
             sib = os.path.basename(full)[:-len(".csproj")].replace(".ns2_0", "")
             if sib in cfg.get("drop_refs", set()):
                 continue
-            target = os.path.join(project_dir(fork, sib), f"webForCore.{sib}.csproj")
+            # A reference to one of the fork's own projects (WebFormsForCore.Web, ...) keeps its path; others are lifted siblings.
+            own = os.path.join(fork, "src", sib, f"{sib}.csproj")
+            target = own if sib not in PROJECTS and os.path.exists(own) else os.path.join(project_dir(fork, sib), f"webForCore.{sib}.csproj")
             refs.append(os.path.relpath(target, dest_dir))
     refs += [os.path.relpath(os.path.join(fork, r), dest_dir) for r in cfg.get("fork_refs", [])]
     aliased = [(os.path.relpath(os.path.join(project_dir(fork, sib), f"webForCore.{sib}.csproj"), dest_dir), alias)
