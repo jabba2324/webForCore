@@ -1872,7 +1872,7 @@ BundleTransformer had already been removed from the repository (LICENSING.md); a
 
 ## Fixes from the smoke test's third round (1 Nov 2026)
 
-The third round ran on the 0.4.0 packages (with webForCore-thirdparty's WebActivatorEx for the apps that use it). 17 of
+The third round ran on the 0.4.0 packages. 17 of
 the 19 applications from before pass. Two more were migrated: aspnet-mvc5-starter passes; MVCForum found #26–#29 and
 #31. Each fix below has a test and names the application.
 
@@ -1902,9 +1902,10 @@ setting on and `MapPath.aspx` must map `~/Default.aspx` to the file (on the 0.4.
 application has it, and web.configs list it. `webForCore.Web.Mvc` didn't depend on `webForCore.Web.Helpers`, and MVCForum,
 whose packages don't bring Microsoft's, failed with "Could not load file or assembly 'System.Web.Helpers'". The lifted
 MVC project references the Helpers project (`fork_refs` in `tools/lift/lift_project.py`), so the package depends on it.
-Re-running the lift for System.Web.Mvc produces that reference; it also showed that the committed project's references
-to the WebFormsForCore projects had drifted from what the script generates (`../WebFormsForCore.Web/...` committed,
-`../webForCore.WebFormsForCore.Web/...` generated), so only the one line is applied. Test: `tools/ci/package-smoke-mvc`
+Re-running the lift for System.Web.Mvc produces that reference. It also showed that the script wrote the spike's
+references to the fork's own projects as lifted siblings (`../webForCore.WebFormsForCore.Web/...`, which doesn't exist,
+where the committed project has `../WebFormsForCore.Web/...`): `lift_project.py` now keeps a reference to a project in
+`src/<Name>/<Name>.csproj` as it is, and re-running the lift reproduces the committed project and files exactly. Test: `tools/ci/package-smoke-mvc`
 lists System.Web.Helpers in web.config and uses `Json.Encode` in a view. Its `deps.json` must have webForCore's
 `System.Web.Helpers`: on 0.4.0 it has `Microsoft.AspNet.WebPages`' `lib/net45` one, which Unity.Mvc brings.
 

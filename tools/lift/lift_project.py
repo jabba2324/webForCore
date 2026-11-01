@@ -1303,7 +1303,9 @@ def lift(name, cfg, roots, spike, fork, commits):
             sib = os.path.basename(full)[:-len(".csproj")].replace(".ns2_0", "")
             if sib in cfg.get("drop_refs", set()):
                 continue
-            target = os.path.join(project_dir(fork, sib), f"webForCore.{sib}.csproj")
+            # A reference to one of the fork's own projects (WebFormsForCore.Web, ...) keeps its path; others are lifted siblings.
+            own = os.path.join(fork, "src", sib, f"{sib}.csproj")
+            target = own if sib not in PROJECTS and os.path.exists(own) else os.path.join(project_dir(fork, sib), f"webForCore.{sib}.csproj")
             refs.append(os.path.relpath(target, dest_dir))
     refs += [os.path.relpath(os.path.join(fork, r), dest_dir) for r in cfg.get("fork_refs", [])]
     aliased = [(os.path.relpath(os.path.join(project_dir(fork, sib), f"webForCore.{sib}.csproj"), dest_dir), alias)

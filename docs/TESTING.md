@@ -6,7 +6,7 @@ where .NET's base class library behaves differently from .NET Framework's; those
 [lifted-changes.md](lifted-changes.md). On top of them, webForCore's own **gate suites** run real sample applications
 on Kestrel and check them over HTTP against IIS's documented behaviour.
 
-**Latest run (round 19, 31 Oct 2026, Linux x64, Release): 27,298 tests in 24 suites. 27,112 pass, 35 are skipped
+**Latest run (round 19, 31 Oct 2026, Linux x64, Release): 27,299 tests in 24 suites. 27,113 pass, 35 are skipped
 with a reason, and 151 fail, all of them known System.Drawing differences (141 are metafiles).** In the full run one
 more test failed, a race between three of Microsoft's MVC Futures test classes over a static setting; they now share an
 xUnit collection, and Microsoft.Web.Mvc.Test passed in three runs since.
