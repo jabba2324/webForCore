@@ -1,4 +1,4 @@
-# Linux build, every test suite (see docs/TESTING.md), and the NuGet packages: every run packs them, checks that an
+# Linux build (and a Windows one, #46), every test suite (see docs/TESTING.md), and the NuGet packages: every run packs them, checks that an
 # application builds and runs from them, and keeps them as the "packages" artifact. A version tag (v0.1.0, matching
 # <Version> in Directory.Build.props) also publishes them as a GitHub release.
 name: CI
@@ -114,6 +114,70 @@ jobs:
             ${{ runner.temp }}/packages/*.nupkg
             ${{ runner.temp }}/packages/*.snupkg
           if-no-files-found: error
+
+  # Windows as a development environment (#46): the same build, tests, packing and package smoke test. Not a required
+  # check yet; each step's failures are recorded while the differences from Linux are fixed or documented.
+  build-windows:
+    runs-on: windows-2025
+    timeout-minutes: 150
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      # Check files out as they are stored, as on Linux: core.autocrlf would give the shell scripts CRLF line endings.
+      - name: Line endings
+        run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@v4
+
+      # The scripts call python3; Windows has python.
+      - name: python3
+        run: |
+          mkdir -p "$HOME/bin"
+          printf '#!/bin/sh\nexec python "$@"\n' > "$HOME/bin/python3"
+          chmod +x "$HOME/bin/python3"
+          cygpath -w "$HOME/bin" >> "$GITHUB_PATH"
+
+      - name: Set up .NET (global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 11.0.100-rc.3.26522.148
+
+      - name: Build the build tasks
+        run: dotnet build src/WebFormsForCore.Build/WebFormsForCore.Build.csproj -c Release
+
+      - name: Test fonts
+        run: tools/ci/fetch-test-fonts.sh
+
+      - name: Build
+        run: dotnet build WebFormsForCore.slnx -c Release -nodeReuse:false -p:Version=0.0.0-windows.${{ github.run_number }}
+
+      # SQL Server isn't available (service containers are Linux only), so Identity.Test's Entity Framework tests and
+      # the IIS gate's typed DataSet test are expected to fail here for now.
+      - name: Test
+        continue-on-error: true
+        run: tools/ci/run-tests.sh "$RUNNER_TEMP/TestResults"
+
+      - name: Test summary
+        if: always()
+        run: cat "$RUNNER_TEMP/TestResults/summary.md" >> "$GITHUB_STEP_SUMMARY" || true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-windows
+          path: ${{ runner.temp }}/TestResults/*.trx
+          if-no-files-found: warn
+
+      - name: Pack
+        if: always()
+        run: tools/ci/pack.sh 0.0.0-windows.${{ github.run_number }} "$RUNNER_TEMP/packages"
+
+      - name: Package smoke test
+        if: always()
+        run: tools/ci/package-smoke.sh "$RUNNER_TEMP/packages" 0.0.0-windows.${{ github.run_number }}
 
   # A version tag: the tested packages become a GitHub release (not published to nuget.org).
   release:

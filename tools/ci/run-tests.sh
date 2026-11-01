@@ -23,6 +23,12 @@ SUITES=(
   WebApi.Gate.Tests Mvc.Gate.Tests IIS.Gate.Tests
 )
 DRAWING_FILTER="category!=failing&category!=nonlinuxtests&category!=nonnetcoreapptests&category!=OuterLoop&category!=IgnoreForCI&category!=nonunixtests"
+KNOWN_FAILURES=tools/ci/known-failures/System.Drawing.Common.Tests.txt
+# Windows (Git Bash, #46): Microsoft's Windows selection, and Windows' own known failures (none recorded yet).
+if [[ "${OS:-}" == Windows_NT ]]; then
+  DRAWING_FILTER="category!=failing&category!=nonwindowstests&category!=nonnetcoreapptests&category!=OuterLoop&category!=IgnoreForCI"
+  KNOWN_FAILURES=tools/ci/known-failures/System.Drawing.Common.Tests.windows.txt
+fi
 
 failed=()
 for s in "${SUITES[@]}"; do
@@ -39,7 +45,7 @@ echo "::group::$s"
 dotnet test "test/webForCore.$s/webForCore.$s.csproj" -c Release --no-build --filter "$DRAWING_FILTER" \
   --logger "trx;LogFileName=$s.trx" --results-directory "$OUT"
 echo "::endgroup::"
-python3 tools/ci/check_failures.py "$OUT/$s.trx" "tools/ci/known-failures/$s.txt" || failed+=("$s")
+python3 tools/ci/check_failures.py "$OUT/$s.trx" "$KNOWN_FAILURES" || failed+=("$s")
 
 python3 tools/lift/trx_summary.py "$OUT"/*.trx > "$OUT/summary.md" || true
 if [ ${#failed[@]} -gt 0 ]; then

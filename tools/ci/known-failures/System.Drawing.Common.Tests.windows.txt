@@ -1,0 +1,1 @@
+# System.Drawing.Common.Tests failures known on Windows (#46), one "Class.Method(arguments)" per line.
