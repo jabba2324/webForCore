@@ -29,6 +29,21 @@
     </ItemGroup>
   </Target>
 
+  <!-- The fork's System.Web.Services contains the System.Web.Services.Description namespace, as on .NET Framework
+       (WsiProfiles, SoapBindingUse, ...). CoreWCF, which System.Web.Extensions' WCF client support uses, depends on the
+       System.Web.Services.Description package, whose reference assembly defines the same types, so code that names them
+       got CS0433: Visual Studio's generic handler template ([WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)],
+       mojoPortal's .ashx handlers) and SOAP client proxies (Subtext's Web References) (#34). Drop the package's compile
+       reference wherever the fork's System.Web.Services is referenced; CoreWCF still gets it at run time. -->
+  <Target Name="WebForCoreDropServicesDescriptionPackage" AfterTargets="ResolveAssemblyReferences" BeforeTargets="FindReferenceAssembliesForReferences" Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">
+    <ItemGroup>
+      <_WebForCoreSystemWebServices Include="@(ReferencePath)" Condition="'%(FileName)' == 'System.Web.Services' AND ('%(ReferencePath.ReferenceSourceTarget)' == 'ProjectReference' OR '%(ReferencePath.NuGetPackageId)' == 'webForCore.Web.Services')" />
+    </ItemGroup>
+    <ItemGroup Condition="'@(_WebForCoreSystemWebServices)' != ''">
+      <ReferencePath Remove="@(ReferencePath)" Condition="'%(FileName)' == 'System.Web.Services.Description' AND '%(ReferencePath.NuGetPackageId)' == 'System.Web.Services.Description'" />
+    </ItemGroup>
+  </Target>
+
   <!-- Packages built on MVC, Web API or Katana (Unity.Mvc, Autofac.Mvc5, Swashbuckle, ...) bring
        Microsoft's packages back transitively, with assemblies of the same names as webForCore's. The SDK keeps one of
        each by assembly version, then file version, so Microsoft's won where the assembly versions tie:
