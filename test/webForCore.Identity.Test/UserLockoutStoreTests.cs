@@ -231,7 +231,7 @@ namespace Identity.Test
         {
             var mgr = TestUtil.CreateManager();
             mgr.UserLockoutEnabledByDefault = true;
-            var user = new IdentityUser("LockoutNowTest") { LockoutEndDateUtc = DateTime.Now.AddMinutes(5) };
+            var user = new IdentityUser("LockoutNowTest") { LockoutEndDateUtc = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, "America/Los_Angeles").AddMinutes(5) }; // webForCore: Pacific time on any OS
             UnitTestHelper.IsSuccess(mgr.Create(user));
             Assert.True(mgr.GetLockoutEnabled(user.Id));
             Assert.True(user.LockoutEnabled);

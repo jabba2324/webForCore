@@ -9,6 +9,8 @@ cd "$(dirname "$0")/../.."
 OUT=$(realpath -m "${1:-TestResults}")
 mkdir -p "$OUT"
 export OPENSSL_ENABLE_SHA1_SIGNATURES=1
+# Test names have non-ASCII characters (∞), and Windows' Python writes and reads its code page otherwise (#46).
+export PYTHONUTF8=1
 # .NET sizes its threads' stacks from this limit, and Web API's deep-nesting tests expect
 # InsufficientExecutionStackException at 10,000 levels: the usual Linux default of 8 MB makes runs comparable.
 ulimit -s 8192 2>/dev/null || echo "warning: could not set the stack limit to 8 MB"

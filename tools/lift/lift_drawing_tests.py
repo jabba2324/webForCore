@@ -45,6 +45,24 @@ FIXUPS = [
     ("src/libraries/Common/tests/System/Drawing/Helpers.cs",
      "            if (PlatformDetection.IsRedHatFamily)\n",
      "            if (false) // webForCore: screened out RedHat's old libgdiplus; GDI+ is SkiaGdiPlus here\n", 2),
+    # On Windows too, GDI+ is SkiaGdiPlus, not Windows' own: the suite's Windows checks choose Windows GDI+'s
+    # expectations, so Windows answers as Linux and both run the same tests with the same expectations (#46).
+    ("src/libraries/Common/tests/TestUtilities/System/PlatformDetection.Windows.cs",
+     "        public static bool IsWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);\n",
+     "        public static bool IsWindows => false; // webForCore: GDI+ is SkiaGdiPlus on Windows too; Windows runs as Linux (#46)\n", 1),
+    ("src/Microsoft.DotNet.XUnitExtensions/src/DiscovererHelpers.cs",
+     "                (platforms.HasFlag(TestPlatforms.Linux) && RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) ||\n",
+     "                // webForCore: GDI+ is SkiaGdiPlus on Windows too; Windows runs as Linux (#46)\n"
+     "                (platforms.HasFlag(TestPlatforms.Linux) && (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.Windows))) ||\n", 1),
+    ("src/Microsoft.DotNet.XUnitExtensions/src/DiscovererHelpers.cs",
+     "                (platforms.HasFlag(TestPlatforms.Windows) && RuntimeInformation.IsOSPlatform(OSPlatform.Windows));\n",
+     "                false; // webForCore: (TestPlatforms.Windows) Windows runs as Linux, above\n", 1),
+    ("src/libraries/System.Drawing.Common/tests/BitmapTests.cs",
+     "                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))\n",
+     "                if (PlatformDetection.IsWindows) // webForCore: Windows runs as Linux (#46)\n", 1),
+    ("src/libraries/System.Drawing.Common/tests/Imaging/MetafileTests.cs",
+     "            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))\n",
+     "            if (PlatformDetection.IsWindows) // webForCore: Windows runs as Linux (#46)\n", 1),
 ]
 
 
@@ -62,7 +80,7 @@ class Lift:
         os.makedirs(os.path.dirname(dest_abs), exist_ok=True)
         shutil.copyfile(os.path.join(repo, source_rel), dest_abs)
         self.manifest.append(f"{label}\t{source_rel}\t{os.path.relpath(dest_abs, self.fork)}")
-        mine = [f for f in self.fixups if f[0] == source_rel and label.startswith("dotnet/runtime ")]
+        mine = [f for f in self.fixups if f[0] == source_rel and label.startswith(("dotnet/runtime ", "dotnet/arcade "))]
         if mine:
             raw = open(dest_abs, "rb").read()
             bom = raw.startswith(b"\xef\xbb\xbf")
