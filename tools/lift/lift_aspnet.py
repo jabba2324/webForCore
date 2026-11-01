@@ -37,7 +37,7 @@ FORK_PROJECTS = {
 #   refs: fork projects (FORK_PROJECTS keys) or other lifted projects (their Name); packages: (id, version).
 PROJECTS = {
     "Microsoft.AspNet.SignalR.Core": dict(
-        source=("signalr", "src/Microsoft.AspNet.SignalR.Core"), style="sdk",
+        version="2.4.3.0", source=("signalr", "src/Microsoft.AspNet.SignalR.Core"), style="sdk",
         # Microsoft's build: SERVER (the server side of shared files), PERFCOUNTERS, and NET45, the framework it targets
         # (the #if NET45 branches are the .NET Framework code paths, which .NET has).
         defines="SERVER;PERFCOUNTERS;NET45;SIGNED", unsafe=True,
@@ -47,11 +47,11 @@ PROJECTS = {
         # Not shipped to .NET Framework apps either: hubs.js comes from Scripts\hubs.js (its non-Windows path).
         resources={"Scripts/hubs.js": "Microsoft.AspNet.SignalR.Scripts.hubs.js"}),
     "Microsoft.AspNet.SignalR.SystemWeb": dict(
-        source=("signalr", "src/Microsoft.AspNet.SignalR.SystemWeb"), style="sdk", defines="NET45;SIGNED",
+        version="2.4.3.0", source=("signalr", "src/Microsoft.AspNet.SignalR.SystemWeb"), style="sdk", defines="NET45;SIGNED",
         refs=["Microsoft.AspNet.SignalR.Core", "Microsoft.Owin", "Microsoft.Owin.Host.SystemWeb", "System.Web"]),
     # The .NET client, as its netstandard2.0 build (the target .NET runs); the gate and SignalR's tests use it.
     "Microsoft.AspNet.SignalR.Client": dict(
-        source=("signalr", "src/Microsoft.AspNet.SignalR.Client"), style="sdk", defines="CLIENT;NETSTANDARD;NETSTANDARD2_0;SIGNED",
+        version="2.4.3.0", source=("signalr", "src/Microsoft.AspNet.SignalR.Client"), style="sdk", defines="CLIENT;NETSTANDARD;NETSTANDARD2_0;SIGNED",
         packages=[NEWTONSOFT]),
     # SignalR's test infrastructure (hosts, test hubs and connections). Left out: IIS Express hosting (Windows); the
     # stress server's connection and hubs are compiled in (Microsoft's build references that project for them).
@@ -267,6 +267,16 @@ def lift(name, cfg, roots, fork):
                for r in cfg.get("private_refs", [])}
     refs += sorted(private - set(refs))
     ref_xml = "\n".join(f'    <ProjectReference Include="{r}"' + (' PrivateAssets="All"' if r in private else "") + " />" for r in refs)
+    # webForCore: Microsoft's assembly version, which Microsoft's build generated (KoreBuild for SignalR: the sources have
+    # no assembly attributes). Without it the assemblies were 0.0.0.0, and libraries built against Microsoft's (SignalR's
+    # SQL Server and Service Bus scale-out: JabbR) failed with CS1705 and wouldn't bind (#40).
+    version_xml = ("    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>" if not cfg.get("version") else
+                   "    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>\n"
+                   f"    <AssemblyVersion>{cfg['version']}</AssemblyVersion>\n    <FileVersion>{cfg['version']}</FileVersion>\n"
+                   "    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>\n"
+                   "    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>\n"
+                   "    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>\n"
+                   "    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>")
     pkg_xml = "\n".join(f'    <PackageReference Include="{i}" Version="{v}" />' for i, v in packages)
     # The test host reads its configuration (connection strings, <entityFramework>) from testhost.dll.config.
     sequential = '    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />' if cfg.get("sequential") else ""
@@ -290,7 +300,7 @@ def lift(name, cfg, roots, fork):
     <RootNamespace>{rootns}</RootNamespace>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+{version_xml}
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <!-- The C# version of Microsoft's build: later ones resolve some calls differently (new Message(a, b, null) became
