@@ -1221,7 +1221,7 @@ namespace System.Drawing.Tests
                 Assert.Equal(rectangle.Height, data.Height);
                 Assert.Equal(expectedStride, data.Stride);
 
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                if (PlatformDetection.IsWindows) // webForCore: Windows runs as Linux (#46)
                 {
                     // "Reserved" is documented as "Reserved. Do not use.", so it's not clear whether we actually need to test this in any unit tests.
                     // Additionally, the values are not consistent across Windows (GDI+) and Unix (libgdiplus)

@@ -337,7 +337,7 @@ In order to use this site, specify a version in the site’s web.config file. Fo
 
             // Act
             var ex = Assert.Throws<HttpCompileException>(() =>
-                PreApplicationStartCode.StartCore(fileSystem, "", @"site/bin", nameValueCollection, loadedAssemblies, buildManager, loadWebPages, registerForChange, null)
+                PreApplicationStartCode.StartCore(fileSystem, "", Path.Combine(@"site", @"bin"), nameValueCollection, loadedAssemblies, buildManager, loadWebPages, registerForChange, null)
             );
 
             // Assert
@@ -345,7 +345,7 @@ In order to use this site, specify a version in the site’s web.config file. Fo
             Assert.Equal((object)true, ex.Data["WebPages.VersionChange"]);
             Assert.False(registeredForChangeNotification);
             VerifyVersionFile(buildManager, new Version(LatestVersion));
-            Assert.True(fileSystem.FileExists(@"site/bin/WebPagesRecompilation.deleteme"));
+            Assert.True(fileSystem.FileExists(Path.Combine(@"site", @"bin", @"WebPagesRecompilation.deleteme")));
         }
 
         [Fact]
@@ -367,13 +367,13 @@ In order to use this site, specify a version in the site’s web.config file. Fo
             Action registerForChange = () => { registeredForChangeNotification = true; };
 
             // Act
-            bool loaded = PreApplicationStartCode.StartCore(fileSystem, "", @"site/bin", nameValueCollection, loadedAssemblies, buildManager, loadWebPages, registerForChange, null);
+            bool loaded = PreApplicationStartCode.StartCore(fileSystem, "", Path.Combine(@"site", @"bin"), nameValueCollection, loadedAssemblies, buildManager, loadWebPages, registerForChange, null);
 
             // Assert
             Assert.False(loaded);
             Assert.False(registeredForChangeNotification);
             VerifyVersionFile(buildManager, AssemblyUtils.ThisAssemblyName.Version);
-            Assert.False(fileSystem.FileExists(@"site/bin/WebPagesRecompilation.deleteme"));
+            Assert.False(fileSystem.FileExists(Path.Combine(@"site", @"bin", @"WebPagesRecompilation.deleteme")));
         }
 
         [Fact]

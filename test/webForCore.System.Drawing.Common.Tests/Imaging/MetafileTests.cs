@@ -1062,7 +1062,7 @@ namespace System.Drawing.Imaging.Tests
 
             AssertMetafileHeaderIsBlank(metafile.GetMetafileHeader());
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (PlatformDetection.IsWindows) // webForCore: Windows runs as Linux (#46)
             {
                 // This values are incorrect on libgdiplus.
                 Assert.Equal(new Rectangle(0, 0, 1, 1), metafile.GetBounds(ref graphicsUnit));

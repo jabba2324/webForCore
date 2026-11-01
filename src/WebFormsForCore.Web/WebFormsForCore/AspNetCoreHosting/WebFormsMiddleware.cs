@@ -132,8 +132,25 @@ namespace Microsoft.AspNetCore.Builder
 				var app = current;
 				if (app != null) InDomain(app, app.Shutdown);
 			});
+			if (IsolateApplication && OperatingSystem.IsWindows()) StartProcessWideWaits();
 			GetApplication();
 			recycleTimer = new Timer(_ => CheckRecycling(), null, Recycling.CheckInterval, Recycling.CheckInterval);
+		}
+
+		// On Windows, two process-wide listeners of the shared framework start on first use and keep the ExecutionContext
+		// they were started on in a registered wait: HttpClient's system proxy (HttpWindowsProxy, for changes to the proxy
+		// settings) and NetworkChange (address changes; WebProxy subscribes the first time it checks for a local address).
+		// Started during a request, they keep that request's domain alive after a restart (#46), so the host starts them
+		// first, without a context, and keeps them.
+		static int processWideWaits;
+		static void StartProcessWideWaits()
+		{
+			if (Interlocked.Exchange(ref processWideWaits, 1) != 0) return;
+			using (ExecutionContext.SuppressFlow())
+			{
+				_ = System.Net.Http.HttpClient.DefaultProxy;
+				System.Net.NetworkInformation.NetworkChange.NetworkAddressChanged += (sender, e) => { };
+			}
 		}
 
 		Application GetApplication()
@@ -238,8 +255,9 @@ namespace Microsoft.AspNetCore.Builder
 					var (start, domain, checks, since) = unloading[i];
 					if (domain.Target is PseudoAppDomain pseudo)
 					{
-						int timers = pseudo.ReleaseTimers(), handlers = pseudo.ReleaseProcessEventHandlers(), handles = pseudo.ReleaseSystemWebHandles(),
-							caches = pseudo.ReleaseFrameworkCaches();
+						// Network change subscriptions too: a request still running when the domain started unloading can add one (#46).
+						int timers = pseudo.ReleaseTimers(), handlers = pseudo.ReleaseProcessEventHandlers() + pseudo.ReleaseNetworkChangeSubscribers(),
+							handles = pseudo.ReleaseSystemWebHandles(), caches = pseudo.ReleaseFrameworkCaches();
 						if (timers + handlers + handles + caches > 0)
 							logger.LogDebug("Application {AppId} (start {Generation}): released {Timers} timers, {Handlers} event handlers, {Handles} GC handles, {Caches} cache entries.",
 								AppId, start, timers, handlers, handles, caches);

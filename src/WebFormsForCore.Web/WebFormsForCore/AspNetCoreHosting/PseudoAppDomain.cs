@@ -159,7 +159,7 @@ namespace System.Web.Hosting
 		// handlers its code added to process-wide events (AppDomain's AssemblyLoad, AssemblyResolve, UnhandledException,
 		// ProcessExit/DomainUnload, FirstChanceException...; on .NET these are static events of AppContext and
 		// AssemblyLoadContext), and the GC handles System.Web allocated (System.Web.Util.GCUtil). Returns the number released.
-		public int ReleaseProcessResources() => DisposeDefaultMemoryCache() + ReleaseDefaultProxy() + ReleaseTimers() + ReleaseNetworkChangeSubscribers() + ReleaseProcessEventHandlers() + ReleaseSystemWebHandles() + ReleaseFrameworkCaches();
+		public int ReleaseProcessResources() => DisposeDefaultMemoryCache() + ClearSqlConnectionPools() + ReleaseDefaultProxy() + ReleaseTimers() + ReleaseNetworkChangeSubscribers() + ReleaseProcessEventHandlers() + ReleaseSystemWebHandles() + ReleaseFrameworkCaches();
 
 		// <system.net><defaultProxy><module> makes HttpClient.DefaultProxy, which is process-wide, an instance of the
 		// application's type (WebFormsForCore.Net.Configuration.NetConfiguration); .NET's default proxy is restored.
@@ -183,6 +183,25 @@ namespace System.Web.Hosting
 			if (field?.GetValue(null) is not IDisposable cache) return 0;
 			cache.Dispose();
 			return 1;
+		}
+
+		// SqlClient (System.Data.SqlClient, Microsoft.Data.SqlClient) is loaded into each domain, and its connection pools
+		// keep connections open. On Windows a connection's native SNI handle holds its state object, and so the domain, in a
+		// strong GC handle until the connection is closed (#46). AppDomain.Unload discarded the pools with the domain; here
+		// they are cleared, which closes their idle connections. Only while the domain still lists its assemblies.
+		public int ClearSqlConnectionPools()
+		{
+			int cleared = 0;
+			foreach (var assembly in Assemblies)
+			{
+				var name = assembly.GetName().Name;
+				if (name != "System.Data.SqlClient" && name != "Microsoft.Data.SqlClient") continue;
+				var clear = assembly.GetType(name + ".SqlConnection")?.GetMethod("ClearAllPools", BindingFlags.Public | BindingFlags.Static, Type.EmptyTypes);
+				if (clear == null) continue;
+				clear.Invoke(null, null);
+				cleared++;
+			}
+			return cleared;
 		}
 
 		// Static caches of the shared framework that hold types (or objects) they were used with, strongly: entries for the
@@ -383,7 +402,9 @@ namespace System.Web.Hosting
 
 		public int ReleaseNetworkChangeSubscribers()
 		{
-			var gate = NetworkChangeType?.GetField("s_gate", BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(null);
+			// The subscribers' lock: s_gate on Unix, s_globalLock on Windows (#46).
+			var gate = (NetworkChangeType?.GetField("s_gate", BindingFlags.Static | BindingFlags.NonPublic)
+				?? NetworkChangeType?.GetField("s_globalLock", BindingFlags.Static | BindingFlags.NonPublic))?.GetValue(null);
 			if (gate == null) return 0;
 			int released = 0;
 			lock (gate)
@@ -420,11 +441,45 @@ namespace System.Web.Hosting
 			return type.IsGenericType && type.GetGenericArguments().Any(IsInDomain);
 		}
 
+		// A context captured the domain if it runs in the domain's contextual reflection scope, or if its AsyncLocal values
+		// reach one of the domain's objects (System.Web's call context, a request's state): on Windows the network change
+		// subscription of HttpClient's system proxy keeps one from a request (#46).
 		bool CapturesDomain(ExecutionContext context)
 		{
 			AssemblyLoadContext captured = null;
 			ExecutionContext.Run(context, _ => captured = CurrentContextualReflectionContext, null);
-			return captured == this;
+			return captured == this || ReachesDomain(typeof(ExecutionContext).GetField("m_localValues", AnyInstance)?.GetValue(context));
+		}
+
+		// Whether the domain is reachable from an object through fields and array elements, within a bounded walk of the
+		// shared framework's objects (an AsyncLocal map, the collections in it). Fields are read, so no code of the objects
+		// runs. Called on the recycling timer: it must not throw.
+		bool ReachesDomain(object start)
+		{
+			const int Limit = 10000;
+			var seen = new HashSet<object>(ReferenceEqualityComparer.Instance);
+			var pending = new Stack<object>();
+			if (start != null) pending.Push(start);
+			while (pending.Count > 0 && seen.Count < Limit)
+			{
+				var value = pending.Pop();
+				if (!seen.Add(value)) continue;
+				Type type;
+				try { type = value.GetType(); }
+				catch (NotSupportedException) { continue; } // runtime-async continuations have no type to show
+				if (IsInDomain(type)) return true;
+				if (type.IsPrimitive || value is string || value is Type || value is MemberInfo || value is Assembly || GetLoadContext(type.Assembly) != Default) continue;
+				if (value is Array array)
+				{
+					if (type.GetElementType().IsPrimitive) continue;
+					foreach (var item in array) if (item != null) pending.Push(item);
+					continue;
+				}
+				for (var t = type; t != null; t = t.BaseType)
+					foreach (var field in t.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
+						if (!field.FieldType.IsPointer && !field.FieldType.IsPrimitive && field.GetValue(value) is object item) pending.Push(item);
+			}
+			return false;
 		}
 
 		static bool IsShared(string name) => SharedAssemblies.Any(shared => shared.EndsWith('*')
