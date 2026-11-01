@@ -183,8 +183,10 @@ These came up migrating real applications; each names one that needed it.
   <Reference Include="Microsoft.AI.Web" HintPath="$(PkgMicrosoft_ApplicationInsights_Web)/lib/net45/Microsoft.AI.Web.dll" />
   ```
 - **Versions webForCore requires** (#6). Restoring fails with `NU1605: Detected package downgrade` below these:
-  `Newtonsoft.Json` 13.0.4 (Web API's formatters, bundling) and `Microsoft.IdentityModel.Tokens` 8.19.1 (through
-  System.Web.Extensions' CoreWCF client support). Raise the application's reference, or remove it if the package was
+  `Newtonsoft.Json` 13.0.4 (Web API's formatters, bundling), `Microsoft.IdentityModel.Tokens` 8.19.1 (through
+  System.Web.Extensions' CoreWCF client support) and `Humanizer.Core` 2.14.1 (through Roslyn in `webForCore.Compilers`;
+  aspnet-mvc5-starter had 2.6.2, #30). `System.Configuration.ConfigurationManager` and `System.Runtime.Caching` come
+  with webForCore at 11.0: remove the application's references to them (MVCForum had 4.5 previews). Raise the application's reference, or remove it if the package was
   only there as another package's dependency. `EntityFramework` before 6.4 has no .NET build: use 6.4 or later
   (6.5.1 works with `System.Data.SqlClient`).
 - **.NET Framework assemblies that are packages on .NET** (#9). The root web.config of .NET Framework referenced its
@@ -193,6 +195,24 @@ These came up migrating real applications; each names one that needed it.
   be found ... forwarded to assembly 'System.ServiceModel.Syndication'` (MiniBlog's feed handler). Among them:
   `System.ServiceModel.Syndication`, `System.Data.SqlClient`, `System.Data.OleDb`, `System.DirectoryServices`,
   `System.Runtime.Caching`, `System.ServiceModel.Http` and the other WCF client packages.
+- **A library's own types named like System.Web.ApplicationServices' become ambiguous** (#29). On .NET Framework a
+  library that references only `System.Web` doesn't see the membership types (`MembershipUser`, `MembershipCreateStatus`,
+  `MembershipProvider`, `Roles`, ...), which `System.Web` forwards to `System.Web.ApplicationServices`. The `webForCore`
+  package references `System.Web.ApplicationServices` for every project, so a library that defines its own
+  `MembershipUser` and has `using System.Web.Security;` gets `CS0104: 'MembershipUser' is an ambiguous reference`
+  (MVCForum). Keep it out of that library's compilation, as it was:
+  ```xml
+  <PackageReference Include="webForCore.Web.ApplicationServices" Version="0.4.0" ExcludeAssets="compile" />
+  ```
+- **A package's .NET Standard build can have less than its `net45` build** (#31). NuGet picks the .NET Standard build
+  for .NET 11, and some packages built it with a smaller API. WindowsAzure.Storage 9.x has no synchronous blob methods
+  there (`Exists`, `OpenRead`, ...: aspnet-mvc5-starter). Hangfire 1.6's has no OWIN extensions (`app.UseHangfireServer`),
+  and its SqlServer storage can't look a connection string name up in web.config (MVCForum). Use the version's `net45`
+  build, in every project that gets the package, the web project included:
+  ```xml
+  <PackageReference Include="Hangfire.Core" Version="1.6.17" GeneratePathProperty="true" ExcludeAssets="compile;runtime" />
+  <Reference Include="Hangfire.Core" HintPath="$(PkgHangfire_Core)/lib/net45/Hangfire.Core.dll" />
+  ```
 - **Katana packages webForCore doesn't lift** (#14, #18). webForCore provides `Microsoft.Owin`, its hosts, `Security`,
   `Security.Cookies`, `Security.OAuth` and `Cors`. The social logins of the Visual Studio templates
   (`Microsoft.Owin.Security.Facebook`, `.Google`, `.MicrosoftAccount`, `.Twitter`) and `.WsFederation` are not: keep

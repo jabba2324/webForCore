@@ -1869,3 +1869,51 @@ original package's `ActivationManager` runs and finds nothing, and the app must 
 LICENSE-BSD-3-CLAUSE.txt and NAMESPACES.md follow. The build-and-run steps above no longer fetch the AjaxControlToolkit
 submodule.
 BundleTransformer had already been removed from the repository (LICENSING.md); a leftover checkout of it is ignored.
+
+## Fixes from the smoke test's third round (1 Nov 2026)
+
+The third round ran on the 0.4.0 packages (with webForCore-thirdparty's WebActivatorEx for the apps that use it). 17 of
+the 19 applications from before pass. Two more were migrated: aspnet-mvc5-starter passes; MVCForum found #26–#29 and
+#31. Each fix below has a test and names the application.
+
+### configSource in a subfolder (#26)
+
+`<security configSource="Config\imageprocessor\security.config" />` (MVCForum's ImageProcessor sections) was a
+Configuration Error on every request. `InternalConfigHost.StaticGetStreamNameForConfigSource`, from the Reference Source,
+combines the path with `Path.Combine`, and on Linux `\` isn't a directory separator. Writing it with `/` isn't an
+option: System.Configuration rejects that, as on .NET Framework. So a `configSource` file in a subfolder could never be
+found. The method now takes `\` as the separator off Windows (the client host already did, in
+`ClientConfigurationHost`). Microsoft's code changed: a guarded `Replace`, with a `webForCore:` comment; in
+MODIFICATIONS.md. Test: `RegressionTests.ConfigSourceInASubfolderIsRead` (`regressions/configsource/`, whose web.config
+has `<appSettings configSource="Config\settings.config" />`; a 500 on 0.4.0).
+
+### relaxedUrlToFileSystemMapping (#27)
+
+With `<httpRuntime relaxedUrlToFileSystemMapping="true">`, System.Web replaces a mapped physical path that has any of
+`s_InvalidPhysicalPathChars` with `<site>/NOT_A_VALID_FILESYSTEM_PATH`. The list, from .NET Framework, includes `/`,
+which is in every physical path on Linux, so every `MapPath` failed: MVCForum's `HostingEnvironment.MapPath("~/App_Data/forum.config")`
+during its database seed. `/` is left out of the list when it is the directory separator. Microsoft's code changed:
+the array's initializer, with a `webForCore:` comment; in MODIFICATIONS.md. Test: `tools/ci/package-smoke` turns the
+setting on and `MapPath.aspx` must map `~/Default.aspx` to the file (on the 0.4.0 packages, every page of the app fails).
+
+### System.Web.Helpers with MVC (#28)
+
+`Microsoft.AspNet.Mvc` depends on `Microsoft.AspNet.WebPages`, which contains `System.Web.Helpers.dll`, so every MVC 5
+application has it, and web.configs list it. `webForCore.Web.Mvc` didn't depend on `webForCore.Web.Helpers`, and MVCForum,
+whose packages don't bring Microsoft's, failed with "Could not load file or assembly 'System.Web.Helpers'". The lifted
+MVC project references the Helpers project (`fork_refs` in `tools/lift/lift_project.py`), so the package depends on it.
+Re-running the lift for System.Web.Mvc produces that reference; it also showed that the committed project's references
+to the WebFormsForCore projects had drifted from what the script generates (`../WebFormsForCore.Web/...` committed,
+`../webForCore.WebFormsForCore.Web/...` generated), so only the one line is applied. Test: `tools/ci/package-smoke-mvc`
+lists System.Web.Helpers in web.config and uses `Json.Encode` in a view. Its `deps.json` must have webForCore's
+`System.Web.Helpers`: on 0.4.0 it has `Microsoft.AspNet.WebPages`' `lib/net45` one, which Unity.Mvc brings.
+
+### Migration guide (#29, #30, #31)
+
+`docs/MIGRATING.md`:
+- `System.Web.ApplicationServices` is visible to every project, so a library's own `MembershipUser` can be ambiguous
+  (#29, MVCForum).
+- More versions webForCore requires: Humanizer.Core 2.14.1, and the System.* packages webForCore brings at 11.0 (#30,
+  aspnet-mvc5-starter and MVCForum).
+- A package's .NET Standard build can have less than its `net45` build: WindowsAzure.Storage 9.x, Hangfire 1.6 (#31,
+  aspnet-mvc5-starter and MVCForum).
