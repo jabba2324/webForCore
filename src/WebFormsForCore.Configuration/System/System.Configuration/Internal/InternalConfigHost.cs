@@ -92,6 +92,11 @@ namespace System.Configuration.Internal {
             string dirStream = UrlPath.GetDirectoryOrRootName(streamName);
 
             // combine with the new config source
+            // webForCore: configSource is a relative path written with '\' ('/' is rejected, as on .NET Framework), and on
+            // Linux Path.Combine doesn't take '\' as a separator, so a file in a subfolder was never found (#26, MVCForum).
+            if (Path.DirectorySeparatorChar != '\\') {
+                configSource = configSource.Replace('\\', Path.DirectorySeparatorChar);
+            }
             string result = Path.Combine(dirStream, configSource);
             result = Path.GetFullPath(result);
 

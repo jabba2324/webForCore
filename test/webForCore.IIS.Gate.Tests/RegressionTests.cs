@@ -218,5 +218,16 @@ namespace IISGate
             Assert.Contains("RouteTable: True", body);
             Assert.Contains("path: ~/regressions/facades/Default.aspx", body);
         }
+
+        // #26: a configSource file in a subfolder, written with '\' as web.configs have it. MVCForum's ImageProcessor
+        // sections (configSource="Config\imageprocessor\processing.config") were a Configuration Error on every request:
+        // on Linux '\' isn't a separator, and '/' is rejected, as on .NET Framework.
+        [Fact]
+        public async Task ConfigSourceInASubfolderIsRead()
+        {
+            var (response, body) = await Get("/regressions/configsource/");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains(@"setting: from Config\settings.config", body);
+        }
     }
 }
