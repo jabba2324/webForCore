@@ -108,6 +108,19 @@ Pages that use `CodeBehind=` are compiled into the project's assembly, as Visual
 `CodeFile=` are compiled at run time, as on IIS. Remove the old `bin` folder, `packages.config` and the
 `Microsoft.CodeDom.Providers.DotNetCompilerPlatform` settings; webForCore brings its own compiler.
 
+Two differences from .NET Framework projects come up when converting:
+
+- **A `.resx` with non-string resources** (images, icons) fails with `MSB3822: Non-string resources require the
+  System.Resources.Extensions assembly at runtime` (#36, Subtext). Add
+  `<GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>` and a reference to the
+  `System.Resources.Extensions` package.
+- **Project references are transitive.** A project now sees the packages and projects its references use.
+  - Packages pinned at different versions in different projects fail with `NU1605: Detected package downgrade`.
+    Use the highest version everywhere (#39, FunnelWeb's Iesi.Collections).
+  - A namespace from an indirect reference can hide a type: `CS0118: 'X' is a namespace but is used like a type`. Put
+    `PrivateAssets="all"` on the `ProjectReference` whose types its dependants shouldn't see (#39, mojoPortal's data
+    layer).
+
 ## 3. References
 
 Remove the .NET Framework references and Microsoft's ASP.NET NuGet packages. With the packages, add
@@ -149,7 +162,9 @@ webForCore ships only Microsoft assemblies, so two libraries apps commonly have 
   webForCore. It finds its attributes with `Assembly.LoadFrom`, which on .NET loads second copies of the application's
   assemblies outside the application (#21; [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md)). Keep the package, and call
   each `[assembly: WebActivatorEx.PreApplicationStartMethod(typeof(X), "Start")]` method from `Application_Start` in
-  Global.asax (`X.Start()`), post-start methods after it, and shutdown methods from `Application_End`.
+  Global.asax (`X.Start()`), post-start methods after it, and shutdown methods from `Application_End`. WebActivator 1.x
+  (`[assembly: WebActivator.PreApplicationStartMethod]`, which MVC 3 era packages such as Ninject.MVC3 bring) is the
+  same (#38, Subtext).
 - **AjaxControlToolkit** isn't provided. The original package is built for .NET Framework.
 
 Keep other NuGet packages, preferring versions that target .NET Standard or .NET. The `test/webForCore.*.Sample`
@@ -271,6 +286,9 @@ reach System.Web, and ASP.NET Core serves everything else.
 - **Keep `web.config`**, including `<system.webServer>`: webForCore reads its modules, handlers, rewrite rules,
   request filtering, default documents, custom errors and static content settings. See
   [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md) for what's covered.
+- **Remove `<compilation><assemblies>` entries for assemblies .NET doesn't have**, such as System.Design and
+  System.Data.Linq ([NAMESPACES.md](NAMESPACES.md)). Each one is a Configuration Error on every page ("Could not load
+  file or assembly 'System.Design, Version=4.0.0.0'"), even when no page uses it (#37, Subtext and mojoPortal).
 - **Set an explicit `<machineKey>`** (validation and decryption keys). Generated keys change with every process, so
   forms authentication cookies, view state and anti-forgery tokens wouldn't survive a restart or work across servers.
 - **Connection strings:** `System.Data.SqlClient` is used, as on .NET Framework. Add `TrustServerCertificate=True` or
