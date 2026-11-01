@@ -1918,3 +1918,80 @@ lists System.Web.Helpers in web.config and uses `Json.Encode` in a view. Its `de
   aspnet-mvc5-starter and MVCForum).
 - A package's .NET Standard build can have less than its `net45` build: WindowsAzure.Storage 9.x, Hangfire 1.6 (#31,
   aspnet-mvc5-starter and MVCForum).
+
+## Windows as a development environment (#46, 1 Nov 2026)
+
+Most teams with ASP.NET 4.x applications develop on Windows, so webForCore now builds, runs and passes its tests there
+too. Linux stays the production target. CI has a `build-windows` job on `windows-2025` that runs `tools/ci/run-tests.sh`
+under Git Bash, packs, and runs the package smoke test.
+
+### Making the scripts run
+
+`pack.sh` strips the CR that Windows' Python ends lines with. `package-smoke.sh` writes the Windows form of the package
+folder into `nuget.config` (`pwd -W`). `run-tests.sh` sets `PYTHONUTF8=1`, because `check_failures.py` failed printing
+a test name with `∞` in Windows' code page.
+
+### What failed, and the fixes
+
+The first run failed 6 suites (Identity 196, System.Drawing 565, IIS gate 7, WebPages.Deployment 9, MVC and Web API
+gates 1 each).
+
+- **SQL Server:** service containers are Linux only. `tools/ci/sqlserver-windows.ps1` installs SQL Server Express on
+  `127.0.0.1,14333` with the `sa` login, so the tests' connection strings don't change.
+- **Deployment tests' paths:** the lift had turned Microsoft's `@"a\b"` test paths into `"a/b"`, which makes mixed paths
+  on Windows that System.Web rejects as non-canonical (`IsSuspiciousPhysicalPath`). `lift_project.py` now writes
+  `Path.Combine("a", "b")`.
+- **Default documents:** on Windows `File.Exists` ignores case, so `default.aspx` from the default-document list was
+  rewritten as typed, not as the file's name (`Default.aspx`). `IISModules.FindFile` now looks the name up on Windows
+  too.
+- **Protected configuration:** on Windows the providers use Windows' own key containers and DPAPI, as on .NET Framework.
+  The tests of the key files and the emulation run off Windows (`NotOnWindowsFact`, with the reason). The Windows DPAPI
+  test checks Windows' own error.
+- **System.Drawing:** Microsoft's tests choose their expectations by OS (`PlatformDetection.IsWindows`,
+  `[PlatformSpecific]`), meaning "GDI+ is Windows' own". Here it is SkiaGdiPlus on both, so `lift_drawing_tests.py`
+  makes Windows answer as Linux (its fixups now apply to arcade's files too). Windows runs the 3,882 tests Linux runs,
+  with the same 151 known failures. `FontNameConverterTest` keeps its real OS check, because "Times" matching
+  "Times New Roman" is about Windows' fonts.
+- **Identity:** `LockoutEndToNowPlus5ShouldNotBeLockedOut` assumes Pacific time. The suite runs with
+  `TZ=America/Los_Angeles`, which .NET on Windows ignores, so the test computes Pacific time itself.
+
+### App domains that didn't unload on Windows
+
+After a restart, the old PseudoAppDomain was never collected on Windows (one test in each gate, two in the IIS gate).
+The investigation ran on a Windows Server 2025 VM:
+
+- dumps of the sample (`dotnet-dump`);
+- a small ClrMD analyzer that walks from the GC's real roots, with named static and thread-static fields. SOS's
+  `gcroot` lists the domain's own static-storage handles as roots, which hides the external one.
+
+Six Windows-only references, each found in a dump and each fix confirmed by a run:
+
+1. **System.Web's telemetry:** `TelemetryLogger` wrote `EventSource` events with System.Web's own types.
+   - On Windows they're really written: `TelemetryEventSource` is in a provider group that Windows' telemetry service
+     enables.
+   - TraceLogging then caches each event's type in a thread static of the writing thread (`TraceLoggingTypeInfo.threadCache`),
+     and the type keeps the domain alive.
+   - webForCore writes no telemetry: the logger is a no-op.
+2. **HttpClient's system proxy:** `HttpWindowsProxy` waits for changes to the proxy settings on the `ExecutionContext`
+   it was created on, which was the first request's. The host now creates it before the first domain, without a
+   context (`WebFormsMiddleware.StartProcessWideWaits`).
+3. **NetworkChange's listener:** on Windows its address-change wait keeps the `ExecutionContext` of the first subscriber
+   (WebProxy, during a request). The host now subscribes first, without a context, and stays subscribed.
+4. **NetworkChange's subscribers:** `ReleaseNetworkChangeSubscribers` locked on `s_gate`, which only the Unix
+   implementation has, so on Windows it released nothing. It now uses `s_globalLock` there.
+   - It also runs at every unload check, not only when unloading starts, because a request still running then can
+     subscribe later.
+   - A context now counts as the domain's when its `AsyncLocal` values reach one of the domain's objects (System.Web's
+     call context). This is a bounded walk of fields that runs no code of the objects.
+5. **SqlClient's pool:** on Windows a pooled connection's native SNI handle holds its state object, and with it the
+   domain, in a strong GC handle. `PseudoAppDomain` clears the domain's SqlClient pools when it starts unloading,
+   as AppDomain.Unload discarded them.
+6. A crash found on the way: runtime-async continuations throw from `GetType()`, so the field walk skips them. It runs
+   on the recycling timer, where an exception would stop the process.
+
+Results:
+
+- **Windows:** every suite passes, and System.Drawing has its 151 known failures. The two Linux-only protected
+  configuration tests are skipped.
+- **Linux:** unchanged.
+- **CI:** the Windows test step fails the job like Linux's. It isn't a required check yet.

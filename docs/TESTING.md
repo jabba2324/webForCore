@@ -28,8 +28,20 @@ as a service container. A suite fails CI on any failing test, except System.Draw
 on a failure that isn't in `tools/ci/known-failures/System.Drawing.Common.Tests.txt`, and it reports known failures
 that now pass, so the list only shrinks.
 
+Windows is supported as a development environment (#46). CI's `build-windows` job runs the same script on Windows Server
+2025 under Git Bash, with SQL Server Express on the same address and login in place of the container
+(`tools/ci/sqlserver-windows.ps1`), and then packs and runs the package smoke test. The results match Linux's: every
+suite passes, and System.Drawing runs the same selection with the same known failures, since its GDI+ engine is
+webForCore's on both. Two IIS gate tests run only off Windows, because on Windows protected configuration uses Windows'
+own key containers and DPAPI, as on .NET Framework: `AppReadsProtectedSections` (the sample's sections are encrypted with
+key files and the DPAPI emulation) and `RegIISProtectExportImportUnprotect` (it would create key containers in the
+machine's store). To run the suites on Windows: Git for Windows, Python 3 (as `python3`), the SDK in `global.json`, and
+SQL Server (Express is enough) at `127.0.0.1,14333` with the `sa` login of `tools/lift/sqlserver.sh`; then the commands
+above in Git Bash.
+
 The default branch, `webforcore-lift`, is protected: a pull request can merge only once CI's `build-and-test` job has
-passed on it (packing and the package smoke test included). Force pushes and deleting the branch are blocked.
+passed on it (packing and the package smoke test included); `build-windows` isn't a required check yet. Force pushes
+and deleting the branch are blocked.
 Repository admins can still push to the branch directly. GitHub runs CI on a first-time contributor's pull request
 only after a maintainer approves the run.
 
