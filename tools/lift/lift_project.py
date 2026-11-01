@@ -52,7 +52,11 @@ PROJECTS = {
     "System.Web.WebPages": dict(source="spike:System.Web.WebPages", tfm="net11.0", roots=["src/System.Web.WebPages"]),
     "System.Web.WebPages.Razor": dict(source="spike:System.Web.WebPages.Razor", tfm="net11.0", roots=["src/System.Web.WebPages.Razor"]),
     "System.Web.Mvc": dict(source="spike:System.Web.Mvc", tfm="net11.0", roots=["src/System.Web.Mvc"],
-                           exclude=["LinqBinaryModelBinder.cs"]),  # System.Data.Linq: see the FIXUPS
+                           exclude=["LinqBinaryModelBinder.cs"],  # System.Data.Linq: see the FIXUPS
+                           # Microsoft.AspNet.Mvc depends on Microsoft.AspNet.WebPages, which contains System.Web.Helpers,
+                           # so MVC 5 applications have it and web.configs list it (#28, MVCForum). The reference makes
+                           # the webForCore.Web.Mvc package depend on webForCore.Web.Helpers.
+                           fork_refs=["src/webForCore.System.Web.Helpers/webForCore.System.Web.Helpers.csproj"]),
     "System.Web.Mvc.Test": dict(source="spike:System.Web.Mvc.Test", tfm="net11.0", roots=["test/System.Web.Mvc.Test"], test=True,
                                 fork_refs=["src/WebFormsForCore.Serialization.Formatters/WebFormsForCore.Serialization.Formatters.csproj"],
                                 exclude=["Test/LinqBinaryModelBinderTest.cs"]),  # System.Data.Linq: see the FIXUPS

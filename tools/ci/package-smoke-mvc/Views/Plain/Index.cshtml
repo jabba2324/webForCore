@@ -1,2 +1,3 @@
 @model string
 <p>@Model view, rendered by Razor</p>
+<p>@Html.Raw(System.Web.Helpers.Json.Encode(new { helpers = true }))</p>
