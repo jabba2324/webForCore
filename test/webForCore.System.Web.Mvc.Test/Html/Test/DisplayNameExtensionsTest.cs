@@ -9,6 +9,7 @@ using Moq;
 
 namespace System.Web.Mvc.Html.Test
 {
+    [Xunit.Collection("Uses ScopeStorage or ViewEngines.Engines")] // webForCore: reads ModelMetadataProviders.Current
     public class DisplayNameExtensionsTest
     {
         [Fact]

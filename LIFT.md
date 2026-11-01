@@ -2026,3 +2026,16 @@ scale-out.
 `Assembly.GetTypes()` on System.Data.SqlClient 4.9.1 throws on .NET 11 (`SqlGuidCaster`), so applications that scan
 every loaded assembly fail (Opserver). The options (lift and fix SqlClient, move to Microsoft.Data.SqlClient, or
 document it) are in the issue.
+
+## A race in Microsoft's MVC tests (1 Nov 2026)
+
+The v0.6.0 tag's Windows run failed one test: `DisplayTextFor_HonoursHtmlEncode_ForProperty` returned a non-BMP
+character unencoded. It's Microsoft's race, not a Windows difference:
+- `MetadataOverrideScope` (`DisplayExtensionsTest`, `EditorExtensionsTest`) replaces the process-wide
+  `ModelMetadataProviders.Current`, and overrides the metadata of every property of a type (`string`).
+- xunit runs the Html test classes in parallel.
+- Microsoft put the classes that read metadata in the "Uses ScopeStorage or ViewEngines.Engines" collection, but not
+  `DisplayNameExtensionsTest`, `DisplayTextExtensionsTest`, `LabelExtensionsTest`, `NameExtensionsTest` and
+  `ValueExtensionsTest`.
+
+`lift_project.py` adds those five to the collection, as for the earlier races (ScopeStorage, ModelBinderConfig).
