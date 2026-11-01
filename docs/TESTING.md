@@ -39,9 +39,9 @@ machine's store). To run the suites on Windows: Git for Windows, Python 3 (as `p
 SQL Server (Express is enough) at `127.0.0.1,14333` with the `sa` login of `tools/lift/sqlserver.sh`; then the commands
 above in Git Bash.
 
-The default branch, `webforcore-lift`, is protected: a pull request can merge only once CI's `build-and-test` job has
-passed on it (packing and the package smoke test included); `build-windows` isn't a required check yet. Force pushes
-and deleting the branch are blocked.
+The default branch, `webforcore-lift`, is protected: a pull request can merge only once CI's `build-and-test`
+and `build-windows` jobs have passed on it (packing and the package smoke test included, on both). A release likewise
+needs both. Force pushes and deleting the branch are blocked.
 Repository admins can still push to the branch directly. GitHub runs CI on a first-time contributor's pull request
 only after a maintainer approves the run.
 

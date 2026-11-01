@@ -1994,4 +1994,5 @@ Results:
 - **Windows:** every suite passes, and System.Drawing has its 151 known failures. The two Linux-only protected
   configuration tests are skipped.
 - **Linux:** unchanged.
-- **CI:** the Windows test step fails the job like Linux's. It isn't a required check yet.
+- **CI:** the Windows job runs beside Linux's on every push, pull request and tag, and fails on a failing test as
+  Linux's does. Both are required checks on `webforcore-lift`, and a release needs both.

@@ -1,6 +1,7 @@
-# Linux build (and a Windows one, #46), every test suite (see docs/TESTING.md), and the NuGet packages: every run packs them, checks that an
-# application builds and runs from them, and keeps them as the "packages" artifact. A version tag (v0.1.0, matching
-# <Version> in Directory.Build.props) also publishes them as a GitHub release.
+# Linux and Windows builds in parallel (Windows is the development environment, #46), every test suite on both (see
+# docs/TESTING.md), and the NuGet packages: every run packs them, checks that an application builds and runs from them,
+# and keeps Linux's as the "packages" artifact. A version tag (v0.1.0, matching <Version> in Directory.Build.props) also
+# publishes them as a GitHub release, once both platforms pass.
 name: CI
 
 on:
@@ -181,7 +182,8 @@ jobs:
 
   # A version tag: the tested packages become a GitHub release (not published to nuget.org).
   release:
-    needs: build-and-test
+    # Both platforms must pass: Windows is the development environment (#46).
+    needs: [build-and-test, build-windows]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-24.04
     permissions:
