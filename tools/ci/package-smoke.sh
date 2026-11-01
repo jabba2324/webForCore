@@ -76,6 +76,9 @@ curl -s http://127.0.0.1:5198/Plain | grep -q "plain view, rendered by Razor" ||
 # System.Web.Helpers, listed in Web.config and used by the view, comes with webForCore.Web.Mvc, as with
 # Microsoft.AspNet.Mvc (issue #28: Configuration Error, "Could not load file or assembly 'System.Web.Helpers'").
 curl -s http://127.0.0.1:5198/Plain | grep -q '{"helpers":true}' || { echo "/Plain: System.Web.Helpers missing"; fail=1; }
+# webForCore's SignalR and DataVisualization have Microsoft's assembly versions, so Microsoft's SignalR SQL Server
+# scale-out (built against SignalR 2.4.3) compiles and binds (issue #40: CS1705 against SignalR.Core 0.0.0.0, JabbR).
+curl -s http://127.0.0.1:5198/Versions | grep -q "SignalR 2.4.3.0, scale-out 2.4.3.0, DataVisualization 4.0.0.0" || { echo "/Versions: unexpected response"; curl -s http://127.0.0.1:5198/Versions | head -c 300; echo; fail=1; }
 # Unity, started from Application_Start (WebActivatorEx's start methods don't run on webForCore, issue #21; the original
 # package is in the build all the same and must not break it), constructs the controller, and its Razor view renders
 # although Unity.Mvc brings Microsoft.AspNet.Razor 3.2.7 (issue #23: it replaced webForCore's, MissingMethodException).

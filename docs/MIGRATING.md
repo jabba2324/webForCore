@@ -114,6 +114,12 @@ Two differences from .NET Framework projects come up when converting:
   System.Resources.Extensions assembly at runtime` (#36, Subtext). Add
   `<GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>` and a reference to the
   `System.Resources.Extensions` package.
+- **The C# version.** .NET Framework projects compiled with the C# of their time: 7.3 by default, or what "latest" meant
+  then. On net11.0 the default is the newest, and C# 14's first-class span conversions resolve some calls differently
+  (`CS0029: Cannot implicitly convert type 'System.ReadOnlySpan<char>' to 'string'`, YAF.NET's ServiceStack.Text). Keep
+  the project's: `<LangVersion>7.3</LangVersion>` if it set none, or 13 for "latest". C# 11's ref-safety rules apply on
+  .NET 7 and later whatever the version (`CS8347 ... may expose variables referenced by parameter 'index'`): mark such a
+  `ref` parameter `scoped` (#43).
 - **Project references are transitive.** A project now sees the packages and projects its references use.
   - Packages pinned at different versions in different projects fail with `NU1605: Detected package downgrade`.
     Use the highest version everywhere (#39, FunnelWeb's Iesi.Collections).
@@ -201,7 +207,10 @@ These came up migrating real applications; each names one that needed it.
   `Newtonsoft.Json` 13.0.4 (Web API's formatters, bundling), `Microsoft.IdentityModel.Tokens` 8.19.1 (through
   System.Web.Extensions' CoreWCF client support) and `Humanizer.Core` 2.14.1 (through Roslyn in `webForCore.Compilers`;
   aspnet-mvc5-starter had 2.6.2, #30). `System.Configuration.ConfigurationManager` and `System.Runtime.Caching` come
-  with webForCore at 11.0: remove the application's references to them (MVCForum had 4.5 previews). Raise the application's reference, or remove it if the package was
+  with webForCore at 11.0: remove the application's references to them (MVCForum had 4.5 previews). More generally, every
+  package webForCore depends on is a floor for the application's reference to it: `System.Data.SqlClient` 4.9.1 (YAF.NET's
+  ServiceStack.OrmLite.SqlServer had 4.8.1) and the System.* packages at 11.0, such as `System.DirectoryServices`
+  (Opserver had 4.5.0) (#42). Raise the application's reference, or remove it if the package was
   only there as another package's dependency. `EntityFramework` before 6.4 has no .NET build: use 6.4 or later
   (6.5.1 works with `System.Data.SqlClient`).
 - **.NET Framework assemblies that are packages on .NET** (#9). The root web.config of .NET Framework referenced its

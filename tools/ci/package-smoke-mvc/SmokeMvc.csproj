@@ -31,6 +31,8 @@
     <PackageReference Include="webForCore.Web.Mvc" Version="$(WebForCoreVersion)" />
     <PackageReference Include="webForCore.Microsoft.Owin.Host.SystemWeb" Version="$(WebForCoreVersion)" />
     <PackageReference Include="webForCore.Microsoft.Owin.Security.Cookies" Version="$(WebForCoreVersion)" />
+    <PackageReference Include="webForCore.Microsoft.AspNet.SignalR.SystemWeb" Version="$(WebForCoreVersion)" />
+    <PackageReference Include="webForCore.Web.DataVisualization" Version="$(WebForCoreVersion)" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,5 +40,7 @@
     <PackageReference Include="Unity.Mvc" Version="5.11.1" />
     <PackageReference Include="WebActivatorEx" Version="2.2.0" />
     <PackageReference Include="Microsoft.Owin.Security.Google" Version="3.0.1" />
+    <!-- Microsoft's, which webForCore doesn't lift: built against Microsoft's SignalR 2.4.3 (#40, JabbR). -->
+    <PackageReference Include="Microsoft.AspNet.SignalR.SqlServer" Version="2.4.3" />
   </ItemGroup>
 </Project>

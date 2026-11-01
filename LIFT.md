@@ -1996,3 +1996,33 @@ Results:
 - **Linux:** unchanged.
 - **CI:** the Windows job runs beside Linux's on every push, pull request and tag, and fails on a failing test as
   Linux's does. Both are required checks on `webforcore-lift`, and a release needs both.
+
+## Fixes from the smoke test's fourth round (1 Nov 2026)
+
+The fourth round ran on the 0.5.0 packages. The 24 migrated applications have no new findings. Three new candidates
+did: JabbR, Opserver and YAF.NET (#44).
+
+### Microsoft's assembly versions for SignalR and DataVisualization (#40)
+
+webForCore's SignalR (Core, SystemWeb, the .NET client) and System.Web.DataVisualization were version 0.0.0.0, so
+libraries built against Microsoft's failed with CS1705 and wouldn't bind. JabbR hit it through SignalR's SQL Server
+scale-out.
+- **SignalR:** Microsoft's build generated the version (KoreBuild; the sources have no assembly attributes).
+  `lift_aspnet.py` now writes `AssemblyVersion` 2.4.3.0 into the three projects. Re-running the lift reproduces them.
+- **DataVisualization:** its `AssemblyInfo.cs` applies `ThisAssembly.Version` (4.0.0.0) only `#if VS_BUILD`. A
+  webForCore file, `WebFormsForCore/AssemblyVersion.cs`, applies it.
+- **Test:** `tools/ci/package-smoke-mvc` compiles a call into Microsoft's `Microsoft.AspNet.SignalR.SqlServer` 2.4.3,
+  and `/Versions` must report 2.4.3.0 and 4.0.0.0.
+
+### Migration guide (#42, #43)
+
+- Every package webForCore depends on is a version floor for the application's reference to it: NU1605 on
+  System.Data.SqlClient 4.8.1 (YAF.NET) and System.DirectoryServices 4.5.0 (Opserver).
+- Keep the C# version the code was written for: C# 14's span conversions resolve some calls differently (YAF.NET's
+  ServiceStack.Text). C# 11's ref safety applies on .NET 7 and later whatever the version.
+
+### Not fixed: #41
+
+`Assembly.GetTypes()` on System.Data.SqlClient 4.9.1 throws on .NET 11 (`SqlGuidCaster`), so applications that scan
+every loaded assembly fail (Opserver). The options (lift and fix SqlClient, move to Microsoft.Data.SqlClient, or
+document it) are in the issue.
