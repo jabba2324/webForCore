@@ -124,7 +124,7 @@ Two differences from .NET Framework projects come up when converting:
 ## 3. References
 
 Remove the .NET Framework references and Microsoft's ASP.NET NuGet packages. With the packages, add
-`<PackageReference Include="webForCore" Version="0.4.0" />` (the "Always" set below) and, for the frameworks the app
+`<PackageReference Include="webForCore" Version="0.5.0" />` (the "Always" set below) and, for the frameworks the app
 uses, the package of the same name with the `src/` folder's `webForCore.System.`/`webForCore.` prefix replaced by
 `webForCore.` (`webForCore.Web.Mvc`, `webForCore.Web.Http.WebHost`, `webForCore.Microsoft.AspNet.SignalR.SystemWeb`,
 `webForCore.Microsoft.Owin.Security.Cookies`, `webForCore.Web.Optimization`, ...).
@@ -217,7 +217,7 @@ These came up migrating real applications; each names one that needed it.
   `MembershipUser` and has `using System.Web.Security;` gets `CS0104: 'MembershipUser' is an ambiguous reference`
   (MVCForum). Keep it out of that library's compilation, as it was:
   ```xml
-  <PackageReference Include="webForCore.Web.ApplicationServices" Version="0.4.0" ExcludeAssets="compile" />
+  <PackageReference Include="webForCore.Web.ApplicationServices" Version="0.5.0" ExcludeAssets="compile" />
   ```
 - **A package's .NET Standard build can have less than its `net45` build** (#31). NuGet picks the .NET Standard build
   for .NET 11, and some packages built it with a smaller API. WindowsAzure.Storage 9.x has no synchronous blob methods
