@@ -57,6 +57,11 @@ FIXUPS = [
     ("src/Microsoft.DotNet.XUnitExtensions/src/DiscovererHelpers.cs",
      "                (platforms.HasFlag(TestPlatforms.Windows) && RuntimeInformation.IsOSPlatform(OSPlatform.Windows));\n",
      "                false; // webForCore: (TestPlatforms.Windows) Windows runs as Linux, above\n", 1),
+    # ... except where the difference is the fonts Windows installs, not GDI+: "Times" matches "Times New Roman".
+    ("src/libraries/System.Drawing.Common/tests/System/Drawing/FontConverterTests.cs",
+     "            // returns \"Times\" under Linux and \"Times New Roman\" under Windows\n            if (PlatformDetection.IsWindows)\n",
+     "            // returns \"Times\" under Linux and \"Times New Roman\" under Windows\n"
+     "            if (OperatingSystem.IsWindows()) // webForCore: Windows' installed fonts, not its GDI+ (#46)\n", 1),
     ("src/libraries/System.Drawing.Common/tests/BitmapTests.cs",
      "                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))\n",
      "                if (PlatformDetection.IsWindows) // webForCore: Windows runs as Linux (#46)\n", 1),
