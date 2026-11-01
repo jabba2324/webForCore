@@ -153,8 +153,12 @@ jobs:
       - name: Build
         run: dotnet build WebFormsForCore.slnx -c Release -nodeReuse:false -p:Version=0.0.0-windows.${{ github.run_number }}
 
-      # SQL Server isn't available (service containers are Linux only), so Identity.Test's Entity Framework tests and
-      # the IIS gate's typed DataSet test are expected to fail here for now.
+      # Service containers are Linux only: SQL Server Express on the same port and login instead.
+      - name: SQL Server
+        shell: pwsh
+        run: tools/ci/sqlserver-windows.ps1
+
+      # The app-restart tests (one in each gate, two in the IIS gate) still fail here (#46), so failures don't fail the job yet.
       - name: Test
         continue-on-error: true
         run: tools/ci/run-tests.sh "$RUNNER_TEMP/TestResults"

@@ -2,8 +2,8 @@
 # Runs every test suite in Release after a build of WebFormsForCore.slnx (Release), as CI does.
 # Usage: tools/ci/run-tests.sh [results-directory]
 # Identity.Test needs SQL Server at 127.0.0.1,14333 (tools/lift/sqlserver.sh starts one locally; CI uses a service
-# container). System.Drawing.Common.Tests runs Microsoft's Linux selection and fails only on failures that are not in
-# tools/ci/known-failures/. A suite's failures do not stop the others; the exit code is non-zero if any suite failed.
+# container on Linux and tools/ci/sqlserver-windows.ps1 on Windows). System.Drawing.Common.Tests runs Microsoft's Linux
+# selection on both and fails only on failures that are not in tools/ci/known-failures/. A suite's failures do not stop the others; the exit code is non-zero if any suite failed.
 set -uo pipefail
 cd "$(dirname "$0")/../.."
 OUT=$(realpath -m "${1:-TestResults}")
@@ -23,12 +23,8 @@ SUITES=(
   WebApi.Gate.Tests Mvc.Gate.Tests IIS.Gate.Tests
 )
 DRAWING_FILTER="category!=failing&category!=nonlinuxtests&category!=nonnetcoreapptests&category!=OuterLoop&category!=IgnoreForCI&category!=nonunixtests"
+# Windows (Git Bash, #46) runs the same selection: the GDI+ engine is webForCore's on both, not Windows' own.
 KNOWN_FAILURES=tools/ci/known-failures/System.Drawing.Common.Tests.txt
-# Windows (Git Bash, #46): Microsoft's Windows selection, and Windows' own known failures (none recorded yet).
-if [[ "${OS:-}" == Windows_NT ]]; then
-  DRAWING_FILTER="category!=failing&category!=nonwindowstests&category!=nonnetcoreapptests&category!=OuterLoop&category!=IgnoreForCI"
-  KNOWN_FAILURES=tools/ci/known-failures/System.Drawing.Common.Tests.windows.txt
-fi
 
 failed=()
 for s in "${SUITES[@]}"; do

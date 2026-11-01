@@ -6,7 +6,8 @@ namespace IISGate
 {
     // Protected configuration on Linux: RsaProtectedConfigurationProvider with a key container file and
     // DataProtectionConfigurationProvider with the DPAPI emulation, read by the app at run time; a section encrypted by
-    // Windows DPAPI; webforcore-regiis (aspnet_regiis's -pef/-pdf/-pc/-px/-pi).
+    // Windows DPAPI; webforcore-regiis (aspnet_regiis's -pef/-pdf/-pc/-px/-pi). On Windows the providers use Windows' own
+    // key containers and DPAPI, as on .NET Framework, so the tests of the key files and the emulation run off Windows (#46).
     [Collection(IISSampleCollection.Name)]
     public class ProtectedConfigurationTests
     {
@@ -17,7 +18,7 @@ namespace IISGate
             _server = server;
         }
 
-        [Fact]
+        [NotOnWindowsFact("the sample's sections are encrypted with key files and the DPAPI emulation, which Windows doesn't use")]
         public async Task AppReadsProtectedSections()
         {
             var body = await _server.Client.GetStringAsync("/protected/Secrets.aspx");
@@ -33,7 +34,8 @@ namespace IISGate
         {
             var body = await _server.Client.GetStringAsync("/protected-windows/Read.aspx");
             Assert.Contains("error=", body);
-            Assert.Contains("Windows DPAPI", body);
+            // Off Windows the emulation names the cause; on Windows, Windows' DPAPI can't decrypt another machine's blob.
+            Assert.Contains(OperatingSystem.IsWindows() ? "Failed to decrypt using provider 'DataProtectionConfigurationProvider'" : "Windows DPAPI", body);
         }
 
         private static string Repository()
@@ -57,7 +59,7 @@ namespace IISGate
         }
 
         // Protect with a new container, move the exported key to another key directory (another machine), unprotect.
-        [Fact]
+        [NotOnWindowsFact("on Windows the tool would create and import key containers in the machine's own store")]
         public void RegIISProtectExportImportUnprotect()
         {
             var root = Path.Combine(Path.GetTempPath(), "webforcore-regiis-" + Guid.NewGuid().ToString("N"));
@@ -90,6 +92,15 @@ namespace IISGate
             {
                 Directory.Delete(root, recursive: true);
             }
+        }
+    }
+
+    // A fact that is skipped on Windows, with the reason, where the code under test takes Windows' own path (#46).
+    public sealed class NotOnWindowsFactAttribute : FactAttribute
+    {
+        public NotOnWindowsFactAttribute(string reason)
+        {
+            if (OperatingSystem.IsWindows()) Skip = "Windows: " + reason;
         }
     }
 }
