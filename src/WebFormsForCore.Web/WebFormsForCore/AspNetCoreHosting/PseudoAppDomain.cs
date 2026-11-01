@@ -38,7 +38,43 @@ namespace System.Web.Hosting
 		// System is the same for the configuration types that were in System.dll on .NET Framework (IConfigurationSectionHandler,
 		// SingleTagSectionHandler, ConfigurationException...): ELMAH's section handlers derive from them (#19). Its other
 		// forwards go to the shared framework, which the domain still shares.
+		// The other facades whose forwards go to assemblies the application carries are per domain as well (below).
 		public static readonly List<string> PerDomainFrameworkAssemblies = new List<string> { "Microsoft.CSharp", "Microsoft.VisualBasic.Core", "System.Configuration", "System" };
+
+		// A shared-framework facade that forwards types to an assembly the application deploys (System.Data's SqlClient,
+		// OleDb and Odbc types, System.Drawing's System.Drawing.Common types, System.ServiceModel.Web's syndication types...).
+		// Loaded in the default context, its forwards resolve there, to a second copy of that assembly: a .NET Framework
+		// library compiled against System.Data then has a different SqlDataReader from the application's, and calls between
+		// them fail with MissingMethodException (#35: Subtext's Microsoft.ApplicationBlocks.Data). Loaded per domain, they
+		// resolve to the domain's copy, as they did in an AppDomain; forwards to the shared framework still go to the shared copy.
+		static readonly System.Collections.Concurrent.ConcurrentDictionary<string, bool> ForwardsToApplication =
+			new System.Collections.Concurrent.ConcurrentDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+
+		static bool HasForwardsToApplication(string path)
+		{
+			return ForwardsToApplication.GetOrAdd(path, file => {
+				try
+				{
+					using (var stream = File.OpenRead(file))
+					using (var pe = new System.Reflection.PortableExecutable.PEReader(stream))
+					{
+						if (!pe.HasMetadata) return false;
+						var metadata = System.Reflection.Metadata.PEReaderExtensions.GetMetadataReader(pe);
+						foreach (var handle in metadata.ExportedTypes)
+						{
+							var implementation = metadata.GetExportedType(handle).Implementation;
+							if (implementation.Kind != System.Reflection.Metadata.HandleKind.AssemblyReference) continue;
+							var target = metadata.GetString(metadata.GetAssemblyReference((System.Reflection.Metadata.AssemblyReferenceHandle)implementation).Name);
+							if (TrustedPlatformAssemblies.Value.TryGetValue(target, out var targetPath)
+								&& !targetPath.StartsWith(SharedFrameworkRoot, StringComparison.OrdinalIgnoreCase)) return true;
+						}
+					}
+				}
+				catch (IOException) { }
+				catch (BadImageFormatException) { }
+				return false;
+			});
+		}
 
 		static readonly string SharedFrameworkRoot = GetSharedFrameworkRoot();
 		static readonly Lazy<Dictionary<string, string>> TrustedPlatformAssemblies = new Lazy<Dictionary<string, string>>(() =>
@@ -404,7 +440,8 @@ namespace System.Web.Hosting
 			if (TrustedPlatformAssemblies.Value.TryGetValue(name, out var path))
 			{
 				return path.StartsWith(SharedFrameworkRoot, StringComparison.OrdinalIgnoreCase)
-					&& !PerDomainFrameworkAssemblies.Contains(name, StringComparer.OrdinalIgnoreCase) ? null : LoadFromAssemblyPath(path);
+					&& !PerDomainFrameworkAssemblies.Contains(name, StringComparer.OrdinalIgnoreCase)
+					&& !HasForwardsToApplication(path) ? null : LoadFromAssemblyPath(path);
 			}
 			// Otherwise the host's output folder (the app's build: bin_dotnet), then the application's bin directory and base,
 			// where .NET Framework's AppDomain looked (a bin folder can hold the app's .NET Framework build).
