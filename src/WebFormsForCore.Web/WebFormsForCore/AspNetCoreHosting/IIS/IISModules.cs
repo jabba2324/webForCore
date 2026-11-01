@@ -134,7 +134,9 @@ namespace WebFormsForCore.Hosting.IIS
 		string FindFile(string path)
 		{
 			var mapped = MapPath(path);
-			if (File.Exists(mapped)) return mapped;
+			// On Windows File.Exists ignores case and keeps the requested name: look the file up, so the request is
+			// rewritten to the file's own name, as on Linux (#46).
+			if (!OperatingSystem.IsWindows() && File.Exists(mapped)) return mapped;
 			var directory = Path.GetDirectoryName(mapped);
 			try
 			{

@@ -122,6 +122,10 @@ FIXUPS = [
      "                {\n                    Task.Delay(100).ContinueWith(_ => saveCulture());\n                }\n", 1),
     # xunit 1.9 (Identity's tests) -> 2.x: Theory and InlineData moved from Xunit.Extensions into Xunit.
     ("Identity.Test", "*.cs", "using Xunit.Extensions;\n", "", None),
+    # LockoutEndToNowPlus5ShouldNotBeLockedOut needs local time to be UTC-8 (TZ above), and .NET on Windows ignores TZ:
+    # the test takes the Pacific time itself, so it holds on Windows and in any time zone (#46).
+    ("Identity.Test", "UserLockoutStoreTests.cs", "LockoutEndDateUtc = DateTime.Now.AddMinutes(5) };\n",
+     "LockoutEndDateUtc = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, \"America/Los_Angeles\").AddMinutes(5) }; // webForCore: Pacific time on any OS\n", 1),
     # xunit 1.9's Assert.ThrowsDelegate is Action in xunit 2.
     ("Identity.Test", "ExceptionHelper.cs", "Assert.ThrowsDelegate", "Action", 4),
     # .NET's ArgumentException message ends "(Parameter 'name')"; .NET Framework's "\r\nParameter name: name" (BCL).

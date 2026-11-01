@@ -4,7 +4,8 @@
 # log went.
 # Usage: tools/ci/package-smoke.sh <package folder> <version>
 set -euo pipefail
-packages=$(cd "$1" && pwd); version=$2
+# pwd -W: the Windows form of the path under Git Bash (#46), since it is written into nuget.config.
+packages=$(cd "$1" && { pwd -W 2>/dev/null || pwd; }); version=$2
 here=$(cd "$(dirname "$0")" && pwd)
 base=$(mktemp -d); work=$base/site; mkdir "$work"
 trap 'kill $server 2>/dev/null || true; rm -rf "$base"' EXIT

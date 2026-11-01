@@ -20,7 +20,8 @@ namespace Microsoft.DotNet.XUnitExtensions
         public static bool TestPlatformApplies(TestPlatforms platforms) =>
                 (platforms.HasFlag(TestPlatforms.Any)) ||
                 (platforms.HasFlag(TestPlatforms.FreeBSD) && RuntimeInformation.IsOSPlatform(OSPlatform.Create("FREEBSD"))) ||
-                (platforms.HasFlag(TestPlatforms.Linux) && RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) ||
+                // webForCore: GDI+ is SkiaGdiPlus on Windows too; Windows runs as Linux (#46)
+                (platforms.HasFlag(TestPlatforms.Linux) && (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.Windows))) ||
                 (platforms.HasFlag(TestPlatforms.NetBSD) && RuntimeInformation.IsOSPlatform(OSPlatform.Create("NETBSD"))) ||
                 (platforms.HasFlag(TestPlatforms.OSX) && RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) ||
                 (platforms.HasFlag(TestPlatforms.illumos) && RuntimeInformation.IsOSPlatform(OSPlatform.Create("ILLUMOS"))) ||
@@ -30,7 +31,7 @@ namespace Microsoft.DotNet.XUnitExtensions
                 (platforms.HasFlag(TestPlatforms.MacCatalyst) && RuntimeInformation.IsOSPlatform(OSPlatform.Create("MACCATALYST"))) ||
                 (platforms.HasFlag(TestPlatforms.Android) && RuntimeInformation.IsOSPlatform(OSPlatform.Create("ANDROID"))) ||
                 (platforms.HasFlag(TestPlatforms.Browser) && RuntimeInformation.IsOSPlatform(OSPlatform.Create("BROWSER"))) ||
-                (platforms.HasFlag(TestPlatforms.Windows) && RuntimeInformation.IsOSPlatform(OSPlatform.Windows));
+                false; // webForCore: (TestPlatforms.Windows) Windows runs as Linux, above
 
         public static bool TestRuntimeApplies(TestRuntimes runtimes) =>
                 (runtimes.HasFlag(TestRuntimes.Mono) && IsMonoRuntime) ||

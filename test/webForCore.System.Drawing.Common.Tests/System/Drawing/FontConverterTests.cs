@@ -17,7 +17,7 @@ namespace System.ComponentModel.TypeConverterTests
         {
             FontConverter.FontNameConverter converter = new FontConverter.FontNameConverter();
             // returns "Times" under Linux and "Times New Roman" under Windows
-            if (PlatformDetection.IsWindows)
+            if (OperatingSystem.IsWindows()) // webForCore: Windows' installed fonts, not its GDI+ (#46)
             {
                 Assert.Equal("Times New Roman", converter.ConvertFrom("Times") as string);
             }

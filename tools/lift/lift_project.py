@@ -724,10 +724,12 @@ MEMBER_EDITS["System.Web.WebPages.Razor.Test"] = [
       'Assert.Equal("WebFormsForCore.CodeDom.Compiler.CSharpCodeProvider", type.CodeDomProviderType.FullName);'),
      "the fork compiles with its own Roslyn CodeDom provider (WebFormsForCore.Compilers), configured in its machine.config."),
 ]
-# Windows paths in test input (Path.Combine with backslashes); the deployment code is path-agnostic.
+# Windows paths in test input (@"a\b"): Path.Combine("a", "b") gives the platform's separator, as the code under test
+# does. Forward slashes would make mixed paths on Windows, which System.Web rejects as non-canonical (#46).
+_combine = lambda m: "Path.Combine(" + ", ".join('@"' + p + '"' for p in m.group(0)[2:-1].split("\\")) + ")"
 RE_TRANSFORMS["System.Web.WebPages.Deployment.Test"] = [
-    ("WebPagesDeploymentTest.cs", r'@"([^"\\]*)\\([^"]*)"', lambda m: '@"' + m.group(1) + "/" + m.group(2).replace("\\", "/") + '"', None),
-    ("PreApplicationStartCodeTest.cs", r'@"([^"\\]*)\\([^"]*)"', lambda m: '@"' + m.group(1) + "/" + m.group(2).replace("\\", "/") + '"', None),
+    ("WebPagesDeploymentTest.cs", r'@"[^"\\]*\\[^"]*"', _combine, None),
+    ("PreApplicationStartCodeTest.cs", r'@"[^"\\]*\\[^"]*"', _combine, None),
 ]
 MEMBER_EDITS["System.Web.WebPages.Deployment.Test"] = [
     ("WebPagesDeploymentTest.cs", f"public void {m}()", "skip", NO_SXS) for m in (

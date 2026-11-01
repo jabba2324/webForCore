@@ -29,6 +29,15 @@ namespace System.Web {
     }
 
     static class TelemetryLogger {
+#if WebFormsForCore
+        // webForCore: no telemetry. .NET Framework wrote these events to Windows' telemetry: TelemetryEventSource is in
+        // its provider group, which Windows' telemetry service enables. On .NET, TraceLogging also caches each event's
+        // type (the structs above, the application's System.Web) in a thread static of the thread that wrote it, which
+        // kept the application's domain from being collected after a restart on Windows (#46).
+        public static void LogHttpHandler(Type httpHandlerType) { }
+        public static void LogTargetFramework(Version targetFrameworkVersion) { }
+        public static void LogProvider(Type providerType) { }
+#else
         // eventsource provider name
         private static readonly string WebFormsProviderName = "Microsoft.DOTNET.ASPNET.WebForms";
 
@@ -107,5 +116,6 @@ namespace System.Web {
                 return Convert.ToBase64String(sha256.ComputeHash(bytes));
             }
         }
+#endif
     }
 }

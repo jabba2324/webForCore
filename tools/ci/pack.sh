@@ -17,6 +17,7 @@ for p in ET.parse("WebFormsForCore.slnx").getroot().iter("Project"):
         print(path)
 PY
 )
+projects=${projects//$'\r'/}  # Windows' Python ends its lines with CRLF (#46)
 for project in $projects; do
   dotnet pack "$project" -c Release --no-build -nodeReuse:false -p:Version="$version" -o "$out" -v q -nologo
 done

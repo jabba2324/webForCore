@@ -68,8 +68,8 @@ webForCore keeps belongs in one of them, with the reason and what an application
 - One problem per commit, with the application that hit it and `Fixes #<issue>` in the message.
 - The pull request lists, for each change: the problem, the application, the fix, the test, and whether Microsoft's code
   changed (and where that is documented).
-- CI (`.github/workflows/ci.yml`) builds, runs every suite, packs the packages and runs the package smoke test; it must
-  pass.
+- CI (`.github/workflows/ci.yml`) builds, runs every suite, packs the packages and runs the package smoke test, on Linux
+  and on Windows (a development environment, #46); both must pass.
 
 Licences: webForCore's own code is MIT; lifted code keeps its licence ([`docs/LICENSING.md`](docs/LICENSING.md)).
 Contributions are accepted under the licence of the file they change.
