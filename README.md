@@ -107,6 +107,15 @@ The full guide is [docs/MIGRATING.md](docs/MIGRATING.md). In outline:
    survive restarts.
 5. **Run it** from the app folder with `dotnet bin_dotnet/YourApp.dll`, and compare its responses with IIS.
 
+## Related repositories
+
+| Repository | What it is |
+| --- | --- |
+| [webForCore-smoke-test](https://github.com/jabba2324/webForCore-smoke-test) | Real open-source ASP.NET 4.x applications migrated with webForCore's release packages, following [docs/MIGRATING.md](docs/MIGRATING.md), then built, run and probed over HTTP. Its findings become this repository's issues, and its results are in its `RESULTS.md` |
+| [webForCore-thirdparty](https://github.com/jabba2324/webForCore-thirdparty) | Builds of third-party libraries for webForCore (WebActivatorEx, WebActivator 1.x, AJAX Control Toolkit), made for the smoke test from webForCore's released packages |
+
+Both build on webForCore's releases; webForCore doesn't depend on either of them.
+
 ## Building and testing this repository
 
 Requirements: the .NET SDK in `global.json` (11.0.100-rc.3), and on Fedora/RHEL `OPENSSL_ENABLE_SHA1_SIGNATURES=1`
