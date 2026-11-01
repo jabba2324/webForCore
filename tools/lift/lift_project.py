@@ -555,6 +555,13 @@ RE_TRANSFORMS["System.Web.Mvc.Test"] = [
     ("**/*.cs", r'\\r\\nParameter name: (\w+)"', r" (Parameter '\1')" + '"', 19),
     ("**/*.cs", r'"\s*\+\s*Environment\.NewLine\s*\+\s*"Parameter name: (\w+)"', r" (Parameter '\1')" + '"', 27),
 ]
+# Microsoft's suite races: MetadataOverrideScope (DisplayExtensionsTest, EditorExtensionsTest) replaces the process-wide
+# ModelMetadataProviders.Current, and overrides the metadata of every property of a type (string), while xunit runs the
+# Html tests in parallel. Microsoft put the classes that use metadata in the "Uses ScopeStorage or ViewEngines.Engines"
+# collection, but not these five; DisplayTextExtensionsTest saw a string property unencoded once on Windows (#46).
+RE_TRANSFORMS["System.Web.Mvc.Test"] += [
+    ("Html/Test/*.cs", r"(?m)^(    public class (?:DisplayNameExtensionsTest|DisplayTextExtensionsTest|LabelExtensionsTest|NameExtensionsTest|ValueExtensionsTest)\b)",
+     '    [Xunit.Collection("Uses ScopeStorage or ViewEngines.Engines")] // webForCore: reads ModelMetadataProviders.Current\n\\1', 5)]
 # Razor/Test builds parser input with Environment.NewLine but checks spans measured with \r\n (as System.Web.Razor.Test).
 TRANSFORMS["System.Web.Mvc.Test"] = [
     ("Razor/Test/*.cs", "Environment.NewLine", '"\\r\\n"', 7),
