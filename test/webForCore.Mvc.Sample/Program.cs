@@ -17,7 +17,7 @@ namespace MvcSample
             app.UseWebForms(options =>
             {
                 options.HandleAllRequestsWithWebForms().UseAspNetCoreSessionProvider();
-                // GATE_RECYCLE_CHECK: seconds between unload checks, so a test sees an old domain collected sooner.
+                // GATE_RECYCLE_CHECK: seconds between checks of the recycling limits.
                 if (int.TryParse(System.Environment.GetEnvironmentVariable("GATE_RECYCLE_CHECK"), out int seconds))
                     options.Recycling(r => r.CheckInterval = System.TimeSpan.FromSeconds(seconds));
             });

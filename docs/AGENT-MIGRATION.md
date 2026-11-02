@@ -154,8 +154,8 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
 
 ## Phase 5: Deploy (only when the user asks)
 
-Follow `docs/MIGRATING.md` section 8: the site folder with `bin_dotnet/`, a systemd unit
-(`tools/deploy/webforcore@.service` in webForCore) or a container, one process per site folder, an explicit
+Follow `docs/MIGRATING.md` section 8: the site folder with `bin_dotnet/`, run under `webforcore-host` by the user's
+service manager or container runtime, one host per site folder, an explicit
 `<machineKey>`, and out-of-process session state before scaling out. Don't deploy, push or commit without the user's
 instruction.
 

@@ -18,6 +18,9 @@
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
     <ProjectReference Include="..\webForCore.Mvc.Sample\webForCore.Mvc.Sample.csproj" />
+    <!-- The samples run under webforcore-host (#56), from its build here. -->
+    <ProjectReference Include="..\..\src\WebFormsForCore.Host\WebFormsForCore.Host.csproj" ReferenceOutputAssembly="false" />
+    <Compile Include="..\Shared\WebForCoreHost.cs" Link="WebForCoreHost.cs" />
     <!-- Built and run, not referenced: its pages compile at run time. -->
     <ProjectReference Include="..\webForCore.WebPages.Sample\webForCore.WebPages.Sample.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>

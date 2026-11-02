@@ -1,16 +1,13 @@
 using System;
 using System.IO;
-using System.Net;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Microsoft.Extensions.DependencyInjection;
 using WebFormsForCore.Hosting.IIS;
 
 namespace IISSample
 {
+    // Run by the gate suite under webforcore-host (#56), which owns the bindings: HTTP and HTTPS with client certificates
+    // accepted (IISGate.SampleServer gives the host its "Kestrel" endpoints).
     public class Program
     {
         public static void Main(string[] args)
@@ -19,39 +16,15 @@ namespace IISSample
             // IIS's compression and W3C logging. The logs are in a plain folder of the site on purpose: webForCore must not
             // serve them (RegressionTests, #15).
             builder.Services.AddWebForms(o => o.LogDirectory = Path.Combine(builder.Environment.ContentRootPath, "w3c-logs", "W3SVC1"));
-            // GATE_HTTPS_PORT: also listen with TLS, a generated certificate, and client certificates accepted (as IIS's
-            // SSL settings "Accept"), for Request.ClientCertificate and the HTTPS/CERT_ server variables.
-            if (int.TryParse(Environment.GetEnvironmentVariable("GATE_HTTPS_PORT"), out int httpsPort))
-            {
-                var http = new Uri(builder.Configuration["urls"]);
-                builder.WebHost.ConfigureKestrel(kestrel =>
-                {
-                    kestrel.Listen(IPAddress.Loopback, http.Port);
-                    kestrel.Listen(IPAddress.Loopback, httpsPort, listen => listen.UseHttps(new HttpsConnectionAdapterOptions
-                    {
-                        ServerCertificate = ServerCertificate(),
-                        ClientCertificateMode = ClientCertificateMode.AllowCertificate,
-                        ClientCertificateValidation = (certificate, chain, errors) => true,
-                    }));
-                });
-            }
             var app = builder.Build();
             app.UseWebForms(options =>
             {
                 options.HandleAllRequestsWithWebForms();
-                // GATE_RECYCLE_CHECK: seconds between unload checks, so a test sees an old domain collected sooner.
+                // GATE_RECYCLE_CHECK: seconds between checks of the recycling limits.
                 if (int.TryParse(Environment.GetEnvironmentVariable("GATE_RECYCLE_CHECK"), out int seconds))
                     options.Recycling(r => r.CheckInterval = TimeSpan.FromSeconds(seconds));
             });
             app.Run();
-        }
-
-        static X509Certificate2 ServerCertificate()
-        {
-            using var key = RSA.Create(2048);
-            var request = new CertificateRequest("CN=localhost", key, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-            using var certificate = request.CreateSelfSigned(DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(1));
-            return X509CertificateLoader.LoadPkcs12(certificate.Export(X509ContentType.Pfx), null);
         }
     }
 }

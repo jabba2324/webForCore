@@ -75,7 +75,7 @@ fixed, or the BCL difference is documented.
 | **Test infrastructure** | `RunInSeparateAppDomain` and `AppDomainUtils` on collectible `AssemblyLoadContext`s (`tools/lift/additions/Microsoft.TestCommon`); xunit 1.9 → 2 (`Assert.ThrowsDelegate`, `Xunit.Extensions`); `PersistedAssemblyBuilder` for `AssemblyBuilderAccess.Save` |
 | **Windows-only test dependencies** | DPAPI in Katana's security tests → `TestDataProtectionProvider` (AES-CBC and HMAC-SHA256); LocalDB → SQL Server in a container (Identity); a test certificate .NET's DER reader rejects outside Windows |
 | **Time zone** | Identity's `LockoutEndToNowPlus5ShouldNotBeLockedOut` assumes Pacific time: the suite runs with `TZ`, and the test takes Pacific time itself, since .NET on Windows ignores `TZ` (#46) |
-| **Mono's System.Web tests** | Corrected to Microsoft's .NET Framework 4.5+ behaviour wherever Mono's own implementation differed (Mono's tests follow Mono); hosting through the fork's PseudoAppDomain |
+| **Mono's System.Web tests** | Corrected to Microsoft's .NET Framework 4.5+ behaviour wherever Mono's own implementation differed (Mono's tests follow Mono); hosting in the test process (.NET has one AppDomain) |
 | **System.Drawing's tests** | The four "is GDI+ available" checks answer for the managed engine instead of probing for libgdiplus. The suite's Windows checks (`PlatformDetection.IsWindows`, `[PlatformSpecific]`, two direct OS checks) mean "GDI+ is Windows' own", which it never is here, so Windows answers as Linux and runs the same tests (#46); the font-name test keeps its real OS check, since it depends on Windows' installed fonts |
 | **Selection** | Microsoft's own categories are used (`category!=failing` and the non-Linux categories for System.Drawing). SignalR's IIS Express and Service Bus tests aren't lifted |
 
@@ -83,14 +83,15 @@ fixed, or the BCL difference is documented.
 
 These aren't lifts. They change WebFormsForCore's port, and each has a `webForCore:` comment and an entry in `LIFT.md`.
 
-- **Hosting:** the PseudoAppDomain (AppDomain emulation), IIS's `<system.webServer>` modules, the Kestrel worker
-  request (WebSockets, client certificates, server variables, timeouts, integrated-pipeline APIs). See
-  [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md).
+- **Hosting:** webforcore-host and its worker processes (process recycling, #56), IIS's `<system.webServer>` modules,
+  the Kestrel worker request (WebSockets, client certificates, server variables, timeouts, integrated-pipeline APIs).
+  See [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md).
 - **Integrated-mode semantics** on the classic pipeline: writable `Response.Headers`, the Content-Type rule, the
   server name from the Host header.
 - **Configuration:** protected configuration on Linux (DPAPI emulation, RSA key containers as files), section type
-  identity inside a PseudoAppDomain, `machine.config` refreshed by content.
-- **Compilation:** the in-process compiler loads into the app's context; precompilation for .NET
+  identity across load contexts, `machine.config` refreshed by content.
+- **Compilation:** the in-process compiler loads into the app's context, and so does `AssemblyBuilder` with every
+  compiled assembly (never CodeDom's `Assembly.LoadFile`, which loaded App_Code a second time, #56); precompilation for .NET
   (`System.Private.CoreLib` as the core library); typed DataSets in App_Code (the Reference Source's
   `System.Data.TypedDataSetGenerator` and webForCore's TableAdapter generator).
 - **`<system.net>`:** `<defaultProxy>` applied at application start, and `<mailSettings>` used by System.Web's mail

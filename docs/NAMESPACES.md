@@ -48,7 +48,7 @@ in the code; the rest are from `LIFT.md`.
 | `System.Web.UI.WebControls.WebParts` | 120 | Web Parts and personalization |
 | `System.Web.UI.HtmlControls`, `.Adapters`, `.WebControls.Adapters` | 74 | |
 | `System.Web.Configuration` | 152 | All `<system.web>` sections; configuration paths are case-insensitive |
-| `System.Web.Hosting` | 71 | `HostingEnvironment`, `VirtualPathProvider`, `ApplicationHost`, the PseudoAppDomain |
+| `System.Web.Hosting` | 71 | `HostingEnvironment`, `VirtualPathProvider`, `ApplicationHost`, webforcore-host's workers |
 | `System.Web.Compilation` | 34 | `BuildManager`; run-time compilation with Roslyn (C# and VB) |
 | `System.Web.ModelBinding` | 99 | Web Forms model binding |
 | `System.Web.Security` | 39 | Forms authentication, membership, roles, `MachineKey`, URL authorization |
@@ -106,16 +106,12 @@ Caveats:
 - `HttpUtility` follows .NET Framework 4.5+ (strict decoding); the 4.0 compatibility quirks of apps without
   `targetFramework` aren't emulated.
 - A `.resx` file reference to an icon (`ResXFileRef` of type `Icon`) throws off Windows.
-- **Restarts and `MemoryCache`:** an old application domain is collected after a restart. `MemoryCache.Default` is
-  disposed with it, but a `new MemoryCache(...)` the application creates holds the domain until it is disposed (.NET
-  Framework disposed it on `DomainUnload`; .NET's no longer does): dispose it in `Application_End`.
-- `ApplicationHost.CreateApplicationHost` returns an object in a PseudoAppDomain without remoting; call it through
-  `dynamic` or reflection.
+- `ApplicationHost.CreateApplicationHost` creates the host in the current process (.NET has one AppDomain), without
+  remoting.
 - **`AppDomain.CurrentDomain.BaseDirectory` is the build output (`bin_dotnet/`), not the site.** On IIS each
   application ran in its own AppDomain whose `ApplicationBase` was the site's folder (with `bin` as its private bin
   path), so `BaseDirectory` and `AppContext.BaseDirectory` were the site root. .NET has one AppDomain per process, whose
-  base directory is the entry assembly's folder; a PseudoAppDomain (an `AssemblyLoadContext`) has none of its own, and
-  .NET libraries rely on it being the build output. Code that reads files next to the site through it should use
+  base directory is the entry assembly's folder, and .NET libraries rely on it being the build output. Code that reads files next to the site through it should use
   `HttpRuntime.AppDomainAppPath`, `HostingEnvironment.ApplicationPhysicalPath` or `Server.MapPath("~/...")`, which are
   the site root as on IIS (#3). `AppDomain.CurrentDomain.SetupInformation.ApplicationBase` is the same as `BaseDirectory`.
 - **Behaviour .NET changes everywhere:** `ArgumentException.Message` ends with `(Parameter 'name')`; ICU cultures

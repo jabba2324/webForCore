@@ -2040,17 +2040,9 @@ namespace System.Web
             AddAppDomainTraceMessage("before Unload");
 
 #if NETCOREAPP
-            // webForCore: the application's domain is a PseudoAppDomain (collectible AssemblyLoadContext): its unload is
-            // started once and completes when nothing references it. Outside one (the default context) there is nothing
-            // to unload; the host decides what follows (WebFormsMiddleware stops the process). The loop below unloaded
-            // the AppDomain again until the thread was aborted by the unload; here it spun or threw.
-            try {
-                var context = PseudoAppDomain.GetDomain(typeof(HttpRuntime).Assembly);
-                if (context != null) context.Unload();
-            }
-            catch (InvalidOperationException) {
-                // already unloading
-            }
+            // webForCore: there is no AppDomain to unload: the application is the process (#56), and the host decides what
+            // follows (WebFormsMiddleware asks webforcore-host for the next worker, then stops the process). The loop
+            // below unloaded the AppDomain again until the thread was aborted by the unload; here it spun or threw.
             return;
 #endif
 #pragma warning disable CS0162 // unreachable on .NET

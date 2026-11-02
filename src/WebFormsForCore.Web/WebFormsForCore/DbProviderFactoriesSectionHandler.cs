@@ -61,38 +61,6 @@ namespace System.Web.Configuration
 	{
 		internal sealed record Operation(string Kind, string Invariant, string Type);
 
-		// DbProviderFactories is process-wide on .NET, but was per AppDomain on .NET Framework. A registration keeps the
-		// factory instance once it has been requested, so a PseudoAppDomain's instance would serve every later start (its
-		// copy of the provider's assembly) and keep the domain from being collected. Registrations whose instance is stale
-		// go back to their type name, to be resolved again in the context that next asks. Runtime internals, read by
-		// reflection; if they change, nothing is reset. Returns the number reset.
-		internal static int ResetRegistrations(Func<DbProviderFactory, bool> isStale)
-		{
-			const BindingFlags AnyStatic = BindingFlags.Static | BindingFlags.NonPublic, AnyInstance = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-			if (!(typeof(DbProviderFactories).GetField("_registeredFactories", AnyStatic)?.GetValue(null) is IDictionary registrations))
-				return 0;
-			int reset = 0;
-			foreach (DictionaryEntry entry in registrations)
-			{
-				var registration = entry.Value;
-				var type = registration?.GetType();
-				if (type?.GetProperty("FactoryInstance", AnyInstance)?.GetValue(registration) is DbProviderFactory factory && isStale(factory)
-					&& type.GetProperty("FactoryTypeAssemblyQualifiedName", AnyInstance)?.GetValue(registration) is string typeName)
-				{
-					DbProviderFactories.RegisterFactory((string)entry.Key, typeName);
-					reset++;
-				}
-			}
-			return reset;
-		}
-
-		// A factory of another PseudoAppDomain than the caller's (an earlier start of the application).
-		internal static bool IsFromOtherDomain(DbProviderFactory factory)
-		{
-			var context = AssemblyLoadContext.GetLoadContext(factory.GetType().Assembly);
-			return context != null && context.IsCollectible && context != AssemblyLoadContext.GetLoadContext(typeof(DbProviderFactoriesConfiguration).Assembly);
-		}
-
 		// Registers the application's providers with .NET's DbProviderFactories, by type name: nothing loads until a
 		// provider is requested, as on .NET Framework. <clear/> and <remove/> also act on the providers System.Web
 		// registers by default (FrameworkDefaults), as they did on machine.config's.

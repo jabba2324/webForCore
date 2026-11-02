@@ -54,6 +54,29 @@ namespace IISGate
             Assert.Contains("connected=True;", body);
         }
 
+        // The connection as the client made it, through webforcore-host (#56): the client's and the binding's addresses
+        // and port, the Host header, and the request target exactly as sent (System.Web's raw URL).
+        [Fact]
+        public async Task ConnectionDetailsReachTheApplication()
+        {
+            var body = await _server.Client.GetStringAsync("/Connection.aspx?q=%2Fa%20b&r=x%26y");
+            int port = _server.BaseAddress.Port;
+            Assert.Contains($"remote=127.0.0.1;local=127.0.0.1;port={port};host=127.0.0.1:{port};raw=/Connection.aspx?q=%2Fa%20b&r=x%26y;keysize=;", body);
+        }
+
+        // A client can't pose as the host: connection details in its own request headers are ignored.
+        [Fact]
+        public async Task ClientsCannotSetTheHostsConnectionDetails()
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, "/Connection.aspx");
+            request.Headers.TryAddWithoutValidation("X-WebForCore-Remote", "[203.0.113.9]:4000");
+            request.Headers.TryAddWithoutValidation("X-WebForCore-Local", "[203.0.113.10]:443");
+            request.Headers.TryAddWithoutValidation("X-WebForCore-Scheme", "https");
+            var body = await (await _server.Client.SendAsync(request)).Content.ReadAsStringAsync();
+            Assert.Contains("https=off;port_secure=0;secure=False;scheme=http;", body);
+            Assert.Contains($"remote=127.0.0.1;local=127.0.0.1;port={_server.BaseAddress.Port};", body);
+        }
+
         [Fact]
         public async Task HttpsAndClientCertificate()
         {
@@ -76,6 +99,9 @@ namespace IISGate
             Assert.Contains($"bytes={certificate.RawData.Length};", body);
             var serial = string.Join("-", Enumerable.Range(0, certificate.SerialNumber.Length / 2).Select(i => certificate.SerialNumber.Substring(i * 2, 2).ToLowerInvariant()));
             Assert.Contains($"serial={serial};", body);
+            // The HTTPS binding's port, and the TLS strength (HTTPS_KEYSIZE), through webforcore-host (#56).
+            Assert.Contains($"port={_server.HttpsAddress.Port};host=127.0.0.1:{_server.HttpsAddress.Port};", body);
+            Assert.Matches(@"keysize=\d+;", body);
         }
 
         // ASP.NET answers 500 "Request timed out." after executionTimeout (its timer checks every 15 seconds); the page's

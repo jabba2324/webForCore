@@ -273,7 +273,7 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        builder.Services.AddWebForms();                 // IIS compression, W3C logging, systemd
+        builder.Services.AddWebForms();                 // IIS compression, W3C logging
         builder.Services.AddDistributedMemoryCache();   // session state (or Redis, SQL Server, ...)
         builder.Services.AddSession();
 
@@ -351,12 +351,22 @@ The first request compiles pages, as on IIS. Then compare the responses recorded
 
 ## 8. Deploy
 
-- **One process per app.** Deploy the site folder (`web.config` at the top, the build in `bin_dotnet/`) and run it
-  under systemd with `tools/deploy/webforcore@.service`. It maps the application pool's settings: identity, rapid-fail
-  protection, ping, shutdown time and memory limits. A container works the same way.
-- **In front:** a reverse proxy (nginx, Apache, a load balancer) for TLS and the public port, or Kestrel's own HTTPS.
-- **Recycling:** a `web.config`, `bin` or `App_Code` change restarts the app in-process, as IIS did. Set time,
-  request or memory recycling with `UseWebForms(o => o.Recycling(...))`.
+- **Under the host.** The `webForCore` package puts `webforcore-host` in the build output
+  (`bin_dotnet/webforcore-host/`). It plays the application pool's part: it owns the bindings and runs the app in
+  worker processes. Deploy the site folder (`web.config` at the top, the build in `bin_dotnet/`) and run
+  `dotnet bin_dotnet/webforcore-host/webforcore-host.dll` from it. Starting the host at boot, restarting it if it
+  ends, and its identity and resource limits are your service manager's job (systemd, a container runtime, a Windows
+  service), as they were Windows' for IIS: webForCore doesn't ship service definitions.
+- **Bindings belong to the host,** as they were IIS's: `--urls`, `ASPNETCORE_URLS`, or the `Kestrel` section of
+  `appsettings.json` (endpoints, certificates, `ClientCertificateMode`). The app's workers serve only the host, so
+  endpoints the app's `Program.cs` sets up itself (`ConfigureKestrel(k => k.Listen(...))`) would conflict: move them to
+  configuration. The host's own settings (startup and shutdown time limits, rapid-fail protection) are in the
+  `WebForCore:Host` section ([IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md#process-model)).
+- **In front:** a reverse proxy (nginx, Apache, a load balancer) for TLS and the public port, or the host's own HTTPS.
+- **Recycling:** a `web.config`, `bin` or `App_Code` change restarts the app in a new worker process, as IIS did; no
+  request fails, and those that arrive meanwhile wait for the new worker. Set time, request or memory recycling with
+  `UseWebForms(o => o.Recycling(...))`. Run without the host (`dotnet bin_dotnet/YourApp.dll`), the app stops when it
+  restarts, for whatever started it to start it again.
 - **Precompilation** (optional): `aspnetcore_compiler -v / -p <site> -b bin_dotnet [-u] <target>`, then copy the build
   into `<target>/bin_dotnet`. Use `-u` for updatable sites.
 - **Scaling out:** use out-of-process session state (Redis or SQL Server through ASP.NET Core's distributed cache) and

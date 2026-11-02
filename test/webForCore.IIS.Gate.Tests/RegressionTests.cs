@@ -174,7 +174,7 @@ namespace IISGate
         public async Task DataControlsWithItemTypeRender()
         {
             var (response, body) = await Get("/regressions/TypedDataControls.aspx");
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.True(response.StatusCode == HttpStatusCode.OK, $"{response.StatusCode}: {body}");
             Assert.Contains("[repeater alpha]", body);
             Assert.Contains("[listview Second book]", body);
             Assert.Contains("[gridview 1 First book]", body);

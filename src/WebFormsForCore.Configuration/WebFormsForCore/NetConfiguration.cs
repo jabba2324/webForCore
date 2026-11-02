@@ -15,8 +15,7 @@ namespace WebFormsForCore.Net.Configuration
 {
 	public static class NetConfiguration
 	{
-		// HttpClient.DefaultProxy before the first application changed it: process-wide, as the proxy is, so each
-		// start of an application (a PseudoAppDomain, with its own copy of this class) begins from it.
+		// HttpClient.DefaultProxy before the application changed it: process-wide, as the proxy is.
 		private const string OriginalProxyKey = "WebFormsForCore.OriginalDefaultProxy";
 
 		// <system.net><mailSettings><smtp>, or null.

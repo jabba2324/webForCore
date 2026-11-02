@@ -31,7 +31,7 @@ a real application behave more like it did on .NET Framework 4.8 and IIS 10, and
    (ASP.NET Web Stack, Katana, SignalR, Identity, System.Drawing) or ported from the .NET Framework reference source
    (System.Web, System.Configuration). Its value is that it *is* Microsoft's behaviour. Before touching those files,
    look for a fix in webForCore's own code: the hosting layer (`src/WebFormsForCore.Web/WebFormsForCore/AspNetCoreHosting`,
-   the PseudoAppDomain, the IIS modules), the build targets (`src/webForCore.WebStack.targets`), the lift scripts'
+   the IIS modules), the host (`src/WebFormsForCore.Host`), the build targets (`src/webForCore.WebStack.targets`), the lift scripts'
    additions (`tools/lift/additions/`), or configuration. Most problems found so far were fixed there.
 
 5. **When Microsoft's code must change, keep the documentation current.** Keep the change as small as it can be (an
@@ -43,6 +43,35 @@ a real application behave more like it did on .NET Framework 4.8 and IIS 10, and
      [`docs/MODIFICATIONS.md`](docs/MODIFICATIONS.md);
    - regenerate [`docs/lifted-changes.md`](docs/lifted-changes.md) (`tools/lift/changes_report.py`), which lists every
      file that differs from upstream with its `webForCore:` notes.
+
+## How webForCore's own code is written
+
+These rules are for the code webForCore writes itself: the hosting layer and the host, the IIS modules, shims and
+facades, build tasks and scripts. They don't apply to Microsoft's code that is lifted or ported unchanged (principle 4
+keeps that as it is). The aim is a runtime that is credible and stable: code a reviewer can see is correct, that keeps
+working when .NET is patched, and that fails safely.
+
+6. **No reflection into .NET's internals.** Don't read, write or call non-public members of the runtime, the shared
+   framework, ASP.NET Core or any other library, and don't depend on their private names or layout. They change in
+   any release, patch releases included, without notice, and code that edits another component's private state can't
+   take that component's locks. Use public APIs. If a behaviour needs something .NET doesn't expose, document the
+   difference (with a test) instead. Reflection over the *application's* own types, to do what ASP.NET did on .NET
+   Framework (create the type a `Web.config` names, find `Global.asax`'s class), is fine. Use public members where
+   there are any, and say in a comment why reflection is needed.
+
+7. **No unsafe code and no GC tricks.** No `unsafe` blocks or pointers, no `Unsafe`/`MemoryMarshal` reinterpretation,
+   no P/Invoke. And nothing that steers the garbage collector: no `GC.Collect`, `GC.WaitForPendingFinalizers` or
+   `GC.AddMemoryPressure`, no registries of `GCHandle`s, no polling weak references to find out whether something has
+   been collected. If a design needs the GC to free something at a particular moment, change the design: release it
+   with `IDisposable`, or put a process boundary around it, as application restarts do (#56).
+
+8. **Slow, secure and stable beats fast.** Don't optimise for performance before a real application shows a problem
+   with a measurement. Choose the simplest design that is clearly correct and safe over a faster one that is harder
+   to reason about. For example, the host forwards each request to the worker process over HTTP instead of handing
+   sockets between processes. When performance does need work, the pull request includes the measurement.
+
+Code written before these rules that breaks them is listed in #57. It is removed or replaced when it is next changed.
+New code doesn't add to it.
 
 ## Where tests go
 

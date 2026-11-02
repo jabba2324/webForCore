@@ -24,22 +24,20 @@ namespace WebFormsForCore.Hosting.IIS
 	//   compression: <urlCompression doStaticCompression="true" doDynamicCompression="false"/> and <httpCompression>'s
 	//     staticTypes/dynamicTypes and minFileSizeForComp, with gzip (IIS's default scheme);
 	//   W3C logging: IIS's default fields, one file a day, in LogDirectory (IIS: %SystemDrive%\inetpub\logs\LogFiles\W3SVC1);
-	//     sc-substatus and sc-win32-status are not available;
-	//   systemd: Type=notify readiness and the watchdog in place of WAS's ping (tools/deploy/webforcore.service).
+	//     sc-substatus and sc-win32-status are not available.
+	// Service managers (systemd, Windows services, containers) are the deployment's business: webForCore has no code for
+	// them (#56).
 	public sealed class WebFormsServicesOptions
 	{
 		public bool Compression { get; set; } = true;
 		public bool W3CLogging { get; set; } = true;
-		// Outside the site, as IIS keeps its logs (#15): systemd's LogsDirectory= ($LOGS_DIRECTORY), otherwise logs/<site>
-		// next to the site folder (the parent of the build output, bin_dotnet). It used to be <site>/logs/W3SVC1, which
-		// the site served: client addresses and every URL with its query string.
+		// Outside the site, as IIS keeps its logs (#15): logs/<site> next to the site folder (the parent of the build
+		// output, bin_dotnet), unless set. It used to be <site>/logs/W3SVC1, which the site served: client addresses and
+		// every URL with its query string.
 		public string LogDirectory { get; set; } = DefaultLogDirectory();
-		public bool Systemd { get; set; } = true;
 
 		internal static string DefaultLogDirectory()
 		{
-			var systemd = Environment.GetEnvironmentVariable("LOGS_DIRECTORY");
-			if (!string.IsNullOrEmpty(systemd)) return Path.Combine(systemd.Split(Path.PathSeparator)[0], "W3SVC1");
 			var site = Path.GetDirectoryName(Path.TrimEndingDirectorySeparator(AppContext.BaseDirectory));
 			var parent = Path.GetDirectoryName(site) ?? site;
 			return Path.Combine(parent, "logs", Path.GetFileName(site), "W3SVC1");
@@ -83,8 +81,6 @@ namespace WebFormsForCore.Hosting.IIS
 					o.FlushInterval = TimeSpan.FromSeconds(1);
 				});
 			}
-			if (options.Systemd && !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("NOTIFY_SOCKET")))
-				services.AddHostedService<SystemdNotifier>();
 			return services;
 		}
 
@@ -140,65 +136,5 @@ namespace WebFormsForCore.Hosting.IIS
 		}
 	}
 
-	// systemd's Type=notify: READY=1 once the host has started, WATCHDOG=1 while the process is responsive (WAS pinged
-	// worker processes and recycled one that did not answer; systemd restarts a service whose watchdog expires), and
-	// STOPPING=1 on shutdown.
-	sealed class SystemdNotifier : IHostedService, IDisposable
-	{
-		readonly IHostApplicationLifetime lifetime;
-		readonly ILogger logger;
-		readonly string socketPath = Environment.GetEnvironmentVariable("NOTIFY_SOCKET");
-		Timer watchdog;
-
-		public SystemdNotifier(IHostApplicationLifetime lifetime, ILogger<SystemdNotifier> logger)
-		{
-			this.lifetime = lifetime;
-			this.logger = logger;
-		}
-
-		public Task StartAsync(CancellationToken cancellationToken)
-		{
-			lifetime.ApplicationStarted.Register(() => Notify("READY=1"));
-			lifetime.ApplicationStopping.Register(() => Notify("STOPPING=1"));
-			if (long.TryParse(Environment.GetEnvironmentVariable("WATCHDOG_USEC"), out var usec) && usec > 0)
-			{
-				var interval = TimeSpan.FromMilliseconds(usec / 2000.0);
-				using (ExecutionContext.SuppressFlow())
-					watchdog = new Timer(_ => Ping(interval), null, interval, interval);
-			}
-			return Task.CompletedTask;
-		}
-
-		// The thread pool runs work within half the watchdog interval: a process whose pool is starved or deadlocked
-		// stops pinging and systemd restarts it.
-		void Ping(TimeSpan interval)
-		{
-			if (Task.Run(() => { }).Wait(interval / 2)) Notify("WATCHDOG=1");
-			else logger.LogWarning("The thread pool did not respond; not pinging the systemd watchdog.");
-		}
-
-		void Notify(string state)
-		{
-			try
-			{
-				var path = socketPath.StartsWith("@") ? "\0" + socketPath.Substring(1) : socketPath;
-				using var socket = new Socket(AddressFamily.Unix, SocketType.Dgram, ProtocolType.Unspecified);
-				socket.Connect(new UnixDomainSocketEndPoint(path));
-				socket.Send(Encoding.ASCII.GetBytes(state));
-			}
-			catch (Exception e) when (e is SocketException || e is IOException || e is ArgumentException)
-			{
-				logger.LogWarning(e, "Notifying systemd ({State}) failed.", state);
-			}
-		}
-
-		public Task StopAsync(CancellationToken cancellationToken)
-		{
-			watchdog?.Dispose();
-			return Task.CompletedTask;
-		}
-
-		public void Dispose() => watchdog?.Dispose();
-	}
 }
 #endif

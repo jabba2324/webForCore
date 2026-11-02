@@ -150,8 +150,6 @@ namespace WebFormsForCore.Hosting.IIS
 			{
 				watcher = null; // read once
 			}
-			// In a PseudoAppDomain the watcher would keep the unloaded domain alive.
-			PseudoAppDomain.OnUnload(typeof(WebServerConfiguration).Assembly, Dispose);
 		}
 
 		static bool IsWebConfig(string name) => name != null && Path.GetFileName(name).Equals("web.config", StringComparison.OrdinalIgnoreCase);

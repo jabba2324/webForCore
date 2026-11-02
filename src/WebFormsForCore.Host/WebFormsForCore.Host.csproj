@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- webforcore-host (#56): plays IIS's part for an application on webForCore. It owns the bindings and TLS, runs the
+       application as worker processes (one start of the application each, like w3wp), recycles them when the
+       application restarts, and forwards each request to the current worker. It never loads the application's
+       assemblies. The package puts it in the application's output folder, in webforcore-host/
+       (buildTransitive/webForCore.Host.targets). -->
+  <PropertyGroup>
+    <TargetFramework>$(netlatest)</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>webforcore-host</AssemblyName>
+    <RootNamespace>WebFormsForCore.Host</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Run as "dotnet webforcore-host.dll": the host starts workers with the same dotnet. -->
+    <UseAppHost>false</UseAppHost>
+
+    <IsPackable>true</IsPackable>
+    <PackageId>webForCore.Host</PackageId>
+    <Description>webForCore's host: runs an ASP.NET 4.x application on webForCore as IIS did, in worker processes it recycles when the application restarts (Web.config, bin or App_Code changes, HttpRuntime.UnloadAppDomain, recycling limits). Brought by the webForCore package; it puts webforcore-host in the application's output folder.</Description>
+    <PackageTags>webforms;aspnet;system.web;porting;net10;iis;hosting</PackageTags>
+    <!-- The host is an application, not a library: its build output goes in tools/host, copied by the targets. -->
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);WebForCoreHostInPackage</TargetsForTfmSpecificContentInPackage>
+    <NoWarn>$(NoWarn);NU5100;NU5128</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Microsoft's reverse proxy (its forwarder only): HTTP/1.1, streaming bodies and WebSockets to the worker. -->
+    <PackageReference Include="Yarp.ReverseProxy" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="buildTransitive\webForCore.Host.targets" Pack="True" PackagePath="buildTransitive\webForCore.Host.targets" />
+  </ItemGroup>
+
+  <Target Name="WebForCoreHostInPackage">
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="$(OutDir)**\*" Exclude="$(OutDir)**\*.pdb" PackagePath="tools\host\%(RecursiveDir)" />
+    </ItemGroup>
+  </Target>
+</Project>

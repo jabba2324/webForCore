@@ -7,8 +7,9 @@ webForCore runs Web Forms, MVC 5, Web API 2, Web Pages, SignalR 2, OWIN/Katana a
 source (through [WebFormsForCore](https://github.com/webformsforcore/WebFormsForCore), which this project forks), and
 the ASP.NET libraries Microsoft open-sourced. Those libraries are lifted file by file from Microsoft's repositories
 and tested with Microsoft's own test suites. The parts IIS used to provide (request filtering, URL Rewrite, default
-documents, custom errors, compression, logging, AppDomain recycling) run in front of the app on Kestrel and are
-configured from the app's existing `<system.webServer>` section.
+documents, custom errors, compression, logging) run in front of the app on Kestrel and are
+configured from the app's existing `<system.webServer>` section, and `webforcore-host` plays the application pool's
+part: it runs the app in worker processes and recycles them when the app restarts.
 
 webForCore ships only Microsoft assemblies, and nothing in it depends on a third-party build of a library.
 
@@ -95,7 +96,7 @@ The full guide is [docs/MIGRATING.md](docs/MIGRATING.md). In outline:
 3. **Add a `Program.cs`:**
    ```csharp
    var builder = WebApplication.CreateBuilder(args);
-   builder.Services.AddWebForms();                 // IIS compression, W3C logging, systemd integration
+   builder.Services.AddWebForms();                 // IIS compression, W3C logging
    builder.Services.AddDistributedMemoryCache();   // if the app uses session state
    builder.Services.AddSession();
    var app = builder.Build();
@@ -105,7 +106,10 @@ The full guide is [docs/MIGRATING.md](docs/MIGRATING.md). In outline:
    ```
 4. **Keep `web.config`**, `<system.webServer>` included. Set an explicit `<machineKey>` so cookies and view state
    survive restarts.
-5. **Run it** from the app folder with `dotnet bin_dotnet/YourApp.dll`, and compare its responses with IIS.
+5. **Run it** from the app folder under the host, `dotnet bin_dotnet/webforcore-host/webforcore-host.dll --urls
+   http://localhost:5000`, and compare its responses with IIS. The host restarts the app in a new worker process when
+   `web.config`, `bin` or `App_Code` changes, as IIS did. `dotnet bin_dotnet/YourApp.dll` also runs it, as a single
+   process that stops when the app restarts.
 
 ## Related repositories
 
@@ -140,7 +144,7 @@ change one, change the script and lift again; see [docs/MODIFICATIONS.md](docs/M
 
 webForCore is a fork of [WebFormsForCore](https://github.com/webformsforcore/WebFormsForCore) by Simon Jakob Egli,
 which ported System.Web and its companions from the .NET Framework reference source to .NET and first ran Web Forms
-on ASP.NET Core. webForCore adds the lifted Microsoft libraries and their tests, the IIS layer, AppDomain emulation,
+on ASP.NET Core. webForCore adds the lifted Microsoft libraries and their tests, the IIS layer, the host and its worker processes,
 System.Drawing on SkiaSharp, and the compatibility work recorded in [LIFT.md](LIFT.md).
 
 The lifted code is © Microsoft and the .NET Foundation (ASP.NET Web Stack, Katana, SignalR, ASP.NET Identity,

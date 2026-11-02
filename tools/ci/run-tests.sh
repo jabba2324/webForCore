@@ -22,7 +22,7 @@ SUITES=(
   Microsoft.Owin.Tests Microsoft.Owin.Host.SystemWeb.Tests Microsoft.Owin.Security.Tests System.Web.MonoTests
   System.Web.Mvc.Test Microsoft.Web.Mvc.Test System.Web.WebPages.Test System.Web.WebPages.Razor.Test
   System.Web.WebPages.Deployment.Test System.Web.Helpers.Test Microsoft.AspNet.SignalR.Tests Identity.Test
-  WebApi.Gate.Tests Mvc.Gate.Tests IIS.Gate.Tests
+  WebApi.Gate.Tests Mvc.Gate.Tests IIS.Gate.Tests Host.Tests
 )
 DRAWING_FILTER="category!=failing&category!=nonlinuxtests&category!=nonnetcoreapptests&category!=OuterLoop&category!=IgnoreForCI&category!=nonunixtests"
 # Windows (Git Bash, #46) runs the same selection: the GDI+ engine is webForCore's on both, not Windows' own.

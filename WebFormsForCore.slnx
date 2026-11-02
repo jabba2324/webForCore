@@ -17,6 +17,7 @@
     <File Path="src/VersionInfo.cs" />
   </Folder>
   <Project Path="src/WebFormsForCore.AspNetCompiler/WebFormsForCore.AspNetCompiler.csproj" />
+  <Project Path="src/WebFormsForCore.Host/WebFormsForCore.Host.csproj" />
   <Project Path="src/WebFormsForCore.RegIIS/WebFormsForCore.RegIIS.csproj" />
   <Project Path="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
   <Project Path="src/WebFormsForCore.Compilers/WebFormsForCore.Compilers.csproj" />
@@ -138,6 +139,8 @@
     <Project Path="test/webForCore.Mvc.Gate.Tests/webForCore.Mvc.Gate.Tests.csproj" />
     <Project Path="test/webForCore.IIS.Gate.Tests/webForCore.IIS.Gate.Tests.csproj" />
     <Project Path="test/webForCore.IIS.Sample/webForCore.IIS.Sample.csproj" />
+    <Project Path="test/webForCore.Host.Tests/webForCore.Host.Tests.csproj" />
+    <Project Path="test/webForCore.Host.Sample/webForCore.Host.Sample.csproj" />
     <Project Path="test/webForCore.Precompiled.Host/webForCore.Precompiled.Host.csproj" />
     <Project Path="test/webForCore.WebPages.Sample/webForCore.WebPages.Sample.csproj" />
     <Project Path="test/webForCore.System.Web.WebPages.Test/webForCore.System.Web.WebPages.Test.csproj" />

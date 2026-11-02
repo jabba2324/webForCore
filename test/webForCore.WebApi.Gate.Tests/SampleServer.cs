@@ -1,14 +1,16 @@
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using WebForCoreGate;
 
 namespace WebApiGate
 {
-    // Runs test/webForCore.WebApi.Sample (built by the project reference) on Kestrel from its project folder, where
-    // the fork's System.Web finds Web.config and Global.asax.
+    // Runs test/webForCore.WebApi.Sample (built by the project reference) under webforcore-host (#56) from its project
+    // folder, where the fork's System.Web finds Web.config and Global.asax.
     public sealed class SampleServer : IDisposable
     {
         private readonly Process _process;
+        private readonly string _tempDirectory;
         private readonly System.Text.StringBuilder _output = new System.Text.StringBuilder();
 
         public SampleServer()
@@ -26,13 +28,12 @@ namespace WebApiGate
             listener.Stop();
             BaseAddress = new Uri($"http://127.0.0.1:{port}");
 
-            var start = new ProcessStartInfo("dotnet", $"bin_dotnet/webForCore.WebApi.Sample.dll --urls {BaseAddress}")
-            {
-                WorkingDirectory = SampleDirectory,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-            };
-            start.Environment["GATE_RECYCLE_CHECK"] = "2";
+            var start = WebForCoreHost.StartInfo(Path.GetDirectoryName(Path.GetDirectoryName(SampleDirectory)), SampleDirectory,
+                "webForCore.WebApi.Sample", new Dictionary<string, string>
+                {
+                    ["Kestrel__Endpoints__Http__Url"] = BaseAddress.ToString(),
+                    ["GATE_RECYCLE_CHECK"] = "2",
+                }, out _tempDirectory);
             _process = Process.Start(start);
             _process.OutputDataReceived += (s, e) => { lock (_output) _output.AppendLine(e.Data); };
             _process.ErrorDataReceived += (s, e) => { lock (_output) _output.AppendLine(e.Data); };
@@ -62,7 +63,7 @@ namespace WebApiGate
 
         public HttpClient Client { get; }
 
-        // The host's console log (application starts, shutdowns, unloads).
+        // The console log of the host and its workers (worker starts, recycles, the application's shutdowns).
         public string Output
         {
             get { lock (_output) return _output.ToString(); }
@@ -77,6 +78,7 @@ namespace WebApiGate
                 _process.WaitForExit(10000);
             }
             _process.Dispose();
+            WebForCoreHost.DeleteTempDirectory(_tempDirectory);
         }
     }
 }

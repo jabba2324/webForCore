@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- webforcore-host's own behaviour (#56): rapid-fail protection, workers ending with the host, an application run on
+       its own. The gate suites cover recycling and forwarding with their samples. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <ProjectReference Include="..\webForCore.Host.Sample\webForCore.Host.Sample.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Host\WebFormsForCore.Host.csproj" ReferenceOutputAssembly="false" />
+    <Compile Include="..\Shared\WebForCoreHost.cs" Link="WebForCoreHost.cs" />
+  </ItemGroup>
+</Project>
