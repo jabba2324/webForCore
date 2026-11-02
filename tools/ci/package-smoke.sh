@@ -8,7 +8,14 @@ set -euo pipefail
 packages=$(cd "$1" && { pwd -W 2>/dev/null || pwd; }); version=$2
 here=$(cd "$(dirname "$0")" && pwd)
 base=$(mktemp -d); work=$base/site; mkdir "$work"
-trap 'kill $server 2>/dev/null || true; rm -rf "$base"' EXIT
+# The host's worker stops when the host does, a moment later: on Windows its folder can't be removed until it has
+# (rm: Device or resource busy), so the removal is retried for up to 30 s.
+cleanup() {
+  kill $server 2>/dev/null || true
+  for i in $(seq 30); do rm -rf "$base" 2>/dev/null && return 0; sleep 1; done
+  rm -rf "$base"
+}
+trap cleanup EXIT
 cp -r "$here/package-smoke/." "$work"
 cd "$work"
 cat > nuget.config <<CONFIG
