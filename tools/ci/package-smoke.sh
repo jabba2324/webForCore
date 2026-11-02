@@ -28,11 +28,14 @@ CONFIG
 # The SDK of the target framework (the run is in a temporary folder, outside this repository's global.json).
 echo '{"sdk":{"version":"10.0.100","rollForward":"latestFeature"}}' > global.json
 dotnet build Smoke.csproj -c Release -p:WebForCoreVersion="$version" -nodeReuse:false
-dotnet bin_dotnet/Smoke.dll --urls http://127.0.0.1:5199 > server.log 2>&1 &
+# Under webforcore-host, which the webForCore package puts in the output (#56), as an application runs.
+dotnet bin_dotnet/webforcore-host/webforcore-host.dll --urls http://127.0.0.1:5199 > server.log 2>&1 &
 server=$!
-for i in $(seq 120); do curl -s -o /dev/null http://127.0.0.1:5199/Default.aspx && break; sleep 1; done
+# -f: the host answers 503 until the worker serves.
+for i in $(seq 120); do curl -sf -o /dev/null http://127.0.0.1:5199/Default.aspx && break; sleep 1; done
 fail=0
 curl -s http://127.0.0.1:5199/Default.aspx | grep -q "webForCore package smoke test: 10/4.8" || { echo "Default.aspx: unexpected response"; fail=1; }
+grep -q "(worker 1 of webforcore-host)" server.log || { echo "server.log: the application didn't run as webforcore-host's worker"; fail=1; }
 curl -s http://127.0.0.1:5199/Greet.aspx | grep -q "hello from App_Code" || { echo "Greet.aspx: unexpected response"; fail=1; }
 # Markup.cs is compiled into the app against the packages' System.Web (issue #7: HttpUtility and IHtmlString, CS0433).
 curl -s http://127.0.0.1:5199/Encode.aspx | grep -q "<b>&lt;compiled&gt;</b>" || { echo "Encode.aspx: unexpected response"; fail=1; }
@@ -78,9 +81,9 @@ if grep -q -E '"lib/net4[0-9]*/System\.Web\.(Mvc|Razor|WebPages[A-Za-z.]*|Helper
   grep -o -E '"lib/net4[0-9]*/System\.Web\.(Mvc|Razor|WebPages[A-Za-z.]*|Helpers)\.dll"' bin_dotnet/SmokeMvc.deps.json | sort -u
   fail=1
 fi
-dotnet bin_dotnet/SmokeMvc.dll --urls http://127.0.0.1:5198 > server.log 2>&1 &
+dotnet bin_dotnet/webforcore-host/webforcore-host.dll --urls http://127.0.0.1:5198 > server.log 2>&1 &
 server=$!
-for i in $(seq 120); do curl -s -o /dev/null http://127.0.0.1:5198/ && break; sleep 1; done
+for i in $(seq 120); do curl -sf -o /dev/null http://127.0.0.1:5198/ && break; sleep 1; done
 # A Razor view renders although Unity.Mvc brings Microsoft.AspNet.Razor 3.2.7 (issue #23: it replaced webForCore's in
 # the output, and every view failed with a MissingMethodException).
 curl -s http://127.0.0.1:5198/Plain | grep -q "plain view, rendered by Razor" || { echo "/Plain: unexpected response"; curl -s http://127.0.0.1:5198/Plain | grep -i -m2 '<title>'; fail=1; }
