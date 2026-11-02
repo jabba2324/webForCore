@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate SDK-style net11.0 csproj files from the ASP.NET Web Stack's old-style csproj files.
+"""Generate SDK-style net10.0 csproj files from the ASP.NET Web Stack's old-style csproj files.
 
 The original source files are NOT copied. Each generated project points at them by relative path,
 so the Web Stack checkout stays pristine and can be updated with `git pull`.
@@ -16,12 +16,12 @@ DEFAULT_PROJECTS = [
     "System.Web.WebPages.Deployment", "System.Web.WebPages", "System.Web.WebPages.Razor", "System.Web.Mvc", "Microsoft.Web.Mvc",
 ]
 
-TARGET_FRAMEWORK = "net11.0"
+TARGET_FRAMEWORK = "net10.0"
 
 # NuGet id prefix for the project. Upstream owns the WebFormsForCore.* ids on nuget.org, so ours must differ.
 PACKAGE_PREFIX = "webForCore"
 
-# Framework references -> what they become on net11.0 with the fork.
+# Framework references -> what they become on net10.0 with the fork.
 WFC = "$(WfcRoot)/src"
 PROJECT_MAP = {
     "System.Web": f"{WFC}/WebFormsForCore.Web/WebFormsForCore.Web.csproj",
@@ -36,11 +36,11 @@ PROJECT_MAP = {
 PROJECT_MAP["System.Web.DataVisualization"] = f"{WFC}/WebFormsForCore.Web.DataVisualization/WebFormsForCore.Web.DataVisualization.csproj"
 # Temporary: Katana comes from NuGet (net45, restores with NU1701) until it is lifted.
 # Versions checked on nuget.org 29 Oct 2026 (Microsoft.Owin latest is 4.2.3; the handoff's 4.2.2 was from memory).
-PACKAGE_MAP = {"System.Runtime.Caching": ("System.Runtime.Caching", "11.0.0-rc.3.26522.148"),
+PACKAGE_MAP = {"System.Runtime.Caching": ("System.Runtime.Caching", "10.0.14"),
                "Microsoft.Owin": ("Microsoft.Owin", "4.2.3"), "Owin": ("Owin", "1.0.0")}
 # Types that were in .NET Framework's System.dll but are a separate package on modern .NET.
 # Every Web Stack project references "System", so every generated project gets these.
-SYSTEM_DLL_PACKAGES = [("System.CodeDom", "11.0.0-rc.3.26522.148")]
+SYSTEM_DLL_PACKAGES = [("System.CodeDom", "10.0.14")]
 BUILTIN = {"system", "system.core", "system.xml", "system.xml.linq", "system.data", "system.net.http",
            "system.componentmodel.dataannotations", "system.runtime.serialization", "microsoft.csharp",
            "system.net.http.webrequest", "windowsbase", "system.identitymodel", "system.transactions",
@@ -115,7 +115,7 @@ def generate(root, out_dir, name, report):
         inc = (item.get("Include") or "").replace("\\", "/")
         sibling = os.path.basename(inc)[:-len(".csproj")]
         if sibling == "System.Net.Http.Formatting":
-            # Microsoft's own netstandard2.0 build; consumable from net11.0 as-is.
+            # Microsoft's own netstandard2.0 build; consumable from net10.0 as-is.
             ns = os.path.join(root, "src", "System.Net.Http.Formatting.ns2_0", "System.Net.Http.Formatting.ns2_0.csproj")
             project_refs.append(rel(gen_dir, ns))
         elif sibling in SDK_TEST_PROJECTS:

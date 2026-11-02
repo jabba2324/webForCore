@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-        <TargetFrameworks>net11.0</TargetFrameworks>
+        <TargetFrameworks>net10.0</TargetFrameworks>
         <!--<TargetFrameworks>net48</TargetFrameworks>-->
         <ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>disable</Nullable>
@@ -15,9 +15,9 @@
         <PackageId>webForCore.Web.Services</PackageId>
         <Title>WebFormsForCore.Web.Services</Title>
         <Product>WebFormsForCore.Web.Services</Product>
-        <Description>System.Web.Services for webForCore: ASP.NET 4.x applications (Web Forms, MVC 5, Web API 2) on .NET 11 and Kestrel.</Description>
+        <Description>System.Web.Services for webForCore: ASP.NET 4.x applications (Web Forms, MVC 5, Web API 2) on .NET 10 and Kestrel.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageTags>webforms;aspnet;system.web;porting;net11</PackageTags>
+        <PackageTags>webforms;aspnet;system.web;porting;net10</PackageTags>
         <IncludeSymbols>true</IncludeSymbols>
         <EmbedUntrackedSources>false</EmbedUntrackedSources>
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
@@ -47,11 +47,11 @@
         <Reference Include="System.Configuration" />
 	</ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'net11.0'">
-        <PackageReference Include="System.Configuration.ConfigurationManager" Version="11.0.0-rc.3.26522.148">
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+        <PackageReference Include="System.Configuration.ConfigurationManager" Version="10.0.14">
             <Aliases>NET</Aliases>
         </PackageReference>
-        <PackageReference Include="System.DirectoryServices" Version="11.0.0-rc.3.26522.148" />
+        <PackageReference Include="System.DirectoryServices" Version="10.0.14" />
         <ProjectReference Include="..\WebFormsForCore.Configuration\WebFormsForCore.Configuration.csproj" />
     </ItemGroup>
 
@@ -87,9 +87,9 @@
             <!-- Do not import System.Configuration.ConfigurationManager version 8 -->
             <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Configuration.ConfigurationManager' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'(?i)system\.configuration\.configurationmanager[\\/]'))" />
             <!-- Do not import System.Web from dotnet -->
-            <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Web' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'[\\/]\.?dotnet[\\/]'))" />
+            <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Web' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'(?i)[\\/]microsoft\.netcore\.app\.ref[\\/]'))" />
             <!-- Do not import System.Drawing from dotnet -->
-            <!--<ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Drawing' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'[\\/]\.?dotnet[\\/]'))" />-->
+            <!--<ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Drawing' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'(?i)[\\/]microsoft\.netcore\.app\.ref[\\/]'))" />-->
         </ItemGroup>
     </Target>
 

@@ -1252,12 +1252,11 @@ public class AssemblyBuilder
             }
             else
             {
+                // webForCore (#56): into System.Web's load context (the default one), never CompilerResults.CompiledAssembly's Assembly.LoadFile:
+                // that loads the file into a load context of its own, a second copy of the assembly beside the one the
+                // assemblies compiled against it bind to (App_Code's types differed between pages and BuildManager.GetType).
                 var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
-                if (alc != AssemblyLoadContext.Default)
-                {
-                    // Avoid Assembly.LoadFile if we're not in the default AssemblyLoadContext
-                    results.CompiledAssembly = alc.LoadFromAssemblyPath(results.PathToAssembly);
-                }
+                results.CompiledAssembly = alc.LoadFromAssemblyPath(results.PathToAssembly);
             }
         }
 

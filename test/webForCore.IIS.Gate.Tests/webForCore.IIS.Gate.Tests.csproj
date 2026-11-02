@@ -4,7 +4,7 @@
        feature the hosting layer implements, checked against IIS 10's documented behaviour, and the PseudoAppDomain's
        in-process restart. -->
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <IsPackable>false</IsPackable>
@@ -18,6 +18,9 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
     <!-- Built and run, not referenced: its pages compile at run time. -->
     <ProjectReference Include="..\webForCore.IIS.Sample\webForCore.IIS.Sample.csproj" ReferenceOutputAssembly="false" />
+    <!-- The samples run under webforcore-host (#56), from its build here. -->
+    <ProjectReference Include="..\..\src\WebFormsForCore.Host\WebFormsForCore.Host.csproj" ReferenceOutputAssembly="false" />
+    <Compile Include="..\Shared\WebForCoreHost.cs" Link="WebForCoreHost.cs" />
     <!-- webforcore-regiis, run by ProtectedConfigurationTests. -->
     <ProjectReference Include="..\..\src\WebFormsForCore.RegIIS\WebFormsForCore.RegIIS.csproj" ReferenceOutputAssembly="false" />
     <!-- aspnet_compiler and the host for the precompiled site, run by PrecompilationTests. -->

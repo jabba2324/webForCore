@@ -5,7 +5,7 @@
        Razor and Web Pages back transitively, #23) and Katana's Google provider (#18). WebActivatorEx's start methods don't
        run on webForCore (#21), so Unity is started from Application_Start, as docs/MIGRATING.md says. -->
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>

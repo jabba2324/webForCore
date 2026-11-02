@@ -6,7 +6,7 @@ namespace Microsoft.Web.Infrastructure
 {
 	public static class InfrastructureHelper
 	{
-		// Restarts the application (on webForCore, its PseudoAppDomain), as when the bin folder changes.
+		// Restarts the application (on webForCore, its worker process: #56), as when the bin folder changes.
 		public static void UnloadAppDomain() => HttpRuntime.UnloadAppDomain();
 
 		// Whether a compiler is registered for the file extension (<system.codedom>), as System.Web checks itself.

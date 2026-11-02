@@ -3,7 +3,7 @@
   <!-- Lifted from aspnet/AspNetWebStack 2106565 (System.Web.Helpers) by tools/lift/lift_project.py.
        Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. -->
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>System.Web.Helpers</AssemblyName>
     <RootNamespace>System.Web.Helpers</RootNamespace>
     <PackageId>webForCore.Web.Helpers</PackageId>
@@ -73,7 +73,7 @@
     <ProjectReference Include="../WebFormsForCore.Web.DataVisualization/WebFormsForCore.Web.DataVisualization.csproj" />
     <ProjectReference Include="../WebFormsForCore.Web.Extensions/WebFormsForCore.Web.Extensions.csproj" />
     <ProjectReference Include="../webForCore.System.Web.WebPages/webForCore.System.Web.WebPages.csproj" />
-    <PackageReference Include="System.CodeDom" Version="11.0.0-rc.3.26522.148" />
-    <PackageReference Include="System.Runtime.Caching" Version="11.0.0-rc.3.26522.148" />
+    <PackageReference Include="System.CodeDom" Version="10.0.14" />
+    <PackageReference Include="System.Runtime.Caching" Version="10.0.14" />
   </ItemGroup>
 </Project>

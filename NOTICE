@@ -46,7 +46,7 @@ Summary
                                               /SoapFormatter                                Microsoft)
   RoslynCodeDomProvider                       src/WebFormsForCore.Web/WebFormsForCore/      MIT (Microsoft)
                                               CodeDom
-  Roslyn compilers (binaries)                 src/WebFormsForCore.Compilers/Roslyn.net11.0  MIT (.NET Foundation)
+  Roslyn compilers (binaries)                 src/WebFormsForCore.Compilers/Roslyn.net10.0  MIT (.NET Foundation)
   Data Visualization for .NET (SR.resx)       src/WebFormsForCore.Web.DataVisualization/    MIT (.NET Foundation)
                                               Common/SR.resx
   ASP.NET Web Optimization                    src/WebFormsForCore.Web.Optimization,         Apache-2.0 (Microsoft)

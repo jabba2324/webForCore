@@ -8,7 +8,14 @@ set -euo pipefail
 packages=$(cd "$1" && { pwd -W 2>/dev/null || pwd; }); version=$2
 here=$(cd "$(dirname "$0")" && pwd)
 base=$(mktemp -d); work=$base/site; mkdir "$work"
-trap 'kill $server 2>/dev/null || true; rm -rf "$base"' EXIT
+# The host's worker stops when the host does, a moment later: on Windows its folder can't be removed until it has
+# (rm: Device or resource busy), so the removal is retried for up to 30 s.
+cleanup() {
+  kill $server 2>/dev/null || true
+  for i in $(seq 30); do rm -rf "$base" 2>/dev/null && return 0; sleep 1; done
+  rm -rf "$base"
+}
+trap cleanup EXIT
 cp -r "$here/package-smoke/." "$work"
 cd "$work"
 cat > nuget.config <<CONFIG
@@ -25,12 +32,17 @@ cat > nuget.config <<CONFIG
   </packageSourceMapping>
 </configuration>
 CONFIG
+# The SDK of the target framework (the run is in a temporary folder, outside this repository's global.json).
+echo '{"sdk":{"version":"10.0.100","rollForward":"latestFeature"}}' > global.json
 dotnet build Smoke.csproj -c Release -p:WebForCoreVersion="$version" -nodeReuse:false
-dotnet bin_dotnet/Smoke.dll --urls http://127.0.0.1:5199 > server.log 2>&1 &
+# Under webforcore-host, which the webForCore package puts in the output (#56), as an application runs.
+dotnet bin_dotnet/webforcore-host/webforcore-host.dll --urls http://127.0.0.1:5199 > server.log 2>&1 &
 server=$!
-for i in $(seq 120); do curl -s -o /dev/null http://127.0.0.1:5199/Default.aspx && break; sleep 1; done
+# -f: the host answers 503 until the worker serves.
+for i in $(seq 120); do curl -sf -o /dev/null http://127.0.0.1:5199/Default.aspx && break; sleep 1; done
 fail=0
-curl -s http://127.0.0.1:5199/Default.aspx | grep -q "webForCore package smoke test: 11/4.8" || { echo "Default.aspx: unexpected response"; fail=1; }
+curl -s http://127.0.0.1:5199/Default.aspx | grep -q "webForCore package smoke test: 10/4.8" || { echo "Default.aspx: unexpected response"; fail=1; }
+grep -q "(worker 1 of webforcore-host)" server.log || { echo "server.log: the application didn't run as webforcore-host's worker"; fail=1; }
 curl -s http://127.0.0.1:5199/Greet.aspx | grep -q "hello from App_Code" || { echo "Greet.aspx: unexpected response"; fail=1; }
 # Markup.cs is compiled into the app against the packages' System.Web (issue #7: HttpUtility and IHtmlString, CS0433).
 curl -s http://127.0.0.1:5199/Encode.aspx | grep -q "<b>&lt;compiled&gt;</b>" || { echo "Encode.aspx: unexpected response"; fail=1; }
@@ -52,11 +64,20 @@ log=$(ls "$base"/logs/site/W3SVC1/ 2>/dev/null | head -1 || true)
 if [ $fail -ne 0 ]; then cat server.log; exit 1; fi
 kill $server; wait $server 2>/dev/null || true
 
+# The same application with its targeting pack taken from the NuGet cache (#55), as when an SDK newer than the target
+# framework builds it: the packages must drop the framework's System.Web.HttpUtility wherever the pack is (CS0433 for
+# HttpUtility and IHtmlString in Markup.cs otherwise). An empty NetCoreTargetingPackRoot makes the SDK download the pack
+# (its package pruning data is in the packs folder too: AllowMissingPrunePackageData).
+nugetpack=$base/nuget-pack; mkdir "$nugetpack" "$base/no-packs"
+cp -r "$here/package-smoke/." "$nugetpack"; cp nuget.config global.json "$nugetpack"
+(cd "$nugetpack" && dotnet build Smoke.csproj -c Release -p:WebForCoreVersion="$version" -p:NetCoreTargetingPackRoot="$base/no-packs" -p:AllowMissingPrunePackageData=true -nodeReuse:false)
+
 # tools/ci/package-smoke-mvc: MVC 5 and OWIN with the third-party packages applications have, as they have them.
 mvc=$base/mvc; mkdir "$mvc"
 cp -r "$here/package-smoke-mvc/." "$mvc"
 cp nuget.config "$mvc"
 cd "$mvc"
+echo '{"sdk":{"version":"10.0.100","rollForward":"latestFeature"}}' > global.json
 dotnet build SmokeMvc.csproj -c Release -p:WebForCoreVersion="$version" -nodeReuse:false
 # The output has webForCore's MVC, Razor, Web Pages and Helpers, not the .NET Framework ones that Unity.Mvc brings
 # (issue #23: Microsoft.AspNet.Razor and WebPages won the SDK's conflict resolution on file version; issue #28: with no
@@ -67,9 +88,9 @@ if grep -q -E '"lib/net4[0-9]*/System\.Web\.(Mvc|Razor|WebPages[A-Za-z.]*|Helper
   grep -o -E '"lib/net4[0-9]*/System\.Web\.(Mvc|Razor|WebPages[A-Za-z.]*|Helpers)\.dll"' bin_dotnet/SmokeMvc.deps.json | sort -u
   fail=1
 fi
-dotnet bin_dotnet/SmokeMvc.dll --urls http://127.0.0.1:5198 > server.log 2>&1 &
+dotnet bin_dotnet/webforcore-host/webforcore-host.dll --urls http://127.0.0.1:5198 > server.log 2>&1 &
 server=$!
-for i in $(seq 120); do curl -s -o /dev/null http://127.0.0.1:5198/ && break; sleep 1; done
+for i in $(seq 120); do curl -sf -o /dev/null http://127.0.0.1:5198/ && break; sleep 1; done
 # A Razor view renders although Unity.Mvc brings Microsoft.AspNet.Razor 3.2.7 (issue #23: it replaced webForCore's in
 # the output, and every view failed with a MissingMethodException).
 curl -s http://127.0.0.1:5198/Plain | grep -q "plain view, rendered by Razor" || { echo "/Plain: unexpected response"; curl -s http://127.0.0.1:5198/Plain | grep -i -m2 '<title>'; fail=1; }

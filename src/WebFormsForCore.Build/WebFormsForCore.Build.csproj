@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net48;net11.0;netstandard2.0</TargetFrameworks>
+        <TargetFrameworks>net48;net10.0;netstandard2.0</TargetFrameworks>
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>disable</Nullable>
         <AssemblyName>WebFormsForCore.Build</AssemblyName>
@@ -18,9 +18,9 @@
         <IsPackable>false</IsPackable>
         <Title>WebFormsForCore.Build</Title>
         <Product>WebFormsForCore.Build</Product>
-        <Description>WebFormsForCore.Build for webForCore: ASP.NET 4.x applications (Web Forms, MVC 5, Web API 2) on .NET 11 and Kestrel.</Description>
+        <Description>WebFormsForCore.Build for webForCore: ASP.NET 4.x applications (Web Forms, MVC 5, Web API 2) on .NET 10 and Kestrel.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageTags>webforms;aspnet;system.web;porting;net11</PackageTags>
+        <PackageTags>webforms;aspnet;system.web;porting;net10</PackageTags>
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <IncludeSymbols>true</IncludeSymbols>
         <RestoreSources>$(RestoreSources);../../nupkg;https://api.nuget.org/v3/index.json</RestoreSources>
@@ -39,7 +39,7 @@
         <AssemblyName>$(AssemblyName).NetFX</AssemblyName>
     </PropertyGroup>
 
-    <PropertyGroup Condition="$(TargetFramework) == 'net11.0'">
+    <PropertyGroup Condition="$(TargetFramework) == 'net10.0'">
         <AssemblyName>$(AssemblyName).NetCore</AssemblyName>
     </PropertyGroup>
 
@@ -108,13 +108,13 @@
         <Reference Include="System.Web" />
     </ItemGroup>
 
-    <ItemGroup Condition="$(TargetFramework) == 'net11.0'">
+    <ItemGroup Condition="$(TargetFramework) == 'net10.0'">
         <PackageReference Include="WebFormsForCore.Web" Version="1.7.0-rc3" />
         <!-- Web depends on Compilers transitively; its lib folder contains native DLLs (DiaSymReader) that must not be passed to csc as references -->
         <PackageReference Include="WebFormsForCore.Compilers" Version="1.7.0-rc3" ExcludeAssets="compile" />
     </ItemGroup>
 
-    <ItemGroup Condition="$(TargetFramework) == 'net11.0'">
+    <ItemGroup Condition="$(TargetFramework) == 'net10.0'">
         <PackageReference Include="WebFormsForCore.AspNetCompiler.Library" Version="1.7.0-rc3" />
     </ItemGroup>
 
@@ -124,18 +124,18 @@
 
     <ItemGroup>
         <None Include="..\..\README.md" PackagePath="\" Pack="True" />
-        <None Include="build\WebFormsForCore.Build.props" PackagePath="build\net11.0" Pack="True" />
-        <None Include="build\WebFormsForCore.Build.targets" PackagePath="build\net11.0" Pack="True" />
+        <None Include="build\WebFormsForCore.Build.props" PackagePath="build\net10.0" Pack="True" />
+        <None Include="build\WebFormsForCore.Build.targets" PackagePath="build\net10.0" Pack="True" />
         <None Include="build\WebFormsForCore.Build.props" PackagePath="build\net48" Pack="True" />
         <None Include="build\WebFormsForCore.Build.targets" PackagePath="build\net48" Pack="True" />
         <None Include="build\WebFormsForCore.Build.props" PackagePath="build\netstandard2.0" Pack="True" />
         <None Include="build\WebFormsForCore.Build.targets" PackagePath="build\netstandard2.0" Pack="True" />
-        <None Include="lib\net11.0\_._" PackagePath="lib\net11.0" Pack="True" />
+        <None Include="lib\net10.0\_._" PackagePath="lib\net10.0" Pack="True" />
         <None Include="lib\net48\_._" PackagePath="lib\net48" Pack="True" />
         <None Include="lib\netstandard2.0\_._" PackagePath="lib\netstandard2.0" Pack="True" />
     </ItemGroup>
     <ItemGroup Condition="$(Packaging) == 'True'">
-        <None Include="..\..\lib\WebFormsForCore.Build\net11.0\**\*.*" PackagePath="build\net11.0" Pack="True" Link="lib\net11.0\%(RecursiveDir)\%(Filename).%(Extension)" />
+        <None Include="..\..\lib\WebFormsForCore.Build\net10.0\**\*.*" PackagePath="build\net10.0" Pack="True" Link="lib\net10.0\%(RecursiveDir)\%(Filename).%(Extension)" />
         <None Include="..\..\lib\WebFormsForCore.Build\net48\**\*.*" PackagePath="build\net48" Pack="True" Link="lib\net48\%(RecursiveDir)\%(Filename).%(Extension)" />
         <None Include="..\..\lib\WebFormsForCore.Build\netstandard2.0\**\*.*" PackagePath="build\netstandard2.0" Pack="True" Link="lib\netstandard2.0\%(RecursiveDir)\%(Filename).%(Extension)" />
     </ItemGroup>

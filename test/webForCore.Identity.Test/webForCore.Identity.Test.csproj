@@ -3,7 +3,7 @@
   <!-- Lifted from aspnet/AspNetIdentity b7fc094 (test/Identity.Test) by tools/lift/lift_aspnet.py.
        MIT License and NOTICE at the repo root. Generated; do not edit. -->
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>Identity.Test</AssemblyName>
     <RootNamespace>Identity.Test</RootNamespace>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>

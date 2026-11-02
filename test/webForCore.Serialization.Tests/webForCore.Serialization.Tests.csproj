@@ -2,7 +2,7 @@
 
   <!-- webForCore: tests for the fork's BinaryFormatter port (src/WebFormsForCore.Serialization.Formatters). -->
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <ImplicitUsings>enable</ImplicitUsings>

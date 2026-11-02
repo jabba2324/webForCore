@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Lift ASP.NET SignalR 2 (SignalR/SignalR, tag 2.4.3, Apache License 2.0) and ASP.NET Identity 2 (aspnet/AspNetIdentity,
-MIT) into the fork as SDK-style projects for net11.0.
+MIT) into the fork as SDK-style projects for net10.0.
 
 SignalR's projects are SDK-style (KoreBuild): their items are the project folder's default globs plus the explicit
 <Compile Include Link> items. Identity's are old-style: their explicit <Compile> and <EmbeddedResource> items. Files are
@@ -42,8 +42,8 @@ PROJECTS = {
         # (the #if NET45 branches are the .NET Framework code paths, which .NET has).
         defines="SERVER;PERFCOUNTERS;NET45;SIGNED", unsafe=True,
         refs=["Microsoft.Owin", "Microsoft.Owin.Security"],
-        packages=[NEWTONSOFT, ("System.Diagnostics.PerformanceCounter", "11.0.0-rc.3.26522.148"),
-                  ("System.Security.Cryptography.ProtectedData", "11.0.0-rc.3.26522.148")],
+        packages=[NEWTONSOFT, ("System.Diagnostics.PerformanceCounter", "10.0.14"),
+                  ("System.Security.Cryptography.ProtectedData", "10.0.14")],
         # Not shipped to .NET Framework apps either: hubs.js comes from Scripts\hubs.js (its non-Windows path).
         resources={"Scripts/hubs.js": "Microsoft.AspNet.SignalR.Scripts.hubs.js"}),
     "Microsoft.AspNet.SignalR.SystemWeb": dict(
@@ -83,7 +83,7 @@ PROJECTS = {
         properties={"TieredCompilation": "false"}),
     "Microsoft.AspNet.Identity.Core": dict(
         source=("identity", "src/Microsoft.AspNet.Identity.Core"), style="legacy",
-        packages=[("System.Security.Cryptography.ProtectedData", "11.0.0-rc.3.26522.148")]),
+        packages=[("System.Security.Cryptography.ProtectedData", "10.0.14")]),
     "Microsoft.AspNet.Identity.EntityFramework": dict(
         source=("identity", "src/Microsoft.AspNet.Identity.EntityFramework"), style="legacy",
         refs=["Microsoft.AspNet.Identity.Core"], packages=[("EntityFramework", "6.5.1")]),
@@ -299,7 +299,7 @@ def lift(name, cfg, roots, fork):
   <!-- Lifted from {src_label} {commit(repo)} ({rel_dir}) by tools/lift/lift_aspnet.py.
        {licence} and NOTICE at the repo root. Generated; do not edit. -->
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>{assembly}</AssemblyName>
     <RootNamespace>{rootns}</RootNamespace>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>

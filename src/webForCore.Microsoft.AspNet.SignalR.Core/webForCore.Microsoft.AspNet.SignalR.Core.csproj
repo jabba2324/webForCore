@@ -3,7 +3,7 @@
   <!-- Lifted from SignalR/SignalR 7f53f26 (src/Microsoft.AspNet.SignalR.Core) by tools/lift/lift_aspnet.py.
        Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. Generated; do not edit. -->
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>Microsoft.AspNet.SignalR.Core</AssemblyName>
     <RootNamespace>Microsoft.AspNet.SignalR</RootNamespace>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
@@ -277,7 +277,7 @@
     <ProjectReference Include="../webForCore.Microsoft.Owin/webForCore.Microsoft.Owin.csproj" />
     <ProjectReference Include="../webForCore.Microsoft.Owin.Security/webForCore.Microsoft.Owin.Security.csproj" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="11.0.0-rc.3.26522.148" />
-    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="11.0.0-rc.3.26522.148" />
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="10.0.14" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.14" />
   </ItemGroup>
 </Project>

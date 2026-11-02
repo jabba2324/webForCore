@@ -71,7 +71,7 @@ namespace IISGate
         {
             var repository = AppContext.BaseDirectory;
             while (!File.Exists(Path.Combine(repository, "WebFormsForCore.slnx"))) repository = Path.GetDirectoryName(repository);
-            var compiler = Path.Combine(repository, "src", "WebFormsForCore.AspNetCompiler", "bin", "Release", "net11.0", "aspnetcore_compiler.dll");
+            var compiler = Path.Combine(repository, "src", "WebFormsForCore.AspNetCompiler", "bin", "Release", "net10.0", "aspnetcore_compiler.dll");
             var start = new ProcessStartInfo("dotnet") { RedirectStandardOutput = true, RedirectStandardError = true };
             start.ArgumentList.Add(compiler);
             start.ArgumentList.Add("-?");
@@ -121,7 +121,7 @@ namespace IISGate
                 prepare?.Invoke(source);
                 Target = Path.Combine(_root, "target");
 
-                var compiler = Path.Combine(repository, "src", "WebFormsForCore.AspNetCompiler", "bin", "Release", "net11.0", "aspnetcore_compiler.dll");
+                var compiler = Path.Combine(repository, "src", "WebFormsForCore.AspNetCompiler", "bin", "Release", "net10.0", "aspnetcore_compiler.dll");
                 // Relative paths: the compiler reads an argument starting with / as a switch.
                 var start = new ProcessStartInfo("dotnet") { WorkingDirectory = _root, RedirectStandardOutput = true, RedirectStandardError = true };
                 foreach (var argument in new[] { compiler, "-nologo", "-v", "/", "-p", "site", "-b", "bin_dotnet" }) start.ArgumentList.Add(argument);

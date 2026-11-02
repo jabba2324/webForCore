@@ -256,7 +256,7 @@ def main():
        managed code for a Unix build, with the GDI+ flat API implemented in managed code on SkiaSharp (SkiaGdiPlus/)
        instead of libgdiplus. Generated; do not edit (change the lift script or tools/lift/additions/{NAME}/). -->
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>System.Drawing.Common</AssemblyName>
     <RootNamespace>System.Drawing</RootNamespace>
     <AssemblyVersion>11.0.0.0</AssemblyVersion>

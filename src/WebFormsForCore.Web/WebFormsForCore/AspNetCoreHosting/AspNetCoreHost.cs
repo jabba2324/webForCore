@@ -33,6 +33,8 @@ namespace System.Web.Hosting
         private readonly System.Collections.Concurrent.ConcurrentDictionary<Core.HttpContext, byte> requests =
             new System.Collections.Concurrent.ConcurrentDictionary<Core.HttpContext, byte>();
         private int unregistered;
+        // webForCore: set when the hosting environment stops the host (#49).
+        private int stopped;
 
         private string physicalClientScriptPath;
 
@@ -126,9 +128,8 @@ namespace System.Web.Hosting
         // webForCore: called once when the hosting environment starts shutting the application down.
         public Action OnShutdown;
 
-        // webForCore: creates the host for WebFormsMiddleware in the domain this copy of System.Web is loaded in (a
-        // PseudoAppDomain, or the middleware's own context). Parameters and results are shared-framework types, so that
-        // the middleware's copy of System.Web can call it in another domain: the host is returned as delegates.
+        // webForCore: creates the host for WebFormsMiddleware, the application's only start in this process (#56). The
+        // host is returned as delegates.
         internal static object[] CreateForMiddleware(string virtualPath, string physicalPath, string[] handleExtensions,
             string[] addHandleExtensions, string[] defaultDocuments, string[] addDefaultDocuments, bool handleAllRequestsWithWebForms,
             bool useClassicMode, bool useAspNetCoreSession, bool iisModules, Action onShutdown)
@@ -142,11 +143,10 @@ namespace System.Web.Hosting
             Type buildManagerHostType = typeof(HttpRuntime).Assembly.GetType("System.Web.Compilation.BuildManagerHost");
             var appId = ApplicationManager.CreateApplicationId(virtualPath, physicalPath);
             var vpath = System.Web.VirtualPath.Create(virtualPath);
-            IRegisteredObject buildManagerHost = applicationManager.CreateInstanceInNewWorkerLoadContext(buildManagerHostType, appId, vpath, physicalPath, false) as IRegisteredObject;
+            var buildManagerHost = (System.Web.Compilation.BuildManagerHost)applicationManager.CreateInstanceInNewWorkerLoadContext(buildManagerHostType, appId, vpath, physicalPath, false);
             // call BuildManagerHost.RegisterAssembly to make Host type loadable in the worker app domain
             var hostType = typeof(AspNetCoreHost);
-            buildManagerHostType.InvokeMember("RegisterAssembly", BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.NonPublic,
-                null, buildManagerHost, new object[] { hostType.Assembly.FullName, hostType.Assembly.Location });
+            buildManagerHost.RegisterAssembly(hostType.Assembly.FullName, hostType.Assembly.Location);
             // create Host in the worker app domain
             var host = (AspNetCoreHost)applicationManager.CreateObject(appId, hostType, virtualPath, physicalPath, false);
 
@@ -156,7 +156,12 @@ namespace System.Web.Hosting
             if (addDefaultDocuments.Length > 0) host.DefaultDocuments = host.DefaultDocuments.Concat(addDefaultDocuments).ToArray();
             host.HandleAllRequestsWithWebForms = handleAllRequestsWithWebForms;
             host.UseClassicMode = useClassicMode;
-            host.OnShutdown = onShutdown;
+            // webForCore: the hosting environment can stop the application before the middleware listens for it: a change
+            // while the worker was starting (#49). The middleware then hears of it now, and the worker is replaced, rather
+            // than it serving on with a runtime that answers every request with 503 (Server Too Busy).
+            Interlocked.Exchange(ref host.OnShutdown, onShutdown);
+            if (Volatile.Read(ref host.stopped) != 0 || HostingEnvironment.ShutdownInitiated)
+                Interlocked.Exchange(ref host.OnShutdown, null)?.Invoke();
             host.Configure(virtualPath, physicalPath);
 
             return new object[] {
@@ -192,7 +197,8 @@ namespace System.Web.Hosting
 
         void IRegisteredObject.Stop(bool immediate)
         {
-            // webForCore: tell the middleware first, so that new requests go to a new domain while this one drains.
+            // webForCore: tell the middleware first, so that new requests go to the next worker while this one drains.
+            Interlocked.Exchange(ref stopped, 1);
             Interlocked.Exchange(ref OnShutdown, null)?.Invoke();
 
             // webForCore: the hosting environment calls Stop(false), waits up to <hostingEnvironment shutdownTimeout> (30 s)

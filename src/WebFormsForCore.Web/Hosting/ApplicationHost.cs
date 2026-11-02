@@ -50,14 +50,7 @@ namespace System.Web.Hosting {
                 physicalDir = physicalDir + Path.DirectorySeparatorChar;
 
 #if NETCOREAPP
-            // webForCore: the new AppDomain is a PseudoAppDomain (AspNetCoreHosting/PseudoAppDomain.cs) with the
-            // application directory as its base; the host is created there by that domain's copy of System.Web. The
-            // result is the domain's object (no remoting proxy): callers reach it through reflection or dynamic.
-            if (PseudoAppDomain.IsSupported) {
-                var domain = new PseudoAppDomain(ApplicationManager.CreateApplicationId(virtualDir, physicalDir), physicalDir);
-                return domain.InvokeStatic(typeof(ApplicationHost), nameof(CreateApplicationHostInCurrentDomain),
-                    domain.GetDomainType(hostType), virtualDir, physicalDir);
-            }
+            // webForCore: .NET has one AppDomain: the host is created in this process, without a remoting proxy (#56).
             return CreateApplicationHostInCurrentDomain(hostType, virtualDir, physicalDir);
         }
 

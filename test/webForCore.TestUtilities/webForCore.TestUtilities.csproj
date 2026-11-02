@@ -3,7 +3,7 @@
   <!-- TestUtilities (dotnet/runtime 76b9680, release/6.0, src/libraries/Common/tests/TestUtilities), lifted by
        tools/lift/lift_drawing_tests.py. MIT. Generated; do not edit. -->
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>

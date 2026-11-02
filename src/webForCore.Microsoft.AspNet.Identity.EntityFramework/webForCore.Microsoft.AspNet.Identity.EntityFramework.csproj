@@ -3,7 +3,7 @@
   <!-- Lifted from aspnet/AspNetIdentity b7fc094 (src/Microsoft.AspNet.Identity.EntityFramework) by tools/lift/lift_aspnet.py.
        MIT License and NOTICE at the repo root. Generated; do not edit. -->
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>Microsoft.AspNet.Identity.EntityFramework</AssemblyName>
     <RootNamespace>Microsoft.AspNet.Identity.EntityFramework</RootNamespace>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>

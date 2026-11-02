@@ -15,7 +15,7 @@ and hasn't been. **Not possible**: Windows-native and can't exist on Linux.
 
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddWebForms();            // compression, W3C logging, systemd integration
+builder.Services.AddWebForms();            // compression, W3C logging
 var app = builder.Build();
 app.UseWebForms(o => o.HandleAllRequestsWithWebForms());   // IIS modules on by default
 app.Run();
@@ -24,11 +24,9 @@ app.Run();
 | Option | Default | Effect |
 | --- | --- | --- |
 | `UseWebForms(o => o.IIS(i => i.Enabled = false))` | on | Turns off the `<system.webServer>` modules |
-| `UseWebForms(o => o.IsolateApplication(false))` | isolated | Runs the app in the default load context, so there's no in-process restart (see [Process model](#process-model)) |
-| `UseWebForms(o => o.Recycling(r => ...))` | IIS's defaults | `Time` (1740 min), `Requests`, `PrivateMemory` (KB), `MaxStuckDomains` (3), `CheckInterval` (30 s) |
+| `UseWebForms(o => o.Recycling(r => ...))` | IIS's defaults | `Time` (1740 min), `Requests`, `PrivateMemory` (KB), `CheckInterval` (30 s): reaching one recycles the worker process (see [Process model](#process-model)) |
 | `AddWebForms(o => o.Compression = false)` | on | IIS's static and dynamic compression |
-| `AddWebForms(o => o.LogDirectory = ...)` | `$LOGS_DIRECTORY/W3SVC1` (systemd's `LogsDirectory=`), otherwise `logs/<site>/W3SVC1` next to the site folder | W3C log folder; never served, even if it is inside the site |
-| `AddWebForms(o => o.Systemd = false)` | on | `sd_notify` readiness and a watchdog |
+| `AddWebForms(o => o.LogDirectory = ...)` | `logs/<site>/W3SVC1` next to the site folder | W3C log folder; never served, even if it is inside the site |
 
 ## How configuration is read
 
@@ -93,17 +91,17 @@ IIS hands ASP.NET a worker request (`HttpWorkerRequest`); on Kestrel this is `As
 
 | IIS feature | Status | On webForCore |
 | --- | --- | --- |
-| App pool worker process | Partial | One Kestrel process per app, supervised by systemd (`tools/deploy/webforcore@.service`) or a container runtime |
-| AppDomain per application | Works | `PseudoAppDomain`: the app runs in a collectible `AssemblyLoadContext`, with its own copy of System.Web and the app's assemblies, so static state is per domain. One difference: `Assembly.LoadFrom` always loads into .NET's default context, so in an application it returns a second copy of an assembly the application already has, where on .NET Framework it returns the one in the AppDomain. Use `Assembly.Load(AssemblyName.GetAssemblyName(path))` or `BuildManager.GetReferencedAssemblies()`. WebActivatorEx does this, so its start methods never run: call them from `Application_Start` ([MIGRATING.md](MIGRATING.md#3-references), #21). The shared framework is shared, except its facades that forward types to the application's assemblies (System.Configuration, System, System.Data's SqlClient, System.Drawing, ...): those are loaded per domain, so a .NET Framework library that names a type through them gets the application's (#1, #19, #35) |
-| Restart on web.config, `bin` or `App_Code` change; `HttpRuntime.UnloadAppDomain` | Works | A new domain starts while the old one drains (overlapped recycle); no requests fail. Requests still running in the old domain after `<hostingEnvironment shutdownTimeout>` (30 s) are aborted, as AppDomain.Unload did: long polls and WebSockets reconnect to the new domain |
-| Recycling by time, request count, private memory | Works | `Recycling(...)`, with IIS's defaults |
-| Freeing old domains | Works | An old domain is collected once its requests finish (gate tests restart the IIS, MVC and Web API samples and wait for it). What .NET keeps process-wide is released when it unloads; an app's own `MemoryCache` instances must be disposed in `Application_End`. A domain still referenced 5 minutes after shutdown is logged, and after 3 the process stops cleanly for systemd to restart it, as WAS recycled a worker |
-| Health monitoring, rapid-fail protection | Works | systemd unit: `Type=notify`, watchdog in place of WAS's ping, 5 failures in 5 minutes |
+| App pool worker process | Works | `webforcore-host` (in the application's output, `bin_dotnet/webforcore-host/`) plays WAS's part: it owns the bindings and TLS and runs the application in worker processes, forwarding each request to the current one over a private Unix socket (#56). Run it with `dotnet bin_dotnet/webforcore-host/webforcore-host.dll`; starting the host itself (at boot, again if it ends) is the service manager's or container runtime's job, as it was Windows' for IIS. The client's address and port, the binding's, the scheme, the client certificate and the TLS strength reach `Request.ServerVariables` as on IIS; the Host header and the raw URL are the client's |
+| AppDomain per application | Works | Each worker process runs one start of the application, so static state, `AppDomain.CurrentDomain` data (`DataDirectory`) and events are per start, as they were per AppDomain. The shared framework is the process's, as the GAC's assemblies were the AppDomain's |
+| Restart on web.config, `bin` or `App_Code` change; `HttpRuntime.UnloadAppDomain` | Works | The worker tells the host, which starts the next worker; requests that arrive meanwhile wait for it, and none fails. The old worker finishes its requests and exits; those still running after `<hostingEnvironment shutdownTimeout>` (30 s) are aborted, as AppDomain.Unload did: long polls and WebSockets reconnect to the new worker. A restart costs a process start (and compiling what isn't precompiled). An application run on its own (`dotnet run`, without the host) stops on a restart, for whatever started it to start it again |
+| Recycling by time, request count, private memory | Works | `Recycling(...)`, with IIS's defaults: a new worker |
+| Freeing old domains | Works | The old worker process exits: everything it held goes with it |
+| Health monitoring, rapid-fail protection | Works | The host replaces a worker that exits; after 5 failures in 5 minutes it starts no more and answers 503 (IIS stops the application pool). Startup and shutdown time limits (90 s) are IIS's. Settings: `WebForCore:Host` (`StartupTimeLimit`, `ShutdownTimeLimit`, `RapidFailProtection`, `RapidFailProtectionMaxCrashes`, `RapidFailProtectionInterval`, `QueueTimeout`, `RequestIdleTimeout`, `AcceptUntrustedClientCertificates`). |
 | Request queue, 503 on overflow | Partial | `appConcurrentRequestLimit` (503.2); no HTTP.sys queue |
 | Idle timeout, AlwaysRunning, preload | Not built | The app starts on its first request |
 | Web gardens | Not built | One app folder per process: run several processes behind a load balancer, with out-of-process session state |
 | Pool identity | Partial | Run each service as its own Linux user |
-| CPU and memory limits | Partial | cgroups through systemd or the container runtime |
+| CPU and memory limits | Partial | The service manager's or container runtime's (cgroups on Linux) |
 | Several sites, applications, virtual directories in one process | Partial | One application per process, with an optional virtual path |
 
 ## Authentication
@@ -123,7 +121,7 @@ IIS hands ASP.NET a worker request (`HttpWorkerRequest`); on Kestrel this is `As
 | --- | --- |
 | `aspnet_compiler` | `aspnetcore_compiler` (`src/WebFormsForCore.AspNetCompiler`): fixed and updatable (`-u`) precompilation with aspnet_compiler's switches; use `-b bin_dotnet` |
 | `aspnet_regiis -pe/-pd/-pc/-px/-pi` | `webforcore-regiis` (`src/WebFormsForCore.RegIIS`): `-pef`/`-pdf` on a site folder, RSA key containers as files, DPAPI emulated with a master key file |
-| `appcmd`, IIS Manager | None. Edit `web.config` and the systemd unit |
+| `appcmd`, IIS Manager | None. Edit `web.config`, and the service manager's configuration |
 
 Implementation history and the reasons behind each choice are in `LIFT.md`, under "AppDomains and IIS on Kestrel",
 "The worker request" and "Protected configuration, the integrated pipeline and precompiled sites".

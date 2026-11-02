@@ -3,8 +3,8 @@
 Record of everything lifted into or changed in webForCore, and of each phase gate.
 Plan: `WEBFORCORE-LIFT-HANDOFF.md` (planning doc, 29 Oct 2026).
 
-**Target framework: net11.0 only.** net8.0 and net10.0 were dropped on 29 Oct 2026 (the handoff said
-net10.0 first). net48 stays for the TestApp's .NET Framework build (the future IIS comparison) and
+**Target framework: net10.0 (.NET 10 LTS) only**, since 2 Nov 2026 (#55; see "Back to .NET 10 LTS" below). From
+29 Oct to 2 Nov 2026 it was net11.0 only: net8.0 and net10.0 had been dropped (the handoff said net10.0 first). net48 stays for the TestApp's .NET Framework build (the future IIS comparison) and
 netstandard2.0 stays for the MSBuild task DLL. Staying mergeable with upstream is not a goal; fork files
 are changed wherever that is the cleaner fix.
 
@@ -960,6 +960,9 @@ Gate: 6 more cases in Mvc.Gate.Tests (63/63). TestApp: pages, CSS and ScriptReso
 ## AppDomains and IIS on Kestrel (30 Oct 2026)
 
 ### PseudoAppDomain: in-process AppDomain emulation
+
+*Replaced on 2 Nov 2026 by worker processes and `webforcore-host` (#56): see "Process recycling instead of in-process
+AppDomains" at the end. What follows is the history.*
 
 .NET has no AppDomains. `System.Web.Hosting.PseudoAppDomain` (`AspNetCoreHosting/PseudoAppDomain.cs`) is a collectible
 AssemblyLoadContext that stands in for the worker AppDomain:
@@ -2039,3 +2042,113 @@ character unencoded. It's Microsoft's race, not a Windows difference:
   `ValueExtensionsTest`.
 
 `lift_project.py` adds those five to the collection, as for the earlier races (ScopeStorage, ModelBinderConfig).
+
+## Back to .NET 10 LTS (#55, 2 Nov 2026)
+
+webForCore targets `net10.0` instead of `net11.0`. .NET 10 is the long-term support release (to November 2028),
+which is what long-lived ASP.NET 4.x applications need. .NET 11 was a release candidate (11.0.0-rc.3), and the
+packages pinned Microsoft's RC packages. No .NET 11 API was used.
+
+- `netlatest` and every project's target framework are `net10.0`. `netlib` (Microsoft's packages: System.Configuration.ConfigurationManager,
+  System.DirectoryServices, System.Runtime.Caching, ...) is 10.0.14, and the versions written in project files with it.
+  `global.json` (and the TestApp's) pins SDK 10.0.100 with `latestFeature`. CI installs the 10.0 SDK, and 11.0 RC for
+  the package smoke test's newer-SDK build (below).
+- `src/WebFormsForCore.Compilers/Roslyn.net11.0` is `Roslyn.net10.0` again; its binaries were `net10.0` builds all along
+  (`csc.runtimeconfig.json`).
+- Build tooling: `NET11_0_OR_GREATER`/`IsNet11` checks are `NET10_0_OR_GREATER`/`IsNet10` (`AspNetCoreCompiler`,
+  `CreateAspDesignerFiles`, `FakeStrongName` and its inline copy in `FakeStrongName.targets`), and the precompiler path
+  is `net10.0`.
+- `AssemblyVersion` stays 11.0.0.0: it is webForCore's assembly version, not the runtime's, and still outranks the
+  framework's 4.0.0.0 facades.
+- The lift scripts (`tools/lift/*.py`, `spike.sh`) generate `net10.0` projects with the 10.0.14 packages, as the
+  project files now have: running a lift again (`lift_mono_tests.py` reproduces its project byte for byte) no longer
+  takes a project back to `net11.0` and the RC packages.
+
+### The framework's System.Web facades, wherever the targeting pack is
+
+The shared framework has a `System.Web.dll` (a facade forwarding `HttpUtility`) and a `System.Web.HttpUtility.dll`
+(`HttpUtility`, `IHtmlString`). Next to webForCore's System.Web the compiler sees those types twice (CS0433, CS7069),
+so the projects and `webForCore.WebStack.targets` drop the framework's copies from the references. They matched them
+by the SDK's packs folder: `[\\/]\.?dotnet[\\/]` (21 project files) and
+`[\\/]packs[\\/]Microsoft\.(NETCore|AspNetCore)\.App\.Ref[\\/]` (`Directory.Build.targets`, `webForCore.WebStack.targets`).
+An SDK newer than the target framework takes the targeting pack from the NuGet cache
+(`~/.nuget/packages/microsoft.netcore.app.ref/10.0.14/ref/net10.0/`), where neither pattern matches: building this
+repository for net10.0 with the .NET 11 SDK failed with 166 × CS0433, and so would an application on the packages built
+that way. All of them now match the pack's name, case-insensitively: `(?i)[\\/]microsoft\.netcore\.app\.ref[\\/]`
+(and `Microsoft.(NETCore|AspNetCore).App.Ref` for HttpUtility). `tools/ci/package-smoke.sh` builds its application a
+second time with an empty `NetCoreTargetingPackRoot`, so that the SDK takes the targeting pack from the NuGet cache, which
+failed with the old patterns (CS0433 for `HttpUtility`/`IHtmlString` in the application's compiled `Markup.cs`). A newer SDK
+alone doesn't show it when the same dotnet root also has the target's pack, as CI's setup-dotnet installs do.
+
+### Docs
+
+README, CONTRIBUTING, MIGRATING, AGENT-MIGRATION, NAMESPACES and MODIFICATIONS say .NET 10. Behaviour notes that were
+measured on .NET 11 say so where they couldn't be rechecked: AutoMapper before 12 (ReaLocate) didn't fail in a plain
+console app on either 10.0.14 or 11.0 RC with a simple map, so the note stays as observed on .NET 11 until the smoke
+test reruns ReaLocate on .NET 10. The rest of this log keeps the framework it was written about.
+
+## Process recycling instead of in-process AppDomains (#56, 2 Nov 2026)
+
+PseudoAppDomain (above, 30 Oct–1 Nov) emulated AppDomain.Unload inside one process: a collectible AssemblyLoadContext
+per start of the application, and, to make old ones collectible, code that disposed timers by reflection over the
+runtime's timer queues, unsubscribed process-wide events, cleared GC handles and dropped `NetworkChange` subscribers.
+#52 showed where that leads: a process crash after restarts that only optimised JIT code hit, on .NET 10 as on 11,
+which bisection tied to no single release step and not to collectibility; on the way, `ReachesDomain` was found throwing
+`FieldAccessException` on a timer thread, which killed the process. And each new library an application used could
+hold an old domain in a new way.
+It is gone. IIS's own answer is the model now: one start of the application per worker process, a new process for each
+restart, and a host that owns the bindings and decides which process serves.
+
+- **`webforcore-host`** (`src/WebFormsForCore.Host`, package `webForCore.Host`, brought by `webForCore`): plays
+  IIS/WAS's part. It owns the bindings and TLS (`--urls`, `ASPNETCORE_URLS`, the application's appsettings `Kestrel`
+  section), starts the application as worker processes (`dotnet <app>.dll`), and forwards each request to the current
+  worker over HTTP on a Unix socket in a private temp folder, with YARP's `IHttpForwarder` (Microsoft's reverse proxy;
+  its forwarder only). The package's build targets put it in `bin_dotnet/webforcore-host/` with the application's
+  name, so `dotnet bin_dotnet/webforcore-host/webforcore-host.dll` runs the application.
+- **Restart:** the application's hosting environment shuts down as before (Web.config, bin or App_Code changes,
+  `HttpRuntime.UnloadAppDomain`, recycling limits). The worker tells the host on its control socket ("recycle"), answers
+  later requests 503 with `X-WebForCore-Restarting` (the host sends requests without a body again, to the next worker),
+  finishes the rest within `<hostingEnvironment shutdownTimeout>` and exits. The host starts the next worker straight
+  away and kills a worker still running after `ShutdownTimeLimit`.
+- **IIS's application-pool settings** (`WebForCore:Host` configuration): `StartupTimeLimit`, `ShutdownTimeLimit` (90 s),
+  rapid-fail protection (5 crashes in 5 minutes: 503 until the host restarts), `QueueTimeout`, and a worker that exits
+  by itself is replaced. A request the worker took and dropped (`Request.Abort()`) resets the client's connection; one a
+  crashing worker never answered (no body) goes to the next worker.
+- **Connection details:** the host forwards the client's address and port, the local endpoint, the scheme, and the TLS
+  details and client certificate in `X-WebForCore-*` headers, which it strips from client requests. The worker applies them
+  through ASP.NET Core's public connection features, so `Request.UserHostAddress`, `IsSecureConnection`, `ClientCertificate`
+  and the `HTTPS_*`/`CERT_*` server variables are the client's.
+- **The worker side** (System.Web's `WorkerProcess`): a hosting startup (`ASPNETCORE_HOSTINGSTARTUPASSEMBLIES=System.Web`,
+  set by the host) makes Kestrel listen on the worker's socket only and applies the forwarded details, whatever the
+  application's Program.cs does. A worker stops when its stdin (a pipe from the host) closes, so it never outlives the host.
+  Without the host, an application that restarts stops its process, for whatever started it to start it again.
+- **Service managers:** webForCore has none of their code. The systemd notifier and the systemd unit in `tools/deploy`
+  are gone; service definitions and container images are a deployment's business.
+
+Removed with PseudoAppDomain: `UseWebForms(o => o.IsolateApplication(...))`, `RecyclingOptions.MaxStuckDomains`,
+`AddWebForms(o => o.Systemd = ...)`, the stuck-domain report and every release step (timers, events, GC handles,
+`DbProviderFactories` registrations, `WebRequest.DefaultWebProxy`, `NetworkChange`). Microsoft's code is back to its own
+behaviour where the emulation had changed it: `HttpRuntime`'s unload, `GCUtil`, `BuildManager`, `BuildManagerHost`,
+`ApplicationManager`, `ApplicationHost.CreateApplicationHost` (in the current domain, as with `CreateApplicationHostInCurrentDomain`).
+Mono's 5 `SimpleWorkerRequestTest` tests that create application hosts are skipped again (`lift_mono_tests.py`), as
+before PseudoAppDomain: they create several in the test process, and the hosting environment the first leaves broke 18
+other tests of the suite (membership, configuration, `SimpleWorkerRequest`'s application path).
+CONTRIBUTING.md now asks for no reflection into private members, no unsafe code and no code that manipulates the GC,
+and prefers slow, secure and stable code to premature optimisation (#57 lists the code that doesn't follow those yet).
+
+### Fixes the worker processes showed
+
+- **#49:** a restart while the next start was starting left the application answering 503 for good. `AspNetCoreHost`
+  remembers that it was stopped, and `CreateForMiddleware` signals a shutdown that happened during the start.
+- **App_Code loaded twice:** with System.Web in the default load context, `AssemblyBuilder` left
+  `CompilerResults.CompiledAssembly` unset, and CodeDom's getter loaded the compiled file with `Assembly.LoadFile`, into a
+  load context of its own. Pages bound to the default context's copy and `BuildManager.GetType` returned the other, so
+  a ListView with `ItemType` from App_Code failed ("The Select Method must return one of IQueryable<IISSample.Book>...")
+  whenever the worker compiled App_Code itself: the first start after a build or a Web.config change. It always loads into
+  System.Web's context now. The gate suites run each time from an empty Temporary ASP.NET Files (a temp folder of their
+  own), which shows it.
+- A restart during the worker's own startup stopped it before Kestrel had bound, and the application's `app.Run()`
+  threw `TaskCanceledException`. The worker stops once it has started.
+
+Gates: IIS 103, MVC 65, Web API 67 and the new Host.Tests 3 pass on Linux; `RecyclingTests` (IIS, MVC) replace the
+AppDomain tests. The package smoke test runs both applications under the host from the packages.

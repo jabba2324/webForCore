@@ -1,11 +1,11 @@
 ---
 name: migrate-to-webforcore
-description: Migrate an ASP.NET 4.x application (Web Forms, MVC 5, Web API 2, Web Pages, OWIN, SignalR 2, Identity 2) from .NET Framework/IIS to .NET 11 on Kestrel with webForCore, keeping its code, markup and web.config. Use when asked to port, migrate or run a System.Web app on .NET, Linux or Kestrel.
+description: Migrate an ASP.NET 4.x application (Web Forms, MVC 5, Web API 2, Web Pages, OWIN, SignalR 2, Identity 2) from .NET Framework/IIS to .NET 10 on Kestrel with webForCore, keeping its code, markup and web.config. Use when asked to port, migrate or run a System.Web app on .NET, Linux or Kestrel.
 ---
 
 # Agent instructions: migrating an ASP.NET 4.x app to webForCore
 
-You are migrating an existing ASP.NET 4.x application to run on .NET 11 with webForCore. webForCore provides
+You are migrating an existing ASP.NET 4.x application to run on .NET 10 with webForCore. webForCore provides
 System.Web and Microsoft's ASP.NET libraries, under their original assembly names, so the migration is mostly
 project and configuration work, not a rewrite. These instructions are self-contained. The human-oriented version is
 `docs/MIGRATING.md` in the webForCore repository. Read `docs/NAMESPACES.md` and `docs/IIS-COMPATIBILITY.md` there
@@ -91,7 +91,7 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
 ## Phase 2: Convert the project
 
 1. Copy the original project file to `<name>.csproj.netfx` (for reference; don't build it).
-2. Rewrite the project as `Microsoft.NET.Sdk.Web` targeting `net11.0`, with exactly the properties, import and items
+2. Rewrite the project as `Microsoft.NET.Sdk.Web` targeting `net10.0`, with exactly the properties, import and items
    in `docs/MIGRATING.md` section 2:
    - `OutputPath` `bin_dotnet`, with the target framework and runtime identifier not appended;
    - `GenerateDependencyFile` true;
@@ -146,7 +146,7 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
    `Content-Type`, `Set-Cookie` names, `Cache-Control`) and bodies. Ignore `Server`, `Date` and generated IDs. Explain
    each difference: either fix it, or confirm it's a documented platform difference (`docs/NAMESPACES.md`,
    `docs/IIS-COMPATIBILITY.md`).
-2. Run the app's own test projects. Migrate them to `net11.0` too if they reference the web project.
+2. Run the app's own test projects. Migrate them to `net10.0` too if they reference the web project.
 3. Check that these return 404: `/bin_dotnet/<AssemblyName>.dll`, `/web.config`, `/App_Data/`, a `.cs` file, and
    `/obj/`.
 4. Exercise login and logout, a form postback, session state, file upload and download, and anything the blocker
@@ -154,8 +154,8 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
 
 ## Phase 5: Deploy (only when the user asks)
 
-Follow `docs/MIGRATING.md` section 8: the site folder with `bin_dotnet/`, a systemd unit
-(`tools/deploy/webforcore@.service` in webForCore) or a container, one process per site folder, an explicit
+Follow `docs/MIGRATING.md` section 8: the site folder with `bin_dotnet/`, run under `webforcore-host` by the user's
+service manager or container runtime, one host per site folder, an explicit
 `<machineKey>`, and out-of-process session state before scaling out. Don't deploy, push or commit without the user's
 instruction.
 

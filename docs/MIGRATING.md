@@ -1,8 +1,8 @@
 # Migrating an ASP.NET 4.x app to webForCore
 
-This guide takes an existing Web Forms, MVC 5, Web API 2 or Web Pages application and runs it on .NET 11 with
+This guide takes an existing Web Forms, MVC 5, Web API 2 or Web Pages application and runs it on .NET 10 with
 webForCore, on Linux or Windows. The approach keeps the application's code, markup and `web.config`: the project
-becomes an SDK-style .NET 11 app whose `Program.cs` hosts the same ASP.NET pipeline on Kestrel.
+becomes an SDK-style .NET 10 app whose `Program.cs` hosts the same ASP.NET pipeline on Kestrel.
 
 For an AI agent doing the migration, the same procedure is written as instructions in
 [AGENT-MIGRATION.md](AGENT-MIGRATION.md).
@@ -72,7 +72,7 @@ hand, and keep a copy of the old `.csproj`. Then use `Microsoft.NET.Sdk.Web` wit
 ```xml
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
@@ -115,7 +115,7 @@ Two differences from .NET Framework projects come up when converting:
   `<GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>` and a reference to the
   `System.Resources.Extensions` package.
 - **The C# version.** .NET Framework projects compiled with the C# of their time: 7.3 by default, or what "latest" meant
-  then. On net11.0 the default is the newest, and C# 14's first-class span conversions resolve some calls differently
+  then. On net10.0 the default is the newest, and C# 14's first-class span conversions resolve some calls differently
   (`CS0029: Cannot implicitly convert type 'System.ReadOnlySpan<char>' to 'string'`, YAF.NET's ServiceStack.Text). Keep
   the project's: `<LangVersion>7.3</LangVersion>` if it set none, or 13 for "latest". C# 11's ref-safety rules apply on
   .NET 7 and later whatever the version (`CS8347 ... may expose variables referenced by parameter 'index'`): mark such a
@@ -229,7 +229,7 @@ These came up migrating real applications; each names one that needed it.
   <PackageReference Include="webForCore.Web.ApplicationServices" Version="0.6.0" ExcludeAssets="compile" />
   ```
 - **A package's .NET Standard build can have less than its `net45` build** (#31). NuGet picks the .NET Standard build
-  for .NET 11, and some packages built it with a smaller API. WindowsAzure.Storage 9.x has no synchronous blob methods
+  for .NET 10, and some packages built it with a smaller API. WindowsAzure.Storage 9.x has no synchronous blob methods
   there (`Exists`, `OpenRead`, ...: aspnet-mvc5-starter). Hangfire 1.6's has no OWIN extensions (`app.UseHangfireServer`),
   and its SqlServer storage can't look a connection string name up in web.config (MVCForum). Use the version's `net45`
   build, in every project that gets the package, the web project included:
@@ -255,10 +255,10 @@ These came up migrating real applications; each names one that needed it.
     `AppDomainSetup.ShadowCopyFiles` (`MissingMethodException`). Remove the packages, the `glimpse` configuration
     section, its module and handler in `<system.web>` and `<system.webServer>`, and the app's `GlimpseSecurityPolicy`
     class (ReaLocate).
-  - **AutoMapper before 12** throws while configuring a map on .NET 11 (`The type or method has 3 generic parameter(s),
+  - **AutoMapper before 12** throws while configuring a map (seen on .NET 11; not yet rechecked on .NET 10) (`The type or method has 3 generic parameter(s),
     but 1 generic argument(s) were provided`, or `... violates the constraint of type 'T'` from `MaxFloat`/`MaxInteger`):
     it scans `System.Linq.Enumerable`'s extension methods, non-public ones included. This isn't webForCore's: a .NET 11
-    console app does the same. AutoMapper 12 works; from 4.x the change is mostly `IMapperConfiguration` →
+    console app did the same. AutoMapper 12 works; from 4.x the change is mostly `IMapperConfiguration` →
     `IMapperConfigurationExpression` (ReaLocate). From 3.x's static `Mapper` it is a rewrite of the mapping code.
 
 ## 4. Program.cs
@@ -273,7 +273,7 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        builder.Services.AddWebForms();                 // IIS compression, W3C logging, systemd
+        builder.Services.AddWebForms();                 // IIS compression, W3C logging
         builder.Services.AddDistributedMemoryCache();   // session state (or Redis, SQL Server, ...)
         builder.Services.AddSession();
 
@@ -351,12 +351,22 @@ The first request compiles pages, as on IIS. Then compare the responses recorded
 
 ## 8. Deploy
 
-- **One process per app.** Deploy the site folder (`web.config` at the top, the build in `bin_dotnet/`) and run it
-  under systemd with `tools/deploy/webforcore@.service`. It maps the application pool's settings: identity, rapid-fail
-  protection, ping, shutdown time and memory limits. A container works the same way.
-- **In front:** a reverse proxy (nginx, Apache, a load balancer) for TLS and the public port, or Kestrel's own HTTPS.
-- **Recycling:** a `web.config`, `bin` or `App_Code` change restarts the app in-process, as IIS did. Set time,
-  request or memory recycling with `UseWebForms(o => o.Recycling(...))`.
+- **Under the host.** The `webForCore` package puts `webforcore-host` in the build output
+  (`bin_dotnet/webforcore-host/`). It plays the application pool's part: it owns the bindings and runs the app in
+  worker processes. Deploy the site folder (`web.config` at the top, the build in `bin_dotnet/`) and run
+  `dotnet bin_dotnet/webforcore-host/webforcore-host.dll` from it. Starting the host at boot, restarting it if it
+  ends, and its identity and resource limits are your service manager's job (systemd, a container runtime, a Windows
+  service), as they were Windows' for IIS: webForCore doesn't ship service definitions.
+- **Bindings belong to the host,** as they were IIS's: `--urls`, `ASPNETCORE_URLS`, or the `Kestrel` section of
+  `appsettings.json` (endpoints, certificates, `ClientCertificateMode`). The app's workers serve only the host, so
+  endpoints the app's `Program.cs` sets up itself (`ConfigureKestrel(k => k.Listen(...))`) would conflict: move them to
+  configuration. The host's own settings (startup and shutdown time limits, rapid-fail protection) are in the
+  `WebForCore:Host` section ([IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md#process-model)).
+- **In front:** a reverse proxy (nginx, Apache, a load balancer) for TLS and the public port, or the host's own HTTPS.
+- **Recycling:** a `web.config`, `bin` or `App_Code` change restarts the app in a new worker process, as IIS did; no
+  request fails, and those that arrive meanwhile wait for the new worker. Set time, request or memory recycling with
+  `UseWebForms(o => o.Recycling(...))`. Run without the host (`dotnet bin_dotnet/YourApp.dll`), the app stops when it
+  restarts, for whatever started it to start it again.
 - **Precompilation** (optional): `aspnetcore_compiler -v / -p <site> -b bin_dotnet [-u] <target>`, then copy the build
   into `<target>/bin_dotnet`. Use `-u` for updatable sites.
 - **Scaling out:** use out-of-process session state (Redis or SQL Server through ASP.NET Core's distributed cache) and

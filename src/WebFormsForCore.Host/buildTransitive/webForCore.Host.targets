@@ -1,0 +1,27 @@
+<Project>
+  <!-- webForCore.Host (#56): puts webforcore-host in the application's output folder (and its publish folder), in
+       webforcore-host/, with the name of the application it runs, so that
+         dotnet bin_dotnet/webforcore-host/webforcore-host.dll [host arguments: the bindings, as for ASP.NET Core]
+       runs the application as IIS did: in worker processes it recycles. -->
+  <PropertyGroup>
+    <_WebForCoreHostSource>$(MSBuildThisFileDirectory)..\tools\host\</_WebForCoreHostSource>
+  </PropertyGroup>
+
+  <Target Name="WebForCoreCopyHost" AfterTargets="Build" Condition="'$(OutputType)' == 'Exe'">
+    <ItemGroup>
+      <_WebForCoreHostFile Include="$(_WebForCoreHostSource)**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_WebForCoreHostFile)" DestinationFiles="@(_WebForCoreHostFile->'$(OutDir)webforcore-host\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+    <WriteLinesToFile File="$(OutDir)webforcore-host\webforcore-host.app" Lines="$(TargetFileName)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+  </Target>
+
+  <Target Name="WebForCorePublishHost" AfterTargets="Publish" Condition="'$(OutputType)' == 'Exe'">
+    <ItemGroup>
+      <_WebForCoreHostFile Include="$(_WebForCoreHostSource)**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_WebForCoreHostFile)" DestinationFiles="@(_WebForCoreHostFile->'$(PublishDir)webforcore-host\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+    <WriteLinesToFile File="$(PublishDir)webforcore-host\webforcore-host.app" Lines="$(TargetFileName)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+  </Target>
+</Project>

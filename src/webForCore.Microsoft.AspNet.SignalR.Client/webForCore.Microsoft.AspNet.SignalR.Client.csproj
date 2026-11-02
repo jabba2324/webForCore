@@ -3,7 +3,7 @@
   <!-- Lifted from SignalR/SignalR 7f53f26 (src/Microsoft.AspNet.SignalR.Client) by tools/lift/lift_aspnet.py.
        Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. Generated; do not edit. -->
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>Microsoft.AspNet.SignalR.Client</AssemblyName>
     <RootNamespace>Microsoft.AspNet.SignalR.Client</RootNamespace>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>

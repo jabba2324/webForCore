@@ -2,7 +2,7 @@
   <!-- Lifted from aspnet/AspNetKatana 096e225 (src/Microsoft.Owin.Cors/Microsoft.Owin.Cors.csproj) by tools/lift/lift_project.py.
        Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. -->
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>Microsoft.Owin.Cors</AssemblyName>
     <RootNamespace>Microsoft.Owin.Cors</RootNamespace>
     <PackageId>webForCore.Microsoft.Owin.Cors</PackageId>

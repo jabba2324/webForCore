@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net11.0</TargetFrameworks>
+        <TargetFrameworks>net10.0</TargetFrameworks>
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>disable</Nullable>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -15,9 +15,9 @@
         <PackageId>webForCore.Web</PackageId>
         <Title>WebFormsForCore.Web</Title>
         <Product>WebFormsForCore.Web</Product>
-        <Description>System.Web for webForCore: ASP.NET 4.x applications (Web Forms, MVC 5, Web API 2) on .NET 11 and Kestrel.</Description>
+        <Description>System.Web for webForCore: ASP.NET 4.x applications (Web Forms, MVC 5, Web API 2) on .NET 10 and Kestrel.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageTags>webforms;aspnet;system.web;porting;net11</PackageTags>
+        <PackageTags>webforms;aspnet;system.web;porting;net10</PackageTags>
         <IncludeSymbols>true</IncludeSymbols>
         <EmbedUntrackedSources>false</EmbedUntrackedSources>
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
@@ -84,20 +84,20 @@
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.401" PrivateAssets="All" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'net11.0'">
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
         <PackageReference Include="Microsoft.Build.Framework" Version="15.9.30" />
         <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.9.30" />
         <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.9.30" />
-        <PackageReference Include="System.Configuration.ConfigurationManager" Version="11.0.0-rc.3.26522.148" Aliases="NET" />
-        <PackageReference Include="System.DirectoryServices" Version="11.0.0-rc.3.26522.148" />
-        <PackageReference Include="System.DirectoryServices.AccountManagement" Version="11.0.0-rc.3.26522.148" />
-        <PackageReference Include="System.DirectoryServices.Protocols" Version="11.0.0-rc.3.26522.148" />
-        <PackageReference Include="System.Runtime.Caching" Version="11.0.0-rc.3.26522.148" />
-        <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="11.0.0-rc.3.26522.148" />
-        <PackageReference Include="System.Security.Cryptography.Pkcs" Version="11.0.0-rc.3.26522.148" />
+        <PackageReference Include="System.Configuration.ConfigurationManager" Version="10.0.14" Aliases="NET" />
+        <PackageReference Include="System.DirectoryServices" Version="10.0.14" />
+        <PackageReference Include="System.DirectoryServices.AccountManagement" Version="10.0.14" />
+        <PackageReference Include="System.DirectoryServices.Protocols" Version="10.0.14" />
+        <PackageReference Include="System.Runtime.Caching" Version="10.0.14" />
+        <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.14" />
+        <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
         <!-- webForCore: System.Drawing.Common 6.0 with GDI+ on SkiaSharp (src/webForCore.System.Drawing.Common), not the Windows-only package. -->
         <ProjectReference Include="..\webForCore.System.Drawing.Common\webForCore.System.Drawing.Common.csproj" Aliases="Common" />
-        <PackageReference Include="System.Data.OleDb" Version="11.0.0-rc.3.26522.148" />
+        <PackageReference Include="System.Data.OleDb" Version="10.0.14" />
     </ItemGroup>
 
     <ItemGroup>
@@ -144,9 +144,9 @@
             <!-- Do not import System.Configuration.ConfigurationManager version 8 -->
             <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Configuration.ConfigurationManager' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'(?i)system\.configuration\.configurationmanager[\\/]'))" />
             <!-- Do not import System.Web from dotnet -->
-            <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Web' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'[\\/]\.?dotnet[\\/]'))" />
+            <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Web' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'(?i)[\\/]microsoft\.netcore\.app\.ref[\\/]'))" />
             <!-- Do not import System.Drawing from dotnet -->
-            <!--<ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Drawing' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'[\\/]\.?dotnet[\\/]'))" />-->
+            <!--<ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Drawing' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'(?i)[\\/]microsoft\.netcore\.app\.ref[\\/]'))" />-->
         </ItemGroup>
     </Target>
 

@@ -1,6 +1,6 @@
 # Implemented namespaces and their caveats
 
-This page lists, assembly by assembly, the .NET Framework and ASP.NET namespaces webForCore provides on .NET 11, and
+This page lists, assembly by assembly, the .NET Framework and ASP.NET namespaces webForCore provides on .NET 10, and
 what doesn't work in each. "Lifted" assemblies are Microsoft's open-source code, copied and built for .NET (see
 [MODIFICATIONS.md](MODIFICATIONS.md)). "Ported" assemblies are WebFormsForCore's port of the .NET Framework reference
 source, with webForCore's changes.
@@ -31,7 +31,7 @@ in the code; the rest are from `LIFT.md`.
 | Web references | `App_WebReferences` (generates nothing) | Generate the proxy with `dotnet-svcutil` and compile it into the app |
 | Metafiles | EMF/WMF in System.Drawing | PNG/SVG |
 | `System.Runtime.Serialization.NetDataContractSerializer` in app code | Apps that use it directly (MVC Futures' `Html.Serialize` / `[Deserialize]` work: webForCore provides their serializer) | `DataContractSerializer` with a `DataContractResolver` |
-| BinaryFormatter in app code | .NET 11's `System.Runtime.Serialization.Formatters.Binary.BinaryFormatter` throws | `WebFormsForCore.Serialization.Formatters.Binary.BinaryFormatter` (System.Web uses it for session and view state) |
+| BinaryFormatter in app code | .NET's `System.Runtime.Serialization.Formatters.Binary.BinaryFormatter` throws (since .NET 9) | `WebFormsForCore.Serialization.Formatters.Binary.BinaryFormatter` (System.Web uses it for session and view state) |
 | Windows-DPAPI-encrypted configuration | Sections encrypted on Windows with `DataProtectionConfigurationProvider` | Decrypt them on Windows; re-encrypt with `webforcore-regiis` or RSA (see [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md#deployment-tools)) |
 | Code Access Security, partial trust | Trust levels, CAS attributes | Ignored: everything runs in full trust |
 | Registry, WMI, COM interop, MSMQ, Office | Windows only | Replace |
@@ -48,7 +48,7 @@ in the code; the rest are from `LIFT.md`.
 | `System.Web.UI.WebControls.WebParts` | 120 | Web Parts and personalization |
 | `System.Web.UI.HtmlControls`, `.Adapters`, `.WebControls.Adapters` | 74 | |
 | `System.Web.Configuration` | 152 | All `<system.web>` sections; configuration paths are case-insensitive |
-| `System.Web.Hosting` | 71 | `HostingEnvironment`, `VirtualPathProvider`, `ApplicationHost`, the PseudoAppDomain |
+| `System.Web.Hosting` | 71 | `HostingEnvironment`, `VirtualPathProvider`, `ApplicationHost`, webforcore-host's workers |
 | `System.Web.Compilation` | 34 | `BuildManager`; run-time compilation with Roslyn (C# and VB) |
 | `System.Web.ModelBinding` | 99 | Web Forms model binding |
 | `System.Web.Security` | 39 | Forms authentication, membership, roles, `MachineKey`, URL authorization |
@@ -106,16 +106,13 @@ Caveats:
 - `HttpUtility` follows .NET Framework 4.5+ (strict decoding); the 4.0 compatibility quirks of apps without
   `targetFramework` aren't emulated.
 - A `.resx` file reference to an icon (`ResXFileRef` of type `Icon`) throws off Windows.
-- **Restarts and `MemoryCache`:** an old application domain is collected after a restart. `MemoryCache.Default` is
-  disposed with it, but a `new MemoryCache(...)` the application creates holds the domain until it is disposed (.NET
-  Framework disposed it on `DomainUnload`; .NET's no longer does): dispose it in `Application_End`.
-- `ApplicationHost.CreateApplicationHost` returns an object in a PseudoAppDomain without remoting; call it through
-  `dynamic` or reflection.
+- `ApplicationHost.CreateApplicationHost` creates the host in the current process (.NET has one AppDomain), without
+  remoting: once per process, since a process has one hosting environment ("Only one HostingEnvironment is allowed in
+  an AppDomain" the second time), and that environment stays for the life of the process.
 - **`AppDomain.CurrentDomain.BaseDirectory` is the build output (`bin_dotnet/`), not the site.** On IIS each
   application ran in its own AppDomain whose `ApplicationBase` was the site's folder (with `bin` as its private bin
   path), so `BaseDirectory` and `AppContext.BaseDirectory` were the site root. .NET has one AppDomain per process, whose
-  base directory is the entry assembly's folder; a PseudoAppDomain (an `AssemblyLoadContext`) has none of its own, and
-  .NET libraries rely on it being the build output. Code that reads files next to the site through it should use
+  base directory is the entry assembly's folder, and .NET libraries rely on it being the build output. Code that reads files next to the site through it should use
   `HttpRuntime.AppDomainAppPath`, `HostingEnvironment.ApplicationPhysicalPath` or `Server.MapPath("~/...")`, which are
   the site root as on IIS (#3). `AppDomain.CurrentDomain.SetupInformation.ApplicationBase` is the same as `BaseDirectory`.
 - **Behaviour .NET changes everywhere:** `ArgumentException.Message` ends with `(Parameter 'name')`; ICU cultures

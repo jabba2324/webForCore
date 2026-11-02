@@ -108,8 +108,6 @@ using System.Runtime.Loader;
             // WOS 1983175: (weird) only the handler in the default domain is notified when there is an AV in a native module
             // while we're in a call to MgdIndicateCompletion.
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(OnUnhandledException);
-            // webForCore: see BuildManager (the event is process-wide).
-            PseudoAppDomain.OnUnload(typeof(ApplicationManager).Assembly, () => AppDomain.CurrentDomain.UnhandledException -= OnUnhandledException);
         }
 
         internal bool ShutdownInProgress {
