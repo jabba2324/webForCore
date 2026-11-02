@@ -789,7 +789,11 @@ namespace System.Web
 
         private void StartMonitoringDirectoryRenamesAndBinDirectory() {
 
-            if (OSInfo.IsWindows) _fcm.StartMonitoringDirectoryRenamesAndBinDirectory(AppDomainAppPathInternal, new FileChangeEventHandler(this.OnCriticalDirectoryChange));
+            // webForCore: on every platform, as in the reference source (#51). WebFormsForCore watched bin and the critical
+            // directories (App_Code, App_GlobalResources, ...) only on Windows, so on Linux a change there didn't restart
+            // the application. Off Windows, the watch of the site's subdirectories for renames is an inotify watch per
+            // directory (fs.inotify.max_user_watches).
+            _fcm.StartMonitoringDirectoryRenamesAndBinDirectory(AppDomainAppPathInternal, new FileChangeEventHandler(this.OnCriticalDirectoryChange));
         }
 
         //
@@ -797,7 +801,7 @@ namespace System.Web
         //
         internal static void StartListeningToLocalResourcesDirectory(VirtualPath virtualDir) {
 #if !FEATURE_PAL // FEATURE_PAL does not enable file change notification
-            if (OSInfo.IsWindows) _theRuntime._fcm.StartListeningToLocalResourcesDirectory(virtualDir);
+            _theRuntime._fcm.StartListeningToLocalResourcesDirectory(virtualDir); // webForCore: on every platform (#51)
 #endif // !FEATURE_PAL
         }
 

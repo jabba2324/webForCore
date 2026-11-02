@@ -102,7 +102,8 @@ These aren't lifts. They change WebFormsForCore's port, and each has a `webForCo
 - **File change notifications off Windows** (`FileChangesMonitor.cs`, `Util/FileUtil.cs`): `FindFileData` names a
   file as `FindFirstFile` does (its name, or its path relative to the monitored root, without the Windows-only parent
   walk), and the `FileSystemWatcher` that replaces `ReadDirectoryChangesW` reports names relative to the watched
-  directory, as `ReadDirectoryChangesW` does (#2).
+  directory, as `ReadDirectoryChangesW` does (#2). `bin` and the critical directories (`App_Code`, ...) are watched
+  on every platform, as in the reference source; WebFormsForCore watched them only on Windows (`HttpRuntime.cs`, #51).
 - **No ASP.NET telemetry** (`TelemetryLogger.cs`): .NET Framework wrote handler, provider and target-framework events
   to Windows' telemetry (`TelemetryEventSource`, in a provider group Windows' telemetry service enables). webForCore
   writes none; on Windows, TraceLogging's per-thread type cache also kept an application's domain alive (#46).

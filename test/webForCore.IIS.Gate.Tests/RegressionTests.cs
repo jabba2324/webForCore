@@ -240,5 +240,16 @@ namespace IISGate
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Contains("same type: True", body);
         }
+
+        // #50: the AppDomain's "DataDirectory" is the site's App_Data, as HttpRuntime sets it on IIS. Bonobo Git Server's
+        // System.Data.SQLite expands |DataDirectory| from it, and created its database in bin_dotnet/ (on Windows, a
+        // change in bin that restarted the application on every write).
+        [Fact]
+        public async Task DataDirectoryIsTheSitesAppData()
+        {
+            var (response, body) = await Get("/regressions/DataDirectory.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("is App_Data: True", body);
+        }
     }
 }

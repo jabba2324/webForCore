@@ -115,6 +115,8 @@ Caveats:
   base directory is the entry assembly's folder, and .NET libraries rely on it being the build output. Code that reads files next to the site through it should use
   `HttpRuntime.AppDomainAppPath`, `HostingEnvironment.ApplicationPhysicalPath` or `Server.MapPath("~/...")`, which are
   the site root as on IIS (#3). `AppDomain.CurrentDomain.SetupInformation.ApplicationBase` is the same as `BaseDirectory`.
+- **`AppDomain.CurrentDomain.GetData("DataDirectory")`** is the site's `App_Data`, as on IIS, for data providers that
+  expand `|DataDirectory|` (#50).
 - **Behaviour .NET changes everywhere:** `ArgumentException.Message` ends with `(Parameter 'name')`; ICU cultures
   (set `<PredefinedCulturesOnly>true` to keep .NET Framework's `CultureNotFoundException`); `\n` newlines; paths are
   case-sensitive and `\` isn't a separator.

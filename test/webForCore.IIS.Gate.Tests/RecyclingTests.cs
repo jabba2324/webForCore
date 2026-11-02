@@ -169,5 +169,26 @@ namespace IISGate
             Assert.Equal(1, after.Starts);
             Assert.Matches($@"Worker \d+ \(process {before.Process}\) exited unexpectedly \(42\)", _server.Output);
         }
+
+        // #51: a change in bin or App_Code restarts the application, as on IIS, on every platform. On Linux only Web.config
+        // did: a deployment that replaced the application's DLLs kept running the old code (found running the smoke
+        // test's applications on Linux: MvcMovie's bin_dotnet, MiniBlog's App_Code).
+        [Theory]
+        [InlineData("bin_dotnet", "restart.gate")]
+        [InlineData("App_Code", "DomainState.cs")]
+        public async Task BinAndAppCodeChangesRestartTheApplication(string folder, string file)
+        {
+            var before = await Current();
+            var path = Path.Combine(_server.SampleDirectory, folder, file);
+            if (file.EndsWith(".cs")) File.SetLastWriteTimeUtc(path, DateTime.UtcNow);
+            else File.WriteAllText(path, DateTime.UtcNow.ToString("O"));
+            var after = await Next(before, TimeSpan.FromSeconds(30));
+            if (!file.EndsWith(".cs"))
+            {
+                // Removing it is a change in bin too: the next test starts after that restart.
+                File.Delete(path);
+                await Next(after, TimeSpan.FromSeconds(30));
+            }
+        }
     }
 }

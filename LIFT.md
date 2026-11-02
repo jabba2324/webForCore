@@ -2152,3 +2152,29 @@ and prefers slow, secure and stable code to premature optimisation (#57 lists th
 
 Gates: IIS 103, MVC 65, Web API 67 and the new Host.Tests 3 pass on Linux; `RecyclingTests` (IIS, MVC) replace the
 AppDomain tests. The package smoke test runs both applications under the host from the packages.
+
+## Fixes from the smoke test's fifth round (2 Nov 2026)
+
+The fifth round ran every migrated application on the 0.6.0 packages, on Linux and on Windows (#49, #50, #51, #52).
+#49 and #52 are fixed by process recycling (above).
+
+### DataDirectory (#50)
+
+`HttpRuntime.SetUpDataDirectory` puts `DataDirectory` in the application's own data (`ApplicationManager.SetLoadContextData`),
+which only webForCore's `SqlConnectionHelper` reads. Data providers that expand `|DataDirectory|` themselves read
+`AppDomain.CurrentDomain.GetData`, which was null: Bonobo Git Server's System.Data.SQLite created its database in
+`bin_dotnet/`. `AspNetCoreHost.CreateForMiddleware` now also sets the AppDomain's, to the site's `App_Data`. A worker
+process runs one application, so it is that application's. No Microsoft code changes. **Test:**
+`RegressionTests.DataDirectoryIsTheSitesAppData`.
+
+### bin and App_Code changes on Linux (#51)
+
+WebFormsForCore's Linux support (867cb6d1) started the monitoring of `bin` and the critical directories (`App_Code`,
+`App_GlobalResources`, `App_Browsers`, `App_WebReferences`, `App_LocalResources`) only on Windows, in
+`HttpRuntime.StartMonitoringDirectoryRenamesAndBinDirectory` and `StartListeningToLocalResourcesDirectory`, so on Linux
+only `web.config` restarted the application. File change notifications work on every platform since the lift
+(`FileChangesMonitor.cs`, above), so the two `OSInfo.IsWindows` guards are removed: **this changes the reference
+source port** (`HttpRuntime.cs`), back to the reference source's own lines. Off Windows the watch of the site's
+subdirectories for renames is one inotify watch per directory (`fs.inotify.max_user_watches`). **Test:**
+`RecyclingTests.BinAndAppCodeChangesRestartTheApplication` (a file written in `bin_dotnet`; `App_Code/DomainState.cs`
+touched), each needing a new worker process.
