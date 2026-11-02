@@ -2070,7 +2070,9 @@ An SDK newer than the target framework takes the targeting pack from the NuGet c
 repository for net10.0 with the .NET 11 SDK failed with 166 × CS0433, and so would an application on the packages built
 that way. All of them now match the pack's name, case-insensitively: `(?i)[\\/]microsoft\.netcore\.app\.ref[\\/]`
 (and `Microsoft.(NETCore|AspNetCore).App.Ref` for HttpUtility). `tools/ci/package-smoke.sh` builds its application a
-second time with the newest SDK installed (CI: 11.0 RC), which failed with the old patterns.
+second time with an empty `NetCoreTargetingPackRoot`, so that the SDK takes the targeting pack from the NuGet cache, which
+failed with the old patterns (CS0433 for `HttpUtility`/`IHtmlString` in the application's compiled `Markup.cs`). A newer SDK
+alone doesn't show it when the same dotnet root also has the target's pack, as CI's setup-dotnet installs do.
 
 ### Docs
 

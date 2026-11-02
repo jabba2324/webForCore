@@ -43,7 +43,7 @@
     <Target Name="DropFrameworkSystemWeb" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">
         <ItemGroup>
             <!-- Do not import System.Web from dotnet -->
-            <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Web' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'[\\/]\.?dotnet[\\/]'))" />
+            <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Web' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'(?i)[\\/]microsoft\.netcore\.app\.ref[\\/]'))" />
         </ItemGroup>
     </Target>
 

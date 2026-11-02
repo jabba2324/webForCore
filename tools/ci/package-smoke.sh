@@ -54,6 +54,14 @@ log=$(ls "$base"/logs/site/W3SVC1/ 2>/dev/null | head -1 || true)
 if [ $fail -ne 0 ]; then cat server.log; exit 1; fi
 kill $server; wait $server 2>/dev/null || true
 
+# The same application with its targeting pack taken from the NuGet cache (#55), as when an SDK newer than the target
+# framework builds it: the packages must drop the framework's System.Web.HttpUtility wherever the pack is (CS0433 for
+# HttpUtility and IHtmlString in Markup.cs otherwise). An empty NetCoreTargetingPackRoot makes the SDK download the pack
+# (its package pruning data is in the packs folder too: AllowMissingPrunePackageData).
+nugetpack=$base/nuget-pack; mkdir "$nugetpack" "$base/no-packs"
+cp -r "$here/package-smoke/." "$nugetpack"; cp nuget.config global.json "$nugetpack"
+(cd "$nugetpack" && dotnet build Smoke.csproj -c Release -p:WebForCoreVersion="$version" -p:NetCoreTargetingPackRoot="$base/no-packs" -p:AllowMissingPrunePackageData=true -nodeReuse:false)
+
 # tools/ci/package-smoke-mvc: MVC 5 and OWIN with the third-party packages applications have, as they have them.
 mvc=$base/mvc; mkdir "$mvc"
 cp -r "$here/package-smoke-mvc/." "$mvc"

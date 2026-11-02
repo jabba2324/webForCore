@@ -240,7 +240,7 @@
                 <Aliases>Core</Aliases>
             </ReferencePath>
             <!-- Do not import System.Web -->
-            <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Web' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'[\\/]\.?dotnet[\\/]'))" />
+            <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Web' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'(?i)[\\/]microsoft\.netcore\.app\.ref[\\/]'))" />
         </ItemGroup>
     </Target>
 

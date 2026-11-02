@@ -56,7 +56,7 @@
             <!-- Do not import the NuGet System.Configuration.ConfigurationManager (the fork provides its own) -->
             <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Configuration.ConfigurationManager' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'(?i)system\.configuration\.configurationmanager[\\/]'))" />
             <!-- Do not import System.Web from dotnet -->
-            <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Web' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'[\\/]\.?dotnet[\\/]'))" />
+            <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Web' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'(?i)[\\/]microsoft\.netcore\.app\.ref[\\/]'))" />
         </ItemGroup>
     </Target>
 </Project>

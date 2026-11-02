@@ -68,10 +68,7 @@ jobs:
       - name: Set up .NET (global.json)
         uses: actions/setup-dotnet@v4
         with:
-          # .NET 10 builds webForCore (global.json); the newer SDK builds the package smoke test once more (#55).
-          dotnet-version: |
-            10.0.x
-            11.0.100-rc.3.26522.148
+          dotnet-version: 10.0.x
 
       - name: System packages
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fontconfig fonts-dejavu-core libfontconfig1
@@ -146,10 +143,7 @@ jobs:
       - name: Set up .NET (global.json)
         uses: actions/setup-dotnet@v4
         with:
-          # .NET 10 builds webForCore (global.json); the newer SDK builds the package smoke test once more (#55).
-          dotnet-version: |
-            10.0.x
-            11.0.100-rc.3.26522.148
+          dotnet-version: 10.0.x
 
       - name: Build the build tasks
         run: dotnet build src/WebFormsForCore.Build/WebFormsForCore.Build.csproj -c Release

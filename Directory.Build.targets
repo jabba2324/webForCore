@@ -15,7 +15,7 @@
       <_WebForCoreHasSystemWeb Condition="'@(_WebForCoreSystemWeb)' != ''">true</_WebForCoreHasSystemWeb>
     </PropertyGroup>
     <ItemGroup Condition="'$(_WebForCoreHasSystemWeb)' == 'true'">
-      <ReferencePath Remove="@(ReferencePath)" Condition="'%(FileName)' == 'System.Web.HttpUtility' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(FullPath),'[\\/]packs[\\/]Microsoft\.(NETCore|AspNetCore)\.App\.Ref[\\/]'))" />
+      <ReferencePath Remove="@(ReferencePath)" Condition="'%(FileName)' == 'System.Web.HttpUtility' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(FullPath),'(?i)[\\/]Microsoft\.(NETCore|AspNetCore)\.App\.Ref[\\/]'))" />
     </ItemGroup>
   </Target>
 </Project>
