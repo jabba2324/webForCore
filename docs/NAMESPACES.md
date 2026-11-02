@@ -107,7 +107,8 @@ Caveats:
   `targetFramework` aren't emulated.
 - A `.resx` file reference to an icon (`ResXFileRef` of type `Icon`) throws off Windows.
 - `ApplicationHost.CreateApplicationHost` creates the host in the current process (.NET has one AppDomain), without
-  remoting.
+  remoting: once per process, since a process has one hosting environment ("Only one HostingEnvironment is allowed in
+  an AppDomain" the second time), and that environment stays for the life of the process.
 - **`AppDomain.CurrentDomain.BaseDirectory` is the build output (`bin_dotnet/`), not the site.** On IIS each
   application ran in its own AppDomain whose `ApplicationBase` was the site's folder (with `bin` as its private bin
   path), so `BaseDirectory` and `AppContext.BaseDirectory` were the site root. .NET has one AppDomain per process, whose

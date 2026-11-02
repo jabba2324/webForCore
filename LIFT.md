@@ -2130,6 +2130,9 @@ Removed with PseudoAppDomain: `UseWebForms(o => o.IsolateApplication(...))`, `Re
 `DbProviderFactories` registrations, `WebRequest.DefaultWebProxy`, `NetworkChange`). Microsoft's code is back to its own
 behaviour where the emulation had changed it: `HttpRuntime`'s unload, `GCUtil`, `BuildManager`, `BuildManagerHost`,
 `ApplicationManager`, `ApplicationHost.CreateApplicationHost` (in the current domain, as with `CreateApplicationHostInCurrentDomain`).
+Mono's 5 `SimpleWorkerRequestTest` tests that create application hosts are skipped again (`lift_mono_tests.py`), as
+before PseudoAppDomain: they create several in the test process, and the hosting environment the first leaves broke 18
+other tests of the suite (membership, configuration, `SimpleWorkerRequest`'s application path).
 CONTRIBUTING.md now asks for no reflection into private members, no unsafe code and no code that manipulates the GC,
 and prefers slow, secure and stable code to premature optimisation (#57 lists the code that doesn't follow those yet).
 

@@ -60,15 +60,13 @@ FIXUPS = {
     **{f: [("using System.Runtime.Serialization.Formatters.Binary;",
             "using BinaryFormatter = WebFormsForCore.Serialization.Formatters.Binary.BinaryFormatter; // webForCore: the fork's port, as its System.Web uses", 1)]
        for f in ("System.Web/HttpCookieTest.cs", "System.Web.Caching/OutputCacheTest.cs")},
-    # ApplicationHost.CreateApplicationHost creates the host in a PseudoAppDomain (the fork's stand-in for an AppDomain);
-    # there is no remoting, so the host is the new domain's own Host type, which the test's Host type cannot be cast
-    # from. The tests reach it through dynamic, as a caller does without a transparent proxy.
+    # ApplicationHost.CreateApplicationHost creates an AppDomain for the host. .NET has one AppDomain per process, so
+    # webForCore creates the host in the calling process (#56): once per process, and its hosting environment stays.
+    # These tests create several, in the test process. Skipped visibly, like the Web Stack's AppDomain tests.
     "System.Web.Hosting/SimpleWorkerRequestTest.cs": [
-        ("\t\tHost MakeHost (string virtualDir)\n\t\t{\n\t\t\treturn (Host) ApplicationHost.CreateApplicationHost (typeof (Host), virtualDir, cwd);",
-         "\t\t// webForCore: the host is the PseudoAppDomain's Host type (no remoting proxy); reached through dynamic.\n"
-         "\t\tdynamic MakeHost (string virtualDir)\n\t\t{\n\t\t\treturn ApplicationHost.CreateApplicationHost (typeof (Host), virtualDir, cwd);", 1),
-        ("\t\tHost MakeHost ()\n", "\t\tdynamic MakeHost ()\n", 1),
-        ("\t\t\tHost h = MakeHost (", "\t\t\tdynamic h = MakeHost (", 5),
+        (f"public void {m} ()",
+         f'[Ignore ("webForCore: needs ApplicationHost.CreateApplicationHost to create a new AppDomain; .NET has one per process")]\n\t\tpublic void {m} ()', 1)
+        for m in ("AppDomainTests", "AppDomain_MapPath1", "AppDomain_MapPath2", "AppDomain_MapPath3", "AppDomain_MapPath4")
     ],
     # HtmlInputRadioButton.RenderAttributes writes the value with HtmlTextWriter.WriteAttribute(name, value), which
     # calls WriteAttribute(name, value, false /*encode*/) (referencesource HtmlInputRadioButton.cs, HTMLTextWriter.cs:1147);
