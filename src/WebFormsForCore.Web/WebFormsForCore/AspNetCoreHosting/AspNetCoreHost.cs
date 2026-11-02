@@ -135,6 +135,11 @@ namespace System.Web.Hosting
             bool useClassicMode, bool useAspNetCoreSession, bool iisModules, Action onShutdown)
         {
             AssemblyLoaderNetCore.Init();
+            // webForCore: HttpRuntime sets "DataDirectory" in the application's load-context data
+            // (ApplicationManager.SetLoadContextData); on IIS it is the AppDomain's, where data providers that expand
+            // |DataDirectory| themselves read it (System.Data.SQLite: Bonobo Git Server's database was created in
+            // bin_dotnet; SqlClient's AttachDbFilename). One application per worker process, so it is that application's (#50).
+            AppDomain.CurrentDomain.SetData("DataDirectory", Path.Combine(physicalPath, HttpRuntime.DataDirectoryName));
             if (iisModules) WebFormsForCore.Hosting.IIS.WebServerModules.Configuration = new WebFormsForCore.Hosting.IIS.WebServerConfiguration(physicalPath);
             if (useAspNetCoreSession) SessionState.SessionStateModule.UseAspNetCoreSessionProvider();
 
