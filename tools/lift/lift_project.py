@@ -19,103 +19,103 @@ import fnmatch, glob, json, os, re, shutil, subprocess, sys
 PROJECTS = {
     "System.Net.Http.Formatting": dict(source="webstack:src/System.Net.Http.Formatting.ns2_0/System.Net.Http.Formatting.ns2_0.csproj",
                                        tfm="netstandard2.0", roots=["src/System.Net.Http.Formatting.ns2_0", "src/System.Net.Http.Formatting"]),
-    "System.Web.Razor": dict(source="spike:System.Web.Razor", tfm="net11.0", roots=["src/System.Web.Razor"]),
-    "System.Web.Http": dict(source="spike:System.Web.Http", tfm="net11.0", roots=["src/System.Web.Http"]),
-    "System.Web.Cors": dict(source="spike:System.Web.Cors", tfm="net11.0", roots=["src/System.Web.Cors"]),
-    "System.Web.Http.Cors": dict(source="spike:System.Web.Http.Cors", tfm="net11.0", roots=["src/System.Web.Http.Cors"]),
+    "System.Web.Razor": dict(source="spike:System.Web.Razor", tfm="net10.0", roots=["src/System.Web.Razor"]),
+    "System.Web.Http": dict(source="spike:System.Web.Http", tfm="net10.0", roots=["src/System.Web.Http"]),
+    "System.Web.Cors": dict(source="spike:System.Web.Cors", tfm="net10.0", roots=["src/System.Web.Cors"]),
+    "System.Web.Http.Cors": dict(source="spike:System.Web.Http.Cors", tfm="net10.0", roots=["src/System.Web.Http.Cors"]),
     # Test projects go to test/. Multi-targeting SDK projects are evaluated for their net8.0 item set.
-    "Microsoft.TestCommon": dict(source="webstack:test/Microsoft.TestCommon/Microsoft.TestCommon.csproj", tfm="net11.0",
+    "Microsoft.TestCommon": dict(source="webstack:test/Microsoft.TestCommon/Microsoft.TestCommon.csproj", tfm="net10.0",
                                  roots=["test/Microsoft.TestCommon"], eval_tfm="net8.0", test=True, runner=False,
                                  # Assert.ThrowsHttpException (MVC tests) needs System.Web, which the fork provides on .NET.
                                  fork_refs=["src/WebFormsForCore.Web/WebFormsForCore.Web.csproj"],
                                  # Built for .NET Framework only by Microsoft; it needs nothing .NET lacks.
                                  compile_extra=["WebUtils.cs"]),
     "System.Net.Http.Formatting.Test": dict(source="webstack:test/System.Net.Http.Formatting.ns2_0.Test/System.Net.Http.Formatting.ns2_0.Test.csproj",
-                                            tfm="net11.0", roots=["test/System.Net.Http.Formatting.ns2_0.Test", "test/System.Net.Http.Formatting.Test"],
+                                            tfm="net10.0", roots=["test/System.Net.Http.Formatting.ns2_0.Test", "test/System.Net.Http.Formatting.Test"],
                                             eval_tfm="net8.0", test=True),
-    "System.Web.Razor.Test": dict(source="spike:System.Web.Razor.Test", tfm="net11.0", roots=["test/System.Web.Razor.Test"], test=True),
-    "System.Web.Http.Test": dict(source="spike:System.Web.Http.Test", tfm="net11.0", roots=["test/System.Web.Http.Test"], test=True),
-    "System.Web.Cors.Test": dict(source="spike:System.Web.Cors.Test", tfm="net11.0", roots=["test/System.Web.Cors.Test"], test=True),
-    "System.Web.Http.Cors.Test": dict(source="spike:System.Web.Http.Cors.Test", tfm="net11.0", roots=["test/System.Web.Http.Cors.Test"], test=True),
+    "System.Web.Razor.Test": dict(source="spike:System.Web.Razor.Test", tfm="net10.0", roots=["test/System.Web.Razor.Test"], test=True),
+    "System.Web.Http.Test": dict(source="spike:System.Web.Http.Test", tfm="net10.0", roots=["test/System.Web.Http.Test"], test=True),
+    "System.Web.Cors.Test": dict(source="spike:System.Web.Cors.Test", tfm="net10.0", roots=["test/System.Web.Cors.Test"], test=True),
+    "System.Web.Http.Cors.Test": dict(source="spike:System.Web.Http.Cors.Test", tfm="net10.0", roots=["test/System.Web.Http.Cors.Test"], test=True),
     # Phase 3: Web API on System.Web and OWIN.
-    "System.Web.Http.WebHost": dict(source="spike:System.Web.Http.WebHost", tfm="net11.0", roots=["src/System.Web.Http.WebHost"]),
-    "System.Web.Http.Owin": dict(source="spike:System.Web.Http.Owin", tfm="net11.0", roots=["src/System.Web.Http.Owin"]),
-    "System.Web.Http.WebHost.Test": dict(source="spike:System.Web.Http.WebHost.Test", tfm="net11.0", roots=["test/System.Web.Http.WebHost.Test"],
+    "System.Web.Http.WebHost": dict(source="spike:System.Web.Http.WebHost", tfm="net10.0", roots=["src/System.Web.Http.WebHost"]),
+    "System.Web.Http.Owin": dict(source="spike:System.Web.Http.Owin", tfm="net10.0", roots=["src/System.Web.Http.Owin"]),
+    "System.Web.Http.WebHost.Test": dict(source="spike:System.Web.Http.WebHost.Test", tfm="net10.0", roots=["test/System.Web.Http.WebHost.Test"],
                                          test=True),
     # OwinHostIntegrationTest runs Web API on Katana's HttpListener server (unmapped in the spike project).
-    "System.Web.Http.Owin.Test": dict(source="spike:System.Web.Http.Owin.Test", tfm="net11.0", roots=["test/System.Web.Http.Owin.Test"], test=True,
+    "System.Web.Http.Owin.Test": dict(source="spike:System.Web.Http.Owin.Test", tfm="net10.0", roots=["test/System.Web.Http.Owin.Test"], test=True,
                                       extra_refs=["Microsoft.Owin.Hosting", "Microsoft.Owin.Host.HttpListener"]),
     # Katana (aspnet/AspNetKatana, beside the Web Stack checkout). SDK-style net45 projects built with Arcade, so they are
     # not evaluated with MSBuild: the items are the project folder's default globs plus the csproj's explicit items.
     # Phase 4: MVC without view compilation. MVC references WebPages and WebPages.Razor, which reference Deployment.
-    "System.Web.WebPages.Deployment": dict(source="spike:System.Web.WebPages.Deployment", tfm="net11.0", roots=["src/System.Web.WebPages.Deployment"]),
-    "System.Web.WebPages": dict(source="spike:System.Web.WebPages", tfm="net11.0", roots=["src/System.Web.WebPages"]),
-    "System.Web.WebPages.Razor": dict(source="spike:System.Web.WebPages.Razor", tfm="net11.0", roots=["src/System.Web.WebPages.Razor"]),
-    "System.Web.Mvc": dict(source="spike:System.Web.Mvc", tfm="net11.0", roots=["src/System.Web.Mvc"],
+    "System.Web.WebPages.Deployment": dict(source="spike:System.Web.WebPages.Deployment", tfm="net10.0", roots=["src/System.Web.WebPages.Deployment"]),
+    "System.Web.WebPages": dict(source="spike:System.Web.WebPages", tfm="net10.0", roots=["src/System.Web.WebPages"]),
+    "System.Web.WebPages.Razor": dict(source="spike:System.Web.WebPages.Razor", tfm="net10.0", roots=["src/System.Web.WebPages.Razor"]),
+    "System.Web.Mvc": dict(source="spike:System.Web.Mvc", tfm="net10.0", roots=["src/System.Web.Mvc"],
                            exclude=["LinqBinaryModelBinder.cs"],  # System.Data.Linq: see the FIXUPS
                            # Microsoft.AspNet.Mvc depends on Microsoft.AspNet.WebPages, which contains System.Web.Helpers,
                            # so MVC 5 applications have it and web.configs list it (#28, MVCForum). The reference makes
                            # the webForCore.Web.Mvc package depend on webForCore.Web.Helpers.
                            fork_refs=["src/webForCore.System.Web.Helpers/webForCore.System.Web.Helpers.csproj"]),
-    "System.Web.Mvc.Test": dict(source="spike:System.Web.Mvc.Test", tfm="net11.0", roots=["test/System.Web.Mvc.Test"], test=True,
+    "System.Web.Mvc.Test": dict(source="spike:System.Web.Mvc.Test", tfm="net10.0", roots=["test/System.Web.Mvc.Test"], test=True,
                                 fork_refs=["src/WebFormsForCore.Serialization.Formatters/WebFormsForCore.Serialization.Formatters.csproj"],
                                 exclude=["Test/LinqBinaryModelBinderTest.cs"]),  # System.Data.Linq: see the FIXUPS
     # Phase 5: views. System.Web.Helpers needs System.Web.WebPages (lifted in phase 4).
-    "System.Web.Helpers": dict(source="spike:System.Web.Helpers", tfm="net11.0", roots=["src/System.Web.Helpers"]),
+    "System.Web.Helpers": dict(source="spike:System.Web.Helpers", tfm="net10.0", roots=["src/System.Web.Helpers"]),
     # ICU creates any well-formed culture name; .NET Framework (Windows) threw CultureNotFoundException for unknown ones.
     # PredefinedCulturesOnly restores that (an app setting; see LIFT.md).
-    "System.Web.WebPages.Test": dict(source="spike:System.Web.WebPages.Test", tfm="net11.0", roots=["test/System.Web.WebPages.Test"], test=True,
+    "System.Web.WebPages.Test": dict(source="spike:System.Web.WebPages.Test", tfm="net10.0", roots=["test/System.Web.WebPages.Test"], test=True,
                                      properties={"PredefinedCulturesOnly": "true"},
                                      # HttpAntiForgeryException is TypeForwardedFrom System.Web.Mvc 2.0: reading it back resolves
                                      # System.Web.Mvc and follows its type forward (on .NET Framework, from the GAC).
                                      # (extern alias: its types would clash with WebPages' own).
                                      alias_refs={"System.Web.Mvc": "SystemWebMvc"},
                                      fork_refs=["src/WebFormsForCore.Serialization.Formatters/WebFormsForCore.Serialization.Formatters.csproj"]),
-    "System.Web.WebPages.Razor.Test": dict(source="spike:System.Web.WebPages.Razor.Test", tfm="net11.0", roots=["test/System.Web.WebPages.Razor.Test"], test=True,
+    "System.Web.WebPages.Razor.Test": dict(source="spike:System.Web.WebPages.Razor.Test", tfm="net10.0", roots=["test/System.Web.WebPages.Razor.Test"], test=True,
                                            app_config=True),
-    "System.Web.WebPages.Deployment.Test": dict(source="spike:System.Web.WebPages.Deployment.Test", tfm="net11.0",
+    "System.Web.WebPages.Deployment.Test": dict(source="spike:System.Web.WebPages.Deployment.Test", tfm="net10.0",
                                                 roots=["test/System.Web.WebPages.Deployment.Test"], test=True),
-    "System.Web.Helpers.Test": dict(source="spike:System.Web.Helpers.Test", tfm="net11.0", roots=["test/System.Web.Helpers.Test"], test=True),
+    "System.Web.Helpers.Test": dict(source="spike:System.Web.Helpers.Test", tfm="net10.0", roots=["test/System.Web.Helpers.Test"], test=True),
     # MVC Futures (the Microsoft.AspNet.Mvc.Futures package).
     # Microsoft builds Futures unsigned (SignAssembly false, as the package on nuget.org is), with MVC's version.
-    "Microsoft.Web.Mvc": dict(source="spike:Microsoft.Web.Mvc", tfm="net11.0", roots=["src/Microsoft.Web.Mvc"], unsigned=True,
-                              packages=[("System.ServiceModel.Syndication", "11.0.0-rc.3.26522.148")]),  # Atom results
-    "Microsoft.Web.Mvc.Test": dict(source="spike:Microsoft.Web.Mvc.Test", tfm="net11.0", roots=["test/Microsoft.Web.Mvc.Test"], test=True,
+    "Microsoft.Web.Mvc": dict(source="spike:Microsoft.Web.Mvc", tfm="net10.0", roots=["src/Microsoft.Web.Mvc"], unsigned=True,
+                              packages=[("System.ServiceModel.Syndication", "10.0.14")]),  # Atom results
+    "Microsoft.Web.Mvc.Test": dict(source="spike:Microsoft.Web.Mvc.Test", tfm="net10.0", roots=["test/Microsoft.Web.Mvc.Test"], test=True,
                                    unsigned=True),
-    "Microsoft.Owin": dict(source="katana:src/Microsoft.Owin/Microsoft.Owin.csproj", tfm="net11.0", roots=["src/Microsoft.Owin"]),
-    "Microsoft.Owin.Security": dict(source="katana:src/Microsoft.Owin.Security/Microsoft.Owin.Security.csproj", tfm="net11.0",
+    "Microsoft.Owin": dict(source="katana:src/Microsoft.Owin/Microsoft.Owin.csproj", tfm="net10.0", roots=["src/Microsoft.Owin"]),
+    "Microsoft.Owin.Security": dict(source="katana:src/Microsoft.Owin.Security/Microsoft.Owin.Security.csproj", tfm="net10.0",
                                     roots=["src/Microsoft.Owin.Security"],
                                     # DPAPI or its emulation (DpapiDataProtector); internal here, public in System.Configuration.
                                     fork_sources=[("src/WebFormsForCore.Configuration/WebFormsForCore/Security/LocalDataProtection.cs",
                                                    "WebFormsForCore/LocalDataProtection.cs")]),
     "Microsoft.Owin.Security.Cookies": dict(source="katana:src/Microsoft.Owin.Security.Cookies/Microsoft.Owin.Security.Cookies.csproj",
-                                            tfm="net11.0", roots=["src/Microsoft.Owin.Security.Cookies"]),
+                                            tfm="net10.0", roots=["src/Microsoft.Owin.Security.Cookies"]),
     "Microsoft.Owin.Security.OAuth": dict(source="katana:src/Microsoft.Owin.Security.OAuth/Microsoft.Owin.Security.OAuth.csproj",
-                                          tfm="net11.0", roots=["src/Microsoft.Owin.Security.OAuth"]),
+                                          tfm="net10.0", roots=["src/Microsoft.Owin.Security.OAuth"]),
     # SignalR's tests configure CORS with it (lift_aspnet.py); it builds on the Web Stack's System.Web.Cors.
-    "Microsoft.Owin.Cors": dict(source="katana:src/Microsoft.Owin.Cors/Microsoft.Owin.Cors.csproj", tfm="net11.0",
+    "Microsoft.Owin.Cors": dict(source="katana:src/Microsoft.Owin.Cors/Microsoft.Owin.Cors.csproj", tfm="net10.0",
                                 roots=["src/Microsoft.Owin.Cors"]),
     "Microsoft.Owin.Host.SystemWeb": dict(source="katana:src/Microsoft.Owin.Host.SystemWeb/Microsoft.Owin.Host.SystemWeb.csproj",
-                                          tfm="net11.0", roots=["src/Microsoft.Owin.Host.SystemWeb"]),
+                                          tfm="net10.0", roots=["src/Microsoft.Owin.Host.SystemWeb"]),
     # The Domain hosting starter runs the app in a new AppDomain over remoting (see FIXUPS).
-    "Microsoft.Owin.Hosting": dict(source="katana:src/Microsoft.Owin.Hosting/Microsoft.Owin.Hosting.csproj", tfm="net11.0",
+    "Microsoft.Owin.Hosting": dict(source="katana:src/Microsoft.Owin.Hosting/Microsoft.Owin.Hosting.csproj", tfm="net10.0",
                                    roots=["src/Microsoft.Owin.Hosting"],
                                    exclude=["Starter/DomainHostingStarter.cs", "Starter/DomainHostingStarterAgent.cs"],
                                    # SettingsLoader reads appSettings through ConfigurationManager by reflection. On .NET
                                    # Framework it is always in the GAC; here the app must carry the fork's copy.
                                    fork_refs=["src/WebFormsForCore.Configuration/WebFormsForCore.Configuration.csproj"]),
     "Microsoft.Owin.Host.HttpListener": dict(source="katana:src/Microsoft.Owin.Host.HttpListener/Microsoft.Owin.Host.HttpListener.csproj",
-                                             tfm="net11.0", roots=["src/Microsoft.Owin.Host.HttpListener"]),
-    "Microsoft.Owin.Testing": dict(source="katana:src/Microsoft.Owin.Testing/Microsoft.Owin.Testing.csproj", tfm="net11.0",
+                                             tfm="net10.0", roots=["src/Microsoft.Owin.Host.HttpListener"]),
+    "Microsoft.Owin.Testing": dict(source="katana:src/Microsoft.Owin.Testing/Microsoft.Owin.Testing.csproj", tfm="net10.0",
                                    roots=["src/Microsoft.Owin.Testing"]),
-    "Microsoft.Owin.Tests": dict(source="katana:tests/Microsoft.Owin.Tests/Microsoft.Owin.Tests.csproj", tfm="net11.0",
+    "Microsoft.Owin.Tests": dict(source="katana:tests/Microsoft.Owin.Tests/Microsoft.Owin.Tests.csproj", tfm="net10.0",
                                  roots=["tests/Microsoft.Owin.Tests"], test=True),
     "Microsoft.Owin.Host.SystemWeb.Tests": dict(source="katana:tests/Microsoft.Owin.Host.SystemWeb.Tests/Microsoft.Owin.Host.SystemWeb.Tests.csproj",
-                                                tfm="net11.0", roots=["tests/Microsoft.Owin.Host.SystemWeb.Tests"], test=True),
+                                                tfm="net10.0", roots=["tests/Microsoft.Owin.Host.SystemWeb.Tests"], test=True),
     # Only the tests for the lifted middleware: the external sign-in providers (Facebook, Google, Twitter, Microsoft
     # account, OpenID Connect, JWT, Active Directory) are not lifted.
     "Microsoft.Owin.Security.Tests": dict(source="katana:tests/Microsoft.Owin.Security.Tests/Microsoft.Owin.Security.Tests.csproj",
-                                          tfm="net11.0", roots=["tests/Microsoft.Owin.Security.Tests"], test=True,
+                                          tfm="net10.0", roots=["tests/Microsoft.Owin.Security.Tests"], test=True,
                                           exclude=["Facebook/**", "Google/**", "Twitter/**", "MicrosoftAccount/**",
                                                    "OpenIdConnect/**", "JwtHandlerTests.cs"],
                                           # Linked from Properties/Resources.resx (ResXFileRef), so not items of their own.
@@ -131,7 +131,7 @@ KATANA_VERSION, KATANA_FILE_VERSION = "4.2.3.0", "4.200.325.35202"
 KATANA_REFERENCES = {
     "System.Web": "src/WebFormsForCore.Web/WebFormsForCore.Web.csproj",
     "System.Configuration": "src/WebFormsForCore.Configuration/WebFormsForCore.Configuration.csproj",
-    "System.Security": ("System.Security.Cryptography.ProtectedData", "11.0.0-rc.3.26522.148"),
+    "System.Security": ("System.Security.Cryptography.ProtectedData", "10.0.14"),
 }
 KATANA_BUILTIN = {"System.Net.Http", "System.Xml", "System.Xml.Linq", "System.Runtime.Serialization", "System.IdentityModel"}
 # Katana's tests run on Arcade's xunit; the lifted tests use the same xunit as the Web Stack's.

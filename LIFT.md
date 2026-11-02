@@ -2057,6 +2057,9 @@ packages pinned Microsoft's RC packages. No .NET 11 API was used.
   is `net10.0`.
 - `AssemblyVersion` stays 11.0.0.0: it is webForCore's assembly version, not the runtime's, and still outranks the
   framework's 4.0.0.0 facades.
+- The lift scripts (`tools/lift/*.py`, `spike.sh`) generate `net10.0` projects with the 10.0.14 packages, as the
+  project files now have: running a lift again (`lift_mono_tests.py` reproduces its project byte for byte) no longer
+  takes a project back to `net11.0` and the RC packages.
 
 ### The framework's System.Web facades, wherever the targeting pack is
 

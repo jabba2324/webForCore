@@ -131,7 +131,7 @@ XUNIT = f"""    <PackageReference Include="xunit.abstractions" Version="2.0.3" /
     <PackageReference Include="xunit.extensibility.core" Version="{XUNIT_VERSION}" />
     <PackageReference Include="xunit.extensibility.execution" Version="{XUNIT_VERSION}" />"""
 
-COMMON_PROPS = """    <TargetFramework>net11.0</TargetFramework>
+COMMON_PROPS = """    <TargetFramework>net10.0</TargetFramework>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>

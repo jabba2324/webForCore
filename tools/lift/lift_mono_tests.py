@@ -342,7 +342,7 @@ CSPROJ = '''<Project Sdk="Microsoft.NET.Sdk">
 
   <!-- Lifted from mono/mono {commit} (mcs/class/System.Web/Test, MIT) by tools/lift/lift_mono_tests.py. See NOTICE. -->
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <!-- The TARGET_DOTNET serialization baselines (OutputCacheTest) were recorded on .NET Framework from a test assembly
          named DotNet4_NUnit_Tests, whose name they contain; Mono's own build calls it System.Web_test. -->
     <AssemblyName>DotNet4_NUnit_Tests</AssemblyName>

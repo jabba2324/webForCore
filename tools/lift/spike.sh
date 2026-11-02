@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Phase 2 compile spike: build the fork's System.Web for net11.0, then try to compile each
+# Phase 2 compile spike: build the fork's System.Web for net10.0, then try to compile each
 # ASP.NET Web Stack project against it and group the compile errors by missing API.
 #
 # Usage: tools/lift/spike.sh <WebStackRoot> <ForkRoot>
@@ -29,8 +29,8 @@ command -v dotnet >/dev/null || { echo "dotnet SDK not found"; exit 1; }
 dotnet --version | grep -qE '^1[1-9]\.' || { echo "Need .NET SDK 11 or newer, found $(dotnet --version)"; exit 1; }
 mkdir -p "$GEN" "$LOGS"
 
-echo "== Step 1: build the fork's System.Web for net11.0 (baseline)"
-dotnet build "$FORK/src/WebFormsForCore.Web/WebFormsForCore.Web.csproj" -c Release -f net11.0 -nologo \
+echo "== Step 1: build the fork's System.Web for net10.0 (baseline)"
+dotnet build "$FORK/src/WebFormsForCore.Web/WebFormsForCore.Web.csproj" -c Release -f net10.0 -nologo \
   > "$LOGS/00-fork-baseline.log" 2>&1
 if [ $? -ne 0 ]; then
   echo "Baseline build of the fork FAILED. See $LOGS/00-fork-baseline.log. Fix this before continuing."
@@ -39,7 +39,7 @@ if [ $? -ne 0 ]; then
 fi
 echo "   baseline OK"
 
-echo "== Step 2: generate SDK-style net11.0 projects from the Web Stack csproj files"
+echo "== Step 2: generate SDK-style net10.0 projects from the Web Stack csproj files"
 cat > "$GEN/Directory.Build.props" <<PROPS
 <Project>
   <PropertyGroup>
