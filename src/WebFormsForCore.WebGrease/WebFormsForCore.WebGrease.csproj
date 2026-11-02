@@ -11,7 +11,7 @@
         <PackageId>webForCore.WebGrease</PackageId>
         <Title>WebFormsForCore.WebGrease</Title>
         <Product>WebFormsForCore.WebGrease</Product>
-        <Description>WebGrease for webForCore: ASP.NET 4.x applications (Web Forms, MVC 5, Web API 2) on .NET 11 and Kestrel.</Description>
+        <Description>WebGrease for webForCore: ASP.NET 4.x applications (Web Forms, MVC 5, Web API 2) on .NET 10 and Kestrel.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>webforms;aspnet;system.web;porting;net10</PackageTags>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>

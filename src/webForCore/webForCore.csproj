@@ -9,7 +9,7 @@
     <SuppressDependenciesWhenPacking>false</SuppressDependenciesWhenPacking>
     <!-- No lib folder: a package of dependencies only. -->
     <NoWarn>$(NoWarn);NU5128</NoWarn>
-    <Description>webForCore: ASP.NET 4.x applications (Web Forms, MVC 5, Web API 2) on .NET 11 and Kestrel. This package brings System.Web and the assemblies every application needs; add webForCore.Web.Mvc, webForCore.Web.Http.WebHost and the others an application uses.</Description>
+    <Description>webForCore: ASP.NET 4.x applications (Web Forms, MVC 5, Web API 2) on .NET 10 and Kestrel. This package brings System.Web and the assemblies every application needs; add webForCore.Web.Mvc, webForCore.Web.Http.WebHost and the others an application uses.</Description>
     <PackageTags>webforms;aspnet;system.web;porting;net10</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>

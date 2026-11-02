@@ -14,7 +14,7 @@
         <PackageId>webForCore.Web.Mobile</PackageId>
         <Title>WebFormsForCore.Web.Mobile</Title>
         <Product>WebFormsForCore.Web.Mobile</Product>
-        <Description>System.Web.Mobile for webForCore: ASP.NET 4.x applications (Web Forms, MVC 5, Web API 2) on .NET 11 and Kestrel.</Description>
+        <Description>System.Web.Mobile for webForCore: ASP.NET 4.x applications (Web Forms, MVC 5, Web API 2) on .NET 10 and Kestrel.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>webforms;aspnet;system.web;porting;net10</PackageTags>
         <IncludeSymbols>true</IncludeSymbols>

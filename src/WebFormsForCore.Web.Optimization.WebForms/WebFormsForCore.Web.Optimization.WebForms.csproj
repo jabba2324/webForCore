@@ -10,7 +10,7 @@
         <PackageId>webForCore.Web.Optimization.WebForms</PackageId>
         <Title>WebFormsForCore.Web.Optimization.WebForms</Title>
         <Product>WebFormsForCore.Web.Optimization.WebForms</Product>
-        <Description>Microsoft.AspNet.Web.Optimization.WebForms for webForCore: ASP.NET 4.x applications (Web Forms, MVC 5, Web API 2) on .NET 11 and Kestrel.</Description>
+        <Description>Microsoft.AspNet.Web.Optimization.WebForms for webForCore: ASP.NET 4.x applications (Web Forms, MVC 5, Web API 2) on .NET 10 and Kestrel.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>webforms;aspnet;system.web;porting;net10</PackageTags>
         <IncludeSymbols>true</IncludeSymbols>

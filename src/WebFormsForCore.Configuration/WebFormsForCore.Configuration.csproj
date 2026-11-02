@@ -14,7 +14,7 @@
         <PackageId>webForCore.Configuration</PackageId>
         <Title>WebFormsForCore.Configuration</Title>
         <Product>WebFormsForCore.Configuration</Product>
-        <Description>System.Configuration.ConfigurationManager for webForCore: ASP.NET 4.x applications (Web Forms, MVC 5, Web API 2) on .NET 11 and Kestrel.</Description>
+        <Description>System.Configuration.ConfigurationManager for webForCore: ASP.NET 4.x applications (Web Forms, MVC 5, Web API 2) on .NET 10 and Kestrel.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>webforms;aspnet;system.web;porting;net10</PackageTags>
         <IncludeSymbols>true</IncludeSymbols>
