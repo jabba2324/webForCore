@@ -4,7 +4,7 @@
        (test/webForCore.IIS.Gate.Tests/PrecompilationTests.cs) copies this output into the precompiled site's bin_dotnet,
        as a deployment puts the app's build next to its precompiled pages, and runs it there. -->
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>

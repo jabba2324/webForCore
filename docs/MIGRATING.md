@@ -1,8 +1,8 @@
 # Migrating an ASP.NET 4.x app to webForCore
 
-This guide takes an existing Web Forms, MVC 5, Web API 2 or Web Pages application and runs it on .NET 11 with
+This guide takes an existing Web Forms, MVC 5, Web API 2 or Web Pages application and runs it on .NET 10 with
 webForCore, on Linux or Windows. The approach keeps the application's code, markup and `web.config`: the project
-becomes an SDK-style .NET 11 app whose `Program.cs` hosts the same ASP.NET pipeline on Kestrel.
+becomes an SDK-style .NET 10 app whose `Program.cs` hosts the same ASP.NET pipeline on Kestrel.
 
 For an AI agent doing the migration, the same procedure is written as instructions in
 [AGENT-MIGRATION.md](AGENT-MIGRATION.md).
@@ -72,7 +72,7 @@ hand, and keep a copy of the old `.csproj`. Then use `Microsoft.NET.Sdk.Web` wit
 ```xml
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
@@ -115,7 +115,7 @@ Two differences from .NET Framework projects come up when converting:
   `<GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>` and a reference to the
   `System.Resources.Extensions` package.
 - **The C# version.** .NET Framework projects compiled with the C# of their time: 7.3 by default, or what "latest" meant
-  then. On net11.0 the default is the newest, and C# 14's first-class span conversions resolve some calls differently
+  then. On net10.0 the default is the newest, and C# 14's first-class span conversions resolve some calls differently
   (`CS0029: Cannot implicitly convert type 'System.ReadOnlySpan<char>' to 'string'`, YAF.NET's ServiceStack.Text). Keep
   the project's: `<LangVersion>7.3</LangVersion>` if it set none, or 13 for "latest". C# 11's ref-safety rules apply on
   .NET 7 and later whatever the version (`CS8347 ... may expose variables referenced by parameter 'index'`): mark such a
@@ -229,7 +229,7 @@ These came up migrating real applications; each names one that needed it.
   <PackageReference Include="webForCore.Web.ApplicationServices" Version="0.6.0" ExcludeAssets="compile" />
   ```
 - **A package's .NET Standard build can have less than its `net45` build** (#31). NuGet picks the .NET Standard build
-  for .NET 11, and some packages built it with a smaller API. WindowsAzure.Storage 9.x has no synchronous blob methods
+  for .NET 10, and some packages built it with a smaller API. WindowsAzure.Storage 9.x has no synchronous blob methods
   there (`Exists`, `OpenRead`, ...: aspnet-mvc5-starter). Hangfire 1.6's has no OWIN extensions (`app.UseHangfireServer`),
   and its SqlServer storage can't look a connection string name up in web.config (MVCForum). Use the version's `net45`
   build, in every project that gets the package, the web project included:
@@ -255,10 +255,10 @@ These came up migrating real applications; each names one that needed it.
     `AppDomainSetup.ShadowCopyFiles` (`MissingMethodException`). Remove the packages, the `glimpse` configuration
     section, its module and handler in `<system.web>` and `<system.webServer>`, and the app's `GlimpseSecurityPolicy`
     class (ReaLocate).
-  - **AutoMapper before 12** throws while configuring a map on .NET 11 (`The type or method has 3 generic parameter(s),
+  - **AutoMapper before 12** throws while configuring a map (seen on .NET 11; not yet rechecked on .NET 10) (`The type or method has 3 generic parameter(s),
     but 1 generic argument(s) were provided`, or `... violates the constraint of type 'T'` from `MaxFloat`/`MaxInteger`):
     it scans `System.Linq.Enumerable`'s extension methods, non-public ones included. This isn't webForCore's: a .NET 11
-    console app does the same. AutoMapper 12 works; from 4.x the change is mostly `IMapperConfiguration` →
+    console app did the same. AutoMapper 12 works; from 4.x the change is mostly `IMapperConfiguration` →
     `IMapperConfigurationExpression` (ReaLocate). From 3.x's static `Mapper` it is a rewrite of the mapping code.
 
 ## 4. Program.cs

@@ -3,7 +3,7 @@
   <!-- Lifted from aspnet/AspNetWebStack 2106565 (Microsoft.Web.Mvc.Test) by tools/lift/lift_project.py.
        Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. -->
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>Microsoft.Web.Mvc.Test</AssemblyName>
     <RootNamespace>Microsoft.Web</RootNamespace>
     <PackageId>webForCore.Microsoft.Web.Mvc.Test</PackageId>
@@ -115,7 +115,7 @@
     <ProjectReference Include="../../src/webForCore.System.Web.WebPages/webForCore.System.Web.WebPages.csproj" />
     <ProjectReference Include="../webForCore.Microsoft.TestCommon/webForCore.Microsoft.TestCommon.csproj" />
     <ProjectReference Include="../webForCore.System.Web.Mvc.Test/webForCore.System.Web.Mvc.Test.csproj" />
-    <PackageReference Include="System.CodeDom" Version="11.0.0-rc.3.26522.148" />
+    <PackageReference Include="System.CodeDom" Version="10.0.14" />
     <PackageReference Include="Castle.Core" Version="5.2.1" />
     <PackageReference Include="Moq" Version="4.21.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />

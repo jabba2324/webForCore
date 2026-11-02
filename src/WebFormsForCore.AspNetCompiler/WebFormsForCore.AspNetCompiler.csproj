@@ -3,7 +3,7 @@
     <PropertyGroup>
         <PackAsTool Condition="$(PackAsTool) == ''">true</PackAsTool>
         <OutputType>Exe</OutputType>
-        <TargetFrameworks>net11.0</TargetFrameworks>
+        <TargetFrameworks>net10.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
         <AssemblyName>aspnetcore_compiler</AssemblyName>
@@ -26,7 +26,7 @@
         <DebufType>embedded</DebufType>
     </PropertyGroup>
 
-    <ItemGroup Condition="$(TargetFramework) == 'net11.0'">
+    <ItemGroup Condition="$(TargetFramework) == 'net10.0'">
         <!-- webForCore: the fork's own assemblies, so a site is precompiled with the System.Web it runs on (the upstream
              WebFormsForCore packages are a different System.Web). -->
         <ProjectReference Include="..\WebFormsForCore.Compilers\WebFormsForCore.Compilers.csproj" />
@@ -41,7 +41,7 @@
         <ProjectReference Include="..\WebFormsForCore.Web.Extensions\WebFormsForCore.Web.Extensions.csproj" />
     </ItemGroup>
 
-    <ItemGroup Condition="$(TargetFramework) == 'net11.0'">
+    <ItemGroup Condition="$(TargetFramework) == 'net10.0'">
         <PackageReference Include="System.CodeDom" Version="$(netlib)" />
     </ItemGroup>
 

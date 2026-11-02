@@ -1,9 +1,9 @@
 # webForCore
 
-**Run ASP.NET 4.x applications on .NET 11, Kestrel and Linux, without rewriting them.**
+**Run ASP.NET 4.x applications on .NET 10 (LTS), Kestrel and Linux, without rewriting them.**
 
 webForCore runs Web Forms, MVC 5, Web API 2, Web Pages, SignalR 2, OWIN/Katana and ASP.NET Identity 2 apps on
-.NET 11. It is built from Microsoft's own code: System.Web and System.Configuration from the .NET Framework reference
+.NET 10. It is built from Microsoft's own code: System.Web and System.Configuration from the .NET Framework reference
 source (through [WebFormsForCore](https://github.com/webformsforcore/WebFormsForCore), which this project forks), and
 the ASP.NET libraries Microsoft open-sourced. Those libraries are lifted file by file from Microsoft's repositories
 and tested with Microsoft's own test suites. The parts IIS used to provide (request filtering, URL Rewrite, default
@@ -12,12 +12,12 @@ configured from the app's existing `<system.webServer>` section.
 
 webForCore ships only Microsoft assemblies, and nothing in it depends on a third-party build of a library.
 
-The reference behaviour is .NET Framework 4.8 on IIS 10. Where .NET 11 behaves differently and webForCore can't
+The reference behaviour is .NET Framework 4.8 on IIS 10. Where .NET 10 behaves differently and webForCore can't
 restore the old behaviour, the difference is documented.
 
 | | |
 | --- | --- |
-| Target | .NET 11 (`net11.0`), Linux x64; Windows as a development environment (built and tested in CI) |
+| Target | .NET 10 LTS (`net10.0`), Linux x64; Windows as a development environment (built and tested in CI) |
 | Status | Pre-release (0.6.0). No production app has been migrated yet. NuGet packages are attached to [GitHub releases](https://github.com/jabba2324/webForCore/releases), not published on nuget.org |
 | Tests | 27,297 tests in 24 suites, almost all of them Microsoft's and Mono's; all pass except 151 known System.Drawing failures, 141 of them metafiles ([TESTING.md](docs/TESTING.md)) |
 | Licence | MIT, Apache 2.0 and BSD 3-Clause, all of which allow commercial use; see [docs/LICENSING.md](docs/LICENSING.md) |
@@ -67,11 +67,11 @@ The full guide is [docs/MIGRATING.md](docs/MIGRATING.md). In outline:
    dotnet build src/WebFormsForCore.Build/WebFormsForCore.Build.csproj -c Release   # build tasks the other projects import
    dotnet build WebFormsForCore.slnx -c Release
    ```
-2. **Make the app an SDK-style `Microsoft.NET.Sdk.Web` project** targeting `net11.0`, with its output in a direct
+2. **Make the app an SDK-style `Microsoft.NET.Sdk.Web` project** targeting `net10.0`, with its output in a direct
    subfolder (`bin_dotnet`), as classic ASP.NET's `bin` was:
    ```xml
    <PropertyGroup>
-     <TargetFramework>net11.0</TargetFramework>
+     <TargetFramework>net10.0</TargetFramework>
      <OutputType>Exe</OutputType>
      <OutputPath>bin_dotnet</OutputPath>
      <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -118,7 +118,7 @@ Both build on webForCore's releases; webForCore doesn't depend on either of them
 
 ## Building and testing this repository
 
-Requirements: the .NET SDK in `global.json` (11.0.100-rc.3), and on Fedora/RHEL `OPENSSL_ENABLE_SHA1_SIGNATURES=1`
+Requirements: the .NET SDK in `global.json` (10.0.100 or a later 10.0 SDK), and on Fedora/RHEL `OPENSSL_ENABLE_SHA1_SIGNATURES=1`
 (strong-name signing uses SHA-1). The Identity tests need SQL Server; `tools/lift/sqlserver.sh` starts one in a
 container.
 

@@ -1,7 +1,7 @@
 # What webForCore changed in lifted code and tests
 
 webForCore runs Microsoft's own ASP.NET 4.x libraries rather than reimplementations of them. Where Microsoft published
-the source, it is **lifted**: copied file by file from the upstream repository at a pinned commit, built for .NET 11,
+the source, it is **lifted**: copied file by file from the upstream repository at a pinned commit, built for .NET 10,
 and tested with the upstream project's own tests. This page explains the rules for those copies and what had to change.
 
 - The full per-file list, with a link from each changed file to its upstream original, is generated:
@@ -59,7 +59,7 @@ webForCore's changes to the port are listed at the end of [lifted-changes.md](li
 | **APIs .NET doesn't have** | `AppDomain.DefineDynamicAssembly` → `AssemblyBuilder.DefineDynamicAssembly` (SignalR); `AppDomainSetup.PrivateBinPath` → scan the app base (Katana's loader); LINQ to SQL's `Binary` binding compiled out (MVC, Web Pages); `NetDataContractSerializer`, which MVC Futures' `MvcSerializer` uses, is replaced by a `DataContractSerializer` with a type-preserving resolver (`tools/lift/additions/Microsoft.Web.Mvc`), so `MvcSerializer.cs` itself is unchanged; Code Access Security policy removed | Web Stack, Katana, SignalR |
 | **Windows-only APIs** | The CryptoAPI certificate context → `PublicKey.ExportSubjectPublicKeyInfo()` (Katana); `DpapiDataProtector` → webForCore's DPAPI emulation (`LocalDataProtection`); the HttpListener host's private-field access → Katana's Mono path | Katana |
 | **.NET Framework behaviour restored** | Web Pages' `WebMail` takes its defaults from `<system.net><mailSettings>`, which .NET's `SmtpClient` ignores; `float`/`double` route constraints reject overflow; a whitespace multipart root path is rejected; `HttpResponseMessage.Content` is never null on .NET, so `ResponseContent.Get` treats `EmptyContent` as no content (11 call sites in the Web API hosts); a request body copied through the seekable stream; `HostString` keeps the host's case | Web Stack, Katana |
-| **Compiler and language** | A `(string)null` where .NET 11's `ArraySegment<T>` overloads made `null` ambiguous; `LangVersion` pinned to what Microsoft built with (C# 7.3 for SignalR) | SignalR, Web Stack |
+| **Compiler and language** | A `(string)null` where .NET's `ArraySegment<T>` overloads made `null` ambiguous; `LangVersion` pinned to what Microsoft built with (C# 7.3 for SignalR) | SignalR, Web Stack |
 | **Linux and ICU** | Case-correct paths for files referenced with a different case; newline handling; IDN mapping | Web Stack tests, Katana |
 | **System.Drawing on SkiaSharp** | System.Drawing.Common 6.0's managed code is unchanged, except that the GDI+ P/Invokes are pointed at a managed GDI+ (`SkiaGdiPlus`, in `tools/lift/additions/System.Drawing.Common/`) instead of libgdiplus | dotnet/runtime |
 

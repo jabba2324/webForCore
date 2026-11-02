@@ -3,8 +3,8 @@
 Record of everything lifted into or changed in webForCore, and of each phase gate.
 Plan: `WEBFORCORE-LIFT-HANDOFF.md` (planning doc, 29 Oct 2026).
 
-**Target framework: net11.0 only.** net8.0 and net10.0 were dropped on 29 Oct 2026 (the handoff said
-net10.0 first). net48 stays for the TestApp's .NET Framework build (the future IIS comparison) and
+**Target framework: net10.0 (.NET 10 LTS) only**, since 2 Nov 2026 (#55; see "Back to .NET 10 LTS" below). From
+29 Oct to 2 Nov 2026 it was net11.0 only: net8.0 and net10.0 had been dropped (the handoff said net10.0 first). net48 stays for the TestApp's .NET Framework build (the future IIS comparison) and
 netstandard2.0 stays for the MSBuild task DLL. Staying mergeable with upstream is not a goal; fork files
 are changed wherever that is the cleaner fix.
 
@@ -2039,3 +2039,42 @@ character unencoded. It's Microsoft's race, not a Windows difference:
   `ValueExtensionsTest`.
 
 `lift_project.py` adds those five to the collection, as for the earlier races (ScopeStorage, ModelBinderConfig).
+
+## Back to .NET 10 LTS (#55, 2 Nov 2026)
+
+webForCore targets `net10.0` instead of `net11.0`. .NET 10 is the long-term support release (to November 2028),
+which is what long-lived ASP.NET 4.x applications need. .NET 11 was a release candidate (11.0.0-rc.3), and the
+packages pinned Microsoft's RC packages. No .NET 11 API was used.
+
+- `netlatest` and every project's target framework are `net10.0`. `netlib` (Microsoft's packages: System.Configuration.ConfigurationManager,
+  System.DirectoryServices, System.Runtime.Caching, ...) is 10.0.14, and the versions written in project files with it.
+  `global.json` (and the TestApp's) pins SDK 10.0.100 with `latestFeature`. CI installs the 10.0 SDK, and 11.0 RC for
+  the package smoke test's newer-SDK build (below).
+- `src/WebFormsForCore.Compilers/Roslyn.net11.0` is `Roslyn.net10.0` again; its binaries were `net10.0` builds all along
+  (`csc.runtimeconfig.json`).
+- Build tooling: `NET11_0_OR_GREATER`/`IsNet11` checks are `NET10_0_OR_GREATER`/`IsNet10` (`AspNetCoreCompiler`,
+  `CreateAspDesignerFiles`, `FakeStrongName` and its inline copy in `FakeStrongName.targets`), and the precompiler path
+  is `net10.0`.
+- `AssemblyVersion` stays 11.0.0.0: it is webForCore's assembly version, not the runtime's, and still outranks the
+  framework's 4.0.0.0 facades.
+
+### The framework's System.Web facades, wherever the targeting pack is
+
+The shared framework has a `System.Web.dll` (a facade forwarding `HttpUtility`) and a `System.Web.HttpUtility.dll`
+(`HttpUtility`, `IHtmlString`). Next to webForCore's System.Web the compiler sees those types twice (CS0433, CS7069),
+so the projects and `webForCore.WebStack.targets` drop the framework's copies from the references. They matched them
+by the SDK's packs folder: `[\\/]\.?dotnet[\\/]` (21 project files) and
+`[\\/]packs[\\/]Microsoft\.(NETCore|AspNetCore)\.App\.Ref[\\/]` (`Directory.Build.targets`, `webForCore.WebStack.targets`).
+An SDK newer than the target framework takes the targeting pack from the NuGet cache
+(`~/.nuget/packages/microsoft.netcore.app.ref/10.0.14/ref/net10.0/`), where neither pattern matches: building this
+repository for net10.0 with the .NET 11 SDK failed with 166 × CS0433, and so would an application on the packages built
+that way. All of them now match the pack's name, case-insensitively: `(?i)[\\/]microsoft\.netcore\.app\.ref[\\/]`
+(and `Microsoft.(NETCore|AspNetCore).App.Ref` for HttpUtility). `tools/ci/package-smoke.sh` builds its application a
+second time with the newest SDK installed (CI: 11.0 RC), which failed with the old patterns.
+
+### Docs
+
+README, CONTRIBUTING, MIGRATING, AGENT-MIGRATION, NAMESPACES and MODIFICATIONS say .NET 10. Behaviour notes that were
+measured on .NET 11 say so where they couldn't be rechecked: AutoMapper before 12 (ReaLocate) didn't fail in a plain
+console app on either 10.0.14 or 11.0 RC with a simple map, so the note stays as observed on .NET 11 until the smoke
+test reruns ReaLocate on .NET 10. The rest of this log keeps the framework it was written about.

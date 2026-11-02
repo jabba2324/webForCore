@@ -47,7 +47,7 @@ namespace IISGate
 
         private static (int Code, string Output) RegIIS(string keys, params string[] args)
         {
-            var tool = Path.Combine(Repository(), "src", "WebFormsForCore.RegIIS", "bin", "Release", "net11.0", "webforcore-regiis.dll");
+            var tool = Path.Combine(Repository(), "src", "WebFormsForCore.RegIIS", "bin", "Release", "net10.0", "webforcore-regiis.dll");
             var start = new ProcessStartInfo("dotnet") { RedirectStandardOutput = true, RedirectStandardError = true };
             start.ArgumentList.Add(tool);
             foreach (var a in args) start.ArgumentList.Add(a);

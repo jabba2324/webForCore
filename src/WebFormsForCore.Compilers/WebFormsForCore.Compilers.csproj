@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net11.0</TargetFrameworks>
+        <TargetFrameworks>net10.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
         <DebugType>portable</DebugType>
@@ -13,24 +13,24 @@
         <Product>WebFormsForCore.Compilers</Product>
         <Description>WebFormsForCore.Compilers for webForCore: ASP.NET 4.x applications (Web Forms, MVC 5, Web API 2) on .NET 11 and Kestrel.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageTags>webforms;aspnet;system.web;porting;net11</PackageTags>
+        <PackageTags>webforms;aspnet;system.web;porting;net10</PackageTags>
         <IncludeSymbols>true</IncludeSymbols>
         <EmbedUntrackedSources>false</EmbedUntrackedSources>
         <AssemblyOriginatorKeyFile>..\SigningKey\WebFormsForCore.snk</AssemblyOriginatorKeyFile>
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     </PropertyGroup>
 
-    <ItemGroup Condition="$(TargetFramework) == 'net11.0'">
+    <ItemGroup Condition="$(TargetFramework) == 'net10.0'">
         <PackageReference Include="Microsoft.CodeAnalysis" Version="5.9.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="5.9.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="Roslyn.net11.0\**\*.*">
+        <Content Include="Roslyn.net10.0\**\*.*">
             <!--<Link>Compilers\%(RecursiveDir)%(Filename)%(Extension)</Link>-->
             <Pack>True</Pack>
-            <PackagePath>lib\net11.0</PackagePath>
+            <PackagePath>lib\net10.0</PackagePath>
         </Content>
     </ItemGroup>
 

@@ -4,7 +4,7 @@
          abstractions in System.Web, where they moved in 4.0. web.configs from MVC 2-4 projects list it in
          <compilation><assemblies>, and libraries built for .NET 3.5 reference it (#20). -->
     <PropertyGroup>
-        <TargetFrameworks>net11.0</TargetFrameworks>
+        <TargetFrameworks>net10.0</TargetFrameworks>
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>disable</Nullable>
         <AssemblyOriginatorKeyFile>..\SigningKey\WebFormsForCore.snk</AssemblyOriginatorKeyFile>
@@ -17,7 +17,7 @@
         <Product>WebFormsForCore.Web.Abstractions</Product>
         <Description>System.Web.Abstractions 4.0.0.0 for webForCore: the .NET Framework 4 facade that forwards HttpContextBase and the other abstractions to System.Web</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageTags>webforms;aspnet;system.web;porting;net11</PackageTags>
+        <PackageTags>webforms;aspnet;system.web;porting;net10</PackageTags>
         <IncludeSymbols>true</IncludeSymbols>
         <EmbedUntrackedSources>false</EmbedUntrackedSources>
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>

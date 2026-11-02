@@ -4,7 +4,7 @@
          doesn't have. Katana's social providers (Google, Facebook, MicrosoftAccount, Twitter) and WS-Federation create
          one (#18). Part of the "Always" set. -->
     <PropertyGroup>
-        <TargetFrameworks>net11.0</TargetFrameworks>
+        <TargetFrameworks>net10.0</TargetFrameworks>
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>disable</Nullable>
         <AssemblyOriginatorKeyFile>..\SigningKey\WebFormsForCore.snk</AssemblyOriginatorKeyFile>
@@ -18,7 +18,7 @@
         <Product>WebFormsForCore.Net.Http.WebRequest</Product>
         <Description>System.Net.Http.WebRequest for webForCore: .NET Framework's WebRequestHandler as an HttpClientHandler, for libraries built against it (Katana's social login providers)</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageTags>webforms;aspnet;system.web;porting;net11</PackageTags>
+        <PackageTags>webforms;aspnet;system.web;porting;net10</PackageTags>
         <IncludeSymbols>true</IncludeSymbols>
         <EmbedUntrackedSources>false</EmbedUntrackedSources>
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>

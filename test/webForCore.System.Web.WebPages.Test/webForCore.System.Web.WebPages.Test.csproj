@@ -3,7 +3,7 @@
   <!-- Lifted from aspnet/AspNetWebStack 2106565 (System.Web.WebPages.Test) by tools/lift/lift_project.py.
        Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. -->
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>System.Web.WebPages.Test</AssemblyName>
     <RootNamespace>System.Web.WebPages.Test</RootNamespace>
     <PackageId>webForCore.Web.WebPages.Test</PackageId>
@@ -142,7 +142,7 @@
     <ProjectReference Include="../webForCore.Microsoft.TestCommon/webForCore.Microsoft.TestCommon.csproj" />
     <ProjectReference Include="../../src/WebFormsForCore.Serialization.Formatters/WebFormsForCore.Serialization.Formatters.csproj" />
     <ProjectReference Include="../../src/webForCore.System.Web.Mvc/webForCore.System.Web.Mvc.csproj" Aliases="SystemWebMvc" />
-    <PackageReference Include="System.CodeDom" Version="11.0.0-rc.3.26522.148" />
+    <PackageReference Include="System.CodeDom" Version="10.0.14" />
     <PackageReference Include="Castle.Core" Version="5.2.1" />
     <PackageReference Include="Moq" Version="4.21.0" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />

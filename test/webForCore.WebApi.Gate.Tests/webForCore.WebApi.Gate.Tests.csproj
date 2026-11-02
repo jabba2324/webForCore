@@ -3,7 +3,7 @@
   <!-- Phase 3 gate: test/webForCore.WebApi.Sample on Kestrel (the fork's System.Web, Web API through GlobalConfiguration
        and through OWIN) against the same controllers in Web API's in-memory HttpServer (no System.Web). -->
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <IsPackable>false</IsPackable>

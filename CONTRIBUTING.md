@@ -1,6 +1,6 @@
 # Contributing to webForCore
 
-webForCore runs existing ASP.NET 4.x applications on .NET 11 without rewriting them. A change is welcome when it makes
+webForCore runs existing ASP.NET 4.x applications on .NET 10 (LTS) without rewriting them. A change is welcome when it makes
 a real application behave more like it did on .NET Framework 4.8 and IIS 10, and when it can prove it with a test.
 
 ## The principles

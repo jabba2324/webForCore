@@ -4,7 +4,7 @@
        feature the hosting layer implements, checked against IIS 10's documented behaviour, and the PseudoAppDomain's
        in-process restart. -->
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <IsPackable>false</IsPackable>

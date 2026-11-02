@@ -3,7 +3,7 @@
   <!-- Phase 4 gate: test/webForCore.Mvc.Sample (the MVC 5 template) on Kestrel with the fork's System.Web.
        Routes, controllers, filters and model binding, checked against MVC 5.3's documented results. -->
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <IsPackable>false</IsPackable>

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net11.0</TargetFrameworks>
+        <TargetFrameworks>net10.0</TargetFrameworks>
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>disable</Nullable>
         <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
@@ -16,7 +16,7 @@
         <Product>WebFormsForCore.Configuration</Product>
         <Description>System.Configuration.ConfigurationManager for webForCore: ASP.NET 4.x applications (Web Forms, MVC 5, Web API 2) on .NET 11 and Kestrel.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageTags>webforms;aspnet;system.web;porting;net11</PackageTags>
+        <PackageTags>webforms;aspnet;system.web;porting;net10</PackageTags>
         <IncludeSymbols>true</IncludeSymbols>
         <EmbedUntrackedSources>false</EmbedUntrackedSources>
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
@@ -36,14 +36,14 @@
         <Reference Include="System.Security" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'net11.0'">
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
         <!--<PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />-->
-        <PackageReference Include="System.Security.Cryptography.Xml" Version="11.0.0-rc.3.26522.148" />
+        <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.14" />
         <!-- DPAPI on Windows (WebFormsForCore/Security/LocalDataProtection.cs). -->
-        <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="11.0.0-rc.3.26522.148" />
-        <PackageReference Include="System.CodeDom" Version="11.0.0-rc.3.26522.148" />
+        <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.14" />
+        <PackageReference Include="System.CodeDom" Version="10.0.14" />
         <PackageReference Include="System.IO.FileSystem.AccessControl" Version="5.0.0" />
-        <PackageReference Include="System.Security.Permissions" Version="11.0.0-rc.3.26522.148" />
+        <PackageReference Include="System.Security.Permissions" Version="10.0.14" />
     </ItemGroup>
 
     <ItemGroup>

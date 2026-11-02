@@ -1,6 +1,6 @@
 # Implemented namespaces and their caveats
 
-This page lists, assembly by assembly, the .NET Framework and ASP.NET namespaces webForCore provides on .NET 11, and
+This page lists, assembly by assembly, the .NET Framework and ASP.NET namespaces webForCore provides on .NET 10, and
 what doesn't work in each. "Lifted" assemblies are Microsoft's open-source code, copied and built for .NET (see
 [MODIFICATIONS.md](MODIFICATIONS.md)). "Ported" assemblies are WebFormsForCore's port of the .NET Framework reference
 source, with webForCore's changes.
@@ -31,7 +31,7 @@ in the code; the rest are from `LIFT.md`.
 | Web references | `App_WebReferences` (generates nothing) | Generate the proxy with `dotnet-svcutil` and compile it into the app |
 | Metafiles | EMF/WMF in System.Drawing | PNG/SVG |
 | `System.Runtime.Serialization.NetDataContractSerializer` in app code | Apps that use it directly (MVC Futures' `Html.Serialize` / `[Deserialize]` work: webForCore provides their serializer) | `DataContractSerializer` with a `DataContractResolver` |
-| BinaryFormatter in app code | .NET 11's `System.Runtime.Serialization.Formatters.Binary.BinaryFormatter` throws | `WebFormsForCore.Serialization.Formatters.Binary.BinaryFormatter` (System.Web uses it for session and view state) |
+| BinaryFormatter in app code | .NET's `System.Runtime.Serialization.Formatters.Binary.BinaryFormatter` throws (since .NET 9) | `WebFormsForCore.Serialization.Formatters.Binary.BinaryFormatter` (System.Web uses it for session and view state) |
 | Windows-DPAPI-encrypted configuration | Sections encrypted on Windows with `DataProtectionConfigurationProvider` | Decrypt them on Windows; re-encrypt with `webforcore-regiis` or RSA (see [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md#deployment-tools)) |
 | Code Access Security, partial trust | Trust levels, CAS attributes | Ignored: everything runs in full trust |
 | Registry, WMI, COM interop, MSMQ, Office | Windows only | Replace |

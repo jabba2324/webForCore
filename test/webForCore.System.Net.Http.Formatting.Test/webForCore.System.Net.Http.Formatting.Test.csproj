@@ -3,7 +3,7 @@
   <!-- Lifted from aspnet/AspNetWebStack 2106565 (test/System.Net.Http.Formatting.ns2_0.Test/System.Net.Http.Formatting.ns2_0.Test.csproj) by tools/lift/lift_project.py.
        Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. -->
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>System.Net.Http.Formatting.ns2_0.Test</AssemblyName>
     <RootNamespace>System.Net.Http</RootNamespace>
     <PackageId>webForCore.Net.Http.Formatting.Test</PackageId>

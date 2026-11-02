@@ -3,7 +3,7 @@
   <!-- System.Drawing.Common.Tests (dotnet/runtime 76b9680, release/6.0), lifted by tools/lift/lift_drawing_tests.py, with test data
        from dotnet/runtime-assets 848e27e (release/6.0). MIT. Runs against the fork's System.Drawing.Common (SkiaGdiPlus). Generated; do not edit. -->
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
