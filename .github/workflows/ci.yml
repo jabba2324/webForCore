@@ -115,8 +115,8 @@ jobs:
             ${{ runner.temp }}/packages/*.snupkg
           if-no-files-found: error
 
-  # Windows as a development environment (#46): the same build, tests, packing and package smoke test. Not a required
-  # check yet; each step's failures are recorded while the differences from Linux are fixed or documented.
+  # Windows as a development environment (#46): the same build, tests, packing and package smoke test. A required
+  # check (docs/TESTING.md): renaming this job renames the check, so change the ruleset in the same change (#76).
   build-windows:
     runs-on: windows-2025
     timeout-minutes: 150
