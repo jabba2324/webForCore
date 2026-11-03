@@ -53,7 +53,6 @@ Code Access Security).
 | [docs/TESTING.md](docs/TESTING.md) | The test suites, where they come from, results and code coverage |
 | [docs/MODIFICATIONS.md](docs/MODIFICATIONS.md) | Where Microsoft's code comes from (the `external/` submodules) and what had to change |
 | [docs/LICENSING.md](docs/LICENSING.md) | Which parts have which licence, commercial use, and what was replaced to get there |
-| [LIFT.md](LIFT.md) | The engineering log: every change, decision and test result, in order |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute: a test and a real application for every change, Microsoft's code left alone |
 
 ## Migrating an app: the short version
@@ -124,7 +123,7 @@ The first two build on webForCore's releases; webForCore doesn't depend on them.
 ## Building and testing this repository
 
 Requirements: the .NET SDK in `global.json` (10.0.100 or a later 10.0 SDK), and on Fedora/RHEL `OPENSSL_ENABLE_SHA1_SIGNATURES=1`
-(strong-name signing uses SHA-1). The Identity tests need SQL Server; `tools/ci/sqlserver.sh` starts one in a
+(strong-name signing uses SHA-1; without it `csc` fails with `OpenSslCryptographicException: ... invalid digest`). The Identity tests need SQL Server; `tools/ci/sqlserver.sh` starts one in a
 container. System.Drawing comes from [drawingForCore](https://github.com/xforcore/drawingForCore)'s packages, restored
 from its feed (`nuget.config`); to try a drawingForCore change here before it is released, build against a checkout
 of it with `-p:DrawingForCoreSource=../drawingForCore`.
@@ -138,6 +137,14 @@ tools/ci/run-tests.sh                 # every suite, as CI runs it
 
 CI (`.github/workflows/ci.yml`) runs the same steps on Ubuntu and on Windows for every push and pull request. On Windows,
 run them in Git Bash, with SQL Server Express in place of the container ([TESTING.md](docs/TESTING.md#running-the-tests)).
+To check that a build is really clean, run `dotnet build-server shutdown` first or pass `-nodeReuse:false`: reused
+MSBuild nodes cache imported `.targets` files.
+
+The packages are `webForCore.*`, because the `WebFormsForCore.*` IDs on nuget.org belong to the upstream project.
+`webForCore.Web` is System.Web, and carries `src/webForCore.WebStack.targets` as `buildTransitive`, so an app needs no
+`<Import>`; `webForCore` is the "Always" set of [MIGRATING.md](docs/MIGRATING.md#3-references) without code of its own.
+`tools/ci/pack.sh` packs the built `src/` projects one at a time (packing the solution fails on the multi-targeted
+build-tools project).
 
 Microsoft's code is compiled from the submodules in `external/`: cleared-down forks of the upstream repositories,
 with webForCore's changes as commits on each fork's `webforcore` branch. The projects in `src/webForCore.*` and
@@ -150,7 +157,9 @@ webForCore is a fork of [WebFormsForCore](https://github.com/webformsforcore/Web
 which ported System.Web and its companions from the .NET Framework reference source to .NET and first ran Web Forms
 on ASP.NET Core. webForCore adds Microsoft's open-source ASP.NET libraries and their tests, the IIS layer, the host
 and its worker processes, System.Drawing on SkiaSharp (now [drawingForCore](https://github.com/xforcore/drawingForCore)),
-and the compatibility work recorded in [LIFT.md](LIFT.md).
+and the compatibility work described in [docs/](docs/) and the [release notes](docs/release-notes/). The engineering
+log kept while the code was lifted in was removed in #67 and is in git history; the repository
+[at 35aeecff](https://github.com/xforcore/webForCore/tree/35aeecff) is the last commit that has it.
 
 The upstream code is © Microsoft and the .NET Foundation (ASP.NET Web Stack, Katana, SignalR, ASP.NET Identity) and
 the Mono project (System.Web tests). See [NOTICE](NOTICE) for every component, its source and its licence.
