@@ -76,9 +76,9 @@ working when .NET is patched, and that fails safely.
 9. **Programs and tools are .NET.** Everything this repository builds, and every tool it uses (CI helpers, generators,
    checks), is written in C# as a project or as a file-based app run with `dotnet run tool.cs`. No Python, Node.js,
    Ruby, Perl or other general-purpose language. Shell scripts (bash, PowerShell) and CI YAML are fine as glue that
-   calls dotnet, git, gh and curl. Anything that parses data or makes decisions belongs in C#. Front-end code is fine: JavaScript, TypeScript, CSS, HTML and anything else that runs in the browser
-   (such as the client scripts and styles System.Web and the other libraries serve) is part of the product, not
-   tooling.
+   calls dotnet, git, gh and curl. Anything that parses data or makes decisions belongs in C#. Front-end code is
+   fine: JavaScript, TypeScript, CSS, HTML and anything else that runs in the browser (such as the client scripts and
+   styles System.Web and the other libraries serve) is part of the product, not tooling.
 
 Code written before rules 6–8 that breaks them is listed in #57, and Python written before rule 9 in #63. Each item is
 removed or replaced when it is next changed. New code doesn't add to either list.
