@@ -12,8 +12,8 @@ namespace WebApiGate
     // through OWIN under /owin (Microsoft.Owin.Host.SystemWeb, System.Web.Http.Owin), and against the oracle: the same
     // controllers and WebApiConfig in Web API's in-memory HttpServer, which involves no System.Web. Status, media type,
     // charset, body, Location and Allow must match the oracle. The headers ASP.NET adds are checked against what
-    // System.Web on IIS sends. Every response is also written to gate-responses.json (beside the test assembly), for a
-    // diff against the same requests on IIS.
+    // System.Web on IIS sends. Every request and response is also written to gate-responses.json (beside the test
+    // assembly); CI's iis-compare job sends the same requests to the sample on IIS 10 and diffs the two (#78).
     public class GateTests : IClassFixture<SampleServer>
     {
         public static readonly string[] Hosts = { "", "/owin" };
@@ -122,7 +122,7 @@ namespace WebApiGate
             string actualBody = await actual.Content.ReadAsStringAsync();
             // A server sends no body for HEAD but keeps the content headers.
             string expectedBody = method == "HEAD" ? "" : await expected.Content.ReadAsStringAsync();
-            Record($"{host} {method} {path} accept={accept} {contentType} {body}".TrimEnd(), actual, actualBody);
+            Record($"{host} {method} {path} accept={accept} {contentType} {body}".TrimEnd(), body, actual, actualBody);
 
             Assert.Equal((int)expected.StatusCode, (int)actual.StatusCode);
             Assert.Equal(expected.Content.Headers.ContentType?.MediaType, actual.Content.Headers.ContentType?.MediaType);
@@ -167,7 +167,7 @@ namespace WebApiGate
         {
             // No Web API route matches (the {id:int} constraint fails), so ASP.NET answers 404, not Web API.
             HttpResponseMessage response = await _server.Client.GetAsync(path);
-            Record($"system.web GET {path}", response, null);
+            Record($"system.web GET {path}", null, response, await response.Content.ReadAsStringAsync());
             Assert.Equal(404, (int)response.StatusCode);
         }
 
@@ -218,19 +218,30 @@ namespace WebApiGate
             return node.ToJsonString();
         }
 
-        private static void Record(string key, HttpResponseMessage response, string body)
+        // Each entry has the request as it was sent, so that tools/ci/iis_compare.cs can send the same requests to the
+        // sample on IIS 10 and compare the responses (#78). Date is left out; Server is kept (Kestrel here, IIS there).
+        private static void Record(string key, string requestBody, HttpResponseMessage response, string body)
         {
+            HttpRequestMessage sent = response.RequestMessage;
+            var request = new
+            {
+                method = sent.Method.Method,
+                url = sent.RequestUri.AbsoluteUri,
+                accept = sent.Headers.Accept.Count == 0 ? null : sent.Headers.Accept.ToString(),
+                contentType = sent.Content?.Headers.ContentType?.ToString(),
+                body = requestBody,
+            };
             var headers = new SortedDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (var h in response.Headers.Concat(response.Content.Headers))
             {
-                if (h.Key != "Date" && h.Key != "Server")
+                if (h.Key != "Date")
                 {
                     headers[h.Key] = string.Join(", ", h.Value);
                 }
             }
             lock (Gate)
             {
-                Recorded[key] = new { status = (int)response.StatusCode, headers, body };
+                Recorded[key] = new { request, status = (int)response.StatusCode, headers, body };
                 File.WriteAllText(Path.Combine(AppContext.BaseDirectory, "gate-responses.json"),
                     JsonSerializer.Serialize(new SortedDictionary<string, object>(Recorded), new JsonSerializerOptions { WriteIndented = true }));
             }
