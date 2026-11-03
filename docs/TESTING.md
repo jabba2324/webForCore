@@ -40,11 +40,14 @@ machine's store). To run the suites on Windows: Git for Windows, the SDK in `glo
 SQL Server (Express is enough) at `127.0.0.1,14333` with the `sa` login of `tools/ci/sqlserver.sh`; then the commands
 above in Git Bash.
 
-The default branch, `webforcore-lift`, is protected: a pull request can merge only once CI's `build-and-test`
-and `build-windows` jobs have passed on it (packing and the package smoke test included, on both). A release likewise
-needs both. Force pushes and deleting the branch are blocked.
-Repository admins can still push to the branch directly. GitHub runs CI on a first-time contributor's pull request
-only after a maintainer approves the run.
+The default branch, `webforcore-lift`, is protected by the repository ruleset `default-branch` (#76), the same in every
+xforcore repository: changes land only through a pull request (no approvals required), and it merges only once CI's
+`build-and-test` and `build-windows` jobs have passed on it (packing and the package smoke test included, on both) with
+the branch up to date with `webforcore-lift`. If it is behind, `gh pr update-branch <n>` merges the base in and CI runs
+again. A release likewise needs both jobs. Force pushes and deleting the branch are blocked, and nobody can bypass the
+rules, administrators included. Version bumps therefore go through a pull request too, before the `v<Version>` tag is
+pushed on the merged commit; tags aren't covered by the ruleset. GitHub runs CI on a first-time contributor's pull
+request only after a maintainer approves the run.
 
 After the tests, CI packs the NuGet packages (version `<Version>-ci.<run number>`; a `v<Version>` tag builds the
 release version and attaches the packages to a GitHub release, with `docs/release-notes/<version>.md` as its notes) and runs `tools/ci/package-smoke.sh`: a Web Forms app
@@ -225,3 +228,7 @@ Branch coverage isn't reported: dotnet-coverage's Cobertura output has no branch
   commit. A difference kept on purpose is in the tables above.
 - `tools/ci/trx_summary.cs` and `trx_failures.cs` summarise `.trx` files (C# file-based apps:
   `dotnet run tools/ci/trx_summary.cs -- <files>`).
+- `tools/ci/check_code_rules.cs` checks webForCore's own code against CONTRIBUTING.md rules 6 and 7 (non-public
+  reflection, unsafe code, P/Invoke, GC steering) and fails on any line that isn't one of #57's known exceptions, or
+  on an exception that has been fixed but is still listed. CI runs it on Linux before the build:
+  `dotnet run tools/ci/check_code_rules.cs`.

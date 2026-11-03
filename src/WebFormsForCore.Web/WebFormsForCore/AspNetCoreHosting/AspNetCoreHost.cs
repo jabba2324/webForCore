@@ -145,7 +145,7 @@ namespace System.Web.Hosting
 
             var applicationManager = new ApplicationManager();
             // create BuildManagerHost in the worker app domain
-            Type buildManagerHostType = typeof(HttpRuntime).Assembly.GetType("System.Web.Compilation.BuildManagerHost");
+            Type buildManagerHostType = typeof(System.Web.Compilation.BuildManagerHost);
             var appId = ApplicationManager.CreateApplicationId(virtualPath, physicalPath);
             var vpath = System.Web.VirtualPath.Create(virtualPath);
             var buildManagerHost = (System.Web.Compilation.BuildManagerHost)applicationManager.CreateInstanceInNewWorkerLoadContext(buildManagerHostType, appId, vpath, physicalPath, false);

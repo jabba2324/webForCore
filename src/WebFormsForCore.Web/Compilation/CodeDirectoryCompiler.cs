@@ -213,7 +213,11 @@ namespace System.Web.Compilation
 								.Any(a => a.Location == results.PathToAssembly)))
 							break;
 
-						GC.Collect();
+						// webForCore: don't wait for the old assembly to go. It can't unload in this process (one
+						// application per worker process, and a restart is a new process, #56), and forcing a GC to
+						// make it go is what CONTRIBUTING.md rule 7 forbids (#57). Fail as the timeout would.
+						Debug.Trace("CodeDirectoryCompiler", "Already loaded and can't unload: " + results.PathToAssembly);
+						throw new HttpException(SR.GetString(SR.Assembly_already_loaded, results.PathToAssembly));
 #endif
 					}
 

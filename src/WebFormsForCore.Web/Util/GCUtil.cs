@@ -18,19 +18,16 @@ namespace System.Web.Util {
 
         public static IntPtr RootObject(object obj) {
             return (obj != null)
-                ? (IntPtr)Alloc(obj)
+                ? (IntPtr)GCHandle.Alloc(obj)
                 : IntPtr.Zero;
         }
-
-        public static GCHandle Alloc(object obj) => GCHandle.Alloc(obj);
-        public static void Free(GCHandle handle) => handle.Free();
 
         public static object UnrootObject(IntPtr pointer) {
             if (pointer != IntPtr.Zero) {
                 GCHandle gcHandle = (GCHandle)pointer;
                 if (gcHandle.IsAllocated) {
                     object target = gcHandle.Target;
-                    Free(gcHandle);
+                    gcHandle.Free();
                     return target;
                 }
             }
@@ -48,7 +45,7 @@ namespace System.Web.Util {
         [PermissionSet(SecurityAction.Assert, Unrestricted = true)]
         public DisposableGCHandleRef(T t) {
             Debug.Assert(t != null);
-            _handle = GCUtil.Alloc(t);
+            _handle = GCHandle.Alloc(t);
         }
 
         public T Target {
@@ -64,7 +61,7 @@ namespace System.Web.Util {
             Target.Dispose();
             Debug.Assert(_handle.IsAllocated);
             if (_handle.IsAllocated) {
-                GCUtil.Free(_handle);
+                _handle.Free();
             }
         }
     }

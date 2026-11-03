@@ -104,6 +104,19 @@ commit that made it, and its issue, say why.
   `System.Data.TypedDataSetGenerator` and webForCore's TableAdapter generator); `BuildManager.ResolveAssembly` looks the
   fixed names (`App_GlobalResources`, `App_Code`, `__code`) up by simple name too, because .NET passes the display name,
   so `Assembly.Load("App_GlobalResources")` finds the compiled assembly, which keeps its random name as on IIS (#33).
+  Off Windows, when App_Code's new assembly has the path of one already loaded, `CodeDirectoryCompiler` fails at
+  once with the reference source's "already loaded" error: it used to force garbage collections for 3 seconds waiting
+  for it to unload, which it can't in a worker process (#57).
+- **Additions removed under CONTRIBUTING.md rules 6 and 7 (#57):** the unused `WebFormsTaskScheduler` (a public type
+  .NET Framework's System.Web never had, which reflected into `ThreadPoolTaskScheduler` and `Task`), a debug-only
+  `#if DebugWF4C` block in `HttpApplication.ExecuteStep`, and the `GCUtil.Alloc`/`Free` wrappers (`GCUtil`,
+  `RootedObjects`, `WorkItem`, `AspCompat` and `FileChangesMonitor` call `GCHandle` directly again, as the reference
+  source does). The BinaryFormatter port no longer looks up `SerializationInfo.StartDeserialization` by reflection;
+  the lookup found nothing on .NET 10, so .NET's SerializationGuard was never on, and isn't now
+  (`SerializationGuardTest`). System.Web's C# and VB CodeDom providers (`CSharpCodeProviderBase`, `VBCodeProviderBase`)
+  take the generator, the converters and member generation from System.CodeDom's public `CSharpCodeProvider` and
+  `VBCodeProvider` instead of creating its internal types by reflection (`CodeDomTests`). `tools/ci/check_code_rules.cs`
+  keeps new breaks out.
 - **`<system.net>`:** `<defaultProxy>` applied at application start, and `<mailSettings>` used by System.Web's mail
   senders (`WebFormsForCore.Net.Configuration.NetConfiguration`).
 - **Build targets** (`src/webForCore.WebStack.targets`, imported by every app through the `webForCore.Web` package):
