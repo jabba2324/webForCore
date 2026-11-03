@@ -10,7 +10,7 @@ that code and what had to change.
 
   | Submodule | Fork branch | Upstream commit | Changes |
   | --- | --- | --- | --- |
-  | `external/AspNetWebStack` | [xforcore/AspNetWebStack `webforcore`](https://github.com/xforcore/AspNetWebStack/commits/webforcore) | `2106565` | 148, a casing fix, and upstream's `.gitattributes` kept (Windows line endings for the tests) |
+  | `external/AspNetWebStack` | [xforcore/AspNetWebStack `webforcore`](https://github.com/xforcore/AspNetWebStack/commits/webforcore) | `2106565` | 149, a casing fix, and upstream's `.gitattributes` kept (Windows line endings for the tests) |
   | `external/AspNetKatana` | [xforcore/AspNetKatana `webforcore`](https://github.com/xforcore/AspNetKatana/commits/webforcore) | `096e225` | 10 |
   | `external/SignalR` | [xforcore/SignalR `webforcore`](https://github.com/xforcore/SignalR/commits/webforcore) | `7f53f26` | 3 |
   | `external/AspNetIdentity` | [xforcore/AspNetIdentity `webforcore`](https://github.com/xforcore/AspNetIdentity/commits/webforcore) | `b7fc094` | 5 |
@@ -74,7 +74,7 @@ fixed, or the BCL difference is documented.
 
 | Kind | Examples |
 | --- | --- |
-| **BCL message and type differences** | `ArgumentException.Message` ends with `(Parameter 'name')`; `MediaTypeHeaderValue(null)` throws `ArgumentNullException`; `System.Private.CoreLib` instead of `mscorlib` in assembly-qualified names; the UTF-8 decoder's replacement characters |
+| **BCL message and type differences** | `ArgumentException.Message` ends with `(Parameter 'name')`; `MediaTypeHeaderValue(null)` throws `ArgumentNullException`; `System.Private.CoreLib` instead of `mscorlib` in assembly-qualified names; the UTF-8 decoder's replacement characters; stack frames: a test asserts on MVC's own frame, not on .NET's Activator frames, which the JIT may inline (#74) |
 | **Platform newline and paths** | Razor's generated code and error messages use `\n` on Linux; tests that built Windows paths build them with `Path.Combine`, which gives each platform's separator (#46) |
 | **Test infrastructure** | `RunInSeparateAppDomain` and `AppDomainUtils` on collectible `AssemblyLoadContext`s (`test/webForCore.Microsoft.TestCommon`); xunit 1.9 → 2 (`Assert.ThrowsDelegate`, `Xunit.Extensions`); `PersistedAssemblyBuilder` for `AssemblyBuilderAccess.Save` |
 | **Windows-only test dependencies** | DPAPI in Katana's security tests → `TestDataProtectionProvider` (AES-CBC and HMAC-SHA256); LocalDB → SQL Server in a container (Identity); a test certificate .NET's DER reader rejects outside Windows |
