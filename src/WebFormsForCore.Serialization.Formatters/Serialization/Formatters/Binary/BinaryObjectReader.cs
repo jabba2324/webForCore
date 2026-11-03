@@ -23,7 +23,6 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
         internal ObjectManager? _objectManager;
         internal InternalFE _formatterEnums;
         internal SerializationBinder? _binder;
-        static MethodInfo startDeserialization = typeof(SerializationInfo).GetMethod("StartDeserialization", BindingFlags.NonPublic | BindingFlags.Static)!;
 
 		// Top object and headers
 		internal long _topId;
@@ -89,7 +88,10 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
 
             _isSimpleAssembly = (_formatterEnums._assemblyFormat == FormatterAssemblyStyle.Simple);
 
-            using (IDisposable? token = (IDisposable?)startDeserialization?.Invoke(null, null))
+            // webForCore: upstream wraps this in `using (SerializationInfo.StartDeserialization())`, which turns on
+            // SerializationGuard. That method isn't in .NET's public reference assemblies, and reaching it by
+            // reflection breaks CONTRIBUTING.md rule 6 (the lookup found nothing on .NET 10 anyway), so the guard
+            // isn't engaged here (#57).
             {
                 if (_fullDeserialization)
                 {

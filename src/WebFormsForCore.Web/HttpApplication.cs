@@ -2629,17 +2629,6 @@ namespace System.Web
          */
 		internal Exception ExecuteStep(IExecutionStep step, ref bool completedSynchronously)
 		{
-#if DebugWF4C
-			var handler = step.GetType().GetField("_handler", BindingFlags.NonPublic | BindingFlags.Instance) ??
-				step.GetType().GetField("_beginHandler", BindingFlags.NonPublic | BindingFlags.Instance);
-			var eventHandler = handler?.GetValue(step) as Delegate;
-			var delegates = eventHandler?.GetInvocationList();
-			var methods = delegates?.Select(d => d.Method.Name).ToArray();
-			if (methods != null && methods.Length > 0) 
-				System.Diagnostics.Debug.WriteLine($"ExecuteStep: {step.GetType().Name} {string.Join('+', methods)}");
-			else System.Diagnostics.Debug.WriteLine($"ExecuteStep: {step.GetType().Name}");
-#endif
-
 			Exception error = null;
 
 			try
