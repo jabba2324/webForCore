@@ -48,7 +48,7 @@
         <PackageReference Include="drawingForCore" Version="$(DrawingForCoreVersion)" Aliases="WfcDrawing" />
         <Compile Include="..\WebFormsForCore.Web\WebFormsForCore\AssemblyRef.cs" Link="Properties\AssemblyRef.cs" />
         <!-- Chart.DataBindTable/DataSource support SqlCommand/SqlDataReader/SqlDataAdapter; a separate package on modern .NET -->
-        <PackageReference Include="System.Data.SqlClient" Version="4.9.1" />
+        <ProjectReference Include="..\webForCore.System.Data.SqlClient\webForCore.System.Data.SqlClient.csproj" />
     </ItemGroup>
 
     <Target Name="ChangeAliasesOfNugetRefs" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">

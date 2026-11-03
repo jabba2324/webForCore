@@ -90,6 +90,15 @@ if grep -q -E '"lib/net4[0-9]*/System\.Web\.(Mvc|Razor|WebPages[A-Za-z.]*|Helper
   grep -o -E '"lib/net4[0-9]*/System\.Web\.(Mvc|Razor|WebPages[A-Za-z.]*|Helpers)\.dll"' bin_dotnet/SmokeMvc.deps.json | sort -u
   fail=1
 fi
+# Nothing of Microsoft's System.Data.SqlClient package, which Entity Framework brings, is in the output or deps.json, its
+# runtimes/unix and runtimes/win builds included (issue #41: they are at other paths than webForCore's, so the SDK's
+# conflict resolution doesn't remove them).
+if grep -q -E '"System\.Data\.SqlClient/|netcoreapp2\.1/System\.Data\.SqlClient\.dll' bin_dotnet/SmokeMvc.deps.json \
+    || [ -n "$(find bin_dotnet -path '*netcoreapp2.1*' -name System.Data.SqlClient.dll)" ]; then
+  echo "Microsoft's System.Data.SqlClient package is in the output:"
+  grep -n 'System.Data.SqlClient' bin_dotnet/SmokeMvc.deps.json | head -20
+  fail=1
+fi
 dotnet bin_dotnet/webforcore-host/webforcore-host.dll --urls http://127.0.0.1:5198 > server.log 2>&1 &
 server=$!
 for i in $(seq 120); do curl -sf -o /dev/null http://127.0.0.1:5198/ && break; sleep 1; done
@@ -102,6 +111,10 @@ curl -s http://127.0.0.1:5198/Plain | grep -q '{"helpers":true}' || { echo "/Pla
 # webForCore's SignalR and DataVisualization have Microsoft's assembly versions, so Microsoft's SignalR SQL Server
 # scale-out (built against SignalR 2.4.3) compiles and binds (issue #40: CS1705 against SignalR.Core 0.0.0.0, JabbR).
 curl -s http://127.0.0.1:5198/Versions | grep -q "SignalR 2.4.3.0, scale-out 2.4.3.0, DataVisualization 4.0.0.0" || { echo "/Versions: unexpected response"; curl -s http://127.0.0.1:5198/Versions | head -c 300; echo; fail=1; }
+# webForCore's System.Data.SqlClient runs, Entity Framework binds to it, and Assembly.GetTypes() works on it and on every
+# other loaded assembly (issue #41: on Microsoft's it threw, so a scan of every loaded assembly failed, as Opserver's did).
+scan=$(curl -s http://127.0.0.1:5198/Scan)
+case "$scan" in "SqlClient 4.901."*", GetTypes ok, Entity Framework binds: True, scan failures: 0 ") ;; *) echo "/Scan: $scan"; fail=1;; esac
 # Unity, started from Application_Start (WebActivatorEx's start methods don't run on webForCore, issue #21; the original
 # package is in the build all the same and must not break it), constructs the controller, and its Razor view renders
 # although Unity.Mvc brings Microsoft.AspNet.Razor 3.2.7 (issue #23: it replaced webForCore's, MissingMethodException).

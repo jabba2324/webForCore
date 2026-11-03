@@ -51,7 +51,9 @@
         <PackageReference Include="System.Configuration.ConfigurationManager" Version="10.0.14">
             <Aliases>NET</Aliases>
         </PackageReference>
-        <PackageReference Include="System.Data.SqlClient" Version="4.9.1" /> <!-- webForCore: as .NET Framework (was Microsoft.Data.SqlClient 7.1.0) -->
+        <!-- webForCore: as .NET Framework (was Microsoft.Data.SqlClient 7.1.0): Microsoft's System.Data.SqlClient 4.9.1, with
+             Assembly.GetTypes() fixed (#41). -->
+        <ProjectReference Include="..\webForCore.System.Data.SqlClient\webForCore.System.Data.SqlClient.csproj" />
         <!--<PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
         <PackageReference Include="System.Text.Json" Version="10.0.0" />
         <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />-->

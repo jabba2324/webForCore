@@ -26,7 +26,9 @@ Summary
   ASP.NET SignalR 2.4.3                       src|test/webForCore.Microsoft.AspNet.SignalR* Apache-2.0 (.NET Foundation)
   ASP.NET Identity 2                          src/webForCore.Microsoft.AspNet.Identity.*,   MIT (Microsoft)
                                               test/webForCore.Identity.Test
-  Mono System.Web tests                       test/webForCore.System.Web.MonoTests          MIT (Novell, Xamarin and
+  System.Data.SqlClient 4.9.1                 src/webForCore.System.Data.SqlClient          MIT (.NET Foundation)
+    (dotnet/maintenance-packages)
+  Mono System.Web tests                      test/webForCore.System.Web.MonoTests          MIT (Novell, Xamarin and
                                                                                             contributors)
   Mono class library code                     src/WebFormsForCore.Web (Mono.Security,       MIT (Novell, Ximian)
                                               ManagedProtection, mono/StronglyTyped-
@@ -119,6 +121,13 @@ b7fc094), licensed under the MIT License, Copyright (c) Microsoft Corporation. I
 the external/AspNetIdentity submodule (https://github.com/xforcore/AspNetIdentity, branch webforcore), compiled by
 src/webForCore.Microsoft.AspNet.Identity.* and test/webForCore.Identity.Test; each file keeps its original header, and
 every change is a commit on that branch.
+
+This product includes System.Data.SqlClient 4.9.1 from dotnet/maintenance-packages
+(https://github.com/dotnet/maintenance-packages, commit e699209), licensed under the MIT License, Copyright (c) .NET
+Foundation and Contributors. It is in the external/maintenance-packages submodule
+(https://github.com/xforcore/maintenance-packages, branch webforcore), compiled by src/webForCore.System.Data.SqlClient;
+each file keeps its original header, and every change is a commit on that branch. The assembly carries Microsoft's
+name, version (4.6.1.6) and public key token (b03f5f7f11d50a3a); it is not signed by Microsoft.
 
 src/WebFormsForCore.Web.DataVisualization/Common/SR.resx comes from Data Visualization for .NET
 (https://github.com/dotnet/winforms-datavisualization, commit 022f396), licensed under the MIT License,

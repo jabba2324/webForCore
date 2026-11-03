@@ -227,11 +227,13 @@ These came up migrating real applications; each names one that needed it.
   System.Web.Extensions' CoreWCF client support) and `Humanizer.Core` 2.14.1 (through Roslyn in `webForCore.Compilers`;
   aspnet-mvc5-starter had 2.6.2, #30). `System.Configuration.ConfigurationManager` and `System.Runtime.Caching` come
   with webForCore at 11.0: remove the application's references to them (MVCForum had 4.5 previews). More generally, every
-  package webForCore depends on is a floor for the application's reference to it: `System.Data.SqlClient` 4.9.1 (YAF.NET's
-  ServiceStack.OrmLite.SqlServer had 4.8.1) and the System.* packages at 11.0, such as `System.DirectoryServices`
-  (Opserver had 4.5.0) (#42). Raise the application's reference, or remove it if the package was
-  only there as another package's dependency. `EntityFramework` before 6.4 has no .NET build: use 6.4 or later
-  (6.5.1 works with `System.Data.SqlClient`). EntityFramework 6.5.1 needs `System.ComponentModel.Annotations` 5.0.0,
+  package webForCore depends on is a floor for the application's reference to it: the System.* packages at 11.0, such
+  as `System.DirectoryServices` (Opserver had 4.5.0) (#42). Raise the application's reference, or remove it if the
+  package was only there as another package's dependency. `System.Data.SqlClient` isn't one of them: webForCore brings
+  its own build of Microsoft's 4.9.1 (`webForCore.Data.SqlClient`, #41), and the `System.Data.SqlClient` package's
+  assemblies are left out of the build at any version the application or its packages reference (YAF.NET's
+  ServiceStack.OrmLite.SqlServer had 4.8.1, Entity Framework 6.5.1 brings 4.8.6). `EntityFramework` before 6.4 has no
+  .NET build: use 6.4 or later (6.5.1 works with `System.Data.SqlClient`). EntityFramework 6.5.1 needs `System.ComponentModel.Annotations` 5.0.0,
   and .NET 10 treats only versions up to 4.3.0 as part of the framework, so a lower reference fails:
   `NU1605: Detected package downgrade: System.ComponentModel.Annotations from 5.0.0 to 4.4.1` (MVCForum). Raise it to
   5.0.0 in every project that has it, or remove it where the project doesn't use it directly (#62).

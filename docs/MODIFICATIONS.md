@@ -17,6 +17,7 @@ that code and what had to change.
   | `external/referencesource` | [xforcore/referencesource `webforcore`](https://github.com/xforcore/referencesource/commits/webforcore) | `ec9fa9a` | 41 |
   | `external/winforms` | [xforcore/winforms `webforcore`](https://github.com/xforcore/winforms/commits/webforcore) | `8266870` | 13 |
   | `external/mono` | [xforcore/mono `webforcore`](https://github.com/xforcore/mono/commits/webforcore) | `0f53e9e` | 31 |
+  | `external/maintenance-packages` | [xforcore/maintenance-packages `webforcore`](https://github.com/xforcore/maintenance-packages/commits/webforcore) | `e699209` | 1 |
 
   Each branch starts at the upstream commit, then one commit keeps only the files webForCore uses (and the licences),
   then the changes, one file per commit. `git log` on a submodule lists them; `git revert` undoes one.
@@ -34,7 +35,8 @@ that code and what had to change.
 4. **Every file is traceable:** the submodule pins the fork's commit, and the fork's history goes back to upstream's.
 5. **Identity is kept.** Assemblies keep Microsoft's names and versions. Those Microsoft strong-named are delay signed
    with Microsoft's public key (`src/SigningKey/35MSSharedLib1024.snk`), so existing references and binding
-   information resolve to them. They aren't signed by Microsoft.
+   information resolve to them. They aren't signed by Microsoft. System.Data.SqlClient carries Microsoft's other public
+   key (`b03f5f7f11d50a3a`), as System.Web does, set by `FakeStrongName`.
 6. **Project files are webForCore's,** edited by hand: they name the submodule files they compile.
 
 ## Components from submodules
@@ -45,11 +47,12 @@ that code and what had to change.
 | Katana (Microsoft.Owin 4.2.3) | [aspnet/AspNetKatana@096e225](https://github.com/aspnet/AspNetKatana/tree/096e225) | Apache 2.0 | 324 · 55 | 8 · 3 |
 | ASP.NET SignalR 2.4.3 | [SignalR/SignalR@7f53f26](https://github.com/SignalR/SignalR/tree/7f53f26) | Apache 2.0 | 318 · 152 | 2 · 1 |
 | ASP.NET Identity 2 | [aspnet/AspNetIdentity@b7fc094](https://github.com/aspnet/AspNetIdentity/tree/b7fc094) | MIT | 75 · 26 | 0 · 4 |
+| System.Data.SqlClient 4.9.1 (replacing Microsoft's package, #41) | [dotnet/maintenance-packages@e699209](https://github.com/dotnet/maintenance-packages/tree/e699209) (`src/System.Data.SqlClient`, `src/Common`) | MIT | 270 | 1 |
 | System.Web tests | [mono/mono@0f53e9e](https://github.com/mono/mono/tree/0f53e9e) (`mcs/class/System.Web/Test`) | MIT | 188 | 30 |
 | System.Configuration, System.Web.ApplicationServices, aspnet_compiler, `BindableTypeAttribute` (replacing WebFormsForCore's decompiled copies); System.Data's typed DataSet generator | [microsoft/referencesource@ec9fa9a](https://github.com/microsoft/referencesource/tree/ec9fa9ae770d522a5b5f0607898044b7478574a3) | MIT | 114 | 41 |
 | ResX classes (replacing decompiled copies) | [dotnet/winforms@8266870](https://github.com/dotnet/winforms/tree/8266870) (release/8.0) | MIT | 13 | 13 |
 | StronglyTypedResourceBuilder (replacing an API reconstruction) | mono/mono@0f53e9e (`mcs/class/System.Design`) | MIT | 1 | 1 |
-| **Total** | | | **4,085** | **250** |
+| **Total** | | | **4,355** | **251** |
 
 The fork itself starts from [webformsforcore/WebFormsForCore@52f4172](https://github.com/webformsforcore/WebFormsForCore/tree/52f4172dbc09b3ad0b849c97642720fa7a49aa22),
 whose System.Web, System.Configuration and related assemblies were ported from Microsoft's .NET Framework reference
@@ -66,6 +69,7 @@ webForCore's changes to the port are its git history since the fork: `git diff 5
 | **.NET Framework behaviour restored** | Web Pages' `WebMail` takes its defaults from `<system.net><mailSettings>`, which .NET's `SmtpClient` ignores; `float`/`double` route constraints reject overflow; a whitespace multipart root path is rejected; `HttpResponseMessage.Content` is never null on .NET, so `ResponseContent.Get` treats `EmptyContent` as no content (11 call sites in the Web API hosts); a request body copied through the seekable stream; `HostString` keeps the host's case | Web Stack, Katana |
 | **Compiler and language** | A `(string)null` where .NET's `ArraySegment<T>` overloads made `null` ambiguous; `LangVersion` pinned to what Microsoft built with (C# 7.3 for SignalR) | SignalR, Web Stack |
 | **Linux and ICU** | Case-correct paths for files referenced with a different case; newline handling; IDN mapping | Web Stack tests, Katana |
+| **Types .NET can't load** | `SqlGuidCaster` overlaid a `byte[]` on `SqlGuid`, whose field is a `Guid?` on .NET, so `Assembly.GetTypes()` threw; its unused `SqlGuidCtor` calls `new SqlGuid(byte[])`, as Microsoft.Data.SqlClient 5.2 does (#41) | System.Data.SqlClient |
 
 ## Test changes, by kind
 

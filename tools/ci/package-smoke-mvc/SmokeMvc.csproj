@@ -42,5 +42,7 @@
     <PackageReference Include="Microsoft.Owin.Security.Google" Version="3.0.1" />
     <!-- Microsoft's, which webForCore doesn't lift: built against Microsoft's SignalR 2.4.3 (#40, JabbR). -->
     <PackageReference Include="Microsoft.AspNet.SignalR.SqlServer" Version="2.4.3" />
+    <!-- Brings Microsoft's System.Data.SqlClient 4.8.6, which webForCore's replaces (#41). -->
+    <PackageReference Include="EntityFramework" Version="6.5.1" />
   </ItemGroup>
 </Project>
