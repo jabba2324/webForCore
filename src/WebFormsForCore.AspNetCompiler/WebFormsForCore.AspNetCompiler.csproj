@@ -8,7 +8,7 @@
         <Nullable>disable</Nullable>
         <AssemblyName>aspnetcore_compiler</AssemblyName>
         <StartupObject>System.Web.Compilation.Start</StartupObject>
-        <RestoreSources>$(RestoreSources);../../nupkg;https://api.nuget.org/v3/index.json;https://jabba2324.github.io/drawingForCore/index.json</RestoreSources>
+        <RestoreSources>$(RestoreSources);../../nupkg;https://api.nuget.org/v3/index.json;https://xforcore.github.io/drawingForCore/index.json</RestoreSources>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 
         <IsPackable>true</IsPackable>
