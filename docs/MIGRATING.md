@@ -36,21 +36,21 @@ For an AI agent doing the migration, the same procedure is written as instructio
 ## 1. Get webForCore
 
 **From the packages (simplest).** webForCore's NuGet packages aren't on nuget.org. From 0.7.0 they are on a NuGet
-feed on GitHub Pages, and System.Drawing comes from [drawingForCore](https://github.com/jabba2324/drawingForCore)'s
+feed on GitHub Pages, and System.Drawing comes from [drawingForCore](https://github.com/xforcore/drawingForCore)'s
 feed, which the `webForCore` package depends on. Add both as package sources in the solution's `nuget.config`:
 
 ```xml
 <configuration>
   <packageSources>
     <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
-    <add key="webForCore" value="https://jabba2324.github.io/webForCore/index.json" />
-    <add key="drawingForCore" value="https://jabba2324.github.io/drawingForCore/index.json" />
+    <add key="webForCore" value="https://xforcore.github.io/webForCore/index.json" />
+    <add key="drawingForCore" value="https://xforcore.github.io/drawingForCore/index.json" />
   </packageSources>
 </configuration>
 ```
 
 The feed keeps the latest five releases. Every release's packages are also attached to it on GitHub
-([Releases](https://github.com/jabba2324/webForCore/releases)); 0.6.0 and earlier are only there (download them into a
+([Releases](https://github.com/xforcore/webForCore/releases)); 0.6.0 and earlier are only there (download them into a
 folder and add the folder as a package source; they include System.Drawing as `webForCore.Drawing`).
 
 Then reference `webForCore` (System.Web and the assemblies every app needs, plus the build targets) and the packages
@@ -60,7 +60,7 @@ for the frameworks the app uses (section 3). The package route needs no `<Import
 **From source**, to work on webForCore itself or use unreleased changes: the app references webForCore's projects.
 
 ```bash
-git clone https://github.com/jabba2324/webForCore
+git clone https://github.com/xforcore/webForCore
 cd webForCore
 dotnet build src/WebFormsForCore.Build/WebFormsForCore.Build.csproj -c Release
 dotnet build WebFormsForCore.slnx -c Release
