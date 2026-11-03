@@ -34,16 +34,16 @@
   <Import Project="../webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="OwinClientHandler.cs" />
-    <Compile Include="Properties/AssemblyInfo.cs" />
-    <Compile Include="RequestBuilder.cs" />
-    <Compile Include="Resources.Designer.cs" />
-    <Compile Include="ResponseStream.cs" />
-    <Compile Include="TestServer.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Testing/OwinClientHandler.cs" Link="OwinClientHandler.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Testing/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Testing/RequestBuilder.cs" Link="RequestBuilder.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Testing/Resources.Designer.cs" Link="Resources.Designer.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Testing/ResponseStream.cs" Link="ResponseStream.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Testing/TestServer.cs" Link="TestServer.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources.resx" LogicalName="Microsoft.Owin.Testing.Resources.resources" />
+    <EmbeddedResource Include="../../external/AspNetKatana/src/Microsoft.Owin.Testing/Resources.resx" Link="Resources.resx" LogicalName="Microsoft.Owin.Testing.Resources.resources" />
   </ItemGroup>
 
   <ItemGroup>

@@ -34,71 +34,71 @@
   <Import Project="../webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="App_Packages/Owin.Loader/LoaderResources.Designer.cs" />
-    <Compile Include="CallContextAsyncResult.cs" />
-    <Compile Include="CallEnvironment/AspNetDictionary.Generated.cs" />
-    <Compile Include="CallEnvironment/AspNetDictionary.cs" />
-    <Compile Include="CallEnvironment/NilDictionary.cs" />
-    <Compile Include="CallEnvironment/TraceTextWriter.cs" />
-    <Compile Include="CallHeaders/AspNetRequestHeaders.cs" />
-    <Compile Include="CallHeaders/AspNetResponseHeaders.cs" />
-    <Compile Include="CallHeaders/SendingHeadersEvent.cs" />
-    <Compile Include="CallStreams/DelegatingStream.cs" />
-    <Compile Include="CallStreams/InputStream.cs" />
-    <Compile Include="CallStreams/OutputStream.cs" />
-    <Compile Include="Constants.cs" />
-    <Compile Include="DataProtection/MachineKeyDataProtectionProvider.cs" />
-    <Compile Include="DataProtection/MachineKeyDataProtector.cs" />
-    <Compile Include="DictionaryExtensions.cs" />
-    <Compile Include="DisconnectWatcher.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="HttpContextBaseExtensions.cs" />
-    <Compile Include="HttpContextExtensions.cs" />
-    <Compile Include="HttpContextItemKeys.cs" />
-    <Compile Include="Infrastructure/DefaultTrace.cs" />
-    <Compile Include="Infrastructure/DefaultTraceFactory.cs" />
-    <Compile Include="Infrastructure/ErrorState.cs" />
-    <Compile Include="Infrastructure/ITrace.cs" />
-    <Compile Include="Infrastructure/ITraceFactory.cs" />
-    <Compile Include="Infrastructure/ReferencedAssemblyWrapper.cs" />
-    <Compile Include="Infrastructure/TraceExtensions.cs" />
-    <Compile Include="Infrastructure/TraceFactory.cs" />
-    <Compile Include="IntegratedPipeline/IntegratedPipelineBlueprint.cs" />
-    <Compile Include="IntegratedPipeline/IntegratedPipelineBlueprintStage.cs" />
-    <Compile Include="IntegratedPipeline/IntegratedPipelineContext.cs" />
-    <Compile Include="IntegratedPipeline/IntegratedPipelineContextStage.cs" />
-    <Compile Include="IntegratedPipeline/StageAsyncResult.cs" />
-    <Compile Include="Loader/Constants.cs" />
-    <Compile Include="Loader/DefaultLoader.cs" />
-    <Compile Include="Loader/NullLoader.cs" />
-    <Compile Include="OwinAppContext.cs" />
-    <Compile Include="OwinApplication.cs" />
-    <Compile Include="OwinBuilder.cs" />
-    <Compile Include="OwinCallContext.DisableResponseCompression.cs" />
-    <Compile Include="OwinCallContext.Environment.cs" />
-    <Compile Include="OwinCallContext.WebSockets.cs" />
-    <Compile Include="OwinCallContext.cs" />
-    <Compile Include="OwinHttpHandler.cs" />
-    <Compile Include="OwinHttpModule.cs" />
-    <Compile Include="OwinRoute.cs" />
-    <Compile Include="OwinRouteHandler.cs" />
-    <Compile Include="PreApplicationStart.cs" />
-    <Compile Include="Properties/AssemblyInfo.cs" />
-    <Compile Include="Resources.Designer.cs" />
-    <Compile Include="RouteCollectionExtensions.cs" />
-    <Compile Include="ShutdownDetector.cs" />
-    <Compile Include="SystemWebChunkingCookieManager.cs" />
-    <Compile Include="SystemWebCookieManager.cs" />
-    <Compile Include="UnsafeIISMethods.cs" />
-    <Compile Include="Utils.cs" />
-    <Compile Include="WebSockets/OwinWebSocketWrapper.cs" />
-    <Compile Include="WebSockets/WebSocketConstants.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/App_Packages/Owin.Loader/LoaderResources.Designer.cs" Link="App_Packages/Owin.Loader/LoaderResources.Designer.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/CallContextAsyncResult.cs" Link="CallContextAsyncResult.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/CallEnvironment/AspNetDictionary.Generated.cs" Link="CallEnvironment/AspNetDictionary.Generated.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/CallEnvironment/AspNetDictionary.cs" Link="CallEnvironment/AspNetDictionary.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/CallEnvironment/NilDictionary.cs" Link="CallEnvironment/NilDictionary.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/CallEnvironment/TraceTextWriter.cs" Link="CallEnvironment/TraceTextWriter.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/CallHeaders/AspNetRequestHeaders.cs" Link="CallHeaders/AspNetRequestHeaders.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/CallHeaders/AspNetResponseHeaders.cs" Link="CallHeaders/AspNetResponseHeaders.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/CallHeaders/SendingHeadersEvent.cs" Link="CallHeaders/SendingHeadersEvent.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/CallStreams/DelegatingStream.cs" Link="CallStreams/DelegatingStream.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/CallStreams/InputStream.cs" Link="CallStreams/InputStream.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/CallStreams/OutputStream.cs" Link="CallStreams/OutputStream.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/Constants.cs" Link="Constants.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/DataProtection/MachineKeyDataProtectionProvider.cs" Link="DataProtection/MachineKeyDataProtectionProvider.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/DataProtection/MachineKeyDataProtector.cs" Link="DataProtection/MachineKeyDataProtector.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/DictionaryExtensions.cs" Link="DictionaryExtensions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/DisconnectWatcher.cs" Link="DisconnectWatcher.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/HttpContextBaseExtensions.cs" Link="HttpContextBaseExtensions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/HttpContextExtensions.cs" Link="HttpContextExtensions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/HttpContextItemKeys.cs" Link="HttpContextItemKeys.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/Infrastructure/DefaultTrace.cs" Link="Infrastructure/DefaultTrace.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/Infrastructure/DefaultTraceFactory.cs" Link="Infrastructure/DefaultTraceFactory.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/Infrastructure/ErrorState.cs" Link="Infrastructure/ErrorState.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/Infrastructure/ITrace.cs" Link="Infrastructure/ITrace.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/Infrastructure/ITraceFactory.cs" Link="Infrastructure/ITraceFactory.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/Infrastructure/ReferencedAssemblyWrapper.cs" Link="Infrastructure/ReferencedAssemblyWrapper.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/Infrastructure/TraceExtensions.cs" Link="Infrastructure/TraceExtensions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/Infrastructure/TraceFactory.cs" Link="Infrastructure/TraceFactory.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/IntegratedPipeline/IntegratedPipelineBlueprint.cs" Link="IntegratedPipeline/IntegratedPipelineBlueprint.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/IntegratedPipeline/IntegratedPipelineBlueprintStage.cs" Link="IntegratedPipeline/IntegratedPipelineBlueprintStage.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/IntegratedPipeline/IntegratedPipelineContext.cs" Link="IntegratedPipeline/IntegratedPipelineContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/IntegratedPipeline/IntegratedPipelineContextStage.cs" Link="IntegratedPipeline/IntegratedPipelineContextStage.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/IntegratedPipeline/StageAsyncResult.cs" Link="IntegratedPipeline/StageAsyncResult.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Owin.Loader/Constants.cs" Link="Loader/Constants.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Owin.Loader/DefaultLoader.cs" Link="Loader/DefaultLoader.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Owin.Loader/NullLoader.cs" Link="Loader/NullLoader.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/OwinAppContext.cs" Link="OwinAppContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/OwinApplication.cs" Link="OwinApplication.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/OwinBuilder.cs" Link="OwinBuilder.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/OwinCallContext.DisableResponseCompression.cs" Link="OwinCallContext.DisableResponseCompression.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/OwinCallContext.Environment.cs" Link="OwinCallContext.Environment.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/OwinCallContext.WebSockets.cs" Link="OwinCallContext.WebSockets.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/OwinCallContext.cs" Link="OwinCallContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/OwinHttpHandler.cs" Link="OwinHttpHandler.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/OwinHttpModule.cs" Link="OwinHttpModule.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/OwinRoute.cs" Link="OwinRoute.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/OwinRouteHandler.cs" Link="OwinRouteHandler.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/PreApplicationStart.cs" Link="PreApplicationStart.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/Resources.Designer.cs" Link="Resources.Designer.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/RouteCollectionExtensions.cs" Link="RouteCollectionExtensions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/ShutdownDetector.cs" Link="ShutdownDetector.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/SystemWebChunkingCookieManager.cs" Link="SystemWebChunkingCookieManager.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/SystemWebCookieManager.cs" Link="SystemWebCookieManager.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/UnsafeIISMethods.cs" Link="UnsafeIISMethods.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/Utils.cs" Link="Utils.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/WebSockets/OwinWebSocketWrapper.cs" Link="WebSockets/OwinWebSocketWrapper.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/WebSockets/WebSocketConstants.cs" Link="WebSockets/WebSocketConstants.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="Microsoft.Owin.Host.SystemWeb.Tests" Key="0024000004800000940000000602000000240000525341310004000001000100b5fc90e7027f67871e773a8fde8938c81dd402ba65b9201d60593e96c492651e889cc13f1415ebb53fac1131ae0bd333c5ee6021672d9718ea31a8aebd0da0072f25d87dba6fc90ffd598ed4da35e44c398c454307e8e33b8426143daec9f596836f97c8f74750e5975c64e2189f45def46b2a2b1247adc3652bf5c308055da9" />
-    <EmbeddedResource Include="App_Packages/Owin.Loader/LoaderResources.resx" LogicalName="Microsoft.Owin.Host.SystemWeb.App_Packages.Owin.Loader.LoaderResources.resources" />
-    <EmbeddedResource Include="Resources.resx" LogicalName="Microsoft.Owin.Host.SystemWeb.Resources.resources" />
+    <EmbeddedResource Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/App_Packages/Owin.Loader/LoaderResources.resx" Link="App_Packages/Owin.Loader/LoaderResources.resx" LogicalName="Microsoft.Owin.Host.SystemWeb.App_Packages.Owin.Loader.LoaderResources.resources" />
+    <EmbeddedResource Include="../../external/AspNetKatana/src/Microsoft.Owin.Host.SystemWeb/Resources.resx" Link="Resources.resx" LogicalName="Microsoft.Owin.Host.SystemWeb.Resources.resources" />
   </ItemGroup>
 
   <ItemGroup>

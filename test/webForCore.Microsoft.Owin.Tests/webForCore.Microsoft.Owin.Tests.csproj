@@ -35,21 +35,21 @@
   <Import Project="../../src/webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="Builder/AppBuilderCookieTests.cs" />
-    <Compile Include="Builder/AppBuilderTestExtensions.cs" />
-    <Compile Include="Builder/AppBuilderTests.cs" />
-    <Compile Include="CookieChunkingTests.cs" />
-    <Compile Include="FormsTests.cs" />
-    <Compile Include="HeaderTests.cs" />
-    <Compile Include="HostStringTests.cs" />
-    <Compile Include="Mapping/MapPathMiddlewareTests.cs" />
-    <Compile Include="Mapping/MapPredicateMiddlewareTests.cs" />
-    <Compile Include="PathStringTests.cs" />
-    <Compile Include="QueryStringTests.cs" />
-    <Compile Include="QueryTests.cs" />
-    <Compile Include="RequestCookieTests.cs" />
-    <Compile Include="Security/AuthenticationManagerTests.cs" />
-    <Compile Include="UriTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Tests/Builder/AppBuilderCookieTests.cs" Link="Builder/AppBuilderCookieTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Tests/Builder/AppBuilderTestExtensions.cs" Link="Builder/AppBuilderTestExtensions.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Tests/Builder/AppBuilderTests.cs" Link="Builder/AppBuilderTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Tests/CookieChunkingTests.cs" Link="CookieChunkingTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Tests/FormsTests.cs" Link="FormsTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Tests/HeaderTests.cs" Link="HeaderTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Tests/HostStringTests.cs" Link="HostStringTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Tests/Mapping/MapPathMiddlewareTests.cs" Link="Mapping/MapPathMiddlewareTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Tests/Mapping/MapPredicateMiddlewareTests.cs" Link="Mapping/MapPredicateMiddlewareTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Tests/PathStringTests.cs" Link="PathStringTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Tests/QueryStringTests.cs" Link="QueryStringTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Tests/QueryTests.cs" Link="QueryTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Tests/RequestCookieTests.cs" Link="RequestCookieTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Tests/Security/AuthenticationManagerTests.cs" Link="Security/AuthenticationManagerTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Tests/UriTests.cs" Link="UriTests.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -35,20 +35,20 @@
   <Import Project="../../src/webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="CallEnvironment/AspNetEnvironmentTests.cs" />
-    <Compile Include="CallHeaders/AspNetRequestHeadersTests.cs" />
-    <Compile Include="DictionaryExtensions.cs" />
-    <Compile Include="EnvironmentContentTests.cs" />
-    <Compile Include="FakeN/FakeHttpContext.cs" />
-    <Compile Include="FakeN/FakeHttpContextEx.cs" />
-    <Compile Include="FakeN/FakeHttpRequest.cs" />
-    <Compile Include="FakeN/FakeHttpRequestEx.cs" />
-    <Compile Include="FakeN/FakeHttpResponse.cs" />
-    <Compile Include="FakeN/FakeHttpResponseEx.cs" />
-    <Compile Include="OwinHttpHandlerTests.cs" />
-    <Compile Include="OwinRouteHandlerTests.cs" />
-    <Compile Include="OwinRouteTests.cs" />
-    <Compile Include="TestsBase.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Host.SystemWeb.Tests/CallEnvironment/AspNetEnvironmentTests.cs" Link="CallEnvironment/AspNetEnvironmentTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Host.SystemWeb.Tests/CallHeaders/AspNetRequestHeadersTests.cs" Link="CallHeaders/AspNetRequestHeadersTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Host.SystemWeb.Tests/DictionaryExtensions.cs" Link="DictionaryExtensions.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Host.SystemWeb.Tests/EnvironmentContentTests.cs" Link="EnvironmentContentTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Host.SystemWeb.Tests/FakeN/FakeHttpContext.cs" Link="FakeN/FakeHttpContext.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Host.SystemWeb.Tests/FakeN/FakeHttpContextEx.cs" Link="FakeN/FakeHttpContextEx.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Host.SystemWeb.Tests/FakeN/FakeHttpRequest.cs" Link="FakeN/FakeHttpRequest.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Host.SystemWeb.Tests/FakeN/FakeHttpRequestEx.cs" Link="FakeN/FakeHttpRequestEx.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Host.SystemWeb.Tests/FakeN/FakeHttpResponse.cs" Link="FakeN/FakeHttpResponse.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Host.SystemWeb.Tests/FakeN/FakeHttpResponseEx.cs" Link="FakeN/FakeHttpResponseEx.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Host.SystemWeb.Tests/OwinHttpHandlerTests.cs" Link="OwinHttpHandlerTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Host.SystemWeb.Tests/OwinRouteHandlerTests.cs" Link="OwinRouteHandlerTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Host.SystemWeb.Tests/OwinRouteTests.cs" Link="OwinRouteTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Host.SystemWeb.Tests/TestsBase.cs" Link="TestsBase.cs" />
   </ItemGroup>
 
   <ItemGroup>

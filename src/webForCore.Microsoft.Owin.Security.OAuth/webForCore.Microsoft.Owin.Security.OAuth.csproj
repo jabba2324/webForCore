@@ -34,49 +34,49 @@
   <Import Project="../webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="Messages/AuthorizeEndpointRequest.cs" />
-    <Compile Include="Messages/TokenEndpointRequest.cs" />
-    <Compile Include="Messages/TokenEndpointRequestAuthorizationCode.cs" />
-    <Compile Include="Messages/TokenEndpointRequestClientCredentials.cs" />
-    <Compile Include="Messages/TokenEndpointRequestCustomExtension.cs" />
-    <Compile Include="Messages/TokenEndpointRequestRefreshToken.cs" />
-    <Compile Include="Messages/TokenEndpointRequestResourceOwnerPasswordCredentials.cs" />
-    <Compile Include="OAuthAuthorizationServerExtensions.cs" />
-    <Compile Include="OAuthAuthorizationServerHandler.cs" />
-    <Compile Include="OAuthAuthorizationServerMiddleware.cs" />
-    <Compile Include="OAuthAuthorizationServerOptions.cs" />
-    <Compile Include="OAuthBearerAuthenticationExtensions.cs" />
-    <Compile Include="OAuthBearerAuthenticationHandler.cs" />
-    <Compile Include="OAuthBearerAuthenticationMiddleware.cs" />
-    <Compile Include="OAuthBearerAuthenticationOptions.cs" />
-    <Compile Include="OAuthConstants.cs" />
-    <Compile Include="OAuthDefaults.cs" />
-    <Compile Include="Properties/AssemblyInfo.cs" />
-    <Compile Include="Provider/BaseValidatingClientContext.cs" />
-    <Compile Include="Provider/BaseValidatingContext.cs" />
-    <Compile Include="Provider/BaseValidatingTicketContext.cs" />
-    <Compile Include="Provider/DefaultBehavior.cs" />
-    <Compile Include="Provider/IOAuthAuthorizationServerProvider.cs" />
-    <Compile Include="Provider/IOAuthBearerAuthenticationProvider.cs" />
-    <Compile Include="Provider/OAuthAuthorizationServerProvider.cs" />
-    <Compile Include="Provider/OAuthAuthorizeEndpointContext.cs" />
-    <Compile Include="Provider/OAuthAuthorizeEndpointResponseContext.cs" />
-    <Compile Include="Provider/OAuthBearerAuthenticationProvider.cs" />
-    <Compile Include="Provider/OAuthChallengeContext.cs" />
-    <Compile Include="Provider/OAuthGrantAuthorizationCodeContext.cs" />
-    <Compile Include="Provider/OAuthGrantClientCredentialsContext.cs" />
-    <Compile Include="Provider/OAuthGrantCustomExtensionContext.cs" />
-    <Compile Include="Provider/OAuthGrantRefreshTokenContext.cs" />
-    <Compile Include="Provider/OAuthGrantResourceOwnerCredentialsContext.cs" />
-    <Compile Include="Provider/OAuthMatchEndpointContext.cs" />
-    <Compile Include="Provider/OAuthRequestTokenContext.cs" />
-    <Compile Include="Provider/OAuthTokenEndpointContext.cs" />
-    <Compile Include="Provider/OAuthTokenEndpointResponseContext.cs" />
-    <Compile Include="Provider/OAuthValidateAuthorizeRequestContext.cs" />
-    <Compile Include="Provider/OAuthValidateClientAuthenticationContext.cs" />
-    <Compile Include="Provider/OAuthValidateClientRedirectUriContext.cs" />
-    <Compile Include="Provider/OAuthValidateIdentityContext.cs" />
-    <Compile Include="Provider/OAuthValidateTokenRequestContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Messages/AuthorizeEndpointRequest.cs" Link="Messages/AuthorizeEndpointRequest.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Messages/TokenEndpointRequest.cs" Link="Messages/TokenEndpointRequest.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Messages/TokenEndpointRequestAuthorizationCode.cs" Link="Messages/TokenEndpointRequestAuthorizationCode.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Messages/TokenEndpointRequestClientCredentials.cs" Link="Messages/TokenEndpointRequestClientCredentials.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Messages/TokenEndpointRequestCustomExtension.cs" Link="Messages/TokenEndpointRequestCustomExtension.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Messages/TokenEndpointRequestRefreshToken.cs" Link="Messages/TokenEndpointRequestRefreshToken.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Messages/TokenEndpointRequestResourceOwnerPasswordCredentials.cs" Link="Messages/TokenEndpointRequestResourceOwnerPasswordCredentials.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/OAuthAuthorizationServerExtensions.cs" Link="OAuthAuthorizationServerExtensions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/OAuthAuthorizationServerHandler.cs" Link="OAuthAuthorizationServerHandler.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/OAuthAuthorizationServerMiddleware.cs" Link="OAuthAuthorizationServerMiddleware.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/OAuthAuthorizationServerOptions.cs" Link="OAuthAuthorizationServerOptions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/OAuthBearerAuthenticationExtensions.cs" Link="OAuthBearerAuthenticationExtensions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/OAuthBearerAuthenticationHandler.cs" Link="OAuthBearerAuthenticationHandler.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/OAuthBearerAuthenticationMiddleware.cs" Link="OAuthBearerAuthenticationMiddleware.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/OAuthBearerAuthenticationOptions.cs" Link="OAuthBearerAuthenticationOptions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/OAuthConstants.cs" Link="OAuthConstants.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/OAuthDefaults.cs" Link="OAuthDefaults.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/BaseValidatingClientContext.cs" Link="Provider/BaseValidatingClientContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/BaseValidatingContext.cs" Link="Provider/BaseValidatingContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/BaseValidatingTicketContext.cs" Link="Provider/BaseValidatingTicketContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/DefaultBehavior.cs" Link="Provider/DefaultBehavior.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/IOAuthAuthorizationServerProvider.cs" Link="Provider/IOAuthAuthorizationServerProvider.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/IOAuthBearerAuthenticationProvider.cs" Link="Provider/IOAuthBearerAuthenticationProvider.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/OAuthAuthorizationServerProvider.cs" Link="Provider/OAuthAuthorizationServerProvider.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/OAuthAuthorizeEndpointContext.cs" Link="Provider/OAuthAuthorizeEndpointContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/OAuthAuthorizeEndpointResponseContext.cs" Link="Provider/OAuthAuthorizeEndpointResponseContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/OAuthBearerAuthenticationProvider.cs" Link="Provider/OAuthBearerAuthenticationProvider.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/OAuthChallengeContext.cs" Link="Provider/OAuthChallengeContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/OAuthGrantAuthorizationCodeContext.cs" Link="Provider/OAuthGrantAuthorizationCodeContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/OAuthGrantClientCredentialsContext.cs" Link="Provider/OAuthGrantClientCredentialsContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/OAuthGrantCustomExtensionContext.cs" Link="Provider/OAuthGrantCustomExtensionContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/OAuthGrantRefreshTokenContext.cs" Link="Provider/OAuthGrantRefreshTokenContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/OAuthGrantResourceOwnerCredentialsContext.cs" Link="Provider/OAuthGrantResourceOwnerCredentialsContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/OAuthMatchEndpointContext.cs" Link="Provider/OAuthMatchEndpointContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/OAuthRequestTokenContext.cs" Link="Provider/OAuthRequestTokenContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/OAuthTokenEndpointContext.cs" Link="Provider/OAuthTokenEndpointContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/OAuthTokenEndpointResponseContext.cs" Link="Provider/OAuthTokenEndpointResponseContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/OAuthValidateAuthorizeRequestContext.cs" Link="Provider/OAuthValidateAuthorizeRequestContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/OAuthValidateClientAuthenticationContext.cs" Link="Provider/OAuthValidateClientAuthenticationContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/OAuthValidateClientRedirectUriContext.cs" Link="Provider/OAuthValidateClientRedirectUriContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/OAuthValidateIdentityContext.cs" Link="Provider/OAuthValidateIdentityContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OAuth/Provider/OAuthValidateTokenRequestContext.cs" Link="Provider/OAuthValidateTokenRequestContext.cs" />
   </ItemGroup>
 
   <ItemGroup>

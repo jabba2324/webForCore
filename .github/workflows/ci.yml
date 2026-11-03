@@ -47,7 +47,10 @@ jobs:
       version: ${{ steps.version.outputs.version }}
 
     steps:
+      # Microsoft's code comes from submodules of cleared-down forks (external/, #61).
       - uses: actions/checkout@v4
+        with:
+          submodules: true
 
       # The release version from Directory.Build.props; any other run builds a prerelease of it (0.1.0-ci.123).
       - name: Version
@@ -126,7 +129,12 @@ jobs:
       - name: Line endings
         run: git config --global core.autocrlf false
 
+      - name: Long paths
+        run: git config --global core.longpaths true
+
       - uses: actions/checkout@v4
+        with:
+          submodules: true
 
       # The scripts call python3; Windows has python.
       - name: python3

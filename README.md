@@ -64,7 +64,7 @@ The full guide is [docs/MIGRATING.md](docs/MIGRATING.md). In outline:
    the packages from a [GitHub release](https://github.com/jabba2324/webForCore/releases) into a folder, and reference
    `webForCore` (see [docs/MIGRATING.md](docs/MIGRATING.md#1-get-webforcore)). Or build it and reference its projects:
    ```bash
-   git clone https://github.com/jabba2324/webForCore && cd webForCore
+   git clone --recurse-submodules https://github.com/jabba2324/webForCore && cd webForCore
    dotnet build src/WebFormsForCore.Build/WebFormsForCore.Build.csproj -c Release   # build tasks the other projects import
    dotnet build WebFormsForCore.slnx -c Release
    ```
