@@ -36,7 +36,7 @@ namespace System.Web {
         private GCHandle _handle;
 
         private RootedObjects() {
-            _handle = System.Web.Util.GCUtil.Alloc(this);
+            _handle = GCHandle.Alloc(this);
             Pointer = (IntPtr)_handle;
 
             // Increment active request count as soon as possible to prevent
@@ -111,7 +111,7 @@ namespace System.Web {
                 }
                 finally {
                     if (_handle.IsAllocated) {
-                        System.Web.Util.GCUtil.Free(_handle);
+                        _handle.Free();
                     }
                     Pointer = IntPtr.Zero;
                     HttpRuntime.DecrementActivePipelineCount();

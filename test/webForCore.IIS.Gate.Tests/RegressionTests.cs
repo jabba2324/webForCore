@@ -251,5 +251,39 @@ namespace IISGate
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Contains("is App_Data: True", body);
         }
+
+        // #33: Assembly.Load("App_GlobalResources"), as Visual Studio's designer classes for global resources do, resolves
+        // to the compiled App_GlobalResources.xxxxxxxx assembly, as on IIS (and "App_Code" and "__code" to App_Code).
+        // mojoPortal's Application_Start and every page failed with "Could not load file or assembly 'App_GlobalResources,
+        // Culture=neutral, PublicKeyToken=null'".
+        [Fact]
+        public async Task FixedNamesOfTopLevelAssembliesLoad()
+        {
+            var (response, body) = await Get("/regressions/FixedAssemblyNames.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("App_Code: App_Code.", body);
+            Assert.Contains("App_GlobalResources: App_GlobalResources.", body);
+            Assert.Contains("__code: App_Code.", body);
+            Assert.Contains("Application_Start: Hello from App_GlobalResources\n", body);
+            Assert.Contains("fr: Bonjour depuis App_GlobalResources\n", body);
+            Assert.Contains("GetGlobalResourceObject: Hello from App_GlobalResources\n", body);
+        }
+
+        // #41 (a difference webForCore keeps for now, documented in docs/MIGRATING.md): Assembly.GetTypes() on
+        // System.Data.SqlClient throws on .NET, Linux and Windows, because of SqlGuidCaster, so Opserver's scan of every
+        // loaded assembly for its tab controllers failed on every page. The documented workaround (catch
+        // ReflectionTypeLoadException and use e.Types) must find the types. If SqlClient is fixed, the first assertion
+        // fails: update MIGRATING.md with it.
+        [Fact]
+        public async Task ScanningEveryAssemblyNeedsTheReflectionTypeLoadExceptionWorkaround()
+        {
+            var (response, body) = await Get("/regressions/AssemblyScan.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("GetTypes: ReflectionTypeLoadException, 1 not loaded: SqlGuidCaster\n", body);
+            Assert.Contains("GetExportedTypes has SqlConnection: True", body);
+            Assert.Contains("scan finds SqlConnection: True", body);
+            Assert.Contains("scan finds this page: True", body);
+            Assert.Contains("scan failures: 0", body);
+        }
     }
 }

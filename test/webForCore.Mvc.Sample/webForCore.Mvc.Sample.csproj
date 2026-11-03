@@ -52,7 +52,8 @@
     <ProjectReference Include="..\..\src\WebFormsForCore.Compilers\WebFormsForCore.Compilers.csproj" />
     <ProjectReference Include="..\..\src\webForCore.System.Web.Mvc\webForCore.System.Web.Mvc.csproj" />
     <!-- MVC Futures, lifted (src/webForCore.Microsoft.Web.Mvc). FuturesController uses it. Microsoft's original binary from
-         nuget.org (Microsoft.AspNet.Mvc.Futures 5.0.0, built for .NET Framework 4.0) passed the same tests: see LIFT.md. -->
+         nuget.org (Microsoft.AspNet.Mvc.Futures 5.0.0, built for .NET Framework 4.0) passed the same tests
+         (docs/MIGRATING.md, section 3). -->
     <ProjectReference Include="..\..\src\webForCore.Microsoft.Web.Mvc\webForCore.Microsoft.Web.Mvc.csproj" />
   </ItemGroup>
 </Project>

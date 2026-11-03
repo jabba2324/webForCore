@@ -145,7 +145,7 @@ namespace System.Configuration
                 if (WebFormsForCore.Security.LocalDataProtection.IsWindowsDpapiBlob(data))
                     throw new ConfigurationErrorsException("webForCore: this section was encrypted with Windows DPAPI (DataProtectionConfigurationProvider), " +
                         "whose keys stay on the Windows machine that encrypted it. Decrypt it there (aspnet_regiis -pdf), then protect it " +
-                        "here (webforcore-regiis -pef) or with RsaProtectedConfigurationProvider and an exported key container (LIFT.md).");
+                        "here (webforcore-regiis -pef) or with RsaProtectedConfigurationProvider and an exported key container.");
                 try {
                     return Encoding.Unicode.GetString(WebFormsForCore.Security.LocalDataProtection.Unprotect(
                         data, Encoding.Unicode.GetBytes(_KeyEntropy ?? ""), UseMachineProtection));
