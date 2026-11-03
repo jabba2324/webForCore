@@ -18,3 +18,18 @@
 	url = https://github.com/xforcore/AspNetWebStack.git
 	branch = webforcore
 	shallow = true
+[submodule "external/referencesource"]
+	path = external/referencesource
+	url = https://github.com/xforcore/referencesource.git
+	branch = webforcore
+	shallow = true
+[submodule "external/winforms"]
+	path = external/winforms
+	url = https://github.com/xforcore/winforms.git
+	branch = webforcore
+	shallow = true
+[submodule "external/mono"]
+	path = external/mono
+	url = https://github.com/xforcore/mono.git
+	branch = webforcore
+	shallow = true

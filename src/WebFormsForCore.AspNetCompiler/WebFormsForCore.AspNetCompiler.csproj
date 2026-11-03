@@ -58,4 +58,10 @@
         <!-- The Reference Source's CompilerResources (ReferenceSource/aspnet_compiler) looks its strings up by this name. -->
         <EmbeddedResource Update="CompilerResources.resx" LogicalName="System.Web.Compilation.CompilerResources.resources" />
     </ItemGroup>
+
+  <!-- From the external/referencesource submodule (#61): the files that were lifted into this project, at their old paths. -->
+  <ItemGroup>
+    <Compile Include="../../external/referencesource/aspnet_compiler/DataAnnotationsResources.Designer.cs" Link="ReferenceSource/aspnet_compiler/DataAnnotationsResources.Designer.cs" />
+    <Compile Include="../../external/referencesource/aspnet_compiler/aspnet_compiler.cs" Link="ReferenceSource/aspnet_compiler/aspnet_compiler.cs" />
+  </ItemGroup>
 </Project>

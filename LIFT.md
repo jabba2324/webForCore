@@ -2169,3 +2169,22 @@ than one project uses, such as `src/Common`, are linked from the one copy. The r
 - System.Net.Http.Formatting.Test 6,445;
 - WebApi.Gate 67;
 - Mvc.Gate 65.
+
+## The Reference Source, WinForms' ResX and Mono from submodules (#61, 3 Nov 2026)
+
+The last lifted sources now come from submodules too:
+- `external/referencesource`: xforcore/referencesource `webforcore`, upstream `ec9fa9a`, 114 files, 41 change commits;
+- `external/winforms`: xforcore/winforms `webforcore`, upstream `8266870`, 13 files, 13 change commits;
+- `external/mono`: xforcore/mono `webforcore`, upstream `0f53e9e`, 189 files, 31 change commits.
+
+How the projects use them:
+- System.Configuration, ApplicationServices, aspnet_compiler and System.Web (ResX, StronglyTypedResourceBuilder,
+  System.Web.Additions) compile their folders by default. Each gets an item group that lists its submodule files,
+  with a `Link` to the old path, and ApplicationServicesStrings.resx keeps its `LogicalName`.
+- The Mono tests list their files, as the lifted projects did.
+
+No manifests are left. Every upstream file webForCore compiles comes from a submodule. `docs/lifted-changes.md` now
+covers only WebFormsForCore's port.
+
+The full run is unchanged from 0.7.0: 23,447 tests in 24 suites, 23,423 passed, 24 skipped, none failed (Linux x64,
+.NET 10.0.14).

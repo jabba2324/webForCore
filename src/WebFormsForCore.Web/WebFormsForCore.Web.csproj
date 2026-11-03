@@ -156,4 +156,32 @@
         <!-- winforms' strings for its ResX classes (tools/lift/lift_resx.py); ResXSR looks them up by this name. -->
         <EmbeddedResource Update="WebFormsForCore\System.Resources\winforms\ResXSR.resx" LogicalName="System.Resources.ResXSR.resources" />
     </ItemGroup>
+
+  <!-- From the external/referencesource submodule (#61): the files that were lifted into this project, at their old paths. -->
+  <ItemGroup>
+    <Compile Include="../../external/referencesource/System.ComponentModel.DataAnnotations/DataAnnotations/BindableTypeAttribute.cs" Link="WebFormsForCore/ReferenceSource/BindableTypeAttribute.cs" />
+    <Compile Include="../../external/referencesource/System.Data/System/Data/CodeGen/datacache.cs" Link="WebFormsForCore/ReferenceSource/datacache.cs" />
+  </ItemGroup>
+
+  <!-- From the external/winforms submodule (#61): the files that were lifted into this project, at their old paths. -->
+  <ItemGroup>
+    <Compile Include="../../external/winforms/src/System.Windows.Forms/src/System/Resources/AssemblyNamesTypeResolutionService.cs" Link="WebFormsForCore/System.Resources/winforms/AssemblyNamesTypeResolutionService.cs" />
+    <Compile Include="../../external/winforms/src/System.Windows.Forms/src/System/Resources/DataNodeInfo.cs" Link="WebFormsForCore/System.Resources/winforms/DataNodeInfo.cs" />
+    <Compile Include="../../external/winforms/src/System.Windows.Forms/src/System/Resources/IAliasResolver.cs" Link="WebFormsForCore/System.Resources/winforms/IAliasResolver.cs" />
+    <Compile Include="../../external/winforms/src/System.Windows.Forms/src/misc/MultitargetUtil.cs" Link="WebFormsForCore/System.Resources/winforms/MultitargetUtil.cs" />
+    <Compile Include="../../external/winforms/src/System.Windows.Forms/src/System/Resources/ResXDataNode.cs" Link="WebFormsForCore/System.Resources/winforms/ResXDataNode.cs" />
+    <Compile Include="../../external/winforms/src/System.Windows.Forms/src/System/Resources/ResXFileRef.cs" Link="WebFormsForCore/System.Resources/winforms/ResXFileRef.cs" />
+    <Compile Include="../../external/winforms/src/System.Windows.Forms/src/System/Resources/ResXNullRef.cs" Link="WebFormsForCore/System.Resources/winforms/ResXNullRef.cs" />
+    <Compile Include="../../external/winforms/src/System.Windows.Forms/src/System/Resources/ResXResourceReader.ReaderAliasResolver.cs" Link="WebFormsForCore/System.Resources/winforms/ResXResourceReader.ReaderAliasResolver.cs" />
+    <Compile Include="../../external/winforms/src/System.Windows.Forms/src/System/Resources/ResXResourceReader.cs" Link="WebFormsForCore/System.Resources/winforms/ResXResourceReader.cs" />
+    <Compile Include="../../external/winforms/src/System.Windows.Forms/src/System/Resources/ResXResourceSet.cs" Link="WebFormsForCore/System.Resources/winforms/ResXResourceSet.cs" />
+    <Compile Include="../../external/winforms/src/System.Windows.Forms/src/System/Resources/ResXResourceWriter.cs" Link="WebFormsForCore/System.Resources/winforms/ResXResourceWriter.cs" />
+    <Compile Include="../../external/winforms/src/System.Windows.Forms/src/System/Resources/ResXSerializationBinder.cs" Link="WebFormsForCore/System.Resources/winforms/ResXSerializationBinder.cs" />
+    <Compile Include="../../external/winforms/src/System.Windows.Forms/src/System/Resources/ResxFileRef.Converter.cs" Link="WebFormsForCore/System.Resources/winforms/ResxFileRef.Converter.cs" />
+  </ItemGroup>
+
+  <!-- From the external/mono submodule (#61): the files that were lifted into this project, at their old paths. -->
+  <ItemGroup>
+    <Compile Include="../../external/mono/mcs/class/System.Design/System.Resources.Tools/StronglyTypedResourceBuilder.cs" Link="WebFormsForCore/mono/StronglyTypedResourceBuilder.cs" />
+  </ItemGroup>
 </Project>
