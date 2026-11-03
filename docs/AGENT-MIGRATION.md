@@ -104,7 +104,9 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
    any file the old project didn't compile.
 4. Keep `Content` files as they are. Remove `packages.config`, `Properties/PublishProfiles` references to IIS, and
    the `system.codedom` compiler entries for `Microsoft.CodeDom.Providers.DotNetCompilerPlatform` in `web.config`
-   (webForCore supplies the compiler). Leave everything else in `web.config` alone.
+   (webForCore supplies the compiler). Entries naming `Microsoft.CSharp.CSharpCodeProvider` or
+   `Microsoft.VisualBasic.VBCodeProvider` in `System` can stay (webForCore compiles with its own providers and their
+   options, #88). Leave everything else in `web.config` alone.
 5. Replace references using the tables in `docs/MIGRATING.md` section 3: every app gets the "Always" set (with
    packages: the `webForCore` package), and then one reference per framework the app uses. Remove `<Reference Include="System.Web...">` and the Microsoft
    ASP.NET packages. Keep other packages; where a package has a .NET Standard or .NET build, use it. Then go through

@@ -111,7 +111,11 @@ hand, and keep a copy of the old `.csproj`. Then use `Microsoft.NET.Sdk.Web` wit
 
 Pages that use `CodeBehind=` are compiled into the project's assembly, as Visual Studio did. Pages that use
 `CodeFile=` are compiled at run time, as on IIS. Remove the old `bin` folder, `packages.config` and the
-`Microsoft.CodeDom.Providers.DotNetCompilerPlatform` settings; webForCore brings its own compiler.
+`Microsoft.CodeDom.Providers.DotNetCompilerPlatform` settings; webForCore brings its own compiler. `<system.codedom>`
+entries that name .NET Framework's own `Microsoft.CSharp.CSharpCodeProvider` or `Microsoft.VisualBasic.VBCodeProvider` (in
+`System`, as the .NET 3.5 and 4.0 project templates wrote them) can stay: they mean webForCore's compilers, with the
+entry's warning level, compiler options and provider options (`WarnAsError`, `OptionInfer`), as on IIS (#88, Umbraco
+6.2.6). Their `CompilerVersion` doesn't pick an older compiler.
 
 These differences from .NET Framework projects come up when converting:
 
