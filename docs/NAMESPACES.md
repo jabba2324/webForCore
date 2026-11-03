@@ -9,7 +9,8 @@ Each assembly keeps the name, and where Microsoft signed it the public key, of t
 references and `web.config` type names therefore resolve without changes.
 
 Type counts are approximate: public types found by searching the source. A caveat with a file reference was confirmed
-in the code; the rest are from `LIFT.md`.
+in the code; the rest come from the test suites and gates ([TESTING.md](TESTING.md)). Why webForCore follows .NET Framework
+4.8 where .NET differs is in [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md#compatibility-decisions).
 
 - [Summary of what doesn't work](#summary-of-what-doesnt-work)
 - [System.Web and its companions (ported)](#systemweb-and-its-companions-ported)
@@ -101,6 +102,11 @@ Caveats:
   `<connectionManagement>` (.NET doesn't limit connections per server, which is also what ASP.NET's `autoConfig`
   set), `<settings>`, `<webRequestModules>`, `<authenticationModules>`, `<requestCaching>`, and proxy
   auto-detection or scripts (WPAD, PAC).
+- **What .NET Framework's machine had:** .NET Framework has every Windows code page and registers SqlClient, OleDb and
+  ODBC in machine.config; .NET has neither. System.Web registers `CodePagesEncodingProvider` (so
+  `requestEncoding="windows-1252"` works) and, by type name and only when not already registered, the
+  `System.Data.SqlClient`, `Microsoft.Data.SqlClient`, `System.Data.OleDb` and `System.Data.Odbc` factories, when it
+  loads (`WebFormsForCore/FrameworkDefaults.cs`). The provider's own package must still be deployed.
 - `<system.data><DbProviderFactories>` in the app's configuration (`<add>`, `<remove>`, `<clear>`) registers ADO.NET
   providers at application start, as on .NET Framework (`WebFormsForCore/DbProviderFactoriesSectionHandler.cs`).
 - `HttpUtility` follows .NET Framework 4.5+ (strict decoding); the 4.0 compatibility quirks of apps without
@@ -129,7 +135,8 @@ QueryExtender and others), `System.Web.Script.Serialization` (`JavaScriptSeriali
 `System.Web.Configuration`, `System.Web.Query.Dynamic`, and the MS AJAX client scripts.
 
 Caveats: **`LinqDataSource` isn't available** (LINQ to SQL; `ui/WebControls/LinqDataSource.cs` is .NET Framework
-only). `ApplicationServicesHostFactory` (WCF) isn't available. WCF service references are built with CoreWCF
+only). UpdatePanel's partial rendering depends on the browser definitions, as on IIS: a client whose User-Agent
+matches no definition gets full postbacks. `ApplicationServicesHostFactory` (WCF) isn't available. WCF service references are built with CoreWCF
 primitives.
 
 ### System.Web.Services (`src/WebFormsForCore.Web.Services`)
@@ -166,7 +173,7 @@ isn't provided ([MIGRATING.md](MIGRATING.md#3-references)).
 | --- | --- | --- |
 | System.Web.ApplicationServices | `System.Web.Security` (MembershipProvider, RoleProvider, ...), `System.Web.Configuration`, `System.Web.Hosting` | System.Web forwards the membership types here, as on .NET Framework |
 | System.Web.DataVisualization | `System.Web.UI.DataVisualization.Charting` (Chart control) | Renders through the SkiaSharp System.Drawing |
-| System.Web.Mobile | `System.Web.Mobile`, `System.Web.UI.MobileControls` (+ `.Adapters`) | Designers are .NET Framework only |
+| System.Web.Mobile | `System.Web.Mobile`, `System.Web.UI.MobileControls` (+ `.Adapters`) | Designers are .NET Framework only. `FontInfo.Name`'s converter reads the installed font list once (.NET Framework refreshed it on `SystemEvents.InstalledFontsChanged`, which is Windows only) |
 | System.Web.RegularExpressions | `System.Web.RegularExpressions` (`NetCoreRegexes`) | The classic public regex classes (`TagRegex`, `DirectiveRegex`, ...) are .NET Framework only; on .NET, System.Web's parser uses source-generated regexes. Code that uses the classic classes directly won't compile |
 | Microsoft.Web.Infrastructure | `Microsoft.Web.Infrastructure`, `.DynamicModuleHelper`, `.DynamicValidationHelper` | webForCore's implementation of the documented API: `DynamicModuleUtility.RegisterModule` (on `HttpApplication.RegisterModule`), `HttpContextHelper`, `InfrastructureHelper`, `ValidationUtility` (granular request validation) |
 | System.Web.Abstractions, System.Web.Routing (4.0.0.0) | (type forwarders) | The .NET Framework 4 facades: `HttpContextBase` and the other abstractions, and routing, are in System.Web, and these forward there, as in the GAC. Part of the "Always" set, for web.configs from MVC 2-4 projects that list them in `<compilation><assemblies>` and .NET 3.5 libraries that reference them |
@@ -239,7 +246,7 @@ Caveats:
 
 | Assembly | Purpose |
 | --- | --- |
-| WebFormsForCore.Serialization.Formatters | A port of BinaryFormatter (and SoapFormatter) in the `WebFormsForCore.Serialization.Formatters.Binary` namespace, with surrogates for .NET Framework types .NET no longer serializes. System.Web uses it for out-of-process session state, view state and the output cache. Subclasses of `NameObjectCollectionBase` that override `GetObjectData` aren't handled |
+| WebFormsForCore.Serialization.Formatters | A port of BinaryFormatter (and SoapFormatter) in the `WebFormsForCore.Serialization.Formatters.Binary` namespace, with surrogates for .NET Framework types .NET no longer serializes: `NameObjectCollectionBase` and its subclasses (`NameValueCollection`, `HttpCookie.Values`), `CaseInsensitiveComparer`, `CaseInsensitiveHashCodeProvider`, `TextInfo` and `CultureInfo`, written with .NET Framework's members. webForCore's .NET Framework 4.0 assemblies are written as `Version=4.0.0.0`, and exceptions from deserialization aren't wrapped in a `SerializationException`, as on .NET Framework. System.Web uses it for out-of-process session state, view state and the output cache. Not handled: subclasses of `NameObjectCollectionBase` that override `GetObjectData` or `OnDeserialization`, and field initializers of derived types (no serialization constructor runs) |
 | System.Net.Http.WebRequest (4.0.0.0) | .NET Framework's `WebRequestHandler`, written from its documented API as an `HttpClientHandler`, for libraries built against it: Katana's social providers and WS-Federation create one as their back-channel handler (#18). Part of the "Always" set. `ServerCertificateValidationCallback` is passed to `ServerCertificateCustomValidationCallback` (its sender is the `HttpRequestMessage`); the settings only `HttpWebRequest` had (`AllowPipelining`, `CachePolicy`, `ReadWriteTimeout`, `ContinueTimeout`, ...) are kept but have no effect |
 | WebFormsForCore.Compilers | Roslyn `csc`/`vbc` for run-time compilation |
 | aspnetcore_compiler | aspnet_compiler for .NET (precompiled sites) |

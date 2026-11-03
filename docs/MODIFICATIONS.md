@@ -3,7 +3,7 @@
 webForCore runs Microsoft's own ASP.NET 4.x libraries rather than reimplementations of them. Where Microsoft published
 the source, webForCore compiles it from a **submodule** in `external/`: a fork of the upstream repository, cleared down
 to the files webForCore uses, at a pinned commit, built for .NET 10 and tested with the upstream project's own tests.
-(Until #61 the files were copied in by lift scripts; `LIFT.md` records that history.) This page explains the rules for
+(Until #61 the files were copied in by lift scripts; git history has that record.) This page explains the rules for
 that code and what had to change.
 
 - **Every change is a commit** on the fork's `webforcore` branch, with its reason in the message:
@@ -84,8 +84,8 @@ fixed, or the BCL difference is documented.
 
 ## webForCore's changes to System.Web and the hosting layer
 
-These aren't in the submodules. They change WebFormsForCore's port, and each has a `webForCore:` comment and an
-entry in `LIFT.md`.
+These aren't in the submodules. They change WebFormsForCore's port, and each has a `webForCore:` comment; the
+commit that made it, and its issue, say why.
 
 - **Hosting:** webforcore-host and its worker processes (process recycling, #56), IIS's `<system.webServer>` modules,
   the Kestrel worker request (WebSockets, client certificates, server variables, timeouts, integrated-pipeline APIs).
@@ -100,6 +100,18 @@ entry in `LIFT.md`.
   `System.Data.TypedDataSetGenerator` and webForCore's TableAdapter generator).
 - **`<system.net>`:** `<defaultProxy>` applied at application start, and `<mailSettings>` used by System.Web's mail
   senders (`WebFormsForCore.Net.Configuration.NetConfiguration`).
+- **Build targets** (`src/webForCore.WebStack.targets`, imported by every app through the `webForCore.Web` package):
+  - The shared framework has facades named `System.Web.dll` and `System.Configuration.dll`, and the host keeps whichever
+    copy has the higher `assemblyVersion` in `deps.json`. The SDK writes none for project references, so the
+    framework's 4.0.0.0 facade won and loading System.Web failed with 0x80131053 ("The requested assembly version
+    conflicts with what is already bound"). A target after `GenerateBuildDependencyFile` writes each app-local
+    assembly's real `assemblyVersion` where a reference pack has one of the same name.
+  - The framework's `System.Web.HttpUtility.dll` (and the `System.Web` facade) are left out of the compiler's references
+    next to webForCore's System.Web (CS0433, CS7069 otherwise). They are matched by the reference pack's name, not by
+    the SDK's `packs` folder: an SDK newer than the target framework takes the pack from the NuGet cache
+    (`microsoft.netcore.app.ref/<version>/`). `tools/ci/package-smoke.sh` builds once that way.
+- **Run-time compilation** adds the targets of a referenced facade's type forwards (CS0012 otherwise), leaving out
+  those whose types System.Web defines itself (`HttpUtility`).
 - **BinaryFormatter port:** surrogates for .NET Framework types .NET no longer serializes (`NameValueCollection`
   and others), so session state and view state round-trip.
 - **Security:** `bin`, `App_Data`, the build output folder and the other hidden segments return 404, as on IIS.
