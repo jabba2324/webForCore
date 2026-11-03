@@ -128,14 +128,6 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      # The scripts call python3; Windows has python.
-      - name: python3
-        run: |
-          mkdir -p "$HOME/bin"
-          printf '#!/bin/sh\nexec python "$@"\n' > "$HOME/bin/python3"
-          chmod +x "$HOME/bin/python3"
-          cygpath -w "$HOME/bin" >> "$GITHUB_PATH"
-
       - name: Set up .NET (global.json)
         uses: actions/setup-dotnet@v4
         with:
