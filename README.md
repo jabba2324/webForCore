@@ -19,8 +19,8 @@ restore the old behaviour, the difference is documented.
 | | |
 | --- | --- |
 | Target | .NET 10 LTS (`net10.0`), Linux x64; Windows as a development environment (built and tested in CI) |
-| Status | Pre-release (0.7.0). No production app has been migrated yet. NuGet packages are on a [feed on GitHub Pages](https://jabba2324.github.io/webForCore/index.json) (from 0.7.0) and attached to [GitHub releases](https://github.com/jabba2324/webForCore/releases), not published on nuget.org |
-| Tests | 23,447 tests in 24 suites, almost all of them Microsoft's and Mono's; all pass ([TESTING.md](docs/TESTING.md)). System.Drawing's own tests are [drawingForCore](https://github.com/jabba2324/drawingForCore)'s |
+| Status | Pre-release (0.7.0). No production app has been migrated yet. NuGet packages are on a [feed on GitHub Pages](https://xforcore.github.io/webForCore/index.json) (from 0.7.0) and attached to [GitHub releases](https://github.com/xforcore/webForCore/releases), not published on nuget.org |
+| Tests | 23,447 tests in 24 suites, almost all of them Microsoft's and Mono's; all pass ([TESTING.md](docs/TESTING.md)). System.Drawing's own tests are [drawingForCore](https://github.com/xforcore/drawingForCore)'s |
 | Licence | MIT, Apache 2.0 and BSD 3-Clause, all of which allow commercial use; see [docs/LICENSING.md](docs/LICENSING.md) |
 
 ## What works
@@ -34,7 +34,7 @@ restore the old behaviour, the difference is documented.
 | SignalR 2.4.3 | Core, SystemWeb, .NET client | WebSockets, Server-Sent Events, long polling |
 | ASP.NET Identity 2 | Core, EntityFramework (EF 6.5), Owin | |
 | Configuration | System.Configuration (web.config, machine.config, protected sections) | DPAPI and RSA key containers work on Linux |
-| Drawing | System.Drawing, System.Drawing.Common 6.0 | [drawingForCore](https://github.com/jabba2324/drawingForCore)'s packages: Microsoft's managed code over a GDI+ engine written on SkiaSharp; no libgdiplus |
+| Drawing | System.Drawing, System.Drawing.Common 6.0 | [drawingForCore](https://github.com/xforcore/drawingForCore)'s packages: Microsoft's managed code over a GDI+ engine written on SkiaSharp; no libgdiplus |
 | Optimization | System.Web.Optimization, WebGrease | |
 
 What doesn't work, and why, is in [docs/NAMESPACES.md](docs/NAMESPACES.md). The main gaps are Windows
@@ -61,10 +61,10 @@ Code Access Security).
 The full guide is [docs/MIGRATING.md](docs/MIGRATING.md). In outline:
 
 1. **Get webForCore:** add webForCore's and drawingForCore's NuGet feeds (from 0.7.0) to `nuget.config`, or download
-   the packages from a [GitHub release](https://github.com/jabba2324/webForCore/releases) into a folder, and reference
+   the packages from a [GitHub release](https://github.com/xforcore/webForCore/releases) into a folder, and reference
    `webForCore` (see [docs/MIGRATING.md](docs/MIGRATING.md#1-get-webforcore)). Or build it and reference its projects:
    ```bash
-   git clone https://github.com/jabba2324/webForCore && cd webForCore
+   git clone https://github.com/xforcore/webForCore && cd webForCore
    dotnet build src/WebFormsForCore.Build/WebFormsForCore.Build.csproj -c Release   # build tasks the other projects import
    dotnet build WebFormsForCore.slnx -c Release
    ```
@@ -115,9 +115,9 @@ The full guide is [docs/MIGRATING.md](docs/MIGRATING.md). In outline:
 
 | Repository | What it is |
 | --- | --- |
-| [webForCore-smoke-test](https://github.com/jabba2324/webForCore-smoke-test) | Real open-source ASP.NET 4.x applications migrated with webForCore's release packages, following [docs/MIGRATING.md](docs/MIGRATING.md), then built, run and probed over HTTP. Its findings become this repository's issues, and its results are in its `RESULTS.md` |
-| [webForCore-thirdparty](https://github.com/jabba2324/webForCore-thirdparty) | Builds of third-party libraries for webForCore (WebActivatorEx, WebActivator 1.x, AJAX Control Toolkit), made for the smoke test from webForCore's released packages |
-| [drawingForCore](https://github.com/jabba2324/drawingForCore) | System.Drawing.Common 6.0 on .NET 11 for Linux, macOS and Windows, with GDI+ written on SkiaSharp, and Microsoft's tests for it. Moved out of this repository (#53); webForCore uses its packages |
+| [webForCore-smoke-test](https://github.com/xforcore/webForCore-smoke-test) | Real open-source ASP.NET 4.x applications migrated with webForCore's release packages, following [docs/MIGRATING.md](docs/MIGRATING.md), then built, run and probed over HTTP. Its findings become this repository's issues, and its results are in its `RESULTS.md` |
+| [webForCore-thirdparty](https://github.com/xforcore/webForCore-thirdparty) | Builds of third-party libraries for webForCore (WebActivatorEx, WebActivator 1.x, AJAX Control Toolkit), made for the smoke test from webForCore's released packages |
+| [drawingForCore](https://github.com/xforcore/drawingForCore) | System.Drawing.Common 6.0 on .NET 11 for Linux, macOS and Windows, with GDI+ written on SkiaSharp, and Microsoft's tests for it. Moved out of this repository (#53); webForCore uses its packages |
 
 The first two build on webForCore's releases; webForCore doesn't depend on them. webForCore depends on drawingForCore.
 
@@ -125,7 +125,7 @@ The first two build on webForCore's releases; webForCore doesn't depend on them.
 
 Requirements: the .NET SDK in `global.json` (10.0.100 or a later 10.0 SDK), and on Fedora/RHEL `OPENSSL_ENABLE_SHA1_SIGNATURES=1`
 (strong-name signing uses SHA-1). The Identity tests need SQL Server; `tools/lift/sqlserver.sh` starts one in a
-container. System.Drawing comes from [drawingForCore](https://github.com/jabba2324/drawingForCore)'s packages, restored
+container. System.Drawing comes from [drawingForCore](https://github.com/xforcore/drawingForCore)'s packages, restored
 from its feed (`nuget.config`); to try a drawingForCore change here before it is released, build against a checkout
 of it with `-p:DrawingForCoreSource=../drawingForCore`.
 
@@ -147,7 +147,7 @@ change one, change the script and lift again; see [docs/MODIFICATIONS.md](docs/M
 webForCore is a fork of [WebFormsForCore](https://github.com/webformsforcore/WebFormsForCore) by Simon Jakob Egli,
 which ported System.Web and its companions from the .NET Framework reference source to .NET and first ran Web Forms
 on ASP.NET Core. webForCore adds the lifted Microsoft libraries and their tests, the IIS layer, the host and its worker processes,
-System.Drawing on SkiaSharp (now [drawingForCore](https://github.com/jabba2324/drawingForCore)), and the compatibility work recorded in [LIFT.md](LIFT.md).
+System.Drawing on SkiaSharp (now [drawingForCore](https://github.com/xforcore/drawingForCore)), and the compatibility work recorded in [LIFT.md](LIFT.md).
 
 The lifted code is © Microsoft and the .NET Foundation (ASP.NET Web Stack, Katana, SignalR, ASP.NET Identity) and
 the Mono project (System.Web tests). See [NOTICE](NOTICE) for every component, its source
