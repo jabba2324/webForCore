@@ -252,6 +252,23 @@ namespace IISGate
             Assert.Contains("is App_Data: True", body);
         }
 
+        // #33: Assembly.Load("App_GlobalResources"), as Visual Studio's designer classes for global resources do, resolves
+        // to the compiled App_GlobalResources.xxxxxxxx assembly, as on IIS (and "App_Code" and "__code" to App_Code).
+        // mojoPortal's Application_Start and every page failed with "Could not load file or assembly 'App_GlobalResources,
+        // Culture=neutral, PublicKeyToken=null'".
+        [Fact]
+        public async Task FixedNamesOfTopLevelAssembliesLoad()
+        {
+            var (response, body) = await Get("/regressions/FixedAssemblyNames.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("App_Code: App_Code.", body);
+            Assert.Contains("App_GlobalResources: App_GlobalResources.", body);
+            Assert.Contains("__code: App_Code.", body);
+            Assert.Contains("Application_Start: Hello from App_GlobalResources\n", body);
+            Assert.Contains("fr: Bonjour depuis App_GlobalResources\n", body);
+            Assert.Contains("GetGlobalResourceObject: Hello from App_GlobalResources\n", body);
+        }
+
         // #41 (a difference webForCore keeps for now, documented in docs/MIGRATING.md): Assembly.GetTypes() on
         // System.Data.SqlClient throws on .NET, Linux and Windows, because of SqlGuidCaster, so Opserver's scan of every
         // loaded assembly for its tab controllers failed on every page. The documented workaround (catch
