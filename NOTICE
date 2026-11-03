@@ -104,7 +104,7 @@ Files without their own header (test-helpers/NunitHelpers.cs) are covered by Mon
 places the class libraries under the MIT License.
 
 System.Drawing and System.Drawing.Common come from drawingForCore's packages, a package dependency
-(https://github.com/jabba2324/drawingForCore): System.Drawing.Common 6.0 from .NET (MIT License, Copyright (c) .NET
+(https://github.com/xforcore/drawingForCore): System.Drawing.Common 6.0 from .NET (MIT License, Copyright (c) .NET
 Foundation and Contributors) with a GDI+ engine on SkiaSharp (MIT License). Its NOTICE lists its components, including
 SkiaSharp and Skia. Up to webForCore 0.6.0 they were built in this repository.
 

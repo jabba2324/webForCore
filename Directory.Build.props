@@ -13,12 +13,12 @@
         <Copyright>Copyright (c) Simon Jakob Egli and webForCore contributors. Portions copyright (c) Microsoft Corporation, the .NET Foundation and others; see NOTICE.</Copyright>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <PackageProjectUrl>https://github.com/jabba2324/webForCore</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/jabba2324/webForCore</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/xforcore/webForCore</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/xforcore/webForCore</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
-        <!-- System.Drawing and System.Drawing.Common: drawingForCore's packages (https://github.com/jabba2324/drawingForCore,
+        <!-- System.Drawing and System.Drawing.Common: drawingForCore's packages (https://github.com/xforcore/drawingForCore,
              feed in nuget.config). -p:DrawingForCoreSource=<checkout> builds a local checkout's projects instead
              (Directory.Build.targets). -->
         <DrawingForCoreVersion>0.2.0</DrawingForCoreVersion>

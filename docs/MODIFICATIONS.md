@@ -9,7 +9,7 @@ and tested with the upstream project's own tests. This page explains the rules f
 - The reasoning for every change, phase by phase, is in [`LIFT.md`](../LIFT.md).
 - Licences and attributions are in [`NOTICE`](../NOTICE) and [`LICENSE`](../LICENSE).
 - System.Drawing.Common 6.0 and its tests were lifted here until they moved to
-  [drawingForCore](https://github.com/jabba2324/drawingForCore) (#53), whose `docs/MODIFICATIONS.md` lists their changes.
+  [drawingForCore](https://github.com/xforcore/drawingForCore) (#53), whose `docs/MODIFICATIONS.md` lists their changes.
 
 ## Rules for lifted code
 
