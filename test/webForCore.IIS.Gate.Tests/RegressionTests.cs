@@ -268,5 +268,22 @@ namespace IISGate
             Assert.Contains("fr: Bonjour depuis App_GlobalResources\n", body);
             Assert.Contains("GetGlobalResourceObject: Hello from App_GlobalResources\n", body);
         }
+
+        // #41 (a difference webForCore keeps for now, documented in docs/MIGRATING.md): Assembly.GetTypes() on
+        // System.Data.SqlClient throws on .NET, Linux and Windows, because of SqlGuidCaster, so Opserver's scan of every
+        // loaded assembly for its tab controllers failed on every page. The documented workaround (catch
+        // ReflectionTypeLoadException and use e.Types) must find the types. If SqlClient is fixed, the first assertion
+        // fails: update MIGRATING.md with it.
+        [Fact]
+        public async Task ScanningEveryAssemblyNeedsTheReflectionTypeLoadExceptionWorkaround()
+        {
+            var (response, body) = await Get("/regressions/AssemblyScan.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("GetTypes: ReflectionTypeLoadException, 1 not loaded: SqlGuidCaster\n", body);
+            Assert.Contains("GetExportedTypes has SqlConnection: True", body);
+            Assert.Contains("scan finds SqlConnection: True", body);
+            Assert.Contains("scan finds this page: True", body);
+            Assert.Contains("scan failures: 0", body);
+        }
     }
 }

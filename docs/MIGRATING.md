@@ -113,7 +113,7 @@ Pages that use `CodeBehind=` are compiled into the project's assembly, as Visual
 `CodeFile=` are compiled at run time, as on IIS. Remove the old `bin` folder, `packages.config` and the
 `Microsoft.CodeDom.Providers.DotNetCompilerPlatform` settings; webForCore brings its own compiler.
 
-Two differences from .NET Framework projects come up when converting:
+These differences from .NET Framework projects come up when converting:
 
 - **A `.resx` with non-string resources** (images, icons) fails with `MSB3822: Non-string resources require the
   System.Resources.Extensions assembly at runtime` (#36, Subtext). Add
@@ -131,6 +131,20 @@ Two differences from .NET Framework projects come up when converting:
   - A namespace from an indirect reference can hide a type: `CS0118: 'X' is a namespace but is used like a type`. Put
     `PrivateAssets="all"` on the `ProjectReference` whose types its dependants shouldn't see (#39, mojoPortal's data
     layer).
+- **Class libraries that reference webForCore** (#62). .NET 10 prunes the `Microsoft.Extensions.*` and
+  `Microsoft.AspNetCore.*` packages (treats them as part of the framework) only in projects that reference the ASP.NET
+  Core shared framework. The web project does, through `Microsoft.NET.Sdk.Web`. A `Microsoft.NET.Sdk` class library
+  doesn't, even though the webForCore packages declare the framework. The library then gets the versions that
+  webForCore's WCF client support brings (through CoreWCF.Http: `Microsoft.Extensions.*` 8.0 to 10.0,
+  `Microsoft.AspNetCore.*` 2.3), and its own older references to them fail:
+  `NU1605: Detected package downgrade: Microsoft.Extensions.Primitives from 8.0.0 to 5.0.1` (YAF.NET's Lucene.Net
+  libraries). Add the framework to every class library that references webForCore (it runs on ASP.NET Core anyway),
+  then remove the references that `NU1510: PackageReference ... will not be pruned` reports:
+  ```xml
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  ```
 
 ## 3. References
 
@@ -179,7 +193,9 @@ webForCore ships only Microsoft assemblies, so two libraries apps commonly have 
 - **AjaxControlToolkit** isn't provided. The original package is built for .NET Framework.
 
 Keep other NuGet packages, preferring versions that target .NET Standard or .NET. The `test/webForCore.*.Sample`
-projects in this repository are working examples for Web Forms, MVC, Web API and Web Pages.
+projects in this repository are working examples for Web Forms, MVC, Web API and Web Pages. A .NET Framework package
+built against MVC 5 runs as it is unless it uses an API .NET lacks: Microsoft's own MVC Futures 5.0.0 binary (built for
+.NET Framework 4.0 against MVC 5.0) ran unmodified on webForCore's MVC 5.3, with .NET binding its 5.0.0.0 reference.
 
 ### Packages that need more than a reference
 
@@ -217,7 +233,10 @@ These came up migrating real applications; each names one that needed it.
   ServiceStack.OrmLite.SqlServer had 4.8.1) and the System.* packages at 11.0, such as `System.DirectoryServices`
   (Opserver had 4.5.0) (#42). Raise the application's reference, or remove it if the package was
   only there as another package's dependency. `EntityFramework` before 6.4 has no .NET build: use 6.4 or later
-  (6.5.1 works with `System.Data.SqlClient`).
+  (6.5.1 works with `System.Data.SqlClient`). EntityFramework 6.5.1 needs `System.ComponentModel.Annotations` 5.0.0,
+  and .NET 10 treats only versions up to 4.3.0 as part of the framework, so a lower reference fails:
+  `NU1605: Detected package downgrade: System.ComponentModel.Annotations from 5.0.0 to 4.4.1` (MVCForum). Raise it to
+  5.0.0 in every project that has it, or remove it where the project doesn't use it directly (#62).
 - **.NET Framework assemblies that are packages on .NET** (#9). The root web.config of .NET Framework referenced its
   framework assemblies for every page, so App_Code and pages used them freely. On .NET some are NuGet packages the
   application must reference, or code compiled at run time fails with `CS1069: The type name 'SyndicationItem' could not
@@ -343,6 +362,23 @@ Fix what the blocker search found (see [NAMESPACES.md](NAMESPACES.md) for replac
   Check pages that format numbers and dates.
 - **BinaryFormatter:** code that calls `System.Runtime.Serialization.Formatters.Binary.BinaryFormatter` directly
   should use `WebFormsForCore.Serialization.Formatters.Binary.BinaryFormatter`.
+- **Scanning every loaded assembly's types** (#41). `Assembly.GetTypes()` on System.Data.SqlClient throws on .NET,
+  on Linux and on Windows: `ReflectionTypeLoadException ... Could not load type 'SqlGuidCaster' ... contains an object
+  field at offset 0 that is incorrectly aligned or overlapped by a non-object field`. Every System.Data.SqlClient
+  version for .NET has this unused type, and every webForCore application has the assembly. On .NET Framework, SqlClient
+  is in System.Data.dll, which hasn't got it, so the scan worked. Code that calls `GetTypes()` on every assembly in
+  `AppDomain.CurrentDomain.GetAssemblies()` (Opserver finds its tabs that way; DI containers' assembly scanning,
+  AutoMapper profiles, MEF and plugin loaders often do too) fails. Catch the exception and use the types that loaded:
+  ```csharp
+  static Type[] LoadableTypes(Assembly a)
+  {
+      try { return a.GetTypes(); }
+      catch (ReflectionTypeLoadException e) { return e.Types.Where(t => t != null).ToArray(); }
+  }
+  // AppDomain.CurrentDomain.GetAssemblies().SelectMany(LoadableTypes)
+  ```
+  `GetExportedTypes()` works, so a scan for public types can use it instead. MVC, Web API and SignalR already catch the
+  exception in their own scans.
 
 ## 7. Run and compare
 
@@ -390,3 +426,4 @@ The first request compiles pages, as on IIS. Then compare the responses recorded
 | Logins lost after a restart | No explicit `<machineKey>` |
 | `PlatformNotSupportedException` | A Windows-only API: see [NAMESPACES.md](NAMESPACES.md) |
 | 503 right after a deploy | Another process is compiling the same site folder |
+| `ReflectionTypeLoadException`: `Could not load type 'SqlGuidCaster'` | The application calls `GetTypes()` on every loaded assembly: see "Scanning every loaded assembly's types" (step 6) |
