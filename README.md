@@ -34,6 +34,7 @@ restore the old behaviour, the difference is documented.
 | OWIN | Microsoft.Owin 4.2.3, Host.SystemWeb, Security (Cookies, OAuth), Hosting, HttpListener, Testing, Cors | |
 | SignalR 2.4.3 | Core, SystemWeb, .NET client | WebSockets, Server-Sent Events, long polling |
 | ASP.NET Identity 2 | Core, EntityFramework (EF 6.5), Owin | |
+| Data | System.Data.SqlClient 4.9.1 | Microsoft's, built from its source with `Assembly.GetTypes()` fixed (#41); replaces the `System.Data.SqlClient` package that Entity Framework 6 brings |
 | Configuration | System.Configuration (web.config, machine.config, protected sections) | DPAPI and RSA key containers work on Linux |
 | Drawing | System.Drawing, System.Drawing.Common 6.0 | [drawingForCore](https://github.com/xforcore/drawingForCore)'s packages: Microsoft's managed code over a GDI+ engine written on SkiaSharp; no libgdiplus |
 | Optimization | System.Web.Optimization, WebGrease | |
