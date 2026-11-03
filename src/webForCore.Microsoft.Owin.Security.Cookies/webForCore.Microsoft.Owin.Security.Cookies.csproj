@@ -34,23 +34,23 @@
   <Import Project="../webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="CookieAuthenticationDefaults.cs" />
-    <Compile Include="CookieAuthenticationExtensions.cs" />
-    <Compile Include="CookieAuthenticationHandler.cs" />
-    <Compile Include="CookieAuthenticationMiddleware.cs" />
-    <Compile Include="CookieAuthenticationOptions.cs" />
-    <Compile Include="CookieSecureOption.cs" />
-    <Compile Include="IAuthenticationSessionStore.cs" />
-    <Compile Include="Properties/AssemblyInfo.cs" />
-    <Compile Include="Provider/CookieApplyRedirectContext.cs" />
-    <Compile Include="Provider/CookieAuthenticationProvider.cs" />
-    <Compile Include="Provider/CookieExceptionContext.cs" />
-    <Compile Include="Provider/CookieResponseSignInContext.cs" />
-    <Compile Include="Provider/CookieResponseSignOutContext.cs" />
-    <Compile Include="Provider/CookieResponseSignedInContext.cs" />
-    <Compile Include="Provider/CookieValidateIdentityContext.cs" />
-    <Compile Include="Provider/DefaultBehavior.cs" />
-    <Compile Include="Provider/ICookieAuthenticationProvider.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Cookies/CookieAuthenticationDefaults.cs" Link="CookieAuthenticationDefaults.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Cookies/CookieAuthenticationExtensions.cs" Link="CookieAuthenticationExtensions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Cookies/CookieAuthenticationHandler.cs" Link="CookieAuthenticationHandler.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Cookies/CookieAuthenticationMiddleware.cs" Link="CookieAuthenticationMiddleware.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Cookies/CookieAuthenticationOptions.cs" Link="CookieAuthenticationOptions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Cookies/CookieSecureOption.cs" Link="CookieSecureOption.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Cookies/IAuthenticationSessionStore.cs" Link="IAuthenticationSessionStore.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Cookies/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Cookies/Provider/CookieApplyRedirectContext.cs" Link="Provider/CookieApplyRedirectContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Cookies/Provider/CookieAuthenticationProvider.cs" Link="Provider/CookieAuthenticationProvider.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Cookies/Provider/CookieExceptionContext.cs" Link="Provider/CookieExceptionContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Cookies/Provider/CookieResponseSignInContext.cs" Link="Provider/CookieResponseSignInContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Cookies/Provider/CookieResponseSignOutContext.cs" Link="Provider/CookieResponseSignOutContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Cookies/Provider/CookieResponseSignedInContext.cs" Link="Provider/CookieResponseSignedInContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Cookies/Provider/CookieValidateIdentityContext.cs" Link="Provider/CookieValidateIdentityContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Cookies/Provider/DefaultBehavior.cs" Link="Provider/DefaultBehavior.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Cookies/Provider/ICookieAuthenticationProvider.cs" Link="Provider/ICookieAuthenticationProvider.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -34,82 +34,82 @@
   <Import Project="../webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="Builder/AppBuilder.cs" />
-    <Compile Include="Builder/Constants.cs" />
-    <Compile Include="Builder/NotFound.cs" />
-    <Compile Include="BuilderProperties/Address.cs" />
-    <Compile Include="BuilderProperties/AddressCollection.cs" />
-    <Compile Include="BuilderProperties/AppProperties.cs" />
-    <Compile Include="BuilderProperties/Capabilities.cs" />
-    <Compile Include="CookieOptions.cs" />
-    <Compile Include="Extensions/AppBuilderCookieExtensions.cs" />
-    <Compile Include="Extensions/AppBuilderExtensions.cs" />
-    <Compile Include="Extensions/AppBuilderUseExtensions.cs" />
-    <Compile Include="Extensions/IntegratedPipelineExtensions.cs" />
-    <Compile Include="Extensions/PipelineStage.cs" />
-    <Compile Include="Extensions/UseHandlerMiddleware.cs" />
-    <Compile Include="FormCollection.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="HeaderDictionary.cs" />
-    <Compile Include="Helpers/WebHelpers.cs" />
-    <Compile Include="HostString.cs" />
-    <Compile Include="IFormCollection.cs" />
-    <Compile Include="IHeaderDictionary.cs" />
-    <Compile Include="IOwinContext.cs" />
-    <Compile Include="IOwinRequest.cs" />
-    <Compile Include="IOwinResponse.cs" />
-    <Compile Include="IReadableStringCollection.cs" />
-    <Compile Include="Infrastructure/AppFuncTransition.cs" />
-    <Compile Include="Infrastructure/ChunkingCookieManager.cs" />
-    <Compile Include="Infrastructure/Constants.cs" />
-    <Compile Include="Infrastructure/CookieManager.cs" />
-    <Compile Include="Infrastructure/ICookieManager.cs" />
-    <Compile Include="Infrastructure/ISystemClock.cs" />
-    <Compile Include="Infrastructure/OwinHelpers.cs" />
-    <Compile Include="Infrastructure/OwinMiddlewareTransition.cs" />
-    <Compile Include="Infrastructure/PathStringHelper.cs" />
-    <Compile Include="Infrastructure/SignatureConversions.cs" />
-    <Compile Include="Infrastructure/SystemClock.cs" />
-    <Compile Include="Infrastructure/WebUtils.cs" />
-    <Compile Include="Loader/OwinStartupAttribute.cs" />
-    <Compile Include="Logging/AppBuilderLoggerExtensions.cs" />
-    <Compile Include="Logging/DiagnosticsLogger.cs" />
-    <Compile Include="Logging/DiagnosticsLoggerFactory.cs" />
-    <Compile Include="Logging/ILogger.cs" />
-    <Compile Include="Logging/ILoggerFactory.cs" />
-    <Compile Include="Logging/LoggerExtensions.cs" />
-    <Compile Include="Logging/LoggerFactory.cs" />
-    <Compile Include="Mapping/MapExtensions.cs" />
-    <Compile Include="Mapping/MapMiddleware.cs" />
-    <Compile Include="Mapping/MapOptions.cs" />
-    <Compile Include="Mapping/MapWhenExtensions.cs" />
-    <Compile Include="Mapping/MapWhenMiddleware.cs" />
-    <Compile Include="Mapping/MapWhenOptions.cs" />
-    <Compile Include="OwinConstants.cs" />
-    <Compile Include="OwinContext.cs" />
-    <Compile Include="OwinMiddleware.cs" />
-    <Compile Include="OwinRequest.cs" />
-    <Compile Include="OwinResponse.cs" />
-    <Compile Include="PathString.cs" />
-    <Compile Include="Properties/AssemblyInfo.cs" />
-    <Compile Include="QueryString.cs" />
-    <Compile Include="ReadableStringCollection.cs" />
-    <Compile Include="RequestCookieCollection.cs" />
-    <Compile Include="Resources.Designer.cs" />
-    <Compile Include="ResponseCookieCollection.cs" />
-    <Compile Include="SameSiteMode.cs" />
-    <Compile Include="Security/AuthenticateResult.cs" />
-    <Compile Include="Security/AuthenticationDescription.cs" />
-    <Compile Include="Security/AuthenticationManager.cs" />
-    <Compile Include="Security/AuthenticationProperties.cs" />
-    <Compile Include="Security/AuthenticationResponseChallenge.cs" />
-    <Compile Include="Security/AuthenticationResponseGrant.cs" />
-    <Compile Include="Security/AuthenticationResponseRevoke.cs" />
-    <Compile Include="Security/IAuthenticationManager.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Builder/AppBuilder.cs" Link="Builder/AppBuilder.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Builder/Constants.cs" Link="Builder/Constants.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Builder/NotFound.cs" Link="Builder/NotFound.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/BuilderProperties/Address.cs" Link="BuilderProperties/Address.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/BuilderProperties/AddressCollection.cs" Link="BuilderProperties/AddressCollection.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/BuilderProperties/AppProperties.cs" Link="BuilderProperties/AppProperties.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/BuilderProperties/Capabilities.cs" Link="BuilderProperties/Capabilities.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/CookieOptions.cs" Link="CookieOptions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Extensions/AppBuilderCookieExtensions.cs" Link="Extensions/AppBuilderCookieExtensions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Extensions/AppBuilderExtensions.cs" Link="Extensions/AppBuilderExtensions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Extensions/AppBuilderUseExtensions.cs" Link="Extensions/AppBuilderUseExtensions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Extensions/IntegratedPipelineExtensions.cs" Link="Extensions/IntegratedPipelineExtensions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Extensions/PipelineStage.cs" Link="Extensions/PipelineStage.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Extensions/UseHandlerMiddleware.cs" Link="Extensions/UseHandlerMiddleware.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/FormCollection.cs" Link="FormCollection.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/HeaderDictionary.cs" Link="HeaderDictionary.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Helpers/WebHelpers.cs" Link="Helpers/WebHelpers.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/HostString.cs" Link="HostString.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/IFormCollection.cs" Link="IFormCollection.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/IHeaderDictionary.cs" Link="IHeaderDictionary.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/IOwinContext.cs" Link="IOwinContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/IOwinRequest.cs" Link="IOwinRequest.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/IOwinResponse.cs" Link="IOwinResponse.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/IReadableStringCollection.cs" Link="IReadableStringCollection.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Infrastructure/AppFuncTransition.cs" Link="Infrastructure/AppFuncTransition.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Infrastructure/ChunkingCookieManager.cs" Link="Infrastructure/ChunkingCookieManager.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Infrastructure/Constants.cs" Link="Infrastructure/Constants.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Infrastructure/CookieManager.cs" Link="Infrastructure/CookieManager.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Infrastructure/ICookieManager.cs" Link="Infrastructure/ICookieManager.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Infrastructure/ISystemClock.cs" Link="Infrastructure/ISystemClock.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Infrastructure/OwinHelpers.cs" Link="Infrastructure/OwinHelpers.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Infrastructure/OwinMiddlewareTransition.cs" Link="Infrastructure/OwinMiddlewareTransition.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Infrastructure/PathStringHelper.cs" Link="Infrastructure/PathStringHelper.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Infrastructure/SignatureConversions.cs" Link="Infrastructure/SignatureConversions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Infrastructure/SystemClock.cs" Link="Infrastructure/SystemClock.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Infrastructure/WebUtils.cs" Link="Infrastructure/WebUtils.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Loader/OwinStartupAttribute.cs" Link="Loader/OwinStartupAttribute.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Logging/AppBuilderLoggerExtensions.cs" Link="Logging/AppBuilderLoggerExtensions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Logging/DiagnosticsLogger.cs" Link="Logging/DiagnosticsLogger.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Logging/DiagnosticsLoggerFactory.cs" Link="Logging/DiagnosticsLoggerFactory.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Logging/ILogger.cs" Link="Logging/ILogger.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Logging/ILoggerFactory.cs" Link="Logging/ILoggerFactory.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Logging/LoggerExtensions.cs" Link="Logging/LoggerExtensions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Logging/LoggerFactory.cs" Link="Logging/LoggerFactory.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Mapping/MapExtensions.cs" Link="Mapping/MapExtensions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Mapping/MapMiddleware.cs" Link="Mapping/MapMiddleware.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Mapping/MapOptions.cs" Link="Mapping/MapOptions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Mapping/MapWhenExtensions.cs" Link="Mapping/MapWhenExtensions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Mapping/MapWhenMiddleware.cs" Link="Mapping/MapWhenMiddleware.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Mapping/MapWhenOptions.cs" Link="Mapping/MapWhenOptions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/OwinConstants.cs" Link="OwinConstants.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/OwinContext.cs" Link="OwinContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/OwinMiddleware.cs" Link="OwinMiddleware.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/OwinRequest.cs" Link="OwinRequest.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/OwinResponse.cs" Link="OwinResponse.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/PathString.cs" Link="PathString.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/QueryString.cs" Link="QueryString.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/ReadableStringCollection.cs" Link="ReadableStringCollection.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/RequestCookieCollection.cs" Link="RequestCookieCollection.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Resources.Designer.cs" Link="Resources.Designer.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/ResponseCookieCollection.cs" Link="ResponseCookieCollection.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/SameSiteMode.cs" Link="SameSiteMode.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Security/AuthenticateResult.cs" Link="Security/AuthenticateResult.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Security/AuthenticationDescription.cs" Link="Security/AuthenticationDescription.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Security/AuthenticationManager.cs" Link="Security/AuthenticationManager.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Security/AuthenticationProperties.cs" Link="Security/AuthenticationProperties.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Security/AuthenticationResponseChallenge.cs" Link="Security/AuthenticationResponseChallenge.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Security/AuthenticationResponseGrant.cs" Link="Security/AuthenticationResponseGrant.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Security/AuthenticationResponseRevoke.cs" Link="Security/AuthenticationResponseRevoke.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin/Security/IAuthenticationManager.cs" Link="Security/IAuthenticationManager.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources.resx" LogicalName="Microsoft.Owin.Resources.resources" />
+    <EmbeddedResource Include="../../external/AspNetKatana/src/Microsoft.Owin/Resources.resx" Link="Resources.resx" LogicalName="Microsoft.Owin.Resources.resources" />
   </ItemGroup>
 
   <ItemGroup>

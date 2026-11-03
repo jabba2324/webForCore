@@ -35,27 +35,27 @@
   <Import Project="../../src/webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="CertificateSubjectKeyIdentifierValidatorTests.cs" />
-    <Compile Include="CertificateSubjectPublicKeyInfoValidatorTests.cs" />
-    <Compile Include="CertificateThumbprintValidatorTests.cs" />
-    <Compile Include="Cookies/CookieMiddlewareTests.cs" />
-    <Compile Include="DataHandler/Base64UrlTextEncoderTests.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="OAuth/OAuth2AuthorizationClientCredentialsGrantTests.cs" />
-    <Compile Include="OAuth/OAuth2AuthorizationCustomGrantTests.cs" />
-    <Compile Include="OAuth/OAuth2AuthorizationServerAuthorizationCodeGrantTests.cs" />
-    <Compile Include="OAuth/OAuth2AuthorizationServerImplicitGrantTests.cs" />
-    <Compile Include="OAuth/OAuth2AuthorizationServerResourceOwnerCredentialsGrantTests.cs" />
-    <Compile Include="OAuth/OAuth2BearerTokenTests.cs" />
-    <Compile Include="OAuth/OAuth2TestServer.cs" />
-    <Compile Include="Properties/Resources.Designer.cs" />
-    <Compile Include="SecurityHelperTests.cs" />
-    <Compile Include="TestClock.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/CertificateSubjectKeyIdentifierValidatorTests.cs" Link="CertificateSubjectKeyIdentifierValidatorTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/CertificateSubjectPublicKeyInfoValidatorTests.cs" Link="CertificateSubjectPublicKeyInfoValidatorTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/CertificateThumbprintValidatorTests.cs" Link="CertificateThumbprintValidatorTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/Cookies/CookieMiddlewareTests.cs" Link="Cookies/CookieMiddlewareTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/DataHandler/Base64UrlTextEncoderTests.cs" Link="DataHandler/Base64UrlTextEncoderTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/OAuth/OAuth2AuthorizationClientCredentialsGrantTests.cs" Link="OAuth/OAuth2AuthorizationClientCredentialsGrantTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/OAuth/OAuth2AuthorizationCustomGrantTests.cs" Link="OAuth/OAuth2AuthorizationCustomGrantTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/OAuth/OAuth2AuthorizationServerAuthorizationCodeGrantTests.cs" Link="OAuth/OAuth2AuthorizationServerAuthorizationCodeGrantTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/OAuth/OAuth2AuthorizationServerImplicitGrantTests.cs" Link="OAuth/OAuth2AuthorizationServerImplicitGrantTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/OAuth/OAuth2AuthorizationServerResourceOwnerCredentialsGrantTests.cs" Link="OAuth/OAuth2AuthorizationServerResourceOwnerCredentialsGrantTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/OAuth/OAuth2BearerTokenTests.cs" Link="OAuth/OAuth2BearerTokenTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/OAuth/OAuth2TestServer.cs" Link="OAuth/OAuth2TestServer.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/Properties/Resources.Designer.cs" Link="Properties/Resources.Designer.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/SecurityHelperTests.cs" Link="SecurityHelperTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/TestClock.cs" Link="TestClock.cs" />
     <Compile Include="TestDataProtectionProvider.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Properties/Resources.resx" LogicalName="Microsoft.Owin.Security.Tests.Properties.Resources.resources" />
+    <EmbeddedResource Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/Properties/Resources.resx" Link="Properties/Resources.resx" LogicalName="Microsoft.Owin.Security.Tests.Properties.Resources.resources" />
   </ItemGroup>
 
   <ItemGroup>

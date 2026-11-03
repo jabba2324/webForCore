@@ -1,0 +1,5 @@
+[submodule "external/AspNetKatana"]
+	path = external/AspNetKatana
+	url = https://github.com/xforcore/AspNetKatana.git
+	branch = webforcore
+	shallow = true

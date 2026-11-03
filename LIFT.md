@@ -2118,3 +2118,20 @@ uses since it moved to .NET 10 LTS (above).
   skipped), as before; the System.Drawing.Common.dll they load is the package's. The full run is CI's.
 - **Not caused by this:** locally, `WebFormsForCore.TestApp` fails to build because NuGet's global cache holds
   upstream's WebFormsForCore.Build 1.7.0-rc3 from nuget.org, whose designer task starts `dotnet.exe`. CI builds it.
+
+## Katana from a submodule (#61, 3 Nov 2026)
+
+Katana is the first upstream to come from a submodule instead of the lift. `external/AspNetKatana` is a shallow
+submodule of [xforcore/AspNetKatana](https://github.com/xforcore/AspNetKatana)'s `webforcore` branch:
+- it starts at `096e225`, the commit lifted from;
+- one commit keeps only the 376 files the lift used, plus the licence;
+- then 10 commits, one per changed file, carry the lift's changes with their `webForCore:` notes as the messages.
+
+The nine Katana projects and three test projects keep their project files. They compile the submodule's files through
+`Link` items, so the paths and resource names are as before. Their 377 lifted copies, their manifests and their
+section of `docs/lifted-changes.md` are gone: the report now covers 3,706 lifted files, 243 of them changed. A change to
+Katana is now a commit on the fork's branch, then a webForCore PR that moves the submodule (CONTRIBUTING.md rule 5).
+
+Result (Linux x64, .NET 10.0.14): Microsoft.Owin.Tests 321/321, Microsoft.Owin.Host.SystemWeb.Tests 36/36,
+Microsoft.Owin.Security.Tests 114 pass, 4 skipped of 118. These are the same as before. CI checks out submodules on
+both platforms, and on Windows sets `core.longpaths`.

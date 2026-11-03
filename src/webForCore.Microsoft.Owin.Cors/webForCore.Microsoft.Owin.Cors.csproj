@@ -34,12 +34,12 @@
   <Import Project="../webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="CorsExtensions.cs" />
-    <Compile Include="CorsMiddleware.cs" />
-    <Compile Include="CorsOptions.cs" />
-    <Compile Include="CorsPolicyProvider.cs" />
-    <Compile Include="ICorsPolicyProvider.cs" />
-    <Compile Include="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Cors/CorsExtensions.cs" Link="CorsExtensions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Cors/CorsMiddleware.cs" Link="CorsMiddleware.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Cors/CorsOptions.cs" Link="CorsOptions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Cors/CorsPolicyProvider.cs" Link="CorsPolicyProvider.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Cors/ICorsPolicyProvider.cs" Link="ICorsPolicyProvider.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Cors/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -34,63 +34,63 @@
   <Import Project="../webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="AppBuilderSecurityExtensions.cs" />
-    <Compile Include="AuthenticationMode.cs" />
-    <Compile Include="AuthenticationOptions.cs" />
-    <Compile Include="AuthenticationTicket.cs" />
-    <Compile Include="CertificateSubjectKeyIdentifierValidator.cs" />
-    <Compile Include="CertificateSubjectPublicKeyInfoValidator.cs" />
-    <Compile Include="CertificateThumbprintValidator.cs" />
-    <Compile Include="Constants.cs" />
-    <Compile Include="DataHandler/Encoder/Base64TextEncoder.cs" />
-    <Compile Include="DataHandler/Encoder/Base64UrlTextEncoder.cs" />
-    <Compile Include="DataHandler/Encoder/ITextEncoder.cs" />
-    <Compile Include="DataHandler/Encoder/TextEncodings.cs" />
-    <Compile Include="DataHandler/ISecureDataFormat.cs" />
-    <Compile Include="DataHandler/PropertiesDataFormat.cs" />
-    <Compile Include="DataHandler/SecureDataFormat.cs" />
-    <Compile Include="DataHandler/Serializer/DataSerializers.cs" />
-    <Compile Include="DataHandler/Serializer/IDataSerializer.cs" />
-    <Compile Include="DataHandler/Serializer/PropertiesSerializer.cs" />
-    <Compile Include="DataHandler/Serializer/TicketSerializer.cs" />
-    <Compile Include="DataHandler/TicketDataFormat.cs" />
-    <Compile Include="DataProtection/AppBuilderExtensions.cs" />
-    <Compile Include="DataProtection/DpapiDataProtectionProvider.cs" />
-    <Compile Include="DataProtection/DpapiDataProtector.cs" />
-    <Compile Include="DataProtection/IDataProtectionProvider.cs" />
-    <Compile Include="DataProtection/IDataProtector.cs" />
-    <Compile Include="ICertificateValidator.cs" />
-    <Compile Include="Infrastructure/AuthenticationHandler.cs" />
-    <Compile Include="Infrastructure/AuthenticationHandler`1.cs" />
-    <Compile Include="Infrastructure/AuthenticationMiddleware.cs" />
-    <Compile Include="Infrastructure/AuthenticationTokenCreateContext.cs" />
-    <Compile Include="Infrastructure/AuthenticationTokenProvider.cs" />
-    <Compile Include="Infrastructure/AuthenticationTokenReceiveContext.cs" />
-    <Compile Include="Infrastructure/Constants.cs" />
-    <Compile Include="Infrastructure/IAuthenticationTokenProvider.cs" />
-    <Compile Include="Infrastructure/OwinRequestExtensions.cs" />
-    <Compile Include="Infrastructure/SecurityHelper.cs" />
-    <Compile Include="Notifications/AuthenticationFailedNotification.cs" />
-    <Compile Include="Notifications/BaseNotification`1.cs" />
-    <Compile Include="Notifications/MessageReceivedNotification.cs" />
-    <Compile Include="Notifications/NotificationResultState.cs" />
-    <Compile Include="Notifications/RedirectToIdentityProviderNotification.cs" />
-    <Compile Include="Notifications/SecurityTokenReceivedNotification.cs" />
-    <Compile Include="Notifications/SecurityTokenValidatedNotification.cs" />
-    <Compile Include="Properties/AssemblyInfo.cs" />
-    <Compile Include="Provider/BaseContext.cs" />
-    <Compile Include="Provider/BaseContext`1.cs" />
-    <Compile Include="Provider/EndpointContext.cs" />
-    <Compile Include="Provider/EndpointContext`1.cs" />
-    <Compile Include="Provider/ReturnEndpointContext.cs" />
-    <Compile Include="Resources.Designer.cs" />
-    <Compile Include="SubjectPublicKeyInfoAlgorithm.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/AppBuilderSecurityExtensions.cs" Link="AppBuilderSecurityExtensions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/AuthenticationMode.cs" Link="AuthenticationMode.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/AuthenticationOptions.cs" Link="AuthenticationOptions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/AuthenticationTicket.cs" Link="AuthenticationTicket.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/CertificateSubjectKeyIdentifierValidator.cs" Link="CertificateSubjectKeyIdentifierValidator.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/CertificateSubjectPublicKeyInfoValidator.cs" Link="CertificateSubjectPublicKeyInfoValidator.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/CertificateThumbprintValidator.cs" Link="CertificateThumbprintValidator.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Constants.cs" Link="Constants.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/DataHandler/Encoder/Base64TextEncoder.cs" Link="DataHandler/Encoder/Base64TextEncoder.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/DataHandler/Encoder/Base64UrlTextEncoder.cs" Link="DataHandler/Encoder/Base64UrlTextEncoder.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/DataHandler/Encoder/ITextEncoder.cs" Link="DataHandler/Encoder/ITextEncoder.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/DataHandler/Encoder/TextEncodings.cs" Link="DataHandler/Encoder/TextEncodings.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/DataHandler/ISecureDataFormat.cs" Link="DataHandler/ISecureDataFormat.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/DataHandler/PropertiesDataFormat.cs" Link="DataHandler/PropertiesDataFormat.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/DataHandler/SecureDataFormat.cs" Link="DataHandler/SecureDataFormat.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/DataHandler/Serializer/DataSerializers.cs" Link="DataHandler/Serializer/DataSerializers.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/DataHandler/Serializer/IDataSerializer.cs" Link="DataHandler/Serializer/IDataSerializer.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/DataHandler/Serializer/PropertiesSerializer.cs" Link="DataHandler/Serializer/PropertiesSerializer.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/DataHandler/Serializer/TicketSerializer.cs" Link="DataHandler/Serializer/TicketSerializer.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/DataHandler/TicketDataFormat.cs" Link="DataHandler/TicketDataFormat.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/DataProtection/AppBuilderExtensions.cs" Link="DataProtection/AppBuilderExtensions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/DataProtection/DpapiDataProtectionProvider.cs" Link="DataProtection/DpapiDataProtectionProvider.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/DataProtection/DpapiDataProtector.cs" Link="DataProtection/DpapiDataProtector.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/DataProtection/IDataProtectionProvider.cs" Link="DataProtection/IDataProtectionProvider.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/DataProtection/IDataProtector.cs" Link="DataProtection/IDataProtector.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/ICertificateValidator.cs" Link="ICertificateValidator.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Infrastructure/AuthenticationHandler.cs" Link="Infrastructure/AuthenticationHandler.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Infrastructure/AuthenticationHandler`1.cs" Link="Infrastructure/AuthenticationHandler`1.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Infrastructure/AuthenticationMiddleware.cs" Link="Infrastructure/AuthenticationMiddleware.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Infrastructure/AuthenticationTokenCreateContext.cs" Link="Infrastructure/AuthenticationTokenCreateContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Infrastructure/AuthenticationTokenProvider.cs" Link="Infrastructure/AuthenticationTokenProvider.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Infrastructure/AuthenticationTokenReceiveContext.cs" Link="Infrastructure/AuthenticationTokenReceiveContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Infrastructure/Constants.cs" Link="Infrastructure/Constants.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Infrastructure/IAuthenticationTokenProvider.cs" Link="Infrastructure/IAuthenticationTokenProvider.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Infrastructure/OwinRequestExtensions.cs" Link="Infrastructure/OwinRequestExtensions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Infrastructure/SecurityHelper.cs" Link="Infrastructure/SecurityHelper.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Notifications/AuthenticationFailedNotification.cs" Link="Notifications/AuthenticationFailedNotification.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Notifications/BaseNotification`1.cs" Link="Notifications/BaseNotification`1.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Notifications/MessageReceivedNotification.cs" Link="Notifications/MessageReceivedNotification.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Notifications/NotificationResultState.cs" Link="Notifications/NotificationResultState.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Notifications/RedirectToIdentityProviderNotification.cs" Link="Notifications/RedirectToIdentityProviderNotification.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Notifications/SecurityTokenReceivedNotification.cs" Link="Notifications/SecurityTokenReceivedNotification.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Notifications/SecurityTokenValidatedNotification.cs" Link="Notifications/SecurityTokenValidatedNotification.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Provider/BaseContext.cs" Link="Provider/BaseContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Provider/BaseContext`1.cs" Link="Provider/BaseContext`1.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Provider/EndpointContext.cs" Link="Provider/EndpointContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Provider/EndpointContext`1.cs" Link="Provider/EndpointContext`1.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Provider/ReturnEndpointContext.cs" Link="Provider/ReturnEndpointContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Resources.Designer.cs" Link="Resources.Designer.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/SubjectPublicKeyInfoAlgorithm.cs" Link="SubjectPublicKeyInfoAlgorithm.cs" />
     <Compile Include="WebFormsForCore/LocalDataProtection.cs" />
-    <Compile Include="Win32.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Win32.cs" Link="Win32.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources.resx" LogicalName="Microsoft.Owin.Security.Resources.resources" />
+    <EmbeddedResource Include="../../external/AspNetKatana/src/Microsoft.Owin.Security/Resources.resx" Link="Resources.resx" LogicalName="Microsoft.Owin.Security.Resources.resources" />
   </ItemGroup>
 
   <ItemGroup>
