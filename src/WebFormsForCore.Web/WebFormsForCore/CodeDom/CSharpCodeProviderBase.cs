@@ -4,67 +4,21 @@ using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Reflection;
-using System.Linq;
 
-#if NETCOREAPP
 using W = WebFormsForCore.CodeDom.Compiler;
-using System.Runtime.Loader;
-#else
-using W = System.CodeDom.Compiler;
-#endif
 
 namespace WebFormsForCore.CodeDom.Compiler;
 
 //
 // Summary:
 //     Provides access to instances of the C# code generator and code compiler.
+//
+// webForCore: on .NET Framework, Microsoft's CSharpCodeProvider derives from Microsoft.CSharp.CSharpCodeProvider.
+// Here it derives from this class, which takes the generator, the converters and member generation from System.CodeDom's
+// public Microsoft.CSharp.CSharpCodeProvider instead of creating its internal types by reflection (#57).
 public class CSharpCodeProviderBase : W.CodeDomProvider
 {
-#if NETCOREAPP
-	const string CodeDomAssembly = "System.CodeDom";
-#else
-	const string CodeDomAssembly  = "System"; 
-#endif
-#if NETCOREAPP
-	private Type Type
-	{
-		get
-		{
-			var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
-			return Type.GetType($"Microsoft.CSharp.CSharpCodeGenerator, {CodeDomAssembly}",
-				assemblyName => alc.LoadFromAssemblyName(assemblyName),
-				(asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)));
-		}
-    }
-    private Type typeAttributeConverterType
-	{
-		get
-        {
-            var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
-            return Type.GetType($"Microsoft.CSharp.CSharpTypeAttributeConverter, {CodeDomAssembly}",
-                assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)));
-		}
-	}
-	private Type memberAttributeConverterType
-	{
-		get
-        {
-            var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
-            return Type.GetType($"Microsoft.CSharp.CSharpMemberAttributeConverter, {CodeDomAssembly}",
-                assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)));
-        }
-    }
-
-#else
-	private Type Type => Type.GetType($"Microsoft.CSharp.CSharpCodeGenerator, {CodeDomAssembly}");
-	private Type typeAttributeConverterType => Type.GetType($"Microsoft.CSharp.CSharpTypeAttributeConverter, {CodeDomAssembly}");
-	private Type memberAttributeConverterType => Type.GetType($"Microsoft.CSharp.CSharpMemberAttributeConverter, {CodeDomAssembly}");
-#endif
-
-    private readonly ICodeGenerator _generator;
+	private readonly global::Microsoft.CSharp.CSharpCodeProvider _provider;
 
 	//
 	// Summary:
@@ -79,7 +33,7 @@ public class CSharpCodeProviderBase : W.CodeDomProvider
 	//     Initializes a new instance of the Microsoft.CSharp.CSharpCodeProvider class.
 	public CSharpCodeProviderBase(): base()
 	{
-		_generator = (ICodeGenerator)Activator.CreateInstance(Type, true);
+		_provider = new global::Microsoft.CSharp.CSharpCodeProvider();
 	}
 
 	//
@@ -102,8 +56,7 @@ public class CSharpCodeProviderBase : W.CodeDomProvider
 			throw new ArgumentNullException("providerOptions");
 		}
 
-		_generator = (ICodeGenerator)Activator.CreateInstance(Type, BindingFlags.NonPublic | BindingFlags.Public,
-			null, new object[] { providerOptions }, null);
+		_provider = new global::Microsoft.CSharp.CSharpCodeProvider(providerOptions);
 	}
 
 	//
@@ -115,7 +68,7 @@ public class CSharpCodeProviderBase : W.CodeDomProvider
 	[Obsolete("ICodeGenerator has been deprecated. Use the methods directly on the CodeDomProvider class instead.")]
 	public override ICodeGenerator CreateGenerator()
 	{
-		return _generator;
+		return _provider.CreateGenerator();
 	}
 
 	//
@@ -127,7 +80,7 @@ public class CSharpCodeProviderBase : W.CodeDomProvider
 	[Obsolete("ICodeCompiler has been deprecated. Use the methods directly on the CodeDomProvider class instead.")]
 	public override ICodeCompiler CreateCompiler()
 	{
-		return (ICodeCompiler)_generator;
+		return _provider.CreateCompiler();
 	}
 
 	//
@@ -143,21 +96,12 @@ public class CSharpCodeProviderBase : W.CodeDomProvider
 	//     A System.ComponentModel.TypeConverter for the specified type.
 	public override TypeConverter GetConverter(Type type)
 	{
-		if (!(type == typeof(MemberAttributes)))
+		if (type == typeof(MemberAttributes) || type == typeof(System.Reflection.TypeAttributes))
 		{
-			if (!(type == typeof(TypeAttributes)))
-			{
-				return base.GetConverter(type);
-			}
-
-			return (TypeConverter)typeAttributeConverterType.GetProperty("Default",
-				BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Static)
-				.GetValue(null);
+			return _provider.GetConverter(type);
 		}
 
-		return (TypeConverter)memberAttributeConverterType.GetProperty("Default",
-			BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Static)
-			.GetValue(null);
+		return base.GetConverter(type);
 	}
 
 	//
@@ -176,8 +120,6 @@ public class CSharpCodeProviderBase : W.CodeDomProvider
 	//     The System.CodeDom.Compiler.CodeGeneratorOptions to use when generating the code.
 	public override void GenerateCodeFromMember(CodeTypeMember member, TextWriter writer, CodeGeneratorOptions options)
 	{
-		var method = _generator.GetType().GetMethod("GenerateCodeFromMember");
-		method.Invoke(_generator, new object[] { member, writer, options });
-		//_generator.GenerateCodeFromMember(member, writer, options);
+		_provider.GenerateCodeFromMember(member, writer, options);
 	}
 }

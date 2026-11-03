@@ -4,66 +4,21 @@ using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.Loader;
 
-#if NETCOREAPP
 using W = WebFormsForCore.CodeDom.Compiler;
-#else
-using W = System.CodeDom.Compiler;
-#endif
 
 namespace WebFormsForCore.CodeDom.Compiler;
 
 //
 // Summary:
 //     Provides access to instances of the Visual Basic code generator and code compiler.
+//
+// webForCore: on .NET Framework, Microsoft's VBCodeProvider derives from Microsoft.VisualBasic.VBCodeProvider.
+// Here it derives from this class, which takes the generator, the converters and member generation from System.CodeDom's
+// public Microsoft.VisualBasic.VBCodeProvider instead of creating its internal types by reflection (#57).
 public class VBCodeProviderBase : W.CodeDomProvider
 {
-#if NETCOREAPP
-	const string CodeDomAssembly = "System.CodeDom";
-#else
-	const string CodeDomAssembly  = "System"; 
-#endif
-
-#if NETCOREAPP
-	private Type Type {
-		get
-		{
-            var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
-            return Type.GetType($"Microsoft.VisualBasic.VBCodeGenerator, {CodeDomAssembly}",
-                assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)));
-        }
-    } 
-	private Type typeAttributeConverterType
-	{
-		get
-		{
-            var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
-            return Type.GetType($"Microsoft.VisualBasic.VBTypeAttributeConverter, {CodeDomAssembly}",
-                assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)));
-        }
-    }
-	private Type memberAttributeConverterType
-	{
-		get
-		{
-            var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
-            return Type.GetType($"Microsoft.VisualBasic.VBMemberAttributeConverter, {CodeDomAssembly}",
-                assemblyName => alc.LoadFromAssemblyName(assemblyName),
-                (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)));
-        }
-    }
-#else
-	private Type Type => Type.GetType($"Microsoft.VisualBasic.VBCodeGenerator, {CodeDomAssembly}");
-	private Type typeAttributeConverterType => Type.GetType($"Microsoft.VisualBasic.VBTypeAttributeConverter, {CodeDomAssembly}");
-	private Type memberAttributeConverterType => Type.GetType($"Microsoft.VisualBasic.VBMemberAttributeConverter, {CodeDomAssembly}");
-#endif
-
-    private readonly ICodeGenerator _generator;
+	private readonly global::Microsoft.VisualBasic.VBCodeProvider _provider;
 
 	//
 	// Summary:
@@ -87,7 +42,7 @@ public class VBCodeProviderBase : W.CodeDomProvider
 	//     Initializes a new instance of the Microsoft.VisualBasic.VBCodeProvider class.
 	public VBCodeProviderBase(): base()
 	{
-		_generator = (ICodeGenerator)Activator.CreateInstance(Type, true);
+		_provider = new global::Microsoft.VisualBasic.VBCodeProvider();
 	}
 
 	//
@@ -110,8 +65,7 @@ public class VBCodeProviderBase : W.CodeDomProvider
 			throw new ArgumentNullException("providerOptions");
 		}
 
-		_generator = (ICodeGenerator)Activator.CreateInstance(Type, BindingFlags.NonPublic | BindingFlags.Public,
-			null, new object[] { providerOptions }, null);
+		_provider = new global::Microsoft.VisualBasic.VBCodeProvider(providerOptions);
 	}
 
 	//
@@ -123,7 +77,7 @@ public class VBCodeProviderBase : W.CodeDomProvider
 	[Obsolete("ICodeGenerator has been deprecated. Use the methods directly on the CodeDomProvider class instead.")]
 	public override ICodeGenerator CreateGenerator()
 	{
-		return _generator;
+		return _provider.CreateGenerator();
 	}
 
 	//
@@ -135,7 +89,7 @@ public class VBCodeProviderBase : W.CodeDomProvider
 	[Obsolete("ICodeCompiler has been deprecated. Use the methods directly on the CodeDomProvider class instead.")]
 	public override ICodeCompiler CreateCompiler()
 	{
-		return (ICodeCompiler)_generator;
+		return _provider.CreateCompiler();
 	}
 
 	//
@@ -151,21 +105,12 @@ public class VBCodeProviderBase : W.CodeDomProvider
 	//     A System.ComponentModel.TypeConverter for the specified type.
 	public override TypeConverter GetConverter(Type type)
 	{
-		if (!(type == typeof(MemberAttributes)))
+		if (type == typeof(MemberAttributes) || type == typeof(System.Reflection.TypeAttributes))
 		{
-			if (!(type == typeof(TypeAttributes)))
-			{
-				return base.GetConverter(type);
-			}
-
-			return (TypeConverter)typeAttributeConverterType.GetProperty("Default",
-				BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Static)
-				.GetValue(null);
+			return _provider.GetConverter(type);
 		}
 
-		return (TypeConverter)memberAttributeConverterType.GetProperty("Default",
-			BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Static)
-			.GetValue(null);
+		return base.GetConverter(type);
 	}
 
 	//
@@ -184,9 +129,6 @@ public class VBCodeProviderBase : W.CodeDomProvider
 	//     The System.CodeDom.Compiler.CodeGeneratorOptions to use when generating the code.
 	public override void GenerateCodeFromMember(CodeTypeMember member, TextWriter writer, CodeGeneratorOptions options)
 	{
-		var method = _generator.GetType().GetMethod("GenerateCodeFromMember");
-		method.Invoke(_generator, new object[] { member, writer, options });
-		//_generator.GenerateCodeFromMember(member, writer, options);
+		_provider.GenerateCodeFromMember(member, writer, options);
 	}
 }
-
