@@ -8,7 +8,7 @@ on Kestrel and check them over HTTP against IIS's documented behaviour.
 
 **Latest run (0.7.0, 3 Nov 2026, Linux x64, .NET 10.0.14, Release): 23,447 tests in 24 suites. 23,423 pass, 24 are
 skipped with a reason, and none fail.** System.Drawing.Common's own tests run in
-[drawingForCore](https://github.com/jabba2324/drawingForCore)'s CI. System.Web.MonoTests skips 11 (6 before 0.7.0): Mono's 5
+[drawingForCore](https://github.com/xforcore/drawingForCore)'s CI. System.Web.MonoTests skips 11 (6 before 0.7.0): Mono's 5
 `SimpleWorkerRequestTest` tests that create application hosts need an AppDomain per host, and are skipped again now that
 webForCore has no in-process AppDomains (LIFT.md).
 
@@ -26,7 +26,7 @@ One suite: `dotnet test test/webForCore.<Suite>/webForCore.<Suite>.csproj -c Rel
 CI (`.github/workflows/ci.yml`) runs the same script on Ubuntu 24.04 for every push and pull request, with SQL Server
 as a service container. A suite fails CI on any failing test.
 
-System.Drawing and System.Drawing.Common come from [drawingForCore](https://github.com/jabba2324/drawingForCore)'s
+System.Drawing and System.Drawing.Common come from [drawingForCore](https://github.com/xforcore/drawingForCore)'s
 packages, and Microsoft's System.Drawing.Common tests run in that repository's CI, with its known failures. Here,
 WebImage and Chart (System.Web.Helpers.Test), and the gate samples, test webForCore's use of it.
 

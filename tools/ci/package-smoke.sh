@@ -25,7 +25,7 @@ cat > nuget.config <<CONFIG
     <clear />
     <add key="webForCore" value="$packages" />
     <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
-    <add key="drawingForCore" value="https://jabba2324.github.io/drawingForCore/index.json" />
+    <add key="drawingForCore" value="https://xforcore.github.io/drawingForCore/index.json" />
   </packageSources>
   <packageSourceMapping>
     <packageSource key="webForCore"><package pattern="webForCore" /><package pattern="webForCore.*" /></packageSource>

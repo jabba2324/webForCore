@@ -669,7 +669,7 @@ FIXUPS["System.Web.WebPages.Test"] = [("Html/InputHelperTest.cs",) + USING("Syst
 NO_SXS = ("side-by-side Web Pages versions (another System.Web.WebPages.Deployment loaded next to this one, as from the GAC): .NET has no "
           "GAC and an AssemblyLoadContext holds one version of a name.")
 # WebImage and Chart run on System.Drawing.Common with GDI+ on SkiaSharp (drawingForCore's packages,
-# https://github.com/jabba2324/drawingForCore). libgdiplus was tried first and rejected (LIFT.md).
+# https://github.com/xforcore/drawingForCore). libgdiplus was tried first and rejected (LIFT.md).
 TRANSFORMS["System.Web.Helpers.Test"] = []
 # Windows paths in the test data (tests only): a drive-rooted path is rooted on Windows, so WebImage takes it as a file
 # path; on Linux it is not. "x:\dir\file.jpg" becomes "/x/dir/file.jpg", rooted on both. ChartTest strips the drive
