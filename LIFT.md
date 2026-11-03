@@ -2199,3 +2199,16 @@ With every upstream in a submodule, `tools/lift/` is gone:
 - **Docs and headers:** the project headers say which submodule a project compiles. CONTRIBUTING.md, README, NOTICE,
   docs/MODIFICATIONS.md, LICENSING.md and TESTING.md describe the forks and their commits instead of the lift. This
   log stays until #67 moves what's still useful into the other docs.
+
+## Own code that broke rules 6 and 7, first pass (#57, 3 Nov 2026)
+
+Removed: `WebFormsTaskScheduler` (unused; private reflection into `ThreadPoolTaskScheduler` and `Task`, and its
+`ExecuteEntryUnsafe` lookup returned null on .NET 10), the `GC.Collect` wait in `CodeDirectoryCompiler` (now fails at
+once off Windows), the `SerializationInfo.StartDeserialization` reflection in `BinaryObjectReader` (it found nothing;
+`SerializationGuardTest` pins that the guard is off), the `#if DebugWF4C` reflection in `HttpApplication.ExecuteStep`,
+the `GCUtil.Alloc`/`Free` wrappers (back to the reference source), an unused `using System.Reflection` in
+`DbProviderFactoriesSectionHandler`, and the by-name `GetType` of `BuildManagerHost` in `AspNetCoreHost`. The C# and
+VB CodeDom providers use System.CodeDom's public providers instead of its internal generator and converter types;
+`CodeDomTests` (CodeDom.aspx) gave the same strings before and after.
+`tools/ci/check_code_rules.cs` (CI, Linux) fails on a new break: 8 on the base (and 8 lines in the CodeDom providers), 0 after,
+with #57's remaining items (in-process Roslyn, FrameworkSurrogates, `geteuid`) as known exceptions.

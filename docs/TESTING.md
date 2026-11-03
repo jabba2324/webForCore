@@ -171,3 +171,7 @@ Branch coverage isn't reported: dotnet-coverage's Cobertura output has no branch
 - `LIFT.md`: why each test was corrected or skipped.
 - `tools/ci/trx_summary.cs` and `trx_failures.cs` summarise `.trx` files (C# file-based apps:
   `dotnet run tools/ci/trx_summary.cs -- <files>`).
+- `tools/ci/check_code_rules.cs` checks webForCore's own code against CONTRIBUTING.md rules 6 and 7 (non-public
+  reflection, unsafe code, P/Invoke, GC steering) and fails on any line that isn't one of #57's known exceptions, or
+  on an exception that has been fixed but is still listed. CI runs it on Linux before the build:
+  `dotnet run tools/ci/check_code_rules.cs`.

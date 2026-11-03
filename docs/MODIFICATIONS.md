@@ -97,7 +97,20 @@ entry in `LIFT.md`.
 - **Compilation:** the in-process compiler loads into the app's context, and so does `AssemblyBuilder` with every
   compiled assembly (never CodeDom's `Assembly.LoadFile`, which loaded App_Code a second time, #56); precompilation for .NET
   (`System.Private.CoreLib` as the core library); typed DataSets in App_Code (the Reference Source's
-  `System.Data.TypedDataSetGenerator` and webForCore's TableAdapter generator).
+  `System.Data.TypedDataSetGenerator` and webForCore's TableAdapter generator). Off Windows, when App_Code's new
+  assembly has the path of one already loaded, `CodeDirectoryCompiler` fails at once with the reference source's
+  "already loaded" error: it used to force garbage collections for 3 seconds waiting for it to unload, which it can't
+  in a worker process (#57).
+- **Additions removed under CONTRIBUTING.md rules 6 and 7 (#57):** the unused `WebFormsTaskScheduler` (a public type
+  .NET Framework's System.Web never had, which reflected into `ThreadPoolTaskScheduler` and `Task`), a debug-only
+  `#if DebugWF4C` block in `HttpApplication.ExecuteStep`, and the `GCUtil.Alloc`/`Free` wrappers (`GCUtil`,
+  `RootedObjects`, `WorkItem`, `AspCompat` and `FileChangesMonitor` call `GCHandle` directly again, as the reference
+  source does). The BinaryFormatter port no longer looks up `SerializationInfo.StartDeserialization` by reflection;
+  the lookup found nothing on .NET 10, so .NET's SerializationGuard was never on, and isn't now
+  (`SerializationGuardTest`). System.Web's C# and VB CodeDom providers (`CSharpCodeProviderBase`, `VBCodeProviderBase`)
+  take the generator, the converters and member generation from System.CodeDom's public `CSharpCodeProvider` and
+  `VBCodeProvider` instead of creating its internal types by reflection (`CodeDomTests`). `tools/ci/check_code_rules.cs`
+  keeps new breaks out.
 - **`<system.net>`:** `<defaultProxy>` applied at application start, and `<mailSettings>` used by System.Web's mail
   senders (`WebFormsForCore.Net.Configuration.NetConfiguration`).
 - **BinaryFormatter port:** surrogates for .NET Framework types .NET no longer serializes (`NameValueCollection`

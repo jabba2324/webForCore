@@ -80,7 +80,8 @@ see is correct, that keeps working when .NET is patched, and that fails safely.
    styles System.Web and the other libraries serve) is part of the product, not tooling.
 
 Code written before rules 6–8 that breaks them is listed in #57. Each item is removed or replaced when it is next
-changed, and new code doesn't add to the list. The Python written before rule 9 was converted to C# or removed (#63).
+changed, and new code doesn't add to the list: `tools/ci/check_code_rules.cs` fails CI on a new break of rules 6 or 7
+in webForCore's own code, and on a #57 exception that is fixed but still listed. The Python written before rule 9 was converted to C# or removed (#63).
 
 ## Where tests go
 
