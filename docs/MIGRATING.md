@@ -327,6 +327,8 @@ reach System.Web, and ASP.NET Core serves everything else.
   file or assembly 'System.Design, Version=4.0.0.0'"), even when no page uses it (#37, Subtext and mojoPortal).
 - **Set an explicit `<machineKey>`** (validation and decryption keys). Generated keys change with every process, so
   forms authentication cookies, view state and anti-forgery tokens wouldn't survive a restart or work across servers.
+- **`<trust level="Medium" />`** (or any partial trust level) can stay: it is ignored and the application runs in full
+  trust (#87). Code that worked around Medium trust keeps working; code that checks the trust level sees full trust.
 - **Connection strings:** `System.Data.SqlClient` is used, as on .NET Framework. Add `TrustServerCertificate=True` or
   a trusted certificate if the server's certificate isn't trusted on Linux. LocalDB doesn't exist on Linux.
 - **Protected sections:** sections encrypted with RSA can be read once the key container is imported

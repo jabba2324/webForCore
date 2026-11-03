@@ -252,6 +252,20 @@ namespace IISGate
             Assert.Contains("is App_Data: True", body);
         }
 
+        // #87: a partial trust level is accepted and ignored: the application runs in full trust. The sample's Web.config
+        // has <trust level="Medium" originUrl=".*" />, as Umbraco 6's development web.config does; every request of the
+        // application was a Configuration Error ("Unable to read the security policy file for trust level 'Medium'").
+        [Fact]
+        public async Task PartialTrustLevelRunsInFullTrust()
+        {
+            var (response, body) = await Get("/regressions/TrustLevel.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("configured: Medium\n", body);
+            Assert.Contains("runtime: Full\n", body);
+            Assert.Contains("permission set: (none: full trust)\n", body);
+            Assert.Contains("demand: Unrestricted\n", body);
+        }
+
         // #33: Assembly.Load("App_GlobalResources"), as Visual Studio's designer classes for global resources do, resolves
         // to the compiled App_GlobalResources.xxxxxxxx assembly, as on IIS (and "App_Code" and "__code" to App_Code).
         // mojoPortal's Application_Start and every page failed with "Could not load file or assembly 'App_GlobalResources,

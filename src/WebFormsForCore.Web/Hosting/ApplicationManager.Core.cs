@@ -1272,7 +1272,12 @@ using System.Runtime.Loader;
 
                         switches.UseLegacyCas = trustSection.LegacyCasModel;
 
-                        if (inClientBuildManager) {
+                        // webForCore (#87): .NET has no Code Access Security, so every application runs in full trust, as
+                        // in the ClientBuildManager: a partial trust level is accepted and ignored. Its policy file
+                        // (web_mediumtrust.config, ...) isn't shipped, and reading it made every request a Configuration
+                        // Error ("Unable to read the security policy file for trust level 'Medium'"; Umbraco 6).
+                        const bool alwaysFullTrust = true;
+                        if (inClientBuildManager || alwaysFullTrust) {
                             permissionSet = new PermissionSet(PermissionState.Unrestricted);
 #if NETFRAMEWORK
                             setup.PartialTrustVisibleAssemblies = defaultPartialTrustVisibleAssemblies;
