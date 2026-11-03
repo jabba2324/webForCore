@@ -29,21 +29,21 @@
   <Import Project="../webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="Extensions/SignInManagerExtensions.cs" />
-    <Compile Include="IdentityFactoryMiddleware.cs" />
-    <Compile Include="IdentityFactoryOptions.cs" />
-    <Compile Include="IIdentityFactoryProvider.cs" />
-    <Compile Include="IdentityFactoryProvider.cs" />
-    <Compile Include="DataProtectorTokenProvider.cs" />
-    <Compile Include="Extensions/AppBuilderExtensions.cs" />
-    <Compile Include="Extensions/AuthenticationManagerExtensions.cs" />
-    <Compile Include="Extensions/OwinContextExtensions.cs" />
-    <Compile Include="ExternalLoginInfo.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Properties/AssemblyInfo.cs" />
-    <Compile Include="SecurityStampValidator.cs" />
-    <Compile Include="SignInManager.cs" />
-    <Compile Include="SignInStatus.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Owin/Extensions/SignInManagerExtensions.cs" Link="Extensions/SignInManagerExtensions.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Owin/IdentityFactoryMiddleware.cs" Link="IdentityFactoryMiddleware.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Owin/IdentityFactoryOptions.cs" Link="IdentityFactoryOptions.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Owin/IIdentityFactoryProvider.cs" Link="IIdentityFactoryProvider.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Owin/IdentityFactoryProvider.cs" Link="IdentityFactoryProvider.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Owin/DataProtectorTokenProvider.cs" Link="DataProtectorTokenProvider.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Owin/Extensions/AppBuilderExtensions.cs" Link="Extensions/AppBuilderExtensions.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Owin/Extensions/AuthenticationManagerExtensions.cs" Link="Extensions/AuthenticationManagerExtensions.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Owin/Extensions/OwinContextExtensions.cs" Link="Extensions/OwinContextExtensions.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Owin/ExternalLoginInfo.cs" Link="ExternalLoginInfo.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Owin/GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Owin/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Owin/SecurityStampValidator.cs" Link="SecurityStampValidator.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Owin/SignInManager.cs" Link="SignInManager.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Owin/SignInStatus.cs" Link="SignInStatus.cs" />
 
 
 

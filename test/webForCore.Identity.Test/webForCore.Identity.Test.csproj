@@ -30,33 +30,33 @@
   <Import Project="../../src/webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="AuthenticationManagerExtensionsTest.cs" />
-    <Compile Include="ApplicationUserTest.cs" />
-    <Compile Include="AsyncHelperTest.cs" />
-    <Compile Include="SignInManagerTest.cs" />
-    <Compile Include="UserLockoutStoreTests.cs" />
-    <Compile Include="PasswordValidatorTest.cs" />
-    <Compile Include="OwinContextExtensionsTest.cs" />
-    <Compile Include="SecurityStampTest.cs" />
-    <Compile Include="CustomGuidKeyTest.cs" />
-    <Compile Include="CustomIntKeyTest.cs" />
-    <Compile Include="IdentityExtensionsTest.cs" />
-    <Compile Include="IdentityDbContextTest.cs" />
-    <Compile Include="InMemoryStore.cs" />
-    <Compile Include="UserStoreTest.cs" />
-    <Compile Include="IdentityResultTest.cs" />
-    <Compile Include="ClaimsIdentityFactoryTest.cs" />
-    <Compile Include="InMemoryStoreTest.cs" />
-    <Compile Include="UserManagerTest.cs" />
-    <Compile Include="RolesTest.cs" />
-    <Compile Include="LoginsTest.cs" />
-    <Compile Include="ExceptionHelper.cs" />
-    <Compile Include="Properties/AssemblyInfo.cs" />
-    <Compile Include="TestUtil.cs" />
-    <Compile Include="UserClaimsTest.cs" />
-    <Compile Include="UnitTestHelper.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/AuthenticationManagerExtensionsTest.cs" Link="AuthenticationManagerExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/ApplicationUserTest.cs" Link="ApplicationUserTest.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/AsyncHelperTest.cs" Link="AsyncHelperTest.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/SignInManagerTest.cs" Link="SignInManagerTest.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/UserLockoutStoreTests.cs" Link="UserLockoutStoreTests.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/PasswordValidatorTest.cs" Link="PasswordValidatorTest.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/OwinContextExtensionsTest.cs" Link="OwinContextExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/SecurityStampTest.cs" Link="SecurityStampTest.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/CustomGuidKeyTest.cs" Link="CustomGuidKeyTest.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/CustomIntKeyTest.cs" Link="CustomIntKeyTest.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/IdentityExtensionsTest.cs" Link="IdentityExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/IdentityDbContextTest.cs" Link="IdentityDbContextTest.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/InMemoryStore.cs" Link="InMemoryStore.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/UserStoreTest.cs" Link="UserStoreTest.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/IdentityResultTest.cs" Link="IdentityResultTest.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/ClaimsIdentityFactoryTest.cs" Link="ClaimsIdentityFactoryTest.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/InMemoryStoreTest.cs" Link="InMemoryStoreTest.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/UserManagerTest.cs" Link="UserManagerTest.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/RolesTest.cs" Link="RolesTest.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/LoginsTest.cs" Link="LoginsTest.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/ExceptionHelper.cs" Link="ExceptionHelper.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/TestUtil.cs" Link="TestUtil.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/UserClaimsTest.cs" Link="UserClaimsTest.cs" />
+    <Compile Include="../../external/AspNetIdentity/test/Identity.Test/UnitTestHelper.cs" Link="UnitTestHelper.cs" />
 
-    <None Include="App.config" Link="testhost.dll.config" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../external/AspNetIdentity/test/Identity.Test/App.config" Link="testhost.dll.config" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
