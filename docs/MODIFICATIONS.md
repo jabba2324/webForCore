@@ -97,7 +97,9 @@ entry in `LIFT.md`.
 - **Compilation:** the in-process compiler loads into the app's context, and so does `AssemblyBuilder` with every
   compiled assembly (never CodeDom's `Assembly.LoadFile`, which loaded App_Code a second time, #56); precompilation for .NET
   (`System.Private.CoreLib` as the core library); typed DataSets in App_Code (the Reference Source's
-  `System.Data.TypedDataSetGenerator` and webForCore's TableAdapter generator).
+  `System.Data.TypedDataSetGenerator` and webForCore's TableAdapter generator); `BuildManager.ResolveAssembly` looks the
+  fixed names (`App_GlobalResources`, `App_Code`, `__code`) up by simple name too, because .NET passes the display name,
+  so `Assembly.Load("App_GlobalResources")` finds the compiled assembly, which keeps its random name as on IIS (#33).
 - **`<system.net>`:** `<defaultProxy>` applied at application start, and `<mailSettings>` used by System.Web's mail
   senders (`WebFormsForCore.Net.Configuration.NetConfiguration`).
 - **BinaryFormatter port:** surrogates for .NET Framework types .NET no longer serializes (`NameValueCollection`

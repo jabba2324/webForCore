@@ -11,5 +11,15 @@
         // app whose controllers share their feature folders' names). No other route of the sample matches anything.
         System.Web.Routing.RouteTable.Routes.RouteExistingFiles = true;
         System.Web.Routing.RouteTable.Routes.MapPageRoute("RegressionsRouted", "regressions/routed", "~/regressions/Routed.aspx");
+        // RegressionTests (#33): mojoPortal's Application_Start reads its global resources through Visual Studio's designer
+        // class, which loads them with Assembly.Load("App_GlobalResources").
+        try
+        {
+            DomainState.GlobalResourceAtStart = IISSample.GlobalResourcesDesigner.Greeting(System.Globalization.CultureInfo.InvariantCulture);
+        }
+        catch (Exception x)
+        {
+            DomainState.GlobalResourceAtStart = x.GetType().Name + ": " + x.Message;
+        }
     }
 </script>

@@ -2199,3 +2199,25 @@ With every upstream in a submodule, `tools/lift/` is gone:
 - **Docs and headers:** the project headers say which submodule a project compiles. CONTRIBUTING.md, README, NOTICE,
   docs/MODIFICATIONS.md, LICENSING.md and TESTING.md describe the forks and their commits instead of the lift. This
   log stays until #67 moves what's still useful into the other docs.
+
+## Assembly.Load of App_GlobalResources (#33, 3 Nov 2026)
+
+Visual Studio's designer classes for `App_GlobalResources` load the global resources with
+`Assembly.Load("App_GlobalResources")`. System.Web compiles them (and App_Code) to random names
+(`App_GlobalResources.xxxxxxxx`) and answers `AppDomain.AssemblyResolve` for the fixed names from
+`BuildManager._assemblyResolveMapping` (VSWhidbey 276776). On .NET the event gets the display name
+(`App_GlobalResources, Culture=neutral, PublicKeyToken=null`), so the lookup missed: mojoPortal's `Application_Start`
+and every page failed with "Could not load file or assembly 'App_GlobalResources'", and only
+`<compilation optimizeCompilations="true">` (fixed names) got round it. `App_Code` worked by luck, through
+`GetNormalizedCodeAssemblyName`'s prefix match; `__code` failed too.
+
+`BuildManager.ResolveAssembly` now also looks the mapping up by simple name (`#if NETCOREAPP`): **this changes the
+reference source port** (`BuildManager.cs`). The issue thought that couldn't work, because .NET refuses a resolved
+assembly whose simple name differs from the requested one; but only `AssemblyLoadContext.Resolving` checks that.
+`AppDomain.AssemblyResolve` in the default context doesn't, and since #56 System.Web and the compiled assemblies are in
+the worker's default context. The errors in the issue came from the collectible PseudoAppDomain contexts, which are
+gone. So the assemblies keep IIS's random names, and Microsoft's naming and build cache are unchanged. A host that
+put System.Web in a context of its own would get the old error. **Test:**
+`RegressionTests.FixedNamesOfTopLevelAssembliesLoad`: the IIS sample has `App_GlobalResources/Gate.resx` and
+`Gate.fr.resx` and a designer class in its bin assembly (`GlobalResourcesDesigner.cs`), read in `Application_Start` and
+on a page, with the French satellite; `App_Code`, `App_GlobalResources` and `__code` load. Gates: IIS 106 → 107.
