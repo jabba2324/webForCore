@@ -153,7 +153,7 @@
     </Target>
 
     <ItemGroup>
-        <!-- winforms' strings for its ResX classes (tools/lift/lift_resx.py); ResXSR looks them up by this name. -->
+        <!-- winforms' strings for its ResX classes (external/winforms); ResXSR looks them up by this name. -->
         <EmbeddedResource Update="WebFormsForCore\System.Resources\winforms\ResXSR.resx" LogicalName="System.Resources.ResXSR.resources" />
     </ItemGroup>
 

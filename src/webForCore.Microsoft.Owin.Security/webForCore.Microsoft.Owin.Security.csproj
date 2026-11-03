@@ -1,5 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <!-- Lifted from aspnet/AspNetKatana 096e225 (src/Microsoft.Owin.Security/Microsoft.Owin.Security.csproj) by tools/lift/lift_project.py.
+  <!-- From aspnet/AspNetKatana 096e225 (src/Microsoft.Owin.Security/Microsoft.Owin.Security.csproj) by way of the external/AspNetKatana submodule (xforcore/AspNetKatana's webforcore branch, #61).
        Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. -->
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>

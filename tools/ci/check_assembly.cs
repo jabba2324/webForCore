@@ -1,6 +1,6 @@
 // Checks lifted assemblies: identity (name, version, PublicKeyToken) and that every strongly typed
 // resource class can load its resources and read a string, exactly as the code does at runtime.
-// Usage: dotnet run tools/lift/check_assembly.cs -- <assembly.dll> [...]
+// Usage: dotnet run tools/ci/check_assembly.cs -- <assembly.dll> [...]
 // Exit code 1 if any resource class fails.
 using System.Globalization;
 using System.Reflection;

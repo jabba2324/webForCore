@@ -1,9 +1,9 @@
 # Tests
 
 webForCore is tested mainly with **other people's tests**: the suites Microsoft and Mono wrote for the libraries
-webForCore runs. They are lifted with the code ([MODIFICATIONS.md](MODIFICATIONS.md)) and run unchanged, except
-where .NET's base class library behaves differently from .NET Framework's; those corrections are listed in
-[lifted-changes.md](lifted-changes.md). On top of them, webForCore's own **gate suites** run real sample applications
+webForCore runs. They come with the code from the `external/` submodules ([MODIFICATIONS.md](MODIFICATIONS.md))
+and run unchanged, except where .NET's base class library behaves differently from .NET Framework's; those corrections
+are commits on the forks, like every other change. On top of them, webForCore's own **gate suites** run real sample applications
 on Kestrel and check them over HTTP against IIS's documented behaviour.
 
 **Latest run (0.7.0, 3 Nov 2026, Linux x64, .NET 10.0.14, Release): 23,447 tests in 24 suites. 23,423 pass, 24 are
@@ -17,7 +17,7 @@ webForCore has no in-process AppDomains (LIFT.md).
 ```bash
 dotnet build src/WebFormsForCore.Build/WebFormsForCore.Build.csproj -c Release
 dotnet build WebFormsForCore.slnx -c Release
-tools/lift/sqlserver.sh          # SQL Server in a container for Identity.Test (podman or docker)
+tools/ci/sqlserver.sh          # SQL Server in a container for Identity.Test (podman or docker)
 tools/ci/run-tests.sh            # every suite; .trx files and summary.md in ./TestResults
 ```
 
@@ -37,7 +37,7 @@ suite passes. Two IIS gate tests run only off Windows, because on Windows protec
 own key containers and DPAPI, as on .NET Framework: `AppReadsProtectedSections` (the sample's sections are encrypted with
 key files and the DPAPI emulation) and `RegIISProtectExportImportUnprotect` (it would create key containers in the
 machine's store). To run the suites on Windows: Git for Windows, the SDK in `global.json`, and
-SQL Server (Express is enough) at `127.0.0.1,14333` with the `sa` login of `tools/lift/sqlserver.sh`; then the commands
+SQL Server (Express is enough) at `127.0.0.1,14333` with the `sa` login of `tools/ci/sqlserver.sh`; then the commands
 above in Git Bash.
 
 The default branch, `webforcore-lift`, is protected: a pull request can merge only once CI's `build-and-test`
@@ -168,7 +168,6 @@ Branch coverage isn't reported: dotnet-coverage's Cobertura output has no branch
 
 ## How results are recorded
 
-- `tools/lift/test-results/2026-10-30.md`: results of each round, including failures grouped by message.
 - `LIFT.md`: why each test was corrected or skipped.
 - `tools/ci/trx_summary.cs` and `trx_failures.cs` summarise `.trx` files (C# file-based apps:
   `dotnet run tools/ci/trx_summary.cs -- <files>`).

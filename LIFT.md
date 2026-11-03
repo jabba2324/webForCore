@@ -155,7 +155,7 @@ Side effects of upstream's own build steps (not edits of ours): the build rewrit
 | `spike.sh` | From the handoff, net11.0. Builds the fork baseline, generates and builds 12 Web Stack projects, groups errors. Run from outside the fork. |
 | `group_errors.py` | From the handoff. Groups compile errors by project and missing API. |
 | `lift_project.py` | New. Copies a project into the fork as a real project (details below). |
-| `check_assembly.cs` | New (`dotnet run tools/lift/check_assembly.cs -- <dll>...`). Prints the assembly identity and loads every strongly typed resource class, reading one string from each. |
+| `check_assembly.cs` | New (`dotnet run tools/ci/check_assembly.cs -- <dll>...`). Prints the assembly identity and loads every strongly typed resource class, reading one string from each. |
 | `trx_summary.py` | New. Summarises `dotnet test` .trx results: totals, and failures grouped by class and message. |
 | `spike-results/`, `test-results/`, `manifests/` | Committed spike report, test results, and per-file provenance (source path, destination path) for every lifted file. |
 
@@ -1087,7 +1087,7 @@ Tests:
   (culture flows with it on .NET and .NET Framework 4.6+; BCL). `TieredCompilation=false`: two weak-reference tests rely on
   a local being dead after its last use, which .NET Framework's JIT gave and .NET's tier-0 code does not.
 - **Identity's tests** (`Identity.Test`): 298 of 311 passed at first; all 311 pass with the DPAPI emulation (below). They need SQL Server: LocalDB is Windows-only, so
-  `tools/lift/sqlserver.sh` runs SQL Server 2022 in a container (podman or docker) and the tests' App.config points at
+  `tools/ci/sqlserver.sh` runs SQL Server 2022 in a container (podman or docker) and the tests' App.config points at
   it (`FIXUPS`). On xunit 2 (Microsoft's were on xunit 1.9: `Assert.ThrowsDelegate` is `Action`, `Xunit.Extensions` is
   gone), one at a time as xunit 1.9 ran them (they share one database), in Pacific time (one test assumes UTC-8).
   Corrected: .NET's ArgumentException message format (BCL). The 13 that failed create Katana's
@@ -2188,3 +2188,14 @@ covers only WebFormsForCore's port.
 
 The full run is unchanged from 0.7.0: 23,447 tests in 24 suites, 23,423 passed, 24 skipped, none failed (Linux x64,
 .NET 10.0.14).
+
+## The lift tooling removed (#61, 3 Nov 2026)
+
+With every upstream in a submodule, `tools/lift/` is gone:
+- **Deleted:** the lift scripts, `gen_csproj.py`, `gen_sr.py`, `changes_report.py`, the spike tooling, the test-results
+  log, and `docs/lifted-changes.md`. Its port section is `git diff 52f4172 -- 'src/WebFormsForCore.*'`.
+- **Already in the projects:** `additions/`, whose 7 files had identical copies there.
+- **Moved to `tools/ci/`:** `sqlserver.sh` and `check_assembly.cs`.
+- **Docs and headers:** the project headers say which submodule a project compiles. CONTRIBUTING.md, README, NOTICE,
+  docs/MODIFICATIONS.md, LICENSING.md and TESTING.md describe the forks and their commits instead of the lift. This
+  log stays until #67 moves what's still useful into the other docs.

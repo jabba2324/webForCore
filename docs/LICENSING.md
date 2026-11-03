@@ -14,7 +14,7 @@ legal advice: for a product decision, have counsel review NOTICE and this page.
 | Part | Where | Licence | Commercial use |
 | --- | --- | --- | --- |
 | webForCore's own code (hosting layer, IIS modules, webforcore-host, DPAPI emulation, Microsoft.Web.Infrastructure, generated resource accessors, tools, docs, tests) | throughout; files marked `webForCore` | MIT | ✅ Yes |
-| WebFormsForCore's port of System.Web, System.Configuration, System.Web.ApplicationServices, System.Web.Extensions, System.Web.Services, Mobile, DataVisualization and aspnet_compiler, from Microsoft's .NET Framework Reference Source | `src/WebFormsForCore.*` (originals copied by the lift scripts are under `ReferenceSource/` folders) | MIT (Microsoft's Reference Source; port © Simon Jakob Egli) | ✅ Yes |
+| WebFormsForCore's port of System.Web, System.Configuration, System.Web.ApplicationServices, System.Web.Extensions, System.Web.Services, Mobile, DataVisualization and aspnet_compiler, from Microsoft's .NET Framework Reference Source | `src/WebFormsForCore.*` (the Reference Source originals come from the `external/referencesource` submodule) | MIT (Microsoft's Reference Source; port © Simon Jakob Egli) | ✅ Yes |
 | ASP.NET MVC 5, Web API 2, Web Pages, Razor, Helpers, CORS, MVC Futures | `src/webForCore.System.Web.*`, `src/webForCore.System.Net.Http.Formatting`, `src/webForCore.Microsoft.Web.Mvc` | Apache 2.0 (© .NET Foundation) | ✅ Yes |
 | Katana (Microsoft.Owin and friends) | `src/webForCore.Microsoft.Owin*` | Apache 2.0 (© .NET Foundation) | ✅ Yes |
 | SignalR 2 | `src/webForCore.Microsoft.AspNet.SignalR.*` | Apache 2.0 (© .NET Foundation) | ✅ Yes |
@@ -55,16 +55,16 @@ script that records each change. Where no MIT source exists, webForCore wrote th
 | Was | Now | How |
 | --- | --- | --- |
 | `webengine.dll`, `webengine4.dll` (.NET Framework native binaries) | Removed | Hashing uses managed code on every OS |
-| System.Configuration: ~150 files decompiled from System.Configuration.dll and System.dll | The Reference Source originals (89 files) | `tools/lift/lift_configuration.py` |
+| System.Configuration: ~150 files decompiled from System.Configuration.dll and System.dll | The Reference Source originals (89 files) | `external/referencesource` |
 | Configuration builders, `WindowsAuthenticationElement` | Written from the documented API | No MIT source exists |
-| System.Web.ApplicationServices (decompiled) | The Reference Source originals (21 files) | `tools/lift/lift_appservices.py` |
-| aspnet_compiler's front end (decompiled aspnet_compiler.exe) | The Reference Source's `aspnet_compiler.cs` and resources, plus WebFormsForCore's own additions | `tools/lift/lift_aspnet_compiler.py` |
-| ResX classes (decompiled System.Windows.Forms.dll) | dotnet/winforms' originals (MIT) | `tools/lift/lift_resx.py` |
-| StronglyTypedResourceBuilder (System.Design API reconstruction) | Mono's implementation (MIT) | `tools/lift/lift_strb.py` |
-| `BindableTypeAttribute` | The Reference Source original | `tools/lift/lift_strb.py` |
+| System.Web.ApplicationServices (decompiled) | The Reference Source originals (21 files) | `external/referencesource` |
+| aspnet_compiler's front end (decompiled aspnet_compiler.exe) | The Reference Source's `aspnet_compiler.cs` and resources, plus WebFormsForCore's own additions | `external/referencesource` |
+| ResX classes (decompiled System.Windows.Forms.dll) | dotnet/winforms' originals (MIT) | `external/winforms` |
+| StronglyTypedResourceBuilder (System.Design API reconstruction) | Mono's implementation (MIT) | `external/mono` |
+| `BindableTypeAttribute` | The Reference Source original | `external/referencesource` |
 | Microsoft.Web.Infrastructure (decompiled from the EULA-licensed 2.0.0 package) | Written from the documented API | Four files |
 | `DataProtector` (decompiled from System.Security.dll), `CallContext`, `AppDomainManager`, `UrlBuilder`, `TransactionOption` | Written from the documented API | |
-| Resource accessor classes (`SR`, `Res`, decompiled from build-generated code) | Generated from the projects' own `.resx` files | `tools/lift/gen_sr.py` |
+| Resource accessor classes (`SR`, `Res`, decompiled from build-generated code) | Generated from the projects' own `.resx` files | Generated once (`gen_sr.py`, in git history before #61) |
 | Assembly identity constants (`AssemblyRef`, `ThisAssembly`, decompiled) | Rewritten with the identity strings they hold | |
 | System.Web.RegularExpressions classes (decompiled; never compiled for .NET) | Removed; System.Web uses source-generated regexes | |
 | Microsoft Report Viewer 12.0 (decompiled, never built) | Removed | |
@@ -74,5 +74,5 @@ script that records each change. Where no MIT source exists, webForCore wrote th
 
 How this was checked: every source file in the port without a licence header was compared, line by line, with the
 Reference Source. Files that match it are Microsoft's MIT code with the header missing; files that don't were traced
-to their origin and replaced or rewritten. The full list of lifted files and changes is in
-[lifted-changes.md](lifted-changes.md), and each lifted file's upstream source is in `tools/lift/manifests/`.
+to their origin and replaced or rewritten. Microsoft's and Mono's files now come from the `external/` submodules, and
+every change to them is a commit on the fork's `webforcore` branch ([MODIFICATIONS.md](MODIFICATIONS.md)).

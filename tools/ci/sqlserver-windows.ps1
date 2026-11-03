@@ -1,5 +1,5 @@
 # SQL Server Express on a Windows CI runner (#46), where the Linux job's SQL Server service container can't run:
-# 127.0.0.1,14333, login sa, the password of tools/lift/sqlserver.sh, so the tests' connection strings are the same on
+# 127.0.0.1,14333, login sa, the password of tools/ci/sqlserver.sh, so the tests' connection strings are the same on
 # both. For Identity.Test and the IIS gate's data test. CI use only.
 $ErrorActionPreference = 'Stop'
 $password = 'webForCore-Test1!'

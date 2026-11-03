@@ -79,27 +79,26 @@ following notice:
     CONDITIONS OF ANY KIND, either express or implied. See the License for the
     specific language governing permissions and limitations under the License.
 
-Code taken from the ASP.NET Web Stack lives in the src/ and test/ directories listed for it in the summary above.
-Each file keeps its original copyright header. Files were copied with line endings normalised to CRLF; every other
-change is listed in docs/lifted-changes.md and LIFT.md, and the per-file source of each copy is recorded in
-tools/lift/manifests/.
+Code taken from the ASP.NET Web Stack is in the external/AspNetWebStack submodule (https://github.com/xforcore/AspNetWebStack,
+branch webforcore), compiled by the src/ and test/ projects listed for it in the summary above. Each file keeps its
+original copyright header; every change is a commit on that branch, with its reason (docs/MODIFICATIONS.md).
 
 The assemblies built from that code are delay signed with Microsoft's public key
 (src/SigningKey/35MSSharedLib1024.snk, from the ASP.NET Web Stack repository), so that their
 identity matches the assemblies Microsoft ships. They are not signed by Microsoft.
 
 This product includes software from Katana (https://github.com/aspnet/AspNetKatana, commit 096e225), licensed
-under the Apache License, Version 2.0 (see LICENSE-APACHE-2.0.txt), with the same notice as above. It lives in
-src/webForCore.Microsoft.Owin* and test/webForCore.Microsoft.Owin*; each file keeps its original copyright header
-and was copied unchanged (Katana's files are LF). Every change is listed in LIFT.md, and the per-file source is
-recorded in tools/lift/manifests/. Those assemblies are delay signed with the same Microsoft public key and carry
-Microsoft.Owin's version 4.2.3.0. Files under tools/lift/additions/ are webForCore's own and say so in their header.
+under the Apache License, Version 2.0 (see LICENSE-APACHE-2.0.txt), with the same notice as above. It is in
+the external/AspNetKatana submodule (https://github.com/xforcore/AspNetKatana, branch webforcore), compiled by
+src/webForCore.Microsoft.Owin* and test/webForCore.Microsoft.Owin*; each file keeps its original copyright header, and
+every change is a commit on that branch. Those assemblies are delay signed with the same Microsoft public key and carry
+Microsoft.Owin's version 4.2.3.0. webForCore's own files in those projects say so in their header.
 
 This product includes tests from Mono (https://github.com/mono/mono, mcs/class/System.Web/Test and
 mcs/class/test-helpers, commit 0f53e9e), licensed under the MIT License. Each file keeps its original copyright
-header (for example "Copyright (C) 2005 Novell, Inc (http://www.novell.com)") and MIT permission notice. They live in
-test/webForCore.System.Web.MonoTests; changes are listed in LIFT.md and tools/lift/lift_mono_tests.py, and the
-per-file source is recorded in tools/lift/manifests/System.Web.MonoTests.tsv.
+header (for example "Copyright (C) 2005 Novell, Inc (http://www.novell.com)") and MIT permission notice. They are in
+the external/mono submodule (https://github.com/xforcore/mono, branch webforcore), compiled by
+test/webForCore.System.Web.MonoTests; every change is a commit on that branch.
 Files without their own header (test-helpers/NunitHelpers.cs) are covered by Mono's repository LICENSE, which
 places the class libraries under the MIT License.
 
@@ -110,15 +109,16 @@ SkiaSharp and Skia. Up to webForCore 0.6.0 they were built in this repository.
 
 This product includes software from ASP.NET SignalR (https://github.com/SignalR/SignalR, tag 2.4.3, commit
 7f53f26), licensed under the Apache License, Version 2.0 (see LICENSE-APACHE-2.0.txt), Copyright (c) .NET
-Foundation. It lives in src/webForCore.Microsoft.AspNet.SignalR.* and test/webForCore.Microsoft.AspNet.SignalR.*; each
-file keeps its original header. The copy is made by tools/lift/lift_aspnet.py, which lists every change, and the
-per-file source is recorded in tools/lift/manifests/.
+Foundation. It is in the external/SignalR submodule
+(https://github.com/xforcore/SignalR, branch webforcore), compiled by src/webForCore.Microsoft.AspNet.SignalR.* and
+test/webForCore.Microsoft.AspNet.SignalR.*; each file keeps its original header, and every change is a commit on that
+branch.
 
 This product includes software from ASP.NET Identity (https://github.com/aspnet/AspNetIdentity, commit
-b7fc094), licensed under the MIT License, Copyright (c) Microsoft Corporation. It lives in
-src/webForCore.Microsoft.AspNet.Identity.* and test/webForCore.Identity.Test; each file keeps its original header. The
-copy is made by tools/lift/lift_aspnet.py, which lists every change, and the per-file source is recorded in
-tools/lift/manifests/.
+b7fc094), licensed under the MIT License, Copyright (c) Microsoft Corporation. It is in
+the external/AspNetIdentity submodule (https://github.com/xforcore/AspNetIdentity, branch webforcore), compiled by
+src/webForCore.Microsoft.AspNet.Identity.* and test/webForCore.Identity.Test; each file keeps its original header, and
+every change is a commit on that branch.
 
 src/WebFormsForCore.Web.DataVisualization/Common/SR.resx comes from Data Visualization for .NET
 (https://github.com/dotnet/winforms-datavisualization, commit 022f396), licensed under the MIT License,
@@ -150,12 +150,12 @@ The TestApp (src/WebFormsForCore.TestApp) includes Bootstrap 5.2.3 (MIT, The Boo
 3.7.1 (MIT, OpenJS Foundation), Modernizr 2.8.3 (MIT) and Microsoft's ASP.NET ScriptManager scripts.
 
 dotnet/winforms (https://github.com/dotnet/winforms, release/8.0, commit 8266870), MIT License, Copyright (c) .NET
-Foundation and Contributors: the ResX classes in src/WebFormsForCore.Web/WebFormsForCore/System.Resources/winforms, copied
-by tools/lift/lift_resx.py (per-file source in tools/lift/manifests/ResX.tsv). Mono's StronglyTypedResourceBuilder
-(mcs/class/System.Design, MIT License, Copyright (C) 2007 Novell, Inc.) is in
-src/WebFormsForCore.Web/WebFormsForCore/mono, copied by tools/lift/lift_strb.py. The Reference Source files that
-tools/lift/lift_configuration.py, lift_appservices.py, lift_aspnet_compiler.py and lift_strb.py copy are listed in
-tools/lift/manifests/.
+Foundation and Contributors: the ResX classes, from
+the external/winforms submodule (https://github.com/xforcore/winforms, branch webforcore), compiled into System.Web.
+Mono's StronglyTypedResourceBuilder (mcs/class/System.Design, MIT License, Copyright (C) 2007 Novell, Inc.) comes from
+the external/mono submodule. The Reference Source files that System.Configuration, System.Web.ApplicationServices,
+aspnet_compiler and System.Web compile come from the external/referencesource submodule
+(https://github.com/xforcore/referencesource, branch webforcore); every change is a commit on that branch.
 
 Material inherited from WebFormsForCore
 ---------------------------------------

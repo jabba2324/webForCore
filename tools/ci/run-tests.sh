@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Runs every test suite in Release after a build of WebFormsForCore.slnx (Release), as CI does.
 # Usage: tools/ci/run-tests.sh [results-directory]
-# Identity.Test needs SQL Server at 127.0.0.1,14333 (tools/lift/sqlserver.sh starts one locally; CI uses a service
+# Identity.Test needs SQL Server at 127.0.0.1,14333 (tools/ci/sqlserver.sh starts one locally; CI uses a service
 # container on Linux and tools/ci/sqlserver-windows.ps1 on Windows). System.Drawing's own tests are drawingForCore's
 # (https://github.com/xforcore/drawingForCore). A suite's failures do not stop the others; the exit code is non-zero if
 # any suite failed.

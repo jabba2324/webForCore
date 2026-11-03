@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <!-- Lifted from SignalR/SignalR 7f53f26 (test/Microsoft.AspNet.SignalR.Tests.Common) by tools/lift/lift_aspnet.py.
+  <!-- From SignalR/SignalR 7f53f26 (test/Microsoft.AspNet.SignalR.Tests.Common) by way of the external/SignalR submodule (xforcore/SignalR's webforcore branch, #61).
        Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. Generated; do not edit. -->
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>

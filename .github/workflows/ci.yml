@@ -30,7 +30,7 @@ jobs:
     timeout-minutes: 120
 
     services:
-      # Identity.Test's Entity Framework tests (LocalDB on Windows); the same server tools/lift/sqlserver.sh starts.
+      # Identity.Test's Entity Framework tests (LocalDB on Windows); the same server tools/ci/sqlserver.sh starts.
       sqlserver:
         image: mcr.microsoft.com/mssql/server:2022-latest
         env:

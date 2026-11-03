@@ -30,12 +30,12 @@ a real application behave more like it did on .NET Framework 4.8 and IIS 10, and
    application that needs it. The [webForCore smoke test](https://github.com/xforcore/webForCore-smoke-test) migrates
    open-source applications and files what breaks; its issues and `FINDINGS.md` are a good source.
 
-4. **Avoid changing Microsoft's code at all costs.** Most of webForCore is Microsoft's own source, lifted unchanged
-   (ASP.NET Web Stack, Katana, SignalR, Identity) or ported from the .NET Framework reference source
+4. **Avoid changing Microsoft's code at all costs.** Most of webForCore is Microsoft's own source, unchanged from
+   upstream in the `external/` submodules (ASP.NET Web Stack, Katana, SignalR, Identity) or ported from the .NET Framework reference source
    (System.Web, System.Configuration). Its value is that it *is* Microsoft's behaviour. Before touching those files,
    look for a fix in webForCore's own code: the hosting layer (`src/WebFormsForCore.Web/WebFormsForCore/AspNetCoreHosting`,
-   the IIS modules), the host (`src/WebFormsForCore.Host`), the build targets (`src/webForCore.WebStack.targets`), the lift scripts'
-   additions (`tools/lift/additions/`), or configuration. Most problems found so far were fixed there.
+   the IIS modules), the host (`src/WebFormsForCore.Host`), the build targets (`src/webForCore.WebStack.targets`), webForCore's own
+   files in the projects, or configuration. Most problems found so far were fixed there.
 
 5. **When Microsoft's code must change, keep the documentation current.** Keep the change as small as it can be (an
    `#if`, a guarded branch for Linux, not a rewrite) and:
@@ -43,12 +43,7 @@ a real application behave more like it did on .NET Framework 4.8 and IIS 10, and
    - for code from a submodule in `external/` (#61), make the change a commit on the fork's `webforcore` branch (for
      example `xforcore/AspNetKatana`), one change per commit with its reason, then move the submodule to it in a
      webForCore pull request with the test;
-   - for code still lifted, make the change a fixup in the lift script (`tools/lift/`), not an edit of the lifted file,
-     and run the lift again;
-   - add the reason to [`LIFT.md`](LIFT.md), the engineering log, and the kind of change to
-     [`docs/MODIFICATIONS.md`](docs/MODIFICATIONS.md);
-   - regenerate [`docs/lifted-changes.md`](docs/lifted-changes.md) (`tools/lift/changes_report.py`), which lists every
-     file that differs from upstream with its `webForCore:` notes.
+   - add the kind of change to [`docs/MODIFICATIONS.md`](docs/MODIFICATIONS.md) if it's a new kind.
 
 ## How webForCore's own code is written
 
