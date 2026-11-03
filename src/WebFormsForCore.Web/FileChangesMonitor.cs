@@ -657,11 +657,11 @@ namespace System.Web {
                     
                     // If I don't do this, myCallback will be collected by GC since its only reference is
                     // from the native code.
-                    _rootCallback = System.Web.Util.GCUtil.Alloc(myCallback);
+                    _rootCallback = GCHandle.Alloc(myCallback);
 #if NETFRAMEWORK
                     hr = UnsafeNativeMethods.DirMonOpen(dir, HttpRuntime.AppDomainAppId, watchSubtree, notifyFilter, dirMon.FcnMode, myCallback, out _ndirMonCompletionPtr);
                     if (hr != HResults.S_OK) {
-                        System.Web.Util.GCUtil.Free(_rootCallback);
+                        _rootCallback.Free();
                         throw FileChangesMonitor.CreateFileMonitoringException(hr, dir);
                     }
 #else
@@ -669,7 +669,7 @@ namespace System.Web {
                         StartManagedDirectoryWatch(dir, watchSubtree, notifyFilter);
                     }
                     catch (Exception) {
-                        System.Web.Util.GCUtil.Free(_rootCallback);
+                        _rootCallback.Free();
                         throw FileChangesMonitor.CreateFileMonitoringException(HResults.E_FAIL, dir);
                     }
 #endif
@@ -722,7 +722,7 @@ namespace System.Web {
                     }
                     else {
                         if (_rootCallback.IsAllocated) {
-                            System.Web.Util.GCUtil.Free(_rootCallback);
+                            _rootCallback.Free();
                         }
 
                         Interlocked.Decrement(ref _activeDirMonCompletions);
@@ -756,7 +756,7 @@ namespace System.Web {
             //
             if (action == FileAction.Dispose) {
                 if (_rootCallback.IsAllocated) {
-                    System.Web.Util.GCUtil.Free(_rootCallback);
+                    _rootCallback.Free();
                 }
                 Interlocked.Decrement(ref _activeDirMonCompletions);
             }
