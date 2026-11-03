@@ -29,301 +29,301 @@
   <Import Project="../../src/webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="Ajax/Test/AjaxExtensionsTest.cs" />
-    <Compile Include="Ajax/Test/AjaxOptionsTest.cs" />
-    <Compile Include="Async/Test/AsyncActionDescriptorTest.cs" />
-    <Compile Include="Async/Test/AsyncActionMethodSelectorTest.cs" />
-    <Compile Include="Async/Test/AsyncControllerActionInvokerTest.cs" />
-    <Compile Include="Async/Test/AsyncManagerTest.cs" />
-    <Compile Include="Async/Test/AsyncResultWrapperTest.cs" />
-    <Compile Include="Async/Test/MockAsyncResult.cs" />
-    <Compile Include="Async/Test/OperationCounterTest.cs" />
-    <Compile Include="Async/Test/ReflectedAsyncActionDescriptorTest.cs" />
-    <Compile Include="Async/Test/ReflectedAsyncControllerDescriptorTest.cs" />
-    <Compile Include="Async/Test/SignalContainer.cs" />
-    <Compile Include="Async/Test/SimpleAsyncResultTest.cs" />
-    <Compile Include="Async/Test/SingleEntryGateTest.cs" />
-    <Compile Include="Async/Test/SynchronizationContextUtilTest.cs" />
-    <Compile Include="Async/Test/SynchronousOperationExceptionTest.cs" />
-    <Compile Include="Async/Test/TaskAsyncActionDescriptorTest.cs" />
-    <Compile Include="Async/Test/TaskWrapperAsyncResultTest.cs" />
-    <Compile Include="Async/Test/TriggerListenerTest.cs" />
-    <Compile Include="Common/AttributeListTest.cs" />
-    <Compile Include="ExpressionUtil/Test/BinaryExpressionFingerprintTest.cs" />
-    <Compile Include="ExpressionUtil/Test/CachedExpressionCompilerTest.cs" />
-    <Compile Include="ExpressionUtil/Test/ConditionalExpressionFingerprintTest.cs" />
-    <Compile Include="ExpressionUtil/Test/ConstantExpressionFingerprintTest.cs" />
-    <Compile Include="ExpressionUtil/Test/DefaultExpressionFingerprintTest.cs" />
-    <Compile Include="ExpressionUtil/Test/DummyExpressionFingerprint.cs" />
-    <Compile Include="ExpressionUtil/Test/ExpressionFingerprintTest.cs" />
-    <Compile Include="ExpressionUtil/Test/FingerprintingExpressionVisitorTest.cs" />
-    <Compile Include="ExpressionUtil/Test/HoistingExpressionVisitorTest.cs" />
-    <Compile Include="ExpressionUtil/Test/IndexExpressionFingerprintTest.cs" />
-    <Compile Include="ExpressionUtil/Test/LambdaExpressionFingerprintTest.cs" />
-    <Compile Include="ExpressionUtil/Test/MemberExpressionFingerprintTest.cs" />
-    <Compile Include="ExpressionUtil/Test/MethodCallExpressionFingerprintTest.cs" />
-    <Compile Include="ExpressionUtil/Test/ParameterExpressionFingerprintTest.cs" />
-    <Compile Include="ExpressionUtil/Test/TypeBinaryExpressionFingerprintTest.cs" />
-    <Compile Include="ExpressionUtil/Test/UnaryExpressionFingerprintTest.cs" />
-    <Compile Include="Html/Test/ChildActionExtensionsTest.cs" />
-    <Compile Include="Html/Test/DefaultDisplayTemplatesTest.cs" />
-    <Compile Include="Html/Test/DefaultEditorTemplatesTest.cs" />
-    <Compile Include="Html/Test/DisplayExtensionsTest.cs" />
-    <Compile Include="Html/Test/DisplayNameExtensionsTest.cs" />
-    <Compile Include="Html/Test/DisplayTextExtensionsTest.cs" />
-    <Compile Include="Html/Test/EditorExtensionsTest.cs" />
-    <Compile Include="Html/Test/EncodedDataSets.cs" />
-    <Compile Include="Html/Test/EnumHelperTest.cs" />
-    <Compile Include="Html/Test/FormExtensionsTest.cs" />
-    <Compile Include="Html/Test/InputExtensionsTest.cs" />
-    <Compile Include="Html/Test/LabelExtensionsTest.cs" />
-    <Compile Include="Html/Test/LinkExtensionsTest.cs" />
-    <Compile Include="Html/Test/MetadataOverrideScope.cs" />
-    <Compile Include="Html/Test/MvcFormTest.cs" />
-    <Compile Include="Html/Test/NameExtensionsTest.cs" />
-    <Compile Include="Html/Test/PartialExtensionsTest.cs" />
-    <Compile Include="Html/Test/RenderPartialExtensionsTest.cs" />
-    <Compile Include="Html/Test/SelectExtensionsTest.cs" />
-    <Compile Include="Html/Test/TemplateHelpersSafeScope.cs" />
-    <Compile Include="Html/Test/TemplateHelpersTest.cs" />
-    <Compile Include="Html/Test/TextAreaExtensionsTest.cs" />
-    <Compile Include="Html/Test/ValidationExtensionsTest.cs" />
-    <Compile Include="Html/Test/ValueExtensionsTest.cs" />
-    <Compile Include="Properties/AssemblyInfo.cs" />
-    <Compile Include="Properties/Resources.Designer.cs" />
-    <Compile Include="Razor/Test/MvcCSharpRazorCodeGeneratorTest.cs" />
-    <Compile Include="Razor/Test/MvcCSharpRazorCodeParserTest.cs" />
-    <Compile Include="Razor/Test/MvcVBRazorCodeParserTest.cs" />
-    <Compile Include="Razor/Test/MvcWebPageRazorHostTest.cs" />
-    <Compile Include="Routing/AttributeRoutingLinkGenerationTest.cs" />
-    <Compile Include="Routing/AttributeRoutingMapperTest.cs" />
-    <Compile Include="Routing/AttributeRoutingTest.cs" />
-    <Compile Include="Routing/DefaultDirectRouteProviderTest.cs" />
-    <Compile Include="Routing/DefaultInlineConstraintResolverTest.cs" />
-    <Compile Include="Routing/DirectRouteBuilderTests.cs" />
-    <Compile Include="Routing/DirectRouteCandidateTest.cs" />
-    <Compile Include="Routing/DirectRouteTestHelpers.cs" />
-    <Compile Include="Routing/InlineRouteTemplateParserTests.cs" />
-    <Compile Include="Routing/RouteAttributeTests.cs" />
-    <Compile Include="Routing/RouteCollectionAttributeRoutingExtensionsTests.cs" />
-    <Compile Include="Routing/RouteConstraintsTests.cs" />
-    <Compile Include="Routing/RouteFactoryAttributeTests.cs" />
-    <Compile Include="Routing/RoutePrecedenceTests.cs" />
-    <Compile Include="Routing/SubRouteCollectionTest.cs" />
-    <Compile Include="Test/AcceptVerbsAttributeTest.cs" />
-    <Compile Include="Test/ActionDescriptorTest.cs" />
-    <Compile Include="Test/ActionExecutedContextTest.cs" />
-    <Compile Include="Test/ActionExecutingContextTest.cs" />
-    <Compile Include="Test/ActionFilterAttributeTest.cs" />
-    <Compile Include="Test/ActionMethodDispatcherCacheTest.cs" />
-    <Compile Include="Test/ActionMethodDispatcherTest.cs" />
-    <Compile Include="Test/ActionMethodSelectorTest.cs" />
-    <Compile Include="Test/ActionNameAttributeTest.cs" />
-    <Compile Include="Test/AdditionalMetadataAttributeTest.cs" />
-    <Compile Include="Test/AjaxHelperOfTModelTest.cs" />
-    <Compile Include="Test/AjaxHelperTest.cs" />
-    <Compile Include="Test/AjaxRequestExtensionsTest.cs" />
-    <Compile Include="Test/AllowHtmlAttributeTest.cs" />
-    <Compile Include="Test/AreaHelpersTest.cs" />
-    <Compile Include="Test/AreaRegistrationContextTest.cs" />
-    <Compile Include="Test/AreaRegistrationTest.cs" />
-    <Compile Include="Test/AssociatedMetadataProviderTest.cs" />
-    <Compile Include="Test/AssociatedValidatorProviderTest.cs" />
-    <Compile Include="Test/AsyncControllerTest.cs" />
-    <Compile Include="Test/AsyncTimeoutAttributeTest.cs" />
-    <Compile Include="Test/AuthorizationContextTest.cs" />
-    <Compile Include="Test/AuthorizeAttributeTest.cs" />
-    <Compile Include="Test/BindAttributeTest.cs" />
-    <Compile Include="Test/BuildManagerCompiledViewTest.cs" />
-    <Compile Include="Test/BuildManagerViewEngineTest.cs" />
-    <Compile Include="Test/ByteArrayModelBinderTest.cs" />
-    <Compile Include="Test/CachedAssociatedMetadataProviderTest.cs" />
-    <Compile Include="Test/CachedDataAnnotationsModelMetadataProviderTest.cs" />
-    <Compile Include="Test/CancellationTokenModelBinderTest.cs" />
-    <Compile Include="Test/ChildActionOnlyAttributeTest.cs" />
-    <Compile Include="Test/ChildActionValueProviderFactoryTest.cs" />
-    <Compile Include="Test/ClientDataTypeModelValidatorProviderTest.cs" />
-    <Compile Include="Test/CompareAttributeAdapterTest.cs" />
-    <Compile Include="Test/CompareAttributeTest.cs" />
-    <Compile Include="Test/ContentResultTest.cs" />
-    <Compile Include="Test/ControllerActionInvokerTest.cs" />
-    <Compile Include="Test/ControllerBaseTest.cs" />
-    <Compile Include="Test/ControllerBuilderTest.cs" />
-    <Compile Include="Test/ControllerContextTest.cs" />
-    <Compile Include="Test/ControllerDescriptorCacheTest.cs" />
-    <Compile Include="Test/ControllerDescriptorTest.cs" />
-    <Compile Include="Test/ControllerInstanceFilterProviderTest.cs" />
-    <Compile Include="Test/ControllerTest.cs" />
-    <Compile Include="Test/CopyOnWriteDictionaryTest.cs" />
-    <Compile Include="Test/DataAnnotationsModelMetadataProviderTest.cs" />
-    <Compile Include="Test/DataAnnotationsModelMetadataProviderTestBase.cs" />
-    <Compile Include="Test/DataAnnotationsModelValidatorProviderTest.cs" />
-    <Compile Include="Test/DataAnnotationsModelValidatorTest.cs" />
-    <Compile Include="Test/DataErrorInfoModelValidatorProviderTest.cs" />
-    <Compile Include="Test/DataTypeUtilTest.cs" />
-    <Compile Include="Test/DefaultControllerFactoryTest.cs" />
-    <Compile Include="Test/DefaultModelBinderTest.cs" />
-    <Compile Include="Test/DefaultViewLocationCacheTest.cs" />
-    <Compile Include="Test/DependencyResolverTest.cs" />
-    <Compile Include="Test/DescriptorUtilTest.cs" />
-    <Compile Include="Test/DictionaryHelpersTest.cs" />
-    <Compile Include="Test/DictionaryValueProviderTest.cs" />
-    <Compile Include="Test/DynamicViewDataDictionaryTest.cs" />
-    <Compile Include="Test/EmptyModelValidatorProviderTest.cs" />
-    <Compile Include="Test/ExceptionContextTest.cs" />
-    <Compile Include="Test/ExpressionHelperTest.cs" />
-    <Compile Include="Test/FieldValidationMetadataTest.cs" />
-    <Compile Include="Test/FileContentResultTest.cs" />
-    <Compile Include="Test/FilePathResultTest.cs" />
-    <Compile Include="Test/FileResultTest.cs" />
-    <Compile Include="Test/FileStreamResultTest.cs" />
-    <Compile Include="Test/FilterAttributeFilterProviderTest.cs" />
-    <Compile Include="Test/FilterInfoTest.cs" />
-    <Compile Include="Test/FilterProviderCollectionTest.cs" />
-    <Compile Include="Test/FilterProvidersTest.cs" />
-    <Compile Include="Test/FilterTest.cs" />
-    <Compile Include="Test/FormCollectionTest.cs" />
-    <Compile Include="Test/FormContextTest.cs" />
-    <Compile Include="Test/FormValueProviderFactoryTest.cs" />
-    <Compile Include="Test/GlobalFilterCollectionTest.cs" />
-    <Compile Include="Test/HandleErrorAttributeTest.cs" />
-    <Compile Include="Test/HandleErrorInfoTest.cs" />
-    <Compile Include="Test/HtmlHelperOfTModelTest.cs" />
-    <Compile Include="Test/HtmlHelperTest.cs" />
-    <Compile Include="Test/HttpDeleteAttributeTest.cs" />
-    <Compile Include="Test/HttpFileCollectionValueProviderFactoryTest.cs" />
-    <Compile Include="Test/HttpFileCollectionValueProviderTest.cs" />
-    <Compile Include="Test/HttpGetAttributeTest.cs" />
-    <Compile Include="Test/HttpHandlerUtilTest.cs" />
-    <Compile Include="Test/HttpHeadAttributeTest.cs" />
-    <Compile Include="Test/HttpNotFoundResultTest.cs" />
-    <Compile Include="Test/HttpOptionsAttributeTest.cs" />
-    <Compile Include="Test/HttpPatchAttributeTest.cs" />
-    <Compile Include="Test/HttpPostAttributeTest.cs" />
-    <Compile Include="Test/HttpPostedFileBaseModelBinderTest.cs" />
-    <Compile Include="Test/HttpPutAttributeTest.cs" />
-    <Compile Include="Test/HttpRequestExtensionsTest.cs" />
-    <Compile Include="Test/HttpStatusCodeResultTest.cs" />
-    <Compile Include="Test/HttpUnauthorizedResultTest.cs" />
-    <Compile Include="Test/HttpVerbAttributeHelper.cs" />
-    <Compile Include="Test/JQueryFormValueProviderFactoryTest.cs" />
-    <Compile Include="Test/JavaScriptResultTest.cs" />
-    <Compile Include="Test/JsonResultTest.cs" />
-    <Compile Include="Test/JsonValueProviderFactoryTest.cs" />
-    <Compile Include="Test/MaxLengthAttributeAdapterTest.cs" />
-    <Compile Include="Test/MinLengthAttributeAdapterTest.cs" />
-    <Compile Include="Test/MockBuildManager.cs" />
-    <Compile Include="Test/MockHelpers.cs" />
-    <Compile Include="Test/MockableUnvalidatedRequestValues.cs" />
-    <Compile Include="Test/ModelBinderAttributeTest.cs" />
-    <Compile Include="Test/ModelBinderDictionaryTest.cs" />
-    <Compile Include="Test/ModelBinderProviderCollectionTest.cs" />
-    <Compile Include="Test/ModelBinderProvidersTest.cs" />
-    <Compile Include="Test/ModelBindersTest.cs" />
-    <Compile Include="Test/ModelBindingContextTest.cs" />
-    <Compile Include="Test/ModelClientValidationRuleTest.cs" />
-    <Compile Include="Test/ModelErrorCollectionTest.cs" />
-    <Compile Include="Test/ModelErrorTest.cs" />
-    <Compile Include="Test/ModelMetadataProvidersTest.cs" />
-    <Compile Include="Test/ModelMetadataTest.cs" />
-    <Compile Include="Test/ModelStateDictionaryTest.cs" />
-    <Compile Include="Test/ModelStateTest.cs" />
-    <Compile Include="Test/ModelValidationResultTest.cs" />
-    <Compile Include="Test/ModelValidatorProviderCollectionTest.cs" />
-    <Compile Include="Test/ModelValidatorProvidersTest.cs" />
-    <Compile Include="Test/ModelValidatorTest.cs" />
-    <Compile Include="Test/MultiSelectListTest.cs" />
-    <Compile Include="Test/MultiServiceResolverTest.cs" />
-    <Compile Include="Test/MvcHandlerTest.cs" />
-    <Compile Include="Test/MvcHtmlStringTest.cs" />
-    <Compile Include="Test/MvcHttpHandlerTest.cs" />
-    <Compile Include="Test/MvcRouteHandlerTest.cs" />
-    <Compile Include="Test/MvcTestHelper.cs" />
-    <Compile Include="Test/MvcWebRazorHostFactoryTest.cs" />
-    <Compile Include="Test/NameValueCollectionExtensionsTest.cs" />
-    <Compile Include="Test/NameValueCollectionValueProviderTest.cs" />
-    <Compile Include="Test/NoAsyncTimeoutAttributeTest.cs" />
-    <Compile Include="Test/NonActionAttributeTest.cs" />
-    <Compile Include="Test/OutputCacheAttributeTest.cs" />
-    <Compile Include="Test/OverrideActionFiltersAttributeTests.cs" />
-    <Compile Include="Test/OverrideAuthenticationAttributeTests.cs" />
-    <Compile Include="Test/OverrideAuthorizationAttributeTests.cs" />
-    <Compile Include="Test/OverrideExceptionFiltersAttributeTests.cs" />
-    <Compile Include="Test/OverrideFiltersAttributeTests.cs" />
-    <Compile Include="Test/OverrideResultFiltersAttributeTests.cs" />
-    <Compile Include="Test/ParameterBindingInfoTest.cs" />
-    <Compile Include="Test/ParameterDescriptorTest.cs" />
-    <Compile Include="Test/ParameterInfoUtilTest.cs" />
-    <Compile Include="Test/PartialViewResultTest.cs" />
-    <Compile Include="Test/PreApplicationStartCodeTest.cs" />
-    <Compile Include="Test/QueryStringValueProviderFactoryTest.cs" />
-    <Compile Include="Test/RangeAttributeAdapterTest.cs" />
-    <Compile Include="Test/RazorViewEngineTest.cs" />
-    <Compile Include="Test/RazorViewTest.cs" />
-    <Compile Include="Test/ReaderWriterCacheTest.cs" />
-    <Compile Include="Test/RedirectResultTest.cs" />
-    <Compile Include="Test/RedirectToRouteResultTest.cs" />
-    <Compile Include="Test/ReflectedActionDescriptorTest.cs" />
-    <Compile Include="Test/ReflectedControllerDescriptorTest.cs" />
-    <Compile Include="Test/ReflectedParameterBindingInfoTest.cs" />
-    <Compile Include="Test/ReflectedParameterDescriptorTest.cs" />
-    <Compile Include="Test/RegularExpressionAttributeAdapterTest.cs" />
-    <Compile Include="Test/RemoteAttributeTest.cs" />
-    <Compile Include="Test/RequireHttpsAttributeTest.cs" />
-    <Compile Include="Test/RequiredAttributeAdapterTest.cs" />
-    <Compile Include="Test/ResultExecutedContextTest.cs" />
-    <Compile Include="Test/ResultExecutingContextTest.cs" />
-    <Compile Include="Test/RouteCollectionExtensionsTest.cs" />
-    <Compile Include="Test/RouteDataValueProviderFactoryTest.cs" />
-    <Compile Include="Test/SelectListTest.cs" />
-    <Compile Include="Test/SessionStateTempDataProviderTest.cs" />
-    <Compile Include="Test/SingleServiceResolverTest.cs" />
-    <Compile Include="Test/StringLengthAttributeAdapterTest.cs" />
-    <Compile Include="Test/TempDataDictionaryTest.cs" />
-    <Compile Include="Test/TypeCacheSerializerTest.cs" />
-    <Compile Include="Test/TypeCacheUtilTest.cs" />
-    <Compile Include="Test/TypeHelpersTest.cs" />
-    <Compile Include="Test/UrlHelperTest.cs" />
-    <Compile Include="Test/UrlParameterTest.cs" />
-    <Compile Include="Test/ValidatableObjectAdapterTest.cs" />
-    <Compile Include="Test/ValidateAntiForgeryTokenAttributeTest.cs" />
-    <Compile Include="Test/ValidateInputAttributeTest.cs" />
-    <Compile Include="Test/ValueProviderCollectionTest.cs" />
-    <Compile Include="Test/ValueProviderDictionaryTest.cs" />
-    <Compile Include="Test/ValueProviderFactoriesTest.cs" />
-    <Compile Include="Test/ValueProviderFactoryCollectionTest.cs" />
-    <Compile Include="Test/ValueProviderResultTest.cs" />
-    <Compile Include="Test/ValueProviderUtilTest.cs" />
-    <Compile Include="Test/ViewContextTest.cs" />
-    <Compile Include="Test/ViewDataDictionaryTest.cs" />
-    <Compile Include="Test/ViewDataInfoTest.cs" />
-    <Compile Include="Test/ViewEngineCollectionTest.cs" />
-    <Compile Include="Test/ViewEngineResultTest.cs" />
-    <Compile Include="Test/ViewEnginesTest.cs" />
-    <Compile Include="Test/ViewMasterPageControlBuilderTest.cs" />
-    <Compile Include="Test/ViewMasterPageTest.cs" />
-    <Compile Include="Test/ViewPageControlBuilderTest.cs" />
-    <Compile Include="Test/ViewPageTest.cs" />
-    <Compile Include="Test/ViewResultBaseTest.cs" />
-    <Compile Include="Test/ViewResultTest.cs" />
-    <Compile Include="Test/ViewStartPageTest.cs" />
-    <Compile Include="Test/ViewTypeParserFilterTest.cs" />
-    <Compile Include="Test/ViewUserControlControlBuilderTest.cs" />
-    <Compile Include="Test/ViewUserControlTest.cs" />
-    <Compile Include="Test/VirtualPathProviderViewEngineTest.cs" />
-    <Compile Include="Test/WebFormViewEngineTest.cs" />
-    <Compile Include="Test/WebFormViewTest.cs" />
-    <Compile Include="Util/AnonymousObject.cs" />
-    <Compile Include="Util/DictionaryHelper.cs" />
-    <Compile Include="Util/HttpContextHelpers.cs" />
-    <Compile Include="Util/MvcHelper.cs" />
-    <Compile Include="Util/Resolver.cs" />
-    <Compile Include="Util/SimpleValueProvider.cs" />
-    <Compile Include="Util/SimpleViewDataContainer.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Ajax/Test/AjaxExtensionsTest.cs" Link="Ajax/Test/AjaxExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Ajax/Test/AjaxOptionsTest.cs" Link="Ajax/Test/AjaxOptionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Async/Test/AsyncActionDescriptorTest.cs" Link="Async/Test/AsyncActionDescriptorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Async/Test/AsyncActionMethodSelectorTest.cs" Link="Async/Test/AsyncActionMethodSelectorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Async/Test/AsyncControllerActionInvokerTest.cs" Link="Async/Test/AsyncControllerActionInvokerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Async/Test/AsyncManagerTest.cs" Link="Async/Test/AsyncManagerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Async/Test/AsyncResultWrapperTest.cs" Link="Async/Test/AsyncResultWrapperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Async/Test/MockAsyncResult.cs" Link="Async/Test/MockAsyncResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Async/Test/OperationCounterTest.cs" Link="Async/Test/OperationCounterTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Async/Test/ReflectedAsyncActionDescriptorTest.cs" Link="Async/Test/ReflectedAsyncActionDescriptorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Async/Test/ReflectedAsyncControllerDescriptorTest.cs" Link="Async/Test/ReflectedAsyncControllerDescriptorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Async/Test/SignalContainer.cs" Link="Async/Test/SignalContainer.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Async/Test/SimpleAsyncResultTest.cs" Link="Async/Test/SimpleAsyncResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Async/Test/SingleEntryGateTest.cs" Link="Async/Test/SingleEntryGateTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Async/Test/SynchronizationContextUtilTest.cs" Link="Async/Test/SynchronizationContextUtilTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Async/Test/SynchronousOperationExceptionTest.cs" Link="Async/Test/SynchronousOperationExceptionTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Async/Test/TaskAsyncActionDescriptorTest.cs" Link="Async/Test/TaskAsyncActionDescriptorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Async/Test/TaskWrapperAsyncResultTest.cs" Link="Async/Test/TaskWrapperAsyncResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Async/Test/TriggerListenerTest.cs" Link="Async/Test/TriggerListenerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Common/AttributeListTest.cs" Link="Common/AttributeListTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/ExpressionUtil/Test/BinaryExpressionFingerprintTest.cs" Link="ExpressionUtil/Test/BinaryExpressionFingerprintTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/ExpressionUtil/Test/CachedExpressionCompilerTest.cs" Link="ExpressionUtil/Test/CachedExpressionCompilerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/ExpressionUtil/Test/ConditionalExpressionFingerprintTest.cs" Link="ExpressionUtil/Test/ConditionalExpressionFingerprintTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/ExpressionUtil/Test/ConstantExpressionFingerprintTest.cs" Link="ExpressionUtil/Test/ConstantExpressionFingerprintTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/ExpressionUtil/Test/DefaultExpressionFingerprintTest.cs" Link="ExpressionUtil/Test/DefaultExpressionFingerprintTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/ExpressionUtil/Test/DummyExpressionFingerprint.cs" Link="ExpressionUtil/Test/DummyExpressionFingerprint.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/ExpressionUtil/Test/ExpressionFingerprintTest.cs" Link="ExpressionUtil/Test/ExpressionFingerprintTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/ExpressionUtil/Test/FingerprintingExpressionVisitorTest.cs" Link="ExpressionUtil/Test/FingerprintingExpressionVisitorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/ExpressionUtil/Test/HoistingExpressionVisitorTest.cs" Link="ExpressionUtil/Test/HoistingExpressionVisitorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/ExpressionUtil/Test/IndexExpressionFingerprintTest.cs" Link="ExpressionUtil/Test/IndexExpressionFingerprintTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/ExpressionUtil/Test/LambdaExpressionFingerprintTest.cs" Link="ExpressionUtil/Test/LambdaExpressionFingerprintTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/ExpressionUtil/Test/MemberExpressionFingerprintTest.cs" Link="ExpressionUtil/Test/MemberExpressionFingerprintTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/ExpressionUtil/Test/MethodCallExpressionFingerprintTest.cs" Link="ExpressionUtil/Test/MethodCallExpressionFingerprintTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/ExpressionUtil/Test/ParameterExpressionFingerprintTest.cs" Link="ExpressionUtil/Test/ParameterExpressionFingerprintTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/ExpressionUtil/Test/TypeBinaryExpressionFingerprintTest.cs" Link="ExpressionUtil/Test/TypeBinaryExpressionFingerprintTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/ExpressionUtil/Test/UnaryExpressionFingerprintTest.cs" Link="ExpressionUtil/Test/UnaryExpressionFingerprintTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Html/Test/ChildActionExtensionsTest.cs" Link="Html/Test/ChildActionExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Html/Test/DefaultDisplayTemplatesTest.cs" Link="Html/Test/DefaultDisplayTemplatesTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Html/Test/DefaultEditorTemplatesTest.cs" Link="Html/Test/DefaultEditorTemplatesTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Html/Test/DisplayExtensionsTest.cs" Link="Html/Test/DisplayExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Html/Test/DisplayNameExtensionsTest.cs" Link="Html/Test/DisplayNameExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Html/Test/DisplayTextExtensionsTest.cs" Link="Html/Test/DisplayTextExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Html/Test/EditorExtensionsTest.cs" Link="Html/Test/EditorExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Html/Test/EncodedDataSets.cs" Link="Html/Test/EncodedDataSets.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Html/Test/EnumHelperTest.cs" Link="Html/Test/EnumHelperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Html/Test/FormExtensionsTest.cs" Link="Html/Test/FormExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Html/Test/InputExtensionsTest.cs" Link="Html/Test/InputExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Html/Test/LabelExtensionsTest.cs" Link="Html/Test/LabelExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Html/Test/LinkExtensionsTest.cs" Link="Html/Test/LinkExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Html/Test/MetadataOverrideScope.cs" Link="Html/Test/MetadataOverrideScope.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Html/Test/MvcFormTest.cs" Link="Html/Test/MvcFormTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Html/Test/NameExtensionsTest.cs" Link="Html/Test/NameExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Html/Test/PartialExtensionsTest.cs" Link="Html/Test/PartialExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Html/Test/RenderPartialExtensionsTest.cs" Link="Html/Test/RenderPartialExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Html/Test/SelectExtensionsTest.cs" Link="Html/Test/SelectExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Html/Test/TemplateHelpersSafeScope.cs" Link="Html/Test/TemplateHelpersSafeScope.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Html/Test/TemplateHelpersTest.cs" Link="Html/Test/TemplateHelpersTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Html/Test/TextAreaExtensionsTest.cs" Link="Html/Test/TextAreaExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Html/Test/ValidationExtensionsTest.cs" Link="Html/Test/ValidationExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Html/Test/ValueExtensionsTest.cs" Link="Html/Test/ValueExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Properties/Resources.Designer.cs" Link="Properties/Resources.Designer.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Razor/Test/MvcCSharpRazorCodeGeneratorTest.cs" Link="Razor/Test/MvcCSharpRazorCodeGeneratorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Razor/Test/MvcCSharpRazorCodeParserTest.cs" Link="Razor/Test/MvcCSharpRazorCodeParserTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Razor/Test/MvcVBRazorCodeParserTest.cs" Link="Razor/Test/MvcVBRazorCodeParserTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Razor/Test/MvcWebPageRazorHostTest.cs" Link="Razor/Test/MvcWebPageRazorHostTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Routing/AttributeRoutingLinkGenerationTest.cs" Link="Routing/AttributeRoutingLinkGenerationTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Routing/AttributeRoutingMapperTest.cs" Link="Routing/AttributeRoutingMapperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Routing/AttributeRoutingTest.cs" Link="Routing/AttributeRoutingTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Routing/DefaultDirectRouteProviderTest.cs" Link="Routing/DefaultDirectRouteProviderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Common/Routing/DefaultInlineConstraintResolverTest.cs" Link="Routing/DefaultInlineConstraintResolverTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Common/Routing/DirectRouteBuilderTests.cs" Link="Routing/DirectRouteBuilderTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Routing/DirectRouteCandidateTest.cs" Link="Routing/DirectRouteCandidateTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Routing/DirectRouteTestHelpers.cs" Link="Routing/DirectRouteTestHelpers.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Common/Routing/InlineRouteTemplateParserTests.cs" Link="Routing/InlineRouteTemplateParserTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Routing/RouteAttributeTests.cs" Link="Routing/RouteAttributeTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Routing/RouteCollectionAttributeRoutingExtensionsTests.cs" Link="Routing/RouteCollectionAttributeRoutingExtensionsTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Common/Routing/RouteConstraintsTests.cs" Link="Routing/RouteConstraintsTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Common/Routing/RouteFactoryAttributeTests.cs" Link="Routing/RouteFactoryAttributeTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Common/Routing/RoutePrecedenceTests.cs" Link="Routing/RoutePrecedenceTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Common/Routing/SubRouteCollectionTest.cs" Link="Routing/SubRouteCollectionTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/AcceptVerbsAttributeTest.cs" Link="Test/AcceptVerbsAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ActionDescriptorTest.cs" Link="Test/ActionDescriptorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ActionExecutedContextTest.cs" Link="Test/ActionExecutedContextTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ActionExecutingContextTest.cs" Link="Test/ActionExecutingContextTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ActionFilterAttributeTest.cs" Link="Test/ActionFilterAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ActionMethodDispatcherCacheTest.cs" Link="Test/ActionMethodDispatcherCacheTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ActionMethodDispatcherTest.cs" Link="Test/ActionMethodDispatcherTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ActionMethodSelectorTest.cs" Link="Test/ActionMethodSelectorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ActionNameAttributeTest.cs" Link="Test/ActionNameAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/AdditionalMetadataAttributeTest.cs" Link="Test/AdditionalMetadataAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/AjaxHelperOfTModelTest.cs" Link="Test/AjaxHelperOfTModelTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/AjaxHelperTest.cs" Link="Test/AjaxHelperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/AjaxRequestExtensionsTest.cs" Link="Test/AjaxRequestExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/AllowHtmlAttributeTest.cs" Link="Test/AllowHtmlAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/AreaHelpersTest.cs" Link="Test/AreaHelpersTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/AreaRegistrationContextTest.cs" Link="Test/AreaRegistrationContextTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/AreaRegistrationTest.cs" Link="Test/AreaRegistrationTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/AssociatedMetadataProviderTest.cs" Link="Test/AssociatedMetadataProviderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/AssociatedValidatorProviderTest.cs" Link="Test/AssociatedValidatorProviderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/AsyncControllerTest.cs" Link="Test/AsyncControllerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/AsyncTimeoutAttributeTest.cs" Link="Test/AsyncTimeoutAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/AuthorizationContextTest.cs" Link="Test/AuthorizationContextTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/AuthorizeAttributeTest.cs" Link="Test/AuthorizeAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/BindAttributeTest.cs" Link="Test/BindAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/BuildManagerCompiledViewTest.cs" Link="Test/BuildManagerCompiledViewTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/BuildManagerViewEngineTest.cs" Link="Test/BuildManagerViewEngineTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ByteArrayModelBinderTest.cs" Link="Test/ByteArrayModelBinderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/CachedAssociatedMetadataProviderTest.cs" Link="Test/CachedAssociatedMetadataProviderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/CachedDataAnnotationsModelMetadataProviderTest.cs" Link="Test/CachedDataAnnotationsModelMetadataProviderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/CancellationTokenModelBinderTest.cs" Link="Test/CancellationTokenModelBinderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ChildActionOnlyAttributeTest.cs" Link="Test/ChildActionOnlyAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ChildActionValueProviderFactoryTest.cs" Link="Test/ChildActionValueProviderFactoryTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ClientDataTypeModelValidatorProviderTest.cs" Link="Test/ClientDataTypeModelValidatorProviderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/CompareAttributeAdapterTest.cs" Link="Test/CompareAttributeAdapterTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/CompareAttributeTest.cs" Link="Test/CompareAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ContentResultTest.cs" Link="Test/ContentResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ControllerActionInvokerTest.cs" Link="Test/ControllerActionInvokerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ControllerBaseTest.cs" Link="Test/ControllerBaseTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ControllerBuilderTest.cs" Link="Test/ControllerBuilderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ControllerContextTest.cs" Link="Test/ControllerContextTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ControllerDescriptorCacheTest.cs" Link="Test/ControllerDescriptorCacheTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ControllerDescriptorTest.cs" Link="Test/ControllerDescriptorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ControllerInstanceFilterProviderTest.cs" Link="Test/ControllerInstanceFilterProviderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ControllerTest.cs" Link="Test/ControllerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/CopyOnWriteDictionaryTest.cs" Link="Test/CopyOnWriteDictionaryTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/DataAnnotationsModelMetadataProviderTest.cs" Link="Test/DataAnnotationsModelMetadataProviderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/DataAnnotationsModelMetadataProviderTestBase.cs" Link="Test/DataAnnotationsModelMetadataProviderTestBase.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/DataAnnotationsModelValidatorProviderTest.cs" Link="Test/DataAnnotationsModelValidatorProviderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/DataAnnotationsModelValidatorTest.cs" Link="Test/DataAnnotationsModelValidatorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/DataErrorInfoModelValidatorProviderTest.cs" Link="Test/DataErrorInfoModelValidatorProviderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/DataTypeUtilTest.cs" Link="Test/DataTypeUtilTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/DefaultControllerFactoryTest.cs" Link="Test/DefaultControllerFactoryTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/DefaultModelBinderTest.cs" Link="Test/DefaultModelBinderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/DefaultViewLocationCacheTest.cs" Link="Test/DefaultViewLocationCacheTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/DependencyResolverTest.cs" Link="Test/DependencyResolverTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/DescriptorUtilTest.cs" Link="Test/DescriptorUtilTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/DictionaryHelpersTest.cs" Link="Test/DictionaryHelpersTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/DictionaryValueProviderTest.cs" Link="Test/DictionaryValueProviderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/DynamicViewDataDictionaryTest.cs" Link="Test/DynamicViewDataDictionaryTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/EmptyModelValidatorProviderTest.cs" Link="Test/EmptyModelValidatorProviderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ExceptionContextTest.cs" Link="Test/ExceptionContextTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ExpressionHelperTest.cs" Link="Test/ExpressionHelperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/FieldValidationMetadataTest.cs" Link="Test/FieldValidationMetadataTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/FileContentResultTest.cs" Link="Test/FileContentResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/FilePathResultTest.cs" Link="Test/FilePathResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/FileResultTest.cs" Link="Test/FileResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/FileStreamResultTest.cs" Link="Test/FileStreamResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/FilterAttributeFilterProviderTest.cs" Link="Test/FilterAttributeFilterProviderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/FilterInfoTest.cs" Link="Test/FilterInfoTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/FilterProviderCollectionTest.cs" Link="Test/FilterProviderCollectionTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/FilterProvidersTest.cs" Link="Test/FilterProvidersTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/FilterTest.cs" Link="Test/FilterTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/FormCollectionTest.cs" Link="Test/FormCollectionTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/FormContextTest.cs" Link="Test/FormContextTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/FormValueProviderFactoryTest.cs" Link="Test/FormValueProviderFactoryTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/GlobalFilterCollectionTest.cs" Link="Test/GlobalFilterCollectionTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/HandleErrorAttributeTest.cs" Link="Test/HandleErrorAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/HandleErrorInfoTest.cs" Link="Test/HandleErrorInfoTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/HtmlHelperOfTModelTest.cs" Link="Test/HtmlHelperOfTModelTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/HtmlHelperTest.cs" Link="Test/HtmlHelperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/HttpDeleteAttributeTest.cs" Link="Test/HttpDeleteAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/HttpFileCollectionValueProviderFactoryTest.cs" Link="Test/HttpFileCollectionValueProviderFactoryTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/HttpFileCollectionValueProviderTest.cs" Link="Test/HttpFileCollectionValueProviderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/HttpGetAttributeTest.cs" Link="Test/HttpGetAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/HttpHandlerUtilTest.cs" Link="Test/HttpHandlerUtilTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/HttpHeadAttributeTest.cs" Link="Test/HttpHeadAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/HttpNotFoundResultTest.cs" Link="Test/HttpNotFoundResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/HttpOptionsAttributeTest.cs" Link="Test/HttpOptionsAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/HttpPatchAttributeTest.cs" Link="Test/HttpPatchAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/HttpPostAttributeTest.cs" Link="Test/HttpPostAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/HttpPostedFileBaseModelBinderTest.cs" Link="Test/HttpPostedFileBaseModelBinderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/HttpPutAttributeTest.cs" Link="Test/HttpPutAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/HttpRequestExtensionsTest.cs" Link="Test/HttpRequestExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/HttpStatusCodeResultTest.cs" Link="Test/HttpStatusCodeResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/HttpUnauthorizedResultTest.cs" Link="Test/HttpUnauthorizedResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/HttpVerbAttributeHelper.cs" Link="Test/HttpVerbAttributeHelper.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/JQueryFormValueProviderFactoryTest.cs" Link="Test/JQueryFormValueProviderFactoryTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/JavaScriptResultTest.cs" Link="Test/JavaScriptResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/JsonResultTest.cs" Link="Test/JsonResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/JsonValueProviderFactoryTest.cs" Link="Test/JsonValueProviderFactoryTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/MaxLengthAttributeAdapterTest.cs" Link="Test/MaxLengthAttributeAdapterTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/MinLengthAttributeAdapterTest.cs" Link="Test/MinLengthAttributeAdapterTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/MockBuildManager.cs" Link="Test/MockBuildManager.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/MockHelpers.cs" Link="Test/MockHelpers.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/MockableUnvalidatedRequestValues.cs" Link="Test/MockableUnvalidatedRequestValues.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ModelBinderAttributeTest.cs" Link="Test/ModelBinderAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ModelBinderDictionaryTest.cs" Link="Test/ModelBinderDictionaryTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ModelBinderProviderCollectionTest.cs" Link="Test/ModelBinderProviderCollectionTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ModelBinderProvidersTest.cs" Link="Test/ModelBinderProvidersTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ModelBindersTest.cs" Link="Test/ModelBindersTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ModelBindingContextTest.cs" Link="Test/ModelBindingContextTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ModelClientValidationRuleTest.cs" Link="Test/ModelClientValidationRuleTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ModelErrorCollectionTest.cs" Link="Test/ModelErrorCollectionTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ModelErrorTest.cs" Link="Test/ModelErrorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ModelMetadataProvidersTest.cs" Link="Test/ModelMetadataProvidersTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ModelMetadataTest.cs" Link="Test/ModelMetadataTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ModelStateDictionaryTest.cs" Link="Test/ModelStateDictionaryTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ModelStateTest.cs" Link="Test/ModelStateTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ModelValidationResultTest.cs" Link="Test/ModelValidationResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ModelValidatorProviderCollectionTest.cs" Link="Test/ModelValidatorProviderCollectionTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ModelValidatorProvidersTest.cs" Link="Test/ModelValidatorProvidersTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ModelValidatorTest.cs" Link="Test/ModelValidatorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/MultiSelectListTest.cs" Link="Test/MultiSelectListTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/MultiServiceResolverTest.cs" Link="Test/MultiServiceResolverTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/MvcHandlerTest.cs" Link="Test/MvcHandlerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/MvcHtmlStringTest.cs" Link="Test/MvcHtmlStringTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/MvcHttpHandlerTest.cs" Link="Test/MvcHttpHandlerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/MvcRouteHandlerTest.cs" Link="Test/MvcRouteHandlerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/MvcTestHelper.cs" Link="Test/MvcTestHelper.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/MvcWebRazorHostFactoryTest.cs" Link="Test/MvcWebRazorHostFactoryTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/NameValueCollectionExtensionsTest.cs" Link="Test/NameValueCollectionExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/NameValueCollectionValueProviderTest.cs" Link="Test/NameValueCollectionValueProviderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/NoAsyncTimeoutAttributeTest.cs" Link="Test/NoAsyncTimeoutAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/NonActionAttributeTest.cs" Link="Test/NonActionAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/OutputCacheAttributeTest.cs" Link="Test/OutputCacheAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/OverrideActionFiltersAttributeTests.cs" Link="Test/OverrideActionFiltersAttributeTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/OverrideAuthenticationAttributeTests.cs" Link="Test/OverrideAuthenticationAttributeTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/OverrideAuthorizationAttributeTests.cs" Link="Test/OverrideAuthorizationAttributeTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/OverrideExceptionFiltersAttributeTests.cs" Link="Test/OverrideExceptionFiltersAttributeTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/OverrideFiltersAttributeTests.cs" Link="Test/OverrideFiltersAttributeTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/OverrideResultFiltersAttributeTests.cs" Link="Test/OverrideResultFiltersAttributeTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ParameterBindingInfoTest.cs" Link="Test/ParameterBindingInfoTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ParameterDescriptorTest.cs" Link="Test/ParameterDescriptorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ParameterInfoUtilTest.cs" Link="Test/ParameterInfoUtilTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/PartialViewResultTest.cs" Link="Test/PartialViewResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/PreApplicationStartCodeTest.cs" Link="Test/PreApplicationStartCodeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/QueryStringValueProviderFactoryTest.cs" Link="Test/QueryStringValueProviderFactoryTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/RangeAttributeAdapterTest.cs" Link="Test/RangeAttributeAdapterTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/RazorViewEngineTest.cs" Link="Test/RazorViewEngineTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/RazorViewTest.cs" Link="Test/RazorViewTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ReaderWriterCacheTest.cs" Link="Test/ReaderWriterCacheTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/RedirectResultTest.cs" Link="Test/RedirectResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/RedirectToRouteResultTest.cs" Link="Test/RedirectToRouteResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ReflectedActionDescriptorTest.cs" Link="Test/ReflectedActionDescriptorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ReflectedControllerDescriptorTest.cs" Link="Test/ReflectedControllerDescriptorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ReflectedParameterBindingInfoTest.cs" Link="Test/ReflectedParameterBindingInfoTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ReflectedParameterDescriptorTest.cs" Link="Test/ReflectedParameterDescriptorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/RegularExpressionAttributeAdapterTest.cs" Link="Test/RegularExpressionAttributeAdapterTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/RemoteAttributeTest.cs" Link="Test/RemoteAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/RequireHttpsAttributeTest.cs" Link="Test/RequireHttpsAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/RequiredAttributeAdapterTest.cs" Link="Test/RequiredAttributeAdapterTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ResultExecutedContextTest.cs" Link="Test/ResultExecutedContextTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ResultExecutingContextTest.cs" Link="Test/ResultExecutingContextTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/RouteCollectionExtensionsTest.cs" Link="Test/RouteCollectionExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/RouteDataValueProviderFactoryTest.cs" Link="Test/RouteDataValueProviderFactoryTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/SelectListTest.cs" Link="Test/SelectListTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/SessionStateTempDataProviderTest.cs" Link="Test/SessionStateTempDataProviderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/SingleServiceResolverTest.cs" Link="Test/SingleServiceResolverTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/StringLengthAttributeAdapterTest.cs" Link="Test/StringLengthAttributeAdapterTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/TempDataDictionaryTest.cs" Link="Test/TempDataDictionaryTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/TypeCacheSerializerTest.cs" Link="Test/TypeCacheSerializerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/TypeCacheUtilTest.cs" Link="Test/TypeCacheUtilTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/TypeHelpersTest.cs" Link="Test/TypeHelpersTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/UrlHelperTest.cs" Link="Test/UrlHelperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/UrlParameterTest.cs" Link="Test/UrlParameterTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ValidatableObjectAdapterTest.cs" Link="Test/ValidatableObjectAdapterTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ValidateAntiForgeryTokenAttributeTest.cs" Link="Test/ValidateAntiForgeryTokenAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ValidateInputAttributeTest.cs" Link="Test/ValidateInputAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ValueProviderCollectionTest.cs" Link="Test/ValueProviderCollectionTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ValueProviderDictionaryTest.cs" Link="Test/ValueProviderDictionaryTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ValueProviderFactoriesTest.cs" Link="Test/ValueProviderFactoriesTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ValueProviderFactoryCollectionTest.cs" Link="Test/ValueProviderFactoryCollectionTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ValueProviderResultTest.cs" Link="Test/ValueProviderResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ValueProviderUtilTest.cs" Link="Test/ValueProviderUtilTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ViewContextTest.cs" Link="Test/ViewContextTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ViewDataDictionaryTest.cs" Link="Test/ViewDataDictionaryTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ViewDataInfoTest.cs" Link="Test/ViewDataInfoTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ViewEngineCollectionTest.cs" Link="Test/ViewEngineCollectionTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ViewEngineResultTest.cs" Link="Test/ViewEngineResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ViewEnginesTest.cs" Link="Test/ViewEnginesTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ViewMasterPageControlBuilderTest.cs" Link="Test/ViewMasterPageControlBuilderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ViewMasterPageTest.cs" Link="Test/ViewMasterPageTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ViewPageControlBuilderTest.cs" Link="Test/ViewPageControlBuilderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ViewPageTest.cs" Link="Test/ViewPageTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ViewResultBaseTest.cs" Link="Test/ViewResultBaseTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ViewResultTest.cs" Link="Test/ViewResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ViewStartPageTest.cs" Link="Test/ViewStartPageTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ViewTypeParserFilterTest.cs" Link="Test/ViewTypeParserFilterTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ViewUserControlControlBuilderTest.cs" Link="Test/ViewUserControlControlBuilderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/ViewUserControlTest.cs" Link="Test/ViewUserControlTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/VirtualPathProviderViewEngineTest.cs" Link="Test/VirtualPathProviderViewEngineTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/WebFormViewEngineTest.cs" Link="Test/WebFormViewEngineTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/WebFormViewTest.cs" Link="Test/WebFormViewTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Util/AnonymousObject.cs" Link="Util/AnonymousObject.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Util/DictionaryHelper.cs" Link="Util/DictionaryHelper.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Util/HttpContextHelpers.cs" Link="Util/HttpContextHelpers.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Util/MvcHelper.cs" Link="Util/MvcHelper.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Util/Resolver.cs" Link="Util/Resolver.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Util/SimpleValueProvider.cs" Link="Util/SimpleValueProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Util/SimpleViewDataContainer.cs" Link="Util/SimpleViewDataContainer.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Properties/Resources.resx" LogicalName="System.Web.Properties.Resources.resources" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Properties/Resources.resx" Link="Properties/Resources.resx" LogicalName="System.Web.Properties.Resources.resources" />
   </ItemGroup>
 
   <ItemGroup>

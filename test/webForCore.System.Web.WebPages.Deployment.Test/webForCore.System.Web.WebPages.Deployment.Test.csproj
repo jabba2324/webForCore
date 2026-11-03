@@ -29,29 +29,29 @@
   <Import Project="../../src/webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="AssemblyUtilsTest.cs" />
-    <Compile Include="DeploymentUtil.cs" />
-    <Compile Include="LatestRazorVersion.cs" />
-    <Compile Include="PreApplicationStartCodeTest.cs" />
-    <Compile Include="TestFileSystem.cs" />
-    <Compile Include="WebPagesDeploymentTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Deployment.Test/AssemblyUtilsTest.cs" Link="AssemblyUtilsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Deployment.Test/DeploymentUtil.cs" Link="DeploymentUtil.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Deployment.Test/LatestRazorVersion.cs" Link="LatestRazorVersion.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Deployment.Test/PreApplicationStartCodeTest.cs" Link="PreApplicationStartCodeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Deployment.Test/TestFileSystem.cs" Link="TestFileSystem.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Deployment.Test/WebPagesDeploymentTest.cs" Link="WebPagesDeploymentTest.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="TestFiles/ConfigTestAssemblies/V2_Signed/System.Web.WebPages.Deployment.dll" />
-    <EmbeddedResource Include="TestFiles/ConfigTestAssemblies/V2_Unsigned/System.Web.WebPages.Deployment.dll" />
-    <EmbeddedResource Include="TestFiles/ConfigTestSites/CshtmlFileConfigV1/Default.cshtml" />
-    <EmbeddedResource Include="TestFiles/ConfigTestSites/CshtmlFileConfigV1/web.config" />
-    <EmbeddedResource Include="TestFiles/ConfigTestSites/CshtmlFileNoVersion/Default.cshtml" />
-    <EmbeddedResource Include="TestFiles/ConfigTestSites/NoCshtml/Default.htm" />
-    <EmbeddedResource Include="TestFiles/ConfigTestSites/NoCshtmlConfigV1/Default.htm" />
-    <EmbeddedResource Include="TestFiles/ConfigTestSites/NoCshtmlConfigV1/web.config" />
-    <EmbeddedResource Include="TestFiles/ConfigTestSites/NoCshtmlNoConfigSetting/Default.htm" />
-    <EmbeddedResource Include="TestFiles/ConfigTestSites/NoCshtmlNoConfigSetting/web.config" />
-    <EmbeddedResource Include="TestFiles/ConfigTestSites/NoCshtmlWithEnabledSetting/Default.htm" />
-    <EmbeddedResource Include="TestFiles/ConfigTestSites/NoCshtmlWithEnabledSetting/web.config" />
-    <EmbeddedResource Include="TestFiles/ConfigTestSites/NoCshtmlWithEnabledSettingFalse/Default.htm" />
-    <EmbeddedResource Include="TestFiles/ConfigTestSites/NoCshtmlWithEnabledSettingFalse/web.config" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestAssemblies/V2_Signed/System.Web.WebPages.Deployment.dll" Link="TestFiles/ConfigTestAssemblies/V2_Signed/System.Web.WebPages.Deployment.dll" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestAssemblies/V2_Unsigned/System.Web.WebPages.Deployment.dll" Link="TestFiles/ConfigTestAssemblies/V2_Unsigned/System.Web.WebPages.Deployment.dll" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/CshtmlFileConfigV1/Default.cshtml" Link="TestFiles/ConfigTestSites/CshtmlFileConfigV1/Default.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/CshtmlFileConfigV1/web.config" Link="TestFiles/ConfigTestSites/CshtmlFileConfigV1/web.config" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/CshtmlFileNoVersion/Default.cshtml" Link="TestFiles/ConfigTestSites/CshtmlFileNoVersion/Default.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtml/Default.htm" Link="TestFiles/ConfigTestSites/NoCshtml/Default.htm" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtmlConfigV1/Default.htm" Link="TestFiles/ConfigTestSites/NoCshtmlConfigV1/Default.htm" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtmlConfigV1/web.config" Link="TestFiles/ConfigTestSites/NoCshtmlConfigV1/web.config" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtmlNoConfigSetting/Default.htm" Link="TestFiles/ConfigTestSites/NoCshtmlNoConfigSetting/Default.htm" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtmlNoConfigSetting/web.config" Link="TestFiles/ConfigTestSites/NoCshtmlNoConfigSetting/web.config" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtmlWithEnabledSetting/Default.htm" Link="TestFiles/ConfigTestSites/NoCshtmlWithEnabledSetting/Default.htm" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtmlWithEnabledSetting/web.config" Link="TestFiles/ConfigTestSites/NoCshtmlWithEnabledSetting/web.config" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtmlWithEnabledSettingFalse/Default.htm" Link="TestFiles/ConfigTestSites/NoCshtmlWithEnabledSettingFalse/Default.htm" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.WebPages.Deployment.Test/TestFiles/ConfigTestSites/NoCshtmlWithEnabledSettingFalse/web.config" Link="TestFiles/ConfigTestSites/NoCshtmlWithEnabledSettingFalse/web.config" />
   </ItemGroup>
 
   <ItemGroup>

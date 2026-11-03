@@ -27,26 +27,26 @@
   <Import Project="../webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="AttributeBasedPolicyProviderFactory.cs" />
-    <Compile Include="CorsHttpConfigurationExtensions.cs" />
-    <Compile Include="CorsHttpRequestMessageExtensions.cs" />
-    <Compile Include="CorsHttpResponseMessageExtensions.cs" />
-    <Compile Include="CorsMessageHandler.cs" />
-    <Compile Include="DisableCorsAttribute.cs" />
-    <Compile Include="EnableCorsAttribute.cs" />
-    <Compile Include="ICorsPolicyProvider.cs" />
-    <Compile Include="ICorsPolicyProviderFactory.cs" />
-    <Compile Include="Properties/AssemblyInfo.cs" />
-    <Compile Include="Properties/CommonAssemblyInfo.cs" />
-    <Compile Include="Properties/SRResources.Designer.cs" />
-    <Compile Include="Tracing/CorsEngineTracer.cs" />
-    <Compile Include="Tracing/CorsPolicyProviderFactoryTracer.cs" />
-    <Compile Include="Tracing/CorsPolicyProviderTracer.cs" />
-    <Compile Include="Tracing/TraceCategories.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.Cors/AttributeBasedPolicyProviderFactory.cs" Link="AttributeBasedPolicyProviderFactory.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.Cors/CorsHttpConfigurationExtensions.cs" Link="CorsHttpConfigurationExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.Cors/CorsHttpRequestMessageExtensions.cs" Link="CorsHttpRequestMessageExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.Cors/CorsHttpResponseMessageExtensions.cs" Link="CorsHttpResponseMessageExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.Cors/CorsMessageHandler.cs" Link="CorsMessageHandler.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.Cors/DisableCorsAttribute.cs" Link="DisableCorsAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.Cors/EnableCorsAttribute.cs" Link="EnableCorsAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.Cors/ICorsPolicyProvider.cs" Link="ICorsPolicyProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.Cors/ICorsPolicyProviderFactory.cs" Link="ICorsPolicyProviderFactory.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.Cors/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/CommonAssemblyInfo.cs" Link="Properties/CommonAssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.Cors/Properties/SRResources.Designer.cs" Link="Properties/SRResources.Designer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.Cors/Tracing/CorsEngineTracer.cs" Link="Tracing/CorsEngineTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.Cors/Tracing/CorsPolicyProviderFactoryTracer.cs" Link="Tracing/CorsPolicyProviderFactoryTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.Cors/Tracing/CorsPolicyProviderTracer.cs" Link="Tracing/CorsPolicyProviderTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.Cors/Tracing/TraceCategories.cs" Link="Tracing/TraceCategories.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Properties/SRResources.resx" LogicalName="System.Web.Http.Cors.Properties.SRResources.resources" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/src/System.Web.Http.Cors/Properties/SRResources.resx" Link="Properties/SRResources.resx" LogicalName="System.Web.Http.Cors.Properties.SRResources.resources" />
   </ItemGroup>
 
   <ItemGroup>

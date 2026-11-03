@@ -27,53 +27,53 @@
   <Import Project="../webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="Common/DictionaryExtensions.cs" />
-    <Compile Include="Common/Error.cs" />
-    <Compile Include="Common/HttpMethodHelper.cs" />
-    <Compile Include="Common/NonOwnedStream.cs" />
-    <Compile Include="Common/TaskHelpers.cs" />
-    <Compile Include="Common/TaskHelpersExtensions.cs" />
-    <Compile Include="GlobalConfiguration.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="HttpBatchContextWrapper.cs" />
-    <Compile Include="HttpControllerHandler.cs" />
-    <Compile Include="HttpControllerRouteHandler.cs" />
-    <Compile Include="HttpControllerTypeCacheSerializer.cs" />
-    <Compile Include="HttpRequestMessageExtensions.cs" />
-    <Compile Include="HttpResponseBaseExtensions.cs" />
-    <Compile Include="PreApplicationStartCode.cs" />
-    <Compile Include="Properties/AssemblyInfo.cs" />
-    <Compile Include="Properties/CommonAssemblyInfo.cs" />
-    <Compile Include="Properties/CommonWebApiResources.Designer.cs" />
-    <Compile Include="Properties/SRResources.Designer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/DictionaryExtensions.cs" Link="Common/DictionaryExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Error.cs" Link="Common/Error.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/HttpMethodHelper.cs" Link="Common/HttpMethodHelper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/NonOwnedStream.cs" Link="Common/NonOwnedStream.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/TaskHelpers.cs" Link="Common/TaskHelpers.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/TaskHelpersExtensions.cs" Link="Common/TaskHelpersExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/GlobalConfiguration.cs" Link="GlobalConfiguration.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/HttpBatchContextWrapper.cs" Link="HttpBatchContextWrapper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/HttpControllerHandler.cs" Link="HttpControllerHandler.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/HttpControllerRouteHandler.cs" Link="HttpControllerRouteHandler.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/HttpControllerTypeCacheSerializer.cs" Link="HttpControllerTypeCacheSerializer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/HttpRequestMessageExtensions.cs" Link="HttpRequestMessageExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/HttpResponseBaseExtensions.cs" Link="HttpResponseBaseExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/PreApplicationStartCode.cs" Link="PreApplicationStartCode.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/CommonAssemblyInfo.cs" Link="Properties/CommonAssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/CommonWebApiResources.Designer.cs" Link="Properties/CommonWebApiResources.Designer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/Properties/SRResources.Designer.cs" Link="Properties/SRResources.Designer.cs" />
     <Compile Include="ResponseContent.cs" />
-    <Compile Include="RouteCollectionExtensions.cs" />
-    <Compile Include="Routing/HostedHttpRoute.cs" />
-    <Compile Include="Routing/HostedHttpRouteCollection.cs" />
-    <Compile Include="Routing/HostedHttpRouteData.cs" />
-    <Compile Include="Routing/HostedHttpVirtualPathData.cs" />
-    <Compile Include="Routing/HttpContextBaseExtensions.cs" />
-    <Compile Include="Routing/HttpRequestMessageContextWrapper.cs" />
-    <Compile Include="Routing/HttpRequestMessageWrapper.cs" />
-    <Compile Include="Routing/HttpRouteDataExtensions.cs" />
-    <Compile Include="Routing/HttpRouteExceptionHandler.cs" />
-    <Compile Include="Routing/HttpRouteExceptionRouteHandler.cs" />
-    <Compile Include="Routing/HttpRouteExtensions.cs" />
-    <Compile Include="Routing/HttpWebRoute.cs" />
-    <Compile Include="SeekableBufferedRequestStream.cs" />
-    <Compile Include="SuppressFormsAuthRedirectHelper.cs" />
-    <Compile Include="TaskWrapperAsyncResult.cs" />
-    <Compile Include="WebHostAssembliesResolver.cs" />
-    <Compile Include="WebHostBufferPolicySelector.cs" />
-    <Compile Include="WebHostExceptionCatchBlocks.cs" />
-    <Compile Include="WebHostExceptionHandler.cs" />
-    <Compile Include="WebHostHttpControllerTypeResolver.cs" />
-    <Compile Include="WebHostHttpRequestContext.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/RouteCollectionExtensions.cs" Link="RouteCollectionExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/Routing/HostedHttpRoute.cs" Link="Routing/HostedHttpRoute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/Routing/HostedHttpRouteCollection.cs" Link="Routing/HostedHttpRouteCollection.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/Routing/HostedHttpRouteData.cs" Link="Routing/HostedHttpRouteData.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/Routing/HostedHttpVirtualPathData.cs" Link="Routing/HostedHttpVirtualPathData.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/Routing/HttpContextBaseExtensions.cs" Link="Routing/HttpContextBaseExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/Routing/HttpRequestMessageContextWrapper.cs" Link="Routing/HttpRequestMessageContextWrapper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/Routing/HttpRequestMessageWrapper.cs" Link="Routing/HttpRequestMessageWrapper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/Routing/HttpRouteDataExtensions.cs" Link="Routing/HttpRouteDataExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/Routing/HttpRouteExceptionHandler.cs" Link="Routing/HttpRouteExceptionHandler.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/Routing/HttpRouteExceptionRouteHandler.cs" Link="Routing/HttpRouteExceptionRouteHandler.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/Routing/HttpRouteExtensions.cs" Link="Routing/HttpRouteExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/Routing/HttpWebRoute.cs" Link="Routing/HttpWebRoute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/SeekableBufferedRequestStream.cs" Link="SeekableBufferedRequestStream.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/SuppressFormsAuthRedirectHelper.cs" Link="SuppressFormsAuthRedirectHelper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/TaskWrapperAsyncResult.cs" Link="TaskWrapperAsyncResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/WebHostAssembliesResolver.cs" Link="WebHostAssembliesResolver.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/WebHostBufferPolicySelector.cs" Link="WebHostBufferPolicySelector.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/WebHostExceptionCatchBlocks.cs" Link="WebHostExceptionCatchBlocks.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/WebHostExceptionHandler.cs" Link="WebHostExceptionHandler.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/WebHostHttpControllerTypeResolver.cs" Link="WebHostHttpControllerTypeResolver.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/WebHostHttpRequestContext.cs" Link="WebHostHttpRequestContext.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Properties/CommonWebApiResources.resx" LogicalName="System.Web.Http.WebHost.Properties.CommonWebApiResources.resources" />
-    <EmbeddedResource Include="Properties/SRResources.resx" LogicalName="System.Web.Http.WebHost.Properties.SRResources.resources" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/src/Common/CommonWebApiResources.resx" Link="Properties/CommonWebApiResources.resx" LogicalName="System.Web.Http.WebHost.Properties.CommonWebApiResources.resources" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/src/System.Web.Http.WebHost/Properties/SRResources.resx" Link="Properties/SRResources.resx" LogicalName="System.Web.Http.WebHost.Properties.SRResources.resources" />
   </ItemGroup>
 
   <ItemGroup>

@@ -29,22 +29,22 @@
   <Import Project="../../src/webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="AttributeBasedPolicyProviderFactoryTest.cs" />
-    <Compile Include="Controllers/DefaultController.cs" />
-    <Compile Include="Controllers/ExternalActionSelectorAttribute.cs" />
-    <Compile Include="Controllers/PerControllerConfigController.cs" />
-    <Compile Include="Controllers/SampleController.cs" />
-    <Compile Include="Controllers/ThrowingController.cs" />
-    <Compile Include="CorsHttpConfigurationExtensionsTest.cs" />
-    <Compile Include="CorsHttpRequestMessageExtensionsTest.cs" />
-    <Compile Include="CorsHttpResponseMessageExtensionsTest.cs" />
-    <Compile Include="CorsMessageHandlerTest.cs" />
-    <Compile Include="DisableCorsAttributeTest.cs" />
-    <Compile Include="EnableCorsAttributeTest.cs" />
-    <Compile Include="HttpRequestMessageExtensions.cs" />
-    <Compile Include="Tracing/CorsEngineTracerTest.cs" />
-    <Compile Include="Tracing/CorsPolicyProviderFactoryTracerTest.cs" />
-    <Compile Include="Tracing/CorsPolicyProviderTracerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Cors.Test/AttributeBasedPolicyProviderFactoryTest.cs" Link="AttributeBasedPolicyProviderFactoryTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Cors.Test/Controllers/DefaultController.cs" Link="Controllers/DefaultController.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Cors.Test/Controllers/ExternalActionSelectorAttribute.cs" Link="Controllers/ExternalActionSelectorAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Cors.Test/Controllers/PerControllerConfigController.cs" Link="Controllers/PerControllerConfigController.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Cors.Test/Controllers/SampleController.cs" Link="Controllers/SampleController.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Cors.Test/Controllers/ThrowingController.cs" Link="Controllers/ThrowingController.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Cors.Test/CorsHttpConfigurationExtensionsTest.cs" Link="CorsHttpConfigurationExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Cors.Test/CorsHttpRequestMessageExtensionsTest.cs" Link="CorsHttpRequestMessageExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Cors.Test/CorsHttpResponseMessageExtensionsTest.cs" Link="CorsHttpResponseMessageExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Cors.Test/CorsMessageHandlerTest.cs" Link="CorsMessageHandlerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Cors.Test/DisableCorsAttributeTest.cs" Link="DisableCorsAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Cors.Test/EnableCorsAttributeTest.cs" Link="EnableCorsAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Cors.Test/HttpRequestMessageExtensions.cs" Link="HttpRequestMessageExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Cors.Test/Tracing/CorsEngineTracerTest.cs" Link="Tracing/CorsEngineTracerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Cors.Test/Tracing/CorsPolicyProviderFactoryTracerTest.cs" Link="Tracing/CorsPolicyProviderFactoryTracerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Cors.Test/Tracing/CorsPolicyProviderTracerTest.cs" Link="Tracing/CorsPolicyProviderTracerTest.cs" />
   </ItemGroup>
 
   <ItemGroup>

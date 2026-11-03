@@ -27,19 +27,19 @@
   <Import Project="../webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="CorsConstants.cs" />
-    <Compile Include="CorsEngine.cs" />
-    <Compile Include="CorsPolicy.cs" />
-    <Compile Include="CorsRequestContext.cs" />
-    <Compile Include="CorsResult.cs" />
-    <Compile Include="ICorsEngine.cs" />
-    <Compile Include="Properties/AssemblyInfo.cs" />
-    <Compile Include="Properties/CommonAssemblyInfo.cs" />
-    <Compile Include="Properties/SRResources.Designer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Cors/CorsConstants.cs" Link="CorsConstants.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Cors/CorsEngine.cs" Link="CorsEngine.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Cors/CorsPolicy.cs" Link="CorsPolicy.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Cors/CorsRequestContext.cs" Link="CorsRequestContext.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Cors/CorsResult.cs" Link="CorsResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Cors/ICorsEngine.cs" Link="ICorsEngine.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Cors/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/CommonAssemblyInfo.cs" Link="Properties/CommonAssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Cors/Properties/SRResources.Designer.cs" Link="Properties/SRResources.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Properties/SRResources.resx" LogicalName="System.Web.Cors.Properties.SRResources.resources" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/src/System.Web.Cors/Properties/SRResources.resx" Link="Properties/SRResources.resx" LogicalName="System.Web.Cors.Properties.SRResources.resources" />
   </ItemGroup>
 
   <ItemGroup>

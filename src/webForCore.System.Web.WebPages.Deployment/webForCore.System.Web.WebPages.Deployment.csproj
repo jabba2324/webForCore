@@ -27,25 +27,25 @@
   <Import Project="../webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="AppDomainHelper.cs" />
-    <Compile Include="AssemblyUtils.cs" />
-    <Compile Include="BuildManagerWrapper.cs" />
-    <Compile Include="Common/CommonResources.Designer.cs" />
-    <Compile Include="Common/GlobalSuppressions.cs" />
-    <Compile Include="Common/IFileSystem.cs" />
-    <Compile Include="Common/PhysicalFileSystem.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="IBuildManager.cs" />
-    <Compile Include="PreApplicationStartCode.cs" />
-    <Compile Include="Properties/AssemblyInfo.cs" />
-    <Compile Include="Properties/CommonAssemblyInfo.cs" />
-    <Compile Include="Resources/ConfigurationResources.Designer.cs" />
-    <Compile Include="WebPagesDeployment.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Deployment/AppDomainHelper.cs" Link="AppDomainHelper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Deployment/AssemblyUtils.cs" Link="AssemblyUtils.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Deployment/BuildManagerWrapper.cs" Link="BuildManagerWrapper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/CommonResources.Designer.cs" Link="Common/CommonResources.Designer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/GlobalSuppressions.cs" Link="Common/GlobalSuppressions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Deployment/Common/IFileSystem.cs" Link="Common/IFileSystem.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Deployment/Common/PhysicalFileSystem.cs" Link="Common/PhysicalFileSystem.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Deployment/GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Deployment/IBuildManager.cs" Link="IBuildManager.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Deployment/PreApplicationStartCode.cs" Link="PreApplicationStartCode.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Deployment/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/CommonAssemblyInfo.cs" Link="Properties/CommonAssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Deployment/Resources/ConfigurationResources.Designer.cs" Link="Resources/ConfigurationResources.Designer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Deployment/WebPagesDeployment.cs" Link="WebPagesDeployment.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Common/CommonResources.resx" LogicalName="System.Web.WebPages.Deployment.Common.CommonResources.resources" />
-    <EmbeddedResource Include="Resources/ConfigurationResources.resx" LogicalName="System.Web.WebPages.Deployment.Resources.ConfigurationResources.resources" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/src/CommonResources.resx" Link="Common/CommonResources.resx" LogicalName="System.Web.WebPages.Deployment.Common.CommonResources.resources" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/src/System.Web.WebPages.Deployment/Resources/ConfigurationResources.resx" Link="Resources/ConfigurationResources.resx" LogicalName="System.Web.WebPages.Deployment.Resources.ConfigurationResources.resources" />
   </ItemGroup>
 
   <ItemGroup>

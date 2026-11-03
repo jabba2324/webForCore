@@ -25,161 +25,161 @@
   <Import Project="../webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="AcceptAttribute.cs" />
-    <Compile Include="ActionLinkAreaAttribute.cs" />
-    <Compile Include="AjaxOnlyAttribute.cs" />
-    <Compile Include="AreaHelpers.cs" />
-    <Compile Include="AsyncManagerExtensions.cs" />
-    <Compile Include="ButtonBuilder.cs" />
-    <Compile Include="ButtonsAndLinkExtensions.cs" />
-    <Compile Include="CachedExpressionCompiler.cs" />
-    <Compile Include="ContentTypeAttribute.cs" />
-    <Compile Include="ControllerExtensions.cs" />
-    <Compile Include="Controls/ActionLink.cs" />
-    <Compile Include="Controls/DropDownList.cs" />
-    <Compile Include="Controls/EncodeType.cs" />
-    <Compile Include="Controls/Hidden.cs" />
-    <Compile Include="Controls/Label.cs" />
-    <Compile Include="Controls/MvcControl.cs" />
-    <Compile Include="Controls/MvcInputControl.cs" />
-    <Compile Include="Controls/Password.cs" />
-    <Compile Include="Controls/Repeater.cs" />
-    <Compile Include="Controls/RepeaterItem.cs" />
-    <Compile Include="Controls/RouteValues.cs" />
-    <Compile Include="Controls/TextBox.cs" />
-    <Compile Include="CookieValueProviderFactory.cs" />
-    <Compile Include="CopyAsyncParametersAttribute.cs" />
-    <Compile Include="CreditCardAttribute.cs" />
-    <Compile Include="CssExtensions.cs" />
-    <Compile Include="DeserializeAttribute.cs" />
-    <Compile Include="DynamicReflectionObject.cs" />
-    <Compile Include="DynamicViewDataDictionary.cs" />
-    <Compile Include="DynamicViewPage.cs" />
-    <Compile Include="DynamicViewPageOfTModel.cs" />
-    <Compile Include="ElementalValueProvider.cs" />
-    <Compile Include="EmailAddressAttribute.cs" />
-    <Compile Include="Error.cs" />
-    <Compile Include="ExpressionUtil/BinaryExpressionFingerprint.cs" />
-    <Compile Include="ExpressionUtil/CachedExpressionCompiler.cs" />
-    <Compile Include="ExpressionUtil/ConditionalExpressionFingerprint.cs" />
-    <Compile Include="ExpressionUtil/ConstantExpressionFingerprint.cs" />
-    <Compile Include="ExpressionUtil/DefaultExpressionFingerprint.cs" />
-    <Compile Include="ExpressionUtil/ExpressionFingerprint.cs" />
-    <Compile Include="ExpressionUtil/ExpressionFingerprintChain.cs" />
-    <Compile Include="ExpressionUtil/FingerprintingExpressionVisitor.cs" />
-    <Compile Include="ExpressionUtil/HashCodeCombiner.cs" />
-    <Compile Include="ExpressionUtil/Hoisted.cs" />
-    <Compile Include="ExpressionUtil/HoistingExpressionVisitor.cs" />
-    <Compile Include="ExpressionUtil/IndexExpressionFingerprint.cs" />
-    <Compile Include="ExpressionUtil/LambdaExpressionFingerprint.cs" />
-    <Compile Include="ExpressionUtil/MemberExpressionFingerprint.cs" />
-    <Compile Include="ExpressionUtil/MethodCallExpressionFingerprint.cs" />
-    <Compile Include="ExpressionUtil/ParameterExpressionFingerprint.cs" />
-    <Compile Include="ExpressionUtil/TypeBinaryExpressionFingerprint.cs" />
-    <Compile Include="ExpressionUtil/UnaryExpressionFingerprint.cs" />
-    <Compile Include="FileExtensionsAttribute.cs" />
-    <Compile Include="FormExtensions.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Html/HtmlHelperExtensions.cs" />
-    <Compile Include="HtmlButtonType.cs" />
-    <Compile Include="IMachineKey.cs" />
-    <Compile Include="ImageExtensions.cs" />
-    <Compile Include="Internal/ExpressionHelper.cs" />
-    <Compile Include="LinkBuilder.cs" />
-    <Compile Include="LinkExtensions.cs" />
-    <Compile Include="MachineKeyWrapper.cs" />
-    <Compile Include="MailToExtensions.cs" />
-    <Compile Include="ModelBinding/ArrayModelBinder.cs" />
-    <Compile Include="ModelBinding/ArrayModelBinderProvider.cs" />
-    <Compile Include="ModelBinding/BinaryDataModelBinderProvider.cs" />
-    <Compile Include="ModelBinding/BindNeverAttribute.cs" />
-    <Compile Include="ModelBinding/BindRequiredAttribute.cs" />
-    <Compile Include="ModelBinding/BindingBehavior.cs" />
-    <Compile Include="ModelBinding/BindingBehaviorAttribute.cs" />
-    <Compile Include="ModelBinding/CollectionModelBinder.cs" />
-    <Compile Include="ModelBinding/CollectionModelBinderProvider.cs" />
-    <Compile Include="ModelBinding/CollectionModelBinderUtil.cs" />
-    <Compile Include="ModelBinding/ComplexModelDto.cs" />
-    <Compile Include="ModelBinding/ComplexModelDtoModelBinder.cs" />
-    <Compile Include="ModelBinding/ComplexModelDtoModelBinderProvider.cs" />
-    <Compile Include="ModelBinding/ComplexModelDtoResult.cs" />
-    <Compile Include="ModelBinding/DictionaryModelBinder.cs" />
-    <Compile Include="ModelBinding/DictionaryModelBinderProvider.cs" />
-    <Compile Include="ModelBinding/ExtensibleModelBinderAdapter.cs" />
-    <Compile Include="ModelBinding/ExtensibleModelBinderAttribute.cs" />
-    <Compile Include="ModelBinding/ExtensibleModelBindingContext.cs" />
-    <Compile Include="ModelBinding/GenericModelBinderProvider.cs" />
-    <Compile Include="ModelBinding/IExtensibleModelBinder.cs" />
-    <Compile Include="ModelBinding/KeyValuePairModelBinder.cs" />
-    <Compile Include="ModelBinding/KeyValuePairModelBinderProvider.cs" />
-    <Compile Include="ModelBinding/KeyValuePairModelBinderUtil.cs" />
-    <Compile Include="ModelBinding/ModelBinderConfig.cs" />
-    <Compile Include="ModelBinding/ModelBinderErrorMessageProvider.cs" />
-    <Compile Include="ModelBinding/ModelBinderProvider.cs" />
-    <Compile Include="ModelBinding/ModelBinderProviderCollection.cs" />
-    <Compile Include="ModelBinding/ModelBinderProviderOptionsAttribute.cs" />
-    <Compile Include="ModelBinding/ModelBinderProviders.cs" />
-    <Compile Include="ModelBinding/ModelBinderUtil.cs" />
-    <Compile Include="ModelBinding/ModelValidatedEventArgs.cs" />
-    <Compile Include="ModelBinding/ModelValidatingEventArgs.cs" />
-    <Compile Include="ModelBinding/ModelValidationNode.cs" />
-    <Compile Include="ModelBinding/MutableObjectModelBinder.cs" />
-    <Compile Include="ModelBinding/MutableObjectModelBinderProvider.cs" />
-    <Compile Include="ModelBinding/SimpleModelBinderProvider.cs" />
-    <Compile Include="ModelBinding/TypeConverterModelBinder.cs" />
-    <Compile Include="ModelBinding/TypeConverterModelBinderProvider.cs" />
-    <Compile Include="ModelBinding/TypeMatchModelBinder.cs" />
-    <Compile Include="ModelBinding/TypeMatchModelBinderProvider.cs" />
-    <Compile Include="ModelCopier.cs" />
-    <Compile Include="MvcSerializer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/AcceptAttribute.cs" Link="AcceptAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ActionLinkAreaAttribute.cs" Link="ActionLinkAreaAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/AjaxOnlyAttribute.cs" Link="AjaxOnlyAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/AreaHelpers.cs" Link="AreaHelpers.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/AsyncManagerExtensions.cs" Link="AsyncManagerExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ButtonBuilder.cs" Link="ButtonBuilder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ButtonsAndLinkExtensions.cs" Link="ButtonsAndLinkExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/CachedExpressionCompiler.cs" Link="CachedExpressionCompiler.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ContentTypeAttribute.cs" Link="ContentTypeAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ControllerExtensions.cs" Link="ControllerExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Controls/ActionLink.cs" Link="Controls/ActionLink.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Controls/DropDownList.cs" Link="Controls/DropDownList.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Controls/EncodeType.cs" Link="Controls/EncodeType.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Controls/Hidden.cs" Link="Controls/Hidden.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Controls/Label.cs" Link="Controls/Label.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Controls/MvcControl.cs" Link="Controls/MvcControl.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Controls/MvcInputControl.cs" Link="Controls/MvcInputControl.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Controls/Password.cs" Link="Controls/Password.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Controls/Repeater.cs" Link="Controls/Repeater.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Controls/RepeaterItem.cs" Link="Controls/RepeaterItem.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Controls/RouteValues.cs" Link="Controls/RouteValues.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Controls/TextBox.cs" Link="Controls/TextBox.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/CookieValueProviderFactory.cs" Link="CookieValueProviderFactory.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/CopyAsyncParametersAttribute.cs" Link="CopyAsyncParametersAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/CreditCardAttribute.cs" Link="CreditCardAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/CssExtensions.cs" Link="CssExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/DeserializeAttribute.cs" Link="DeserializeAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/DynamicReflectionObject.cs" Link="DynamicReflectionObject.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/DynamicViewDataDictionary.cs" Link="DynamicViewDataDictionary.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/DynamicViewPage.cs" Link="DynamicViewPage.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/DynamicViewPageOfTModel.cs" Link="DynamicViewPageOfTModel.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ElementalValueProvider.cs" Link="ElementalValueProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/EmailAddressAttribute.cs" Link="EmailAddressAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Error.cs" Link="Error.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ExpressionUtil/BinaryExpressionFingerprint.cs" Link="ExpressionUtil/BinaryExpressionFingerprint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ExpressionUtil/CachedExpressionCompiler.cs" Link="ExpressionUtil/CachedExpressionCompiler.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ExpressionUtil/ConditionalExpressionFingerprint.cs" Link="ExpressionUtil/ConditionalExpressionFingerprint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ExpressionUtil/ConstantExpressionFingerprint.cs" Link="ExpressionUtil/ConstantExpressionFingerprint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ExpressionUtil/DefaultExpressionFingerprint.cs" Link="ExpressionUtil/DefaultExpressionFingerprint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ExpressionUtil/ExpressionFingerprint.cs" Link="ExpressionUtil/ExpressionFingerprint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ExpressionUtil/ExpressionFingerprintChain.cs" Link="ExpressionUtil/ExpressionFingerprintChain.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ExpressionUtil/FingerprintingExpressionVisitor.cs" Link="ExpressionUtil/FingerprintingExpressionVisitor.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ExpressionUtil/HashCodeCombiner.cs" Link="ExpressionUtil/HashCodeCombiner.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ExpressionUtil/Hoisted.cs" Link="ExpressionUtil/Hoisted.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ExpressionUtil/HoistingExpressionVisitor.cs" Link="ExpressionUtil/HoistingExpressionVisitor.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ExpressionUtil/IndexExpressionFingerprint.cs" Link="ExpressionUtil/IndexExpressionFingerprint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ExpressionUtil/LambdaExpressionFingerprint.cs" Link="ExpressionUtil/LambdaExpressionFingerprint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ExpressionUtil/MemberExpressionFingerprint.cs" Link="ExpressionUtil/MemberExpressionFingerprint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ExpressionUtil/MethodCallExpressionFingerprint.cs" Link="ExpressionUtil/MethodCallExpressionFingerprint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ExpressionUtil/ParameterExpressionFingerprint.cs" Link="ExpressionUtil/ParameterExpressionFingerprint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ExpressionUtil/TypeBinaryExpressionFingerprint.cs" Link="ExpressionUtil/TypeBinaryExpressionFingerprint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ExpressionUtil/UnaryExpressionFingerprint.cs" Link="ExpressionUtil/UnaryExpressionFingerprint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/FileExtensionsAttribute.cs" Link="FileExtensionsAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/FormExtensions.cs" Link="FormExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Html/HtmlHelperExtensions.cs" Link="Html/HtmlHelperExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/HtmlButtonType.cs" Link="HtmlButtonType.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/IMachineKey.cs" Link="IMachineKey.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ImageExtensions.cs" Link="ImageExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Internal/ExpressionHelper.cs" Link="Internal/ExpressionHelper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/LinkBuilder.cs" Link="LinkBuilder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/LinkExtensions.cs" Link="LinkExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/MachineKeyWrapper.cs" Link="MachineKeyWrapper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/MailToExtensions.cs" Link="MailToExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/ArrayModelBinder.cs" Link="ModelBinding/ArrayModelBinder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/ArrayModelBinderProvider.cs" Link="ModelBinding/ArrayModelBinderProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/BinaryDataModelBinderProvider.cs" Link="ModelBinding/BinaryDataModelBinderProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/BindNeverAttribute.cs" Link="ModelBinding/BindNeverAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/BindRequiredAttribute.cs" Link="ModelBinding/BindRequiredAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/BindingBehavior.cs" Link="ModelBinding/BindingBehavior.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/BindingBehaviorAttribute.cs" Link="ModelBinding/BindingBehaviorAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/CollectionModelBinder.cs" Link="ModelBinding/CollectionModelBinder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/CollectionModelBinderProvider.cs" Link="ModelBinding/CollectionModelBinderProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/CollectionModelBinderUtil.cs" Link="ModelBinding/CollectionModelBinderUtil.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/ComplexModelDto.cs" Link="ModelBinding/ComplexModelDto.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/ComplexModelDtoModelBinder.cs" Link="ModelBinding/ComplexModelDtoModelBinder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/ComplexModelDtoModelBinderProvider.cs" Link="ModelBinding/ComplexModelDtoModelBinderProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/ComplexModelDtoResult.cs" Link="ModelBinding/ComplexModelDtoResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/DictionaryModelBinder.cs" Link="ModelBinding/DictionaryModelBinder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/DictionaryModelBinderProvider.cs" Link="ModelBinding/DictionaryModelBinderProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/ExtensibleModelBinderAdapter.cs" Link="ModelBinding/ExtensibleModelBinderAdapter.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/ExtensibleModelBinderAttribute.cs" Link="ModelBinding/ExtensibleModelBinderAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/ExtensibleModelBindingContext.cs" Link="ModelBinding/ExtensibleModelBindingContext.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/GenericModelBinderProvider.cs" Link="ModelBinding/GenericModelBinderProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/IExtensibleModelBinder.cs" Link="ModelBinding/IExtensibleModelBinder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/KeyValuePairModelBinder.cs" Link="ModelBinding/KeyValuePairModelBinder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/KeyValuePairModelBinderProvider.cs" Link="ModelBinding/KeyValuePairModelBinderProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/KeyValuePairModelBinderUtil.cs" Link="ModelBinding/KeyValuePairModelBinderUtil.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/ModelBinderConfig.cs" Link="ModelBinding/ModelBinderConfig.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/ModelBinderErrorMessageProvider.cs" Link="ModelBinding/ModelBinderErrorMessageProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/ModelBinderProvider.cs" Link="ModelBinding/ModelBinderProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/ModelBinderProviderCollection.cs" Link="ModelBinding/ModelBinderProviderCollection.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/ModelBinderProviderOptionsAttribute.cs" Link="ModelBinding/ModelBinderProviderOptionsAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/ModelBinderProviders.cs" Link="ModelBinding/ModelBinderProviders.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/ModelBinderUtil.cs" Link="ModelBinding/ModelBinderUtil.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/ModelValidatedEventArgs.cs" Link="ModelBinding/ModelValidatedEventArgs.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/ModelValidatingEventArgs.cs" Link="ModelBinding/ModelValidatingEventArgs.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/ModelValidationNode.cs" Link="ModelBinding/ModelValidationNode.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/MutableObjectModelBinder.cs" Link="ModelBinding/MutableObjectModelBinder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/MutableObjectModelBinderProvider.cs" Link="ModelBinding/MutableObjectModelBinderProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/SimpleModelBinderProvider.cs" Link="ModelBinding/SimpleModelBinderProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/TypeConverterModelBinder.cs" Link="ModelBinding/TypeConverterModelBinder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/TypeConverterModelBinderProvider.cs" Link="ModelBinding/TypeConverterModelBinderProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/TypeMatchModelBinder.cs" Link="ModelBinding/TypeMatchModelBinder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelBinding/TypeMatchModelBinderProvider.cs" Link="ModelBinding/TypeMatchModelBinderProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ModelCopier.cs" Link="ModelCopier.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/MvcSerializer.cs" Link="MvcSerializer.cs" />
     <Compile Include="NetDataContractSerializer.cs" />
-    <Compile Include="Properties/AssemblyInfo.cs" />
-    <Compile Include="Properties/CommonAssemblyInfo.cs" />
-    <Compile Include="Properties/MvcResources.Designer.cs" />
-    <Compile Include="RadioExtensions.cs" />
-    <Compile Include="ReaderWriterCache.cs" />
-    <Compile Include="Resources/ActionType.cs" />
-    <Compile Include="Resources/AjaxHelperExtensions.cs" />
-    <Compile Include="Resources/AtomEntryActionResult.cs" />
-    <Compile Include="Resources/AtomFeedActionResult.cs" />
-    <Compile Include="Resources/AtomServiceDocumentActionResult.cs" />
-    <Compile Include="Resources/DataContractJsonActionResult.cs" />
-    <Compile Include="Resources/DataContractXmlActionResult.cs" />
-    <Compile Include="Resources/DefaultFormatHelper.cs" />
-    <Compile Include="Resources/DefaultFormatManager.cs" />
-    <Compile Include="Resources/FormatHelper.cs" />
-    <Compile Include="Resources/FormatManager.cs" />
-    <Compile Include="Resources/HtmlHelperExtensions.cs" />
-    <Compile Include="Resources/HttpRequestBaseExtensions.cs" />
-    <Compile Include="Resources/IEnumerableExtensions.cs" />
-    <Compile Include="Resources/IRequestFormatHandler.cs" />
-    <Compile Include="Resources/IResponseFormatHandler.cs" />
-    <Compile Include="Resources/JsonFormatHandler.cs" />
-    <Compile Include="Resources/MultiFormatActionResult.cs" />
-    <Compile Include="Resources/RequestContextExtensions.cs" />
-    <Compile Include="Resources/ResourceControllerFactory.cs" />
-    <Compile Include="Resources/ResourceErrorActionResult.cs" />
-    <Compile Include="Resources/ResourceModelBinder.cs" />
-    <Compile Include="Resources/ResourceRedirectToRouteResult.cs" />
-    <Compile Include="Resources/RouteCollectionExtensions.cs" />
-    <Compile Include="Resources/UriHelperExtensions.cs" />
-    <Compile Include="Resources/WebApiEnabledAttribute.cs" />
-    <Compile Include="Resources/XmlFormatHandler.cs" />
-    <Compile Include="ScriptExtensions.cs" />
-    <Compile Include="SerializationExtensions.cs" />
-    <Compile Include="ServerVariablesValueProviderFactory.cs" />
-    <Compile Include="SessionValueProviderFactory.cs" />
-    <Compile Include="SkipBindingAttribute.cs" />
-    <Compile Include="TempDataValueProviderFactory.cs" />
-    <Compile Include="TypeDescriptorHelper.cs" />
-    <Compile Include="TypeHelpers.cs" />
-    <Compile Include="UrlAttribute.cs" />
-    <Compile Include="ValueProviderUtil.cs" />
-    <Compile Include="ViewExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/CommonAssemblyInfo.cs" Link="Properties/CommonAssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Properties/MvcResources.Designer.cs" Link="Properties/MvcResources.Designer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/RadioExtensions.cs" Link="RadioExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ReaderWriterCache.cs" Link="ReaderWriterCache.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/ActionType.cs" Link="Resources/ActionType.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/AjaxHelperExtensions.cs" Link="Resources/AjaxHelperExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/AtomEntryActionResult.cs" Link="Resources/AtomEntryActionResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/AtomFeedActionResult.cs" Link="Resources/AtomFeedActionResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/AtomServiceDocumentActionResult.cs" Link="Resources/AtomServiceDocumentActionResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/DataContractJsonActionResult.cs" Link="Resources/DataContractJsonActionResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/DataContractXmlActionResult.cs" Link="Resources/DataContractXmlActionResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/DefaultFormatHelper.cs" Link="Resources/DefaultFormatHelper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/DefaultFormatManager.cs" Link="Resources/DefaultFormatManager.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/FormatHelper.cs" Link="Resources/FormatHelper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/FormatManager.cs" Link="Resources/FormatManager.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/HtmlHelperExtensions.cs" Link="Resources/HtmlHelperExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/HttpRequestBaseExtensions.cs" Link="Resources/HttpRequestBaseExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/IEnumerableExtensions.cs" Link="Resources/IEnumerableExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/IRequestFormatHandler.cs" Link="Resources/IRequestFormatHandler.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/IResponseFormatHandler.cs" Link="Resources/IResponseFormatHandler.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/JsonFormatHandler.cs" Link="Resources/JsonFormatHandler.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/MultiFormatActionResult.cs" Link="Resources/MultiFormatActionResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/RequestContextExtensions.cs" Link="Resources/RequestContextExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/ResourceControllerFactory.cs" Link="Resources/ResourceControllerFactory.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/ResourceErrorActionResult.cs" Link="Resources/ResourceErrorActionResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/ResourceModelBinder.cs" Link="Resources/ResourceModelBinder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/ResourceRedirectToRouteResult.cs" Link="Resources/ResourceRedirectToRouteResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/RouteCollectionExtensions.cs" Link="Resources/RouteCollectionExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/UriHelperExtensions.cs" Link="Resources/UriHelperExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/WebApiEnabledAttribute.cs" Link="Resources/WebApiEnabledAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Resources/XmlFormatHandler.cs" Link="Resources/XmlFormatHandler.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ScriptExtensions.cs" Link="ScriptExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/SerializationExtensions.cs" Link="SerializationExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ServerVariablesValueProviderFactory.cs" Link="ServerVariablesValueProviderFactory.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/SessionValueProviderFactory.cs" Link="SessionValueProviderFactory.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/SkipBindingAttribute.cs" Link="SkipBindingAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/TempDataValueProviderFactory.cs" Link="TempDataValueProviderFactory.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/TypeDescriptorHelper.cs" Link="TypeDescriptorHelper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/TypeHelpers.cs" Link="TypeHelpers.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/UrlAttribute.cs" Link="UrlAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ValueProviderUtil.cs" Link="ValueProviderUtil.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/ViewExtensions.cs" Link="ViewExtensions.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Properties/MvcResources.resx" LogicalName="Microsoft.Web.Mvc.Properties.MvcResources.resources" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/src/Microsoft.Web.Mvc/Properties/MvcResources.resx" Link="Properties/MvcResources.resx" LogicalName="Microsoft.Web.Mvc.Properties.MvcResources.resources" />
   </ItemGroup>
 
   <ItemGroup>

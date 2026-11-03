@@ -13,3 +13,8 @@
 	url = https://github.com/xforcore/SignalR.git
 	branch = webforcore
 	shallow = true
+[submodule "external/AspNetWebStack"]
+	path = external/AspNetWebStack
+	url = https://github.com/xforcore/AspNetWebStack.git
+	branch = webforcore
+	shallow = true

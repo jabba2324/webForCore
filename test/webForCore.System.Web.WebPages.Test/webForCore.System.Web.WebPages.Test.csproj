@@ -30,105 +30,105 @@
   <Import Project="../../src/webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="ApplicationParts/ApplicationPartRegistryTest.cs" />
-    <Compile Include="ApplicationParts/ApplicationPartTest.cs" />
-    <Compile Include="ApplicationParts/MimeMappingTest.cs" />
-    <Compile Include="ApplicationParts/ResourceHandlerTest.cs" />
-    <Compile Include="ApplicationParts/TestResourceAssembly.cs" />
-    <Compile Include="Common/CollectionExtensionsTest.cs" />
-    <Compile Include="Common/PathHelpersTest.cs" />
-    <Compile Include="Extensions/HttpContextExtensionsTest.cs" />
-    <Compile Include="Extensions/HttpRequestExtensionsTest.cs" />
-    <Compile Include="Extensions/HttpResponseExtensionsTest.cs" />
-    <Compile Include="Extensions/StringExtensionsTest.cs" />
-    <Compile Include="Extensions/StringWriterExtensionsTest.cs" />
-    <Compile Include="Helpers/AntiForgeryConfigTest.cs" />
-    <Compile Include="Helpers/AntiForgeryTest.cs" />
-    <Compile Include="Helpers/AntiXsrf/AntiForgeryTokenSerializerTest.cs" />
-    <Compile Include="Helpers/AntiXsrf/AntiForgeryTokenStoreTest.cs" />
-    <Compile Include="Helpers/AntiXsrf/AntiForgeryTokenTest.cs" />
-    <Compile Include="Helpers/AntiXsrf/AntiForgeryWorkerTest.cs" />
-    <Compile Include="Helpers/AntiXsrf/BinaryBlobTest.cs" />
-    <Compile Include="Helpers/AntiXsrf/ClaimUidExtractorTest.cs" />
-    <Compile Include="Helpers/AntiXsrf/HexUtil.cs" />
-    <Compile Include="Helpers/AntiXsrf/MachineKey45CryptoSystemTest.cs" />
-    <Compile Include="Helpers/AntiXsrf/MockAntiForgeryConfig.cs" />
-    <Compile Include="Helpers/AntiXsrf/MockableAntiForgeryTokenSerializer.cs" />
-    <Compile Include="Helpers/AntiXsrf/MockableClaimUidExtractor.cs" />
-    <Compile Include="Helpers/AntiXsrf/MockableCryptoSystem.cs" />
-    <Compile Include="Helpers/AntiXsrf/MockableTokenStore.cs" />
-    <Compile Include="Helpers/AntiXsrf/MockableTokenValidator.cs" />
-    <Compile Include="Helpers/AntiXsrf/TokenValidatorTest.cs" />
-    <Compile Include="Helpers/Claims/ClaimTest.cs" />
-    <Compile Include="Helpers/Claims/ClaimsIdentityConverterTest.cs" />
-    <Compile Include="Helpers/Claims/ClaimsIdentityTest.cs" />
-    <Compile Include="Helpers/Claims/MockClaimsIdentity.cs" />
-    <Compile Include="Helpers/CryptoUtilTest.cs" />
-    <Compile Include="Helpers/UnvalidatedRequestValuesTest.cs" />
-    <Compile Include="Html/CheckBoxTest.cs" />
-    <Compile Include="Html/HtmlHelperFactory.cs" />
-    <Compile Include="Html/HtmlHelperTest.cs" />
-    <Compile Include="Html/InputHelperTest.cs" />
-    <Compile Include="Html/LabelHelperTest.cs" />
-    <Compile Include="Html/RadioButtonTest.cs" />
-    <Compile Include="Html/SelectHelperTest.cs" />
-    <Compile Include="Html/TextAreaHelperTest.cs" />
-    <Compile Include="Html/ValidationHelperTest.cs" />
-    <Compile Include="Instrumentation/InstrumentationServiceTest.cs" />
-    <Compile Include="LatestRazorVersion.cs" />
-    <Compile Include="Mvc/HttpAntiForgeryExceptionTest.cs" />
-    <Compile Include="Mvc/ModelClientValidationMaxLengthRuleTest.cs" />
-    <Compile Include="Mvc/ModelClientValidationMembershipPasswordRuleTest.cs" />
-    <Compile Include="Mvc/ModelClientValidationMinLengthRuleTest.cs" />
-    <Compile Include="Mvc/ModelClientValidationStringLengthRuleTest.cs" />
-    <Compile Include="Mvc/TagBuilderTest.cs" />
-    <Compile Include="Mvc/UnobtrusiveValidationAttributesGeneratorTest.cs" />
-    <Compile Include="PreApplicationStartCodeTest.cs" />
-    <Compile Include="ScopeStorage/AspNetRequestScopeStorageProviderTest.cs" />
-    <Compile Include="ScopeStorage/ScopeStorageDictionaryTest.cs" />
-    <Compile Include="ScopeStorage/ScopeStorageKeyComparerTest.cs" />
-    <Compile Include="ScopeStorage/WebConfigScopeStorageTest.cs" />
-    <Compile Include="Utils/CultureUtilTest.cs" />
-    <Compile Include="Utils/HtmlAttributePropertyHelperTest.cs" />
-    <Compile Include="Utils/PathUtilTest.cs" />
-    <Compile Include="Utils/PropertyHelperTest.cs" />
-    <Compile Include="Utils/SessionStateUtilTest.cs" />
-    <Compile Include="Utils/TestObjectFactory.cs" />
-    <Compile Include="Utils/TypeHelperTest.cs" />
-    <Compile Include="Utils/UrlRewriterHelperTest.cs" />
-    <Compile Include="Utils/UrlUtilTest.cs" />
-    <Compile Include="Validation/ValidationHelperTest.cs" />
-    <Compile Include="Validation/ValidatorTest.cs" />
-    <Compile Include="WebPage/ApplicationStartPageTest.cs" />
-    <Compile Include="WebPage/BrowserHelpersTest.cs" />
-    <Compile Include="WebPage/BrowserOverrideStoresTest.cs" />
-    <Compile Include="WebPage/BuildManagerExceptionUtilTest.cs" />
-    <Compile Include="WebPage/BuildManagerWrapperTest.cs" />
-    <Compile Include="WebPage/CookieBrowserOverrideStoreTest.cs" />
-    <Compile Include="WebPage/DefaultDisplayModeTest.cs" />
-    <Compile Include="WebPage/DisplayInfoTest.cs" />
-    <Compile Include="WebPage/DisplayModeProviderTest.cs" />
-    <Compile Include="WebPage/DynamicHttpApplicationStateTest.cs" />
-    <Compile Include="WebPage/DynamicPageDataDictionaryTest.cs" />
-    <Compile Include="WebPage/FileExistenceCacheTest.cs" />
-    <Compile Include="WebPage/LayoutTest.cs" />
-    <Compile Include="WebPage/PageDataDictionaryTest.cs" />
-    <Compile Include="WebPage/RenderPageTest.cs" />
-    <Compile Include="WebPage/RequestBrowserOverrideStoreTest.cs" />
-    <Compile Include="WebPage/RequestResourceTrackerTest.cs" />
-    <Compile Include="WebPage/StartPageTest.cs" />
-    <Compile Include="WebPage/TemplateStackTest.cs" />
-    <Compile Include="WebPage/UrlDataTest.cs" />
-    <Compile Include="WebPage/Utils.cs" />
-    <Compile Include="WebPage/VirtualPathFactoryExtensionsTest.cs" />
-    <Compile Include="WebPage/VirtualPathFactoryManagerTest.cs" />
-    <Compile Include="WebPage/WebPageContextTest.cs" />
-    <Compile Include="WebPage/WebPageExecutingBaseTest.cs" />
-    <Compile Include="WebPage/WebPageHttpHandlerTest.cs" />
-    <Compile Include="WebPage/WebPageHttpModuleTest.cs" />
-    <Compile Include="WebPage/WebPageRenderingBaseTest.cs" />
-    <Compile Include="WebPage/WebPageRouteTest.cs" />
-    <Compile Include="WebPage/WebPageTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/ApplicationParts/ApplicationPartRegistryTest.cs" Link="ApplicationParts/ApplicationPartRegistryTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/ApplicationParts/ApplicationPartTest.cs" Link="ApplicationParts/ApplicationPartTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/ApplicationParts/MimeMappingTest.cs" Link="ApplicationParts/MimeMappingTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/ApplicationParts/ResourceHandlerTest.cs" Link="ApplicationParts/ResourceHandlerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/ApplicationParts/TestResourceAssembly.cs" Link="ApplicationParts/TestResourceAssembly.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Common/CollectionExtensionsTest.cs" Link="Common/CollectionExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Common/PathHelpersTest.cs" Link="Common/PathHelpersTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Extensions/HttpContextExtensionsTest.cs" Link="Extensions/HttpContextExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Extensions/HttpRequestExtensionsTest.cs" Link="Extensions/HttpRequestExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Extensions/HttpResponseExtensionsTest.cs" Link="Extensions/HttpResponseExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Extensions/StringExtensionsTest.cs" Link="Extensions/StringExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Extensions/StringWriterExtensionsTest.cs" Link="Extensions/StringWriterExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Helpers/AntiForgeryConfigTest.cs" Link="Helpers/AntiForgeryConfigTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Helpers/AntiForgeryTest.cs" Link="Helpers/AntiForgeryTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Helpers/AntiXsrf/AntiForgeryTokenSerializerTest.cs" Link="Helpers/AntiXsrf/AntiForgeryTokenSerializerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Helpers/AntiXsrf/AntiForgeryTokenStoreTest.cs" Link="Helpers/AntiXsrf/AntiForgeryTokenStoreTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Helpers/AntiXsrf/AntiForgeryTokenTest.cs" Link="Helpers/AntiXsrf/AntiForgeryTokenTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Helpers/AntiXsrf/AntiForgeryWorkerTest.cs" Link="Helpers/AntiXsrf/AntiForgeryWorkerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Helpers/AntiXsrf/BinaryBlobTest.cs" Link="Helpers/AntiXsrf/BinaryBlobTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Helpers/AntiXsrf/ClaimUidExtractorTest.cs" Link="Helpers/AntiXsrf/ClaimUidExtractorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Helpers/AntiXsrf/HexUtil.cs" Link="Helpers/AntiXsrf/HexUtil.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Helpers/AntiXsrf/MachineKey45CryptoSystemTest.cs" Link="Helpers/AntiXsrf/MachineKey45CryptoSystemTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Helpers/AntiXsrf/MockAntiForgeryConfig.cs" Link="Helpers/AntiXsrf/MockAntiForgeryConfig.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Helpers/AntiXsrf/MockableAntiForgeryTokenSerializer.cs" Link="Helpers/AntiXsrf/MockableAntiForgeryTokenSerializer.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Helpers/AntiXsrf/MockableClaimUidExtractor.cs" Link="Helpers/AntiXsrf/MockableClaimUidExtractor.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Helpers/AntiXsrf/MockableCryptoSystem.cs" Link="Helpers/AntiXsrf/MockableCryptoSystem.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Helpers/AntiXsrf/MockableTokenStore.cs" Link="Helpers/AntiXsrf/MockableTokenStore.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Helpers/AntiXsrf/MockableTokenValidator.cs" Link="Helpers/AntiXsrf/MockableTokenValidator.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Helpers/AntiXsrf/TokenValidatorTest.cs" Link="Helpers/AntiXsrf/TokenValidatorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Helpers/Claims/ClaimTest.cs" Link="Helpers/Claims/ClaimTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Helpers/Claims/ClaimsIdentityConverterTest.cs" Link="Helpers/Claims/ClaimsIdentityConverterTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Helpers/Claims/ClaimsIdentityTest.cs" Link="Helpers/Claims/ClaimsIdentityTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Helpers/Claims/MockClaimsIdentity.cs" Link="Helpers/Claims/MockClaimsIdentity.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Helpers/CryptoUtilTest.cs" Link="Helpers/CryptoUtilTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Helpers/UnvalidatedRequestValuesTest.cs" Link="Helpers/UnvalidatedRequestValuesTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Html/CheckBoxTest.cs" Link="Html/CheckBoxTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Html/HtmlHelperFactory.cs" Link="Html/HtmlHelperFactory.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Html/HtmlHelperTest.cs" Link="Html/HtmlHelperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Html/InputHelperTest.cs" Link="Html/InputHelperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Html/LabelHelperTest.cs" Link="Html/LabelHelperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Html/RadioButtonTest.cs" Link="Html/RadioButtonTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Html/SelectHelperTest.cs" Link="Html/SelectHelperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Html/TextAreaHelperTest.cs" Link="Html/TextAreaHelperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Html/ValidationHelperTest.cs" Link="Html/ValidationHelperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Instrumentation/InstrumentationServiceTest.cs" Link="Instrumentation/InstrumentationServiceTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/LatestRazorVersion.cs" Link="LatestRazorVersion.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Mvc/HttpAntiForgeryExceptionTest.cs" Link="Mvc/HttpAntiForgeryExceptionTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Mvc/ModelClientValidationMaxLengthRuleTest.cs" Link="Mvc/ModelClientValidationMaxLengthRuleTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Mvc/ModelClientValidationMembershipPasswordRuleTest.cs" Link="Mvc/ModelClientValidationMembershipPasswordRuleTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Mvc/ModelClientValidationMinLengthRuleTest.cs" Link="Mvc/ModelClientValidationMinLengthRuleTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Mvc/ModelClientValidationStringLengthRuleTest.cs" Link="Mvc/ModelClientValidationStringLengthRuleTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Mvc/TagBuilderTest.cs" Link="Mvc/TagBuilderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Mvc/UnobtrusiveValidationAttributesGeneratorTest.cs" Link="Mvc/UnobtrusiveValidationAttributesGeneratorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/PreApplicationStartCodeTest.cs" Link="PreApplicationStartCodeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/ScopeStorage/AspNetRequestScopeStorageProviderTest.cs" Link="ScopeStorage/AspNetRequestScopeStorageProviderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/ScopeStorage/ScopeStorageDictionaryTest.cs" Link="ScopeStorage/ScopeStorageDictionaryTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/ScopeStorage/ScopeStorageKeyComparerTest.cs" Link="ScopeStorage/ScopeStorageKeyComparerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/ScopeStorage/WebConfigScopeStorageTest.cs" Link="ScopeStorage/WebConfigScopeStorageTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Utils/CultureUtilTest.cs" Link="Utils/CultureUtilTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Utils/HtmlAttributePropertyHelperTest.cs" Link="Utils/HtmlAttributePropertyHelperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Utils/PathUtilTest.cs" Link="Utils/PathUtilTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Utils/PropertyHelperTest.cs" Link="Utils/PropertyHelperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Utils/SessionStateUtilTest.cs" Link="Utils/SessionStateUtilTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Utils/TestObjectFactory.cs" Link="Utils/TestObjectFactory.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Utils/TypeHelperTest.cs" Link="Utils/TypeHelperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Utils/UrlRewriterHelperTest.cs" Link="Utils/UrlRewriterHelperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Utils/UrlUtilTest.cs" Link="Utils/UrlUtilTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Validation/ValidationHelperTest.cs" Link="Validation/ValidationHelperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/Validation/ValidatorTest.cs" Link="Validation/ValidatorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/ApplicationStartPageTest.cs" Link="WebPage/ApplicationStartPageTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/BrowserHelpersTest.cs" Link="WebPage/BrowserHelpersTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/BrowserOverrideStoresTest.cs" Link="WebPage/BrowserOverrideStoresTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/BuildManagerExceptionUtilTest.cs" Link="WebPage/BuildManagerExceptionUtilTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/BuildManagerWrapperTest.cs" Link="WebPage/BuildManagerWrapperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/CookieBrowserOverrideStoreTest.cs" Link="WebPage/CookieBrowserOverrideStoreTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/DefaultDisplayModeTest.cs" Link="WebPage/DefaultDisplayModeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/DisplayInfoTest.cs" Link="WebPage/DisplayInfoTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/DisplayModeProviderTest.cs" Link="WebPage/DisplayModeProviderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/DynamicHttpApplicationStateTest.cs" Link="WebPage/DynamicHttpApplicationStateTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/DynamicPageDataDictionaryTest.cs" Link="WebPage/DynamicPageDataDictionaryTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/FileExistenceCacheTest.cs" Link="WebPage/FileExistenceCacheTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/LayoutTest.cs" Link="WebPage/LayoutTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/PageDataDictionaryTest.cs" Link="WebPage/PageDataDictionaryTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/RenderPageTest.cs" Link="WebPage/RenderPageTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/RequestBrowserOverrideStoreTest.cs" Link="WebPage/RequestBrowserOverrideStoreTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/RequestResourceTrackerTest.cs" Link="WebPage/RequestResourceTrackerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/StartPageTest.cs" Link="WebPage/StartPageTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/TemplateStackTest.cs" Link="WebPage/TemplateStackTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/UrlDataTest.cs" Link="WebPage/UrlDataTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/Utils.cs" Link="WebPage/Utils.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/VirtualPathFactoryExtensionsTest.cs" Link="WebPage/VirtualPathFactoryExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/VirtualPathFactoryManagerTest.cs" Link="WebPage/VirtualPathFactoryManagerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/WebPageContextTest.cs" Link="WebPage/WebPageContextTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/WebPageExecutingBaseTest.cs" Link="WebPage/WebPageExecutingBaseTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/WebPageHttpHandlerTest.cs" Link="WebPage/WebPageHttpHandlerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/WebPageHttpModuleTest.cs" Link="WebPage/WebPageHttpModuleTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/WebPageRenderingBaseTest.cs" Link="WebPage/WebPageRenderingBaseTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/WebPageRouteTest.cs" Link="WebPage/WebPageRouteTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Test/WebPage/WebPageTest.cs" Link="WebPage/WebPageTest.cs" />
   </ItemGroup>
 
   <ItemGroup>

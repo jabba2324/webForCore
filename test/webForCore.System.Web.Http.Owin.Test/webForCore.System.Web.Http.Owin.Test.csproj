@@ -29,24 +29,24 @@
   <Import Project="../../src/webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="ExceptionHandling/DefaultExceptionHandlerTests.cs" />
-    <Compile Include="ExceptionHandling/EmptyExceptionLoggerTests.cs" />
-    <Compile Include="HostAuthenticationAttributeTest.cs" />
-    <Compile Include="HostAuthenticationFilterTest.cs" />
-    <Compile Include="HttpMessageHandlerAdapterTest.cs" />
-    <Compile Include="HttpMessageHandlerExtensions.cs" />
-    <Compile Include="HttpMessageHandlerOptionsTests.cs" />
-    <Compile Include="NonOwnedStreamTests.cs" />
-    <Compile Include="OwinBufferPolicySelectorTest.cs" />
-    <Compile Include="OwinExceptionCatchBlocksTests.cs" />
-    <Compile Include="OwinHostIntegrationTest.cs" />
-    <Compile Include="OwinHttpConfigurationExtensionsTest.cs" />
-    <Compile Include="OwinHttpRequestContextTests.cs" />
-    <Compile Include="OwinHttpRequestMessageExtensionsTest.cs" />
-    <Compile Include="OwinRequestExtensionsTests.cs" />
-    <Compile Include="OwinResponseExtensionsTests.cs" />
-    <Compile Include="PassiveAuthenticationMessageHandlerTest.cs" />
-    <Compile Include="WebApiAppBuilderExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Owin.Test/ExceptionHandling/DefaultExceptionHandlerTests.cs" Link="ExceptionHandling/DefaultExceptionHandlerTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Owin.Test/ExceptionHandling/EmptyExceptionLoggerTests.cs" Link="ExceptionHandling/EmptyExceptionLoggerTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Owin.Test/HostAuthenticationAttributeTest.cs" Link="HostAuthenticationAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Owin.Test/HostAuthenticationFilterTest.cs" Link="HostAuthenticationFilterTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Owin.Test/HttpMessageHandlerAdapterTest.cs" Link="HttpMessageHandlerAdapterTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Owin.Test/HttpMessageHandlerExtensions.cs" Link="HttpMessageHandlerExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Owin.Test/HttpMessageHandlerOptionsTests.cs" Link="HttpMessageHandlerOptionsTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Owin.Test/NonOwnedStreamTests.cs" Link="NonOwnedStreamTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Owin.Test/OwinBufferPolicySelectorTest.cs" Link="OwinBufferPolicySelectorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Owin.Test/OwinExceptionCatchBlocksTests.cs" Link="OwinExceptionCatchBlocksTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Owin.Test/OwinHostIntegrationTest.cs" Link="OwinHostIntegrationTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Owin.Test/OwinHttpConfigurationExtensionsTest.cs" Link="OwinHttpConfigurationExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Owin.Test/OwinHttpRequestContextTests.cs" Link="OwinHttpRequestContextTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Owin.Test/OwinHttpRequestMessageExtensionsTest.cs" Link="OwinHttpRequestMessageExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Owin.Test/OwinRequestExtensionsTests.cs" Link="OwinRequestExtensionsTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Owin.Test/OwinResponseExtensionsTests.cs" Link="OwinResponseExtensionsTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Owin.Test/PassiveAuthenticationMessageHandlerTest.cs" Link="PassiveAuthenticationMessageHandlerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.Owin.Test/WebApiAppBuilderExtensionsTest.cs" Link="WebApiAppBuilderExtensionsTest.cs" />
   </ItemGroup>
 
   <ItemGroup>

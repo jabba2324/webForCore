@@ -27,30 +27,30 @@
   <Import Project="../webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="AssemblyBuilderWrapper.cs" />
-    <Compile Include="Common/CommonResources.Designer.cs" />
-    <Compile Include="Common/GlobalSuppressions.cs" />
-    <Compile Include="CompilingPathEventArgs.cs" />
-    <Compile Include="Configuration/HostSection.cs" />
-    <Compile Include="Configuration/RazorPagesSection.cs" />
-    <Compile Include="Configuration/RazorWebSectionGroup.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="HostingEnvironmentWrapper.cs" />
-    <Compile Include="IAssemblyBuilder.cs" />
-    <Compile Include="IHostingEnvironment.cs" />
-    <Compile Include="PreApplicationStartCode.cs" />
-    <Compile Include="Properties/AssemblyInfo.cs" />
-    <Compile Include="Properties/CommonAssemblyInfo.cs" />
-    <Compile Include="RazorBuildProvider.cs" />
-    <Compile Include="Resources/RazorWebResources.Designer.cs" />
-    <Compile Include="WebCodeRazorHost.cs" />
-    <Compile Include="WebPageRazorHost.cs" />
-    <Compile Include="WebRazorHostFactory.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Razor/AssemblyBuilderWrapper.cs" Link="AssemblyBuilderWrapper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/CommonResources.Designer.cs" Link="Common/CommonResources.Designer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/GlobalSuppressions.cs" Link="Common/GlobalSuppressions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Razor/CompilingPathEventArgs.cs" Link="CompilingPathEventArgs.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Razor/Configuration/HostSection.cs" Link="Configuration/HostSection.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Razor/Configuration/RazorPagesSection.cs" Link="Configuration/RazorPagesSection.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Razor/Configuration/RazorWebSectionGroup.cs" Link="Configuration/RazorWebSectionGroup.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Razor/GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Razor/HostingEnvironmentWrapper.cs" Link="HostingEnvironmentWrapper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Razor/IAssemblyBuilder.cs" Link="IAssemblyBuilder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Razor/IHostingEnvironment.cs" Link="IHostingEnvironment.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Razor/PreApplicationStartCode.cs" Link="PreApplicationStartCode.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Razor/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/CommonAssemblyInfo.cs" Link="Properties/CommonAssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Razor/RazorBuildProvider.cs" Link="RazorBuildProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Razor/Resources/RazorWebResources.Designer.cs" Link="Resources/RazorWebResources.Designer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Razor/WebCodeRazorHost.cs" Link="WebCodeRazorHost.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Razor/WebPageRazorHost.cs" Link="WebPageRazorHost.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.WebPages.Razor/WebRazorHostFactory.cs" Link="WebRazorHostFactory.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Common/CommonResources.resx" LogicalName="System.Web.WebPages.Razor.Common.CommonResources.resources" />
-    <EmbeddedResource Include="Resources/RazorWebResources.resx" LogicalName="System.Web.WebPages.Razor.Resources.RazorWebResources.resources" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/src/CommonResources.resx" Link="Common/CommonResources.resx" LogicalName="System.Web.WebPages.Razor.Common.CommonResources.resources" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/src/System.Web.WebPages.Razor/Resources/RazorWebResources.resx" Link="Resources/RazorWebResources.resx" LogicalName="System.Web.WebPages.Razor.Resources.RazorWebResources.resources" />
   </ItemGroup>
 
   <ItemGroup>

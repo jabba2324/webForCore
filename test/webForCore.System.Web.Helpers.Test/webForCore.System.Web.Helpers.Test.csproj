@@ -29,31 +29,31 @@
   <Import Project="../../src/webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="ChartTest.cs" />
-    <Compile Include="ConversionUtilTest.cs" />
-    <Compile Include="CryptoTest.cs" />
-    <Compile Include="DynamicDictionary.cs" />
-    <Compile Include="DynamicHelperTest.cs" />
-    <Compile Include="DynamicWrapper.cs" />
-    <Compile Include="HelperResultTest.cs" />
-    <Compile Include="JsonTest.cs" />
-    <Compile Include="ObjectInfoTest.cs" />
-    <Compile Include="PreComputedGridDataSourceTest.cs" />
-    <Compile Include="ServerInfoTest.cs" />
-    <Compile Include="WebCacheTest.cs" />
-    <Compile Include="WebGridDataSourceTest.cs" />
-    <Compile Include="WebGridTest.cs" />
-    <Compile Include="WebImageTest.cs" />
-    <Compile Include="WebMailTest.cs" />
-    <Compile Include="XhtmlAssert.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Helpers.Test/ChartTest.cs" Link="ChartTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Helpers.Test/ConversionUtilTest.cs" Link="ConversionUtilTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Helpers.Test/CryptoTest.cs" Link="CryptoTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Helpers.Test/DynamicDictionary.cs" Link="DynamicDictionary.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Helpers.Test/DynamicHelperTest.cs" Link="DynamicHelperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Helpers.Test/DynamicWrapper.cs" Link="DynamicWrapper.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Helpers.Test/HelperResultTest.cs" Link="HelperResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Helpers.Test/JsonTest.cs" Link="JsonTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Helpers.Test/ObjectInfoTest.cs" Link="ObjectInfoTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Helpers.Test/PreComputedGridDataSourceTest.cs" Link="PreComputedGridDataSourceTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Helpers.Test/ServerInfoTest.cs" Link="ServerInfoTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Helpers.Test/WebCacheTest.cs" Link="WebCacheTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Helpers.Test/WebGridDataSourceTest.cs" Link="WebGridDataSourceTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Helpers.Test/WebGridTest.cs" Link="WebGridTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Helpers.Test/WebImageTest.cs" Link="WebImageTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Helpers.Test/WebMailTest.cs" Link="WebMailTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Helpers.Test/XhtmlAssert.cs" Link="XhtmlAssert.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="TestFiles/LambdaFinal.jpg" />
-    <EmbeddedResource Include="TestFiles/NETLogo.png" />
-    <EmbeddedResource Include="TestFiles/Test.ico" />
-    <EmbeddedResource Include="TestFiles/logo.bmp" />
-    <EmbeddedResource Include="TestFiles/xhtml11-flat.dtd" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Helpers.Test/TestFiles/LambdaFinal.jpg" Link="TestFiles/LambdaFinal.jpg" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Helpers.Test/TestFiles/NETLogo.png" Link="TestFiles/NETLogo.png" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Helpers.Test/TestFiles/Test.ico" Link="TestFiles/Test.ico" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Helpers.Test/TestFiles/logo.bmp" Link="TestFiles/logo.bmp" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Helpers.Test/TestFiles/xhtml11-flat.dtd" Link="TestFiles/xhtml11-flat.dtd" />
   </ItemGroup>
 
   <ItemGroup>

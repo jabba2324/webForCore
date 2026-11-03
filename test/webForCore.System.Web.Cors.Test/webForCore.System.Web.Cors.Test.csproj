@@ -29,10 +29,10 @@
   <Import Project="../../src/webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="CorsEngineTest.cs" />
-    <Compile Include="CorsPolicyTest.cs" />
-    <Compile Include="CorsRequestContextTest.cs" />
-    <Compile Include="CorsResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Cors.Test/CorsEngineTest.cs" Link="CorsEngineTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Cors.Test/CorsPolicyTest.cs" Link="CorsPolicyTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Cors.Test/CorsRequestContextTest.cs" Link="CorsRequestContextTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Cors.Test/CorsResultTest.cs" Link="CorsResultTest.cs" />
   </ItemGroup>
 
   <ItemGroup>
