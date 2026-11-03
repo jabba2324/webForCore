@@ -13,14 +13,11 @@ SUITES=(
   Microsoft.Owin.Tests Microsoft.Owin.Host.SystemWeb.Tests Microsoft.Owin.Security.Tests System.Web.MonoTests
   System.Web.Mvc.Test Microsoft.Web.Mvc.Test System.Web.WebPages.Test System.Web.WebPages.Razor.Test
   System.Web.WebPages.Deployment.Test System.Web.Helpers.Test Microsoft.AspNet.SignalR.Tests Identity.Test
-  WebApi.Gate.Tests Mvc.Gate.Tests IIS.Gate.Tests System.Drawing.Common.Tests
+  WebApi.Gate.Tests Mvc.Gate.Tests IIS.Gate.Tests
 )
-DRAWING_FILTER="category!=failing&category!=nonlinuxtests&category!=nonnetcoreapptests&category!=OuterLoop&category!=IgnoreForCI&category!=nonunixtests"
 for s in "${SUITES[@]}"; do
-  filter=()
-  [ "$s" = System.Drawing.Common.Tests ] && filter=(--filter "$DRAWING_FILTER")
   echo "== $s"
-  dotnet-coverage collect "dotnet test test/webForCore.$s/webForCore.$s.csproj -c Release --no-build ${filter[*]:+--filter \"$DRAWING_FILTER\"}" \
+  dotnet-coverage collect "dotnet test test/webForCore.$s/webForCore.$s.csproj -c Release --no-build" \
     -f coverage -o "$OUT/$s.coverage" > "$OUT/$s.log" 2>&1
   grep -E '^(Passed|Failed)!' "$OUT/$s.log" | tail -1
 done

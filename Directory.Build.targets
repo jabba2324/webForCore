@@ -1,4 +1,14 @@
 <Project>
+  <!-- webForCore: -p:DrawingForCoreSource=<drawingForCore checkout> builds against that checkout's projects instead of
+       the drawingForCore packages, to try a System.Drawing change in webForCore before it is released. Each package
+       reference becomes a reference to its project, keeping its metadata (Aliases). -->
+  <ItemGroup Condition="'$(DrawingForCoreSource)' != ''">
+    <_DrawingForCorePackage Include="@(PackageReference->WithMetadataValue('Identity', 'drawingForCore'))" DrawingForCoreProject="$(DrawingForCoreSource)/src/drawingForCore.System.Drawing/drawingForCore.System.Drawing.csproj" />
+    <_DrawingForCorePackage Include="@(PackageReference->WithMetadataValue('Identity', 'drawingForCore.Common'))" DrawingForCoreProject="$(DrawingForCoreSource)/src/drawingForCore.System.Drawing.Common/drawingForCore.System.Drawing.Common.csproj" />
+    <ProjectReference Include="@(_DrawingForCorePackage->'%(DrawingForCoreProject)')" RemoveMetadata="DrawingForCoreProject;Version" />
+    <PackageReference Remove="@(_DrawingForCorePackage)" />
+  </ItemGroup>
+
   <!-- webForCore: the fork's System.Web contains Microsoft's System.Web.HttpUtility (as on .NET Framework). The shared
        framework also has a System.Web.HttpUtility.dll with a System.Web.HttpUtility type, so in projects that reference
        the fork's System.Web the compiler would see two (CS0433). Drop the framework copy there, as the projects already

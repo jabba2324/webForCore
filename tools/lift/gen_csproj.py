@@ -29,7 +29,6 @@ PROJECT_MAP = {
     "System.Web.Routing": f"{WFC}/WebFormsForCore.Web/WebFormsForCore.Web.csproj",
     "System.Web.Extensions": f"{WFC}/WebFormsForCore.Web.Extensions/WebFormsForCore.Web.Extensions.csproj",
     "System.Web.Services": f"{WFC}/WebFormsForCore.Web.Services/WebFormsForCore.Web.Services.csproj",
-    "System.Drawing": f"{WFC}/WebFormsForCore.Drawing/WebFormsForCore.Drawing.csproj",
     "System.configuration": f"{WFC}/WebFormsForCore.Configuration/WebFormsForCore.Configuration.csproj",
     "Microsoft.Web.Infrastructure": f"{WFC}/WebFormsForCore.Web.Infrastructure/WebFormsForCore.Web.Infrastructure.csproj",
 }
@@ -37,7 +36,9 @@ PROJECT_MAP["System.Web.DataVisualization"] = f"{WFC}/WebFormsForCore.Web.DataVi
 # Temporary: Katana comes from NuGet (net45, restores with NU1701) until it is lifted.
 # Versions checked on nuget.org 29 Oct 2026 (Microsoft.Owin latest is 4.2.3; the handoff's 4.2.2 was from memory).
 PACKAGE_MAP = {"System.Runtime.Caching": ("System.Runtime.Caching", "10.0.14"),
-               "Microsoft.Owin": ("Microsoft.Owin", "4.2.3"), "Owin": ("Owin", "1.0.0")}
+               "Microsoft.Owin": ("Microsoft.Owin", "4.2.3"), "Owin": ("Owin", "1.0.0"),
+               # drawingForCore's package (#53); lift_project.py writes its version as $(DrawingForCoreVersion).
+               "System.Drawing": ("drawingForCore", "$(DrawingForCoreVersion)")}
 # Types that were in .NET Framework's System.dll but are a separate package on modern .NET.
 # Every Web Stack project references "System", so every generated project gets these.
 SYSTEM_DLL_PACKAGES = [("System.CodeDom", "10.0.14")]

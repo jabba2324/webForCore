@@ -35,18 +35,23 @@ For an AI agent doing the migration, the same procedure is written as instructio
 
 ## 1. Get webForCore
 
-**From the packages (simplest).** Each release on GitHub
-([Releases](https://github.com/jabba2324/webForCore/releases)) has webForCore's NuGet packages attached; they aren't
-on nuget.org. Download them into a folder (for example `packages/` next to the solution) and add it as a package
-source in the solution's `nuget.config`:
+**From the packages (simplest).** webForCore's NuGet packages aren't on nuget.org. From 0.7.0 they are on a NuGet
+feed on GitHub Pages, and System.Drawing comes from [drawingForCore](https://github.com/jabba2324/drawingForCore)'s
+feed, which the `webForCore` package depends on. Add both as package sources in the solution's `nuget.config`:
 
 ```xml
 <configuration>
   <packageSources>
-    <add key="webForCore" value="packages" />
+    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+    <add key="webForCore" value="https://jabba2324.github.io/webForCore/index.json" />
+    <add key="drawingForCore" value="https://jabba2324.github.io/drawingForCore/index.json" />
   </packageSources>
 </configuration>
 ```
+
+The feed keeps the latest five releases. Every release's packages are also attached to it on GitHub
+([Releases](https://github.com/jabba2324/webForCore/releases)); 0.6.0 and earlier are only there (download them into a
+folder and add the folder as a package source; they include System.Drawing as `webForCore.Drawing`).
 
 Then reference `webForCore` (System.Web and the assemblies every app needs, plus the build targets) and the packages
 for the frameworks the app uses (section 3). The package route needs no `<Import>` of `webForCore.WebStack.targets`:
@@ -130,11 +135,12 @@ Two differences from .NET Framework projects come up when converting:
 ## 3. References
 
 Remove the .NET Framework references and Microsoft's ASP.NET NuGet packages. With the packages, add
-`<PackageReference Include="webForCore" Version="0.6.0" />` (the "Always" set below) and, for the frameworks the app
+`<PackageReference Include="webForCore" Version="0.7.0" />` (the "Always" set below) and, for the frameworks the app
 uses, the package of the same name with the `src/` folder's `webForCore.System.`/`webForCore.` prefix replaced by
 `webForCore.` (`webForCore.Web.Mvc`, `webForCore.Web.Http.WebHost`, `webForCore.Microsoft.AspNet.SignalR.SystemWeb`,
 `webForCore.Microsoft.Owin.Security.Cookies`, `webForCore.Web.Optimization`, ...).
-From source, add project references to the fork. Everything an app needs:
+From source, add project references to the fork. System.Drawing then comes with System.Web, as drawingForCore's
+packages, so the app's `nuget.config` needs drawingForCore's feed (above). Everything an app needs:
 
 | Always | Project (under `webForCore/src/`) |
 | --- | --- |
@@ -145,7 +151,6 @@ From source, add project references to the fork. Everything an app needs:
 | Microsoft.Web.Infrastructure | `WebFormsForCore.Web.Infrastructure/...` |
 | System.Web.RegularExpressions | `WebFormsForCore.Web.RegularExpressions/...` |
 | BinaryFormatter port (session, view state) | `WebFormsForCore.Serialization.Formatters/...` |
-| System.Drawing | `WebFormsForCore.Drawing/...` |
 | Run-time compiler | `WebFormsForCore.Compilers/...` |
 | System.Web.DynamicData (data controls with `ItemType` load it) | `WebFormsForCore.Web.DynamicData/...` |
 
@@ -226,7 +231,7 @@ These came up migrating real applications; each names one that needed it.
   `MembershipUser` and has `using System.Web.Security;` gets `CS0104: 'MembershipUser' is an ambiguous reference`
   (MVCForum). Keep it out of that library's compilation, as it was:
   ```xml
-  <PackageReference Include="webForCore.Web.ApplicationServices" Version="0.6.0" ExcludeAssets="compile" />
+  <PackageReference Include="webForCore.Web.ApplicationServices" Version="0.7.0" ExcludeAssets="compile" />
   ```
 - **A package's .NET Standard build can have less than its `net45` build** (#31). NuGet picks the .NET Standard build
   for .NET 10, and some packages built it with a smaller API. WindowsAzure.Storage 9.x has no synchronous blob methods

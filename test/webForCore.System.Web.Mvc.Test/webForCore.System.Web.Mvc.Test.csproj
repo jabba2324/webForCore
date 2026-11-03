@@ -328,7 +328,6 @@
 
   <ItemGroup>
     <ProjectReference Include="../../src/WebFormsForCore.Configuration/WebFormsForCore.Configuration.csproj" />
-    <ProjectReference Include="../../src/WebFormsForCore.Drawing/WebFormsForCore.Drawing.csproj" />
     <ProjectReference Include="../../src/WebFormsForCore.Web/WebFormsForCore.Web.csproj" />
     <ProjectReference Include="../../src/WebFormsForCore.Web.Extensions/WebFormsForCore.Web.Extensions.csproj" />
     <ProjectReference Include="../../src/webForCore.System.Web.Http/webForCore.System.Web.Http.csproj" />
@@ -339,6 +338,7 @@
     <ProjectReference Include="../webForCore.Microsoft.TestCommon/webForCore.Microsoft.TestCommon.csproj" />
     <ProjectReference Include="../webForCore.System.Web.Razor.Test/webForCore.System.Web.Razor.Test.csproj" />
     <ProjectReference Include="../../src/WebFormsForCore.Serialization.Formatters/WebFormsForCore.Serialization.Formatters.csproj" />
+    <PackageReference Include="drawingForCore" Version="$(DrawingForCoreVersion)" />
     <PackageReference Include="System.CodeDom" Version="10.0.14" />
     <PackageReference Include="System.Runtime.Caching" Version="10.0.14" />
     <PackageReference Include="Castle.Core" Version="5.2.1" />

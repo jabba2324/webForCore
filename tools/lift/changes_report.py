@@ -13,9 +13,6 @@ import sys
 CHECKOUTS = {  # manifest repository name -> (checkout directory, GitHub repository)
     "aspnet/AspNetWebStack": ("AspNetWebStack", "aspnet/AspNetWebStack"),
     "aspnet/AspNetKatana": ("AspNetKatana", "aspnet/AspNetKatana"),
-    "dotnet/runtime": ("dotnet-runtime-6.0", "dotnet/runtime"),
-    "dotnet/arcade": ("arcade-6.0", "dotnet/arcade"),
-    "dotnet/runtime-assets": ("runtime-assets", "dotnet/runtime-assets"),
     "mono/mono": ("mono", "mono/mono"),
     "identity": ("AspNetIdentity", "aspnet/AspNetIdentity"),
     "signalr": ("SignalR", "SignalR/SignalR"),

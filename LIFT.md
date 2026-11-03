@@ -1096,108 +1096,12 @@ Tests:
   over WebSockets, Server-Sent Events and long polling, and `/signalr/hubs`; script and style bundles rendered, served
   concatenated and minified.
 
-### System.Drawing on libgdiplus: tried and rejected (30 Oct 2026)
+### System.Drawing (30 Oct 2026; moved to drawingForCore on 2 Nov 2026)
 
-System.Drawing.Common 6.0 (the last version with a Unix implementation) over libgdiplus 6.2 (Fedora) on .NET 11, with
-`System.Drawing.EnableUnixSupport`. Drawing, text, PNG/JPEG/GIF and resizing work, and 79 of the 137 WebImage and Chart
-tests that ran passed. But **libgdiplus corrupts the heap and aborts the process** (`double free or corruption`) when a
-24bpp or 32bppRgb bitmap that has been drawn on is rotated by 90 or 270 degrees. A JPEG loads as 24bpp, so WebImage's
-resize-then-rotate takes down the whole server (2 tests). It reproduces in a 6-line program. A native crash can't be
-contained by a PseudoAppDomain, and the library parses untrusted images. Not adopted. The other failures were the fork's
-DataVisualization resources (19), Windows paths in the tests (9), missing Windows fonts (6) and save-path errors.
-Next: a SkiaSharp-based System.Drawing, measured by the same 136 tests (below).
-
-### System.Drawing on SkiaSharp (30 Oct 2026)
-
-`src/webForCore.System.Drawing.Common` replaces the System.Drawing.Common package (Windows only since .NET 7) for the
-whole fork (System.Web, System.Drawing, DataVisualization, AjaxControlToolkit and everything built on them). It is
-built by `tools/lift/lift_drawing.py`:
-- **Microsoft's code, unchanged except as listed:** System.Drawing.Common 6.0 (dotnet/runtime release/6.0), the
-  csproj's own file list for a Unix build (199 files). That keeps the public API, argument validation, exceptions and
-  .NET Framework-compatible behaviour of `Bitmap`, `Graphics`, `Image`, `Font`, `Icon`, ... The assembly keeps
-  System.Drawing.Common's name and public key token, so references (and the shared framework's System.Drawing facade)
-  resolve to it.
-- **GDI+ in managed code on SkiaSharp** instead of libgdiplus: every `[DllImport("libgdiplus")]` (556 GDI+ flat API
-  functions) becomes a call to `SkiaGdiPlus` (`tools/lift/additions/System.Drawing.Common/`), which implements 516 of
-  them; the rest return GDI+'s NotImplemented status (generated stubs).
-- **Lift fixups:** LibraryResolver no longer requires `System.Drawing.EnableUnixSupport` (it still loads libcups for
-  printing); `ImageFormatConverter` throws NotSupportedException for an unknown name, as .NET Framework did (.NET Core
-  3.0+ throws FormatException; Microsoft's System.Web.Helpers relies on the 4.8 behaviour).
-
-The engine:
-- **Images:** pixels as premultiplied BGRA (what Skia draws into), with the GDI+ pixel format kept apart and applied at
-  the edges (LockBits, GetPixel, saving), so drawing never depends on it. GDI+'s reported formats (24bpp for JPEG,
-  8bpp indexed for GIF, 32bppRgb for 32-bit BMP...), palettes, resolution, EXIF property items (read and written),
-  GIF frames, delays and loop count, multi-page TIFF.
-- **Codecs:** Skia decodes BMP, GIF, ICO, JPEG and PNG and encodes JPEG and PNG; webForCore's own code does what Skia
-  cannot: BMP, GIF (halftone palette, LZW) and TIFF encoders, a baseline TIFF reader (none/LZW/PackBits; grey, palette,
-  RGB, RGBA), EXIF and the GDI+ codec list. Formats GDI+ cannot read (WebP...) are rejected as on Windows.
-- **Graphics:** an SKCanvas with GDI+'s state: world, page (unit and scale) and container transforms, device-space
-  clipping, Save/Restore, smoothing, compositing and interpolation modes, and GDI+'s pixel-centre convention
-  (PixelOffsetMode None puts pixel centres on integer coordinates; Skia's are at +0.5). DrawImage at physical size
-  (resolution), source units, parallelograms, ImageAttributes.
-- **Brushes, pens, paths, regions:** solid, hatch (8x8 patterns, the common styles exact), linear gradients
-  (blends, preset colours, sigma/linear shapes, wrap modes, transforms), path gradients (drawn as GDI+ defines them,
-  centre to boundary colours, as a vertex mesh), textures; pen widths, units, dash styles and caps, joins, anchor caps;
-  GDI+ path data (arcs, ellipses and cardinal curves as GDI+'s Béziers), flatten, widen, warp, iterators; regions on
-  Skia path operations.
-- **Text:** families resolve through fontconfig; the Windows core fonts map to installed metric-compatible ones
-  (Arial, Times New Roman, Courier New to Liberation; Calibri, Cambria to Carlito, Caladea) and keep their names, as
-  libgdiplus did; GDI+-style layout: 1/6 em padding (not for GenericTypographic), word wrap, alignment, trimming,
-  hotkey prefixes, character ranges, AddString.
-- **ImageAttributes:** remap tables, colour keys, colour matrices (with grey modes), threshold, gamma, output channel,
-  per adjust type, applied exactly on the CPU.
-
-Not implemented: metafiles (EMF/WMF), X11/macOS surfaces,
-SaveAdd (multi-frame saving), the encoder parameter list, pen compound arrays and alignment, path-gradient blends and
-focus scales, ICC profiles, JPEG-compressed or tiled TIFF. Text: no font fallback for characters a font lacks, no
-bidirectional or vertical layout, tabs as four spaces.
-
-Also: `src/WebFormsForCore.Web.DataVisualization/Common/SR.resx`, the chart strings, from dotnet/winforms-datavisualization
-(MIT; 1,288 of the 1,290 keys, the others are Windows Forms accessibility switches). Without them every Chart threw
-MissingManifestResourceException.
-
-Tests: System.Web.Helpers.Test's 136 WebImage and Chart tests run (they were skipped). WebImageTest's Windows paths
-(`x:\file.jpg`, rooted on Windows only) become Linux-rooted, and ChartTest strips a drive letter only if there is one
-(test data, `RE_TRANSFORMS`). **Result: 418/418** (was 279 passed, 136 skipped). With libgdiplus: 79 of 137 passed and
-the process crashed.
-
-### System.Drawing.Common's own tests (30 Oct 2026)
-
-`tools/lift/lift_drawing_tests.py` lifts Microsoft's System.Drawing.Common 6.0 test suite (90 files) with what it needs:
-TestUtilities (PlatformDetection, AssertExtensions) from dotnet/runtime, Microsoft.DotNet.XUnitExtensions and
-RemoteExecutor from dotnet/arcade release/6.0 (built from source instead of the dotnet-eng feed), and the test data
-from dotnet/runtime-assets release/6.0. Test files are unchanged. The suite's "is GDI+ available" checks probe for
-libgdiplus and screen out old libgdiplus builds (by version, and on RedHat/Fedora/openSUSE); those four checks answer
-for SkiaGdiPlus instead (fixups in the script). Selection is upstream's (`category!=failing` on Linux).
-
-Result (tools/lift/test-results, round 11): **3,716 of 3,883 pass** in Microsoft's Linux selection; of the 151
-failures, 141 are metafiles, 8 are deliberate differences from libgdiplus or .NET Core (listed there), 1 compares
-against Windows' pixels and 1 is premultiplied-alpha rounding. Of the 1,008 tests Microsoft disabled on Unix because
-libgdiplus failed them, 560 pass. The first run had 563 failures in the Linux selection.
-
-Engine changes the suite drove, each following Windows GDI+ as the tests record it:
-- **Lift:** `static extern unsafe` imports were not rewritten (GdipGetMatrixElements(float*) still called libgdiplus).
-  Every Graphics function now returns ObjectBusy while the Graphics' HDC is out (generated in the lift).
-- **Pixels:** the GDI+-to-Skia shift is 0.5 - 1/32, not 0.5: Skia's aliased rasterizer rounds an edge on a pixel
-  centre the other way from GDI+, which put fills, clips and even-width pens one pixel off. Aliased 1 px lines cover
-  both end pixels.
-- **Matrix:** IsIdentity within 0.0001; finite overflow saturates at float.MaxValue (infinities stay); non-finite
-  matrices are not invertible; invalid MatrixOrder is rejected (on brushes and pens Multiply treats it as Append and
-  rejects non-invertible matrices); world transforms stay invertible.
-- **LinearGradientBrush:** GDI+'s model, a horizontal gradient across the rectangle mapped by the brush transform; the
-  constructor's angle is in Transform (rotation about the centre, scaled to span the corners).
-- **Graphics:** BeginContainer resets the settings and clip (the outer clip becomes the container's), folds the page
-  transform into the container and rejects World/Display units; DrawImage rejects World/Display source units and
-  overflows past GDI+'s 28.4 fixed-point range.
-- **Handles:** HDC, HICON, HBITMAP and HRGN are handles (libgdiplus's convention, which System.Drawing's Unix code
-  assumes); region data is written and read in GDI+'s format (one node per region; any node tree is read).
-- **Images:** ImageFlags as GDI+ (memory bitmaps HasAlpha only; HasRealDpi only when the file states a resolution;
-  JPEG's colour space), icons decode the image nearest 16x16, PNG/TIFF write alpha unless the format has none
-  (32bppRgb keeps it), default palette flags, missing files are ArgumentException.
-- **Validation and details:** custom line caps, pen caps and dash patterns, path reverse markers and warp, region
-  normalisation and half-open containment, MeasureCharacterRanges ranges and negative layouts, ImageAttributes flags,
-  path-gradient bounds, surround colours and 256/511-point sigma blends, ToLogFont's charset, codec masks.
+System.Drawing.Common 6.0 on libgdiplus was tried and rejected; it was then lifted here with a GDI+ engine written on
+SkiaSharp, together with Microsoft's tests for it. All of that, and its history, is now in
+[drawingForCore](https://github.com/jabba2324/drawingForCore) (its `LIFT.md`); see "System.Drawing moves to
+drawingForCore" below.
 
 ## Protected configuration, the integrated pipeline and precompiled sites (30 Oct 2026)
 
@@ -2178,3 +2082,39 @@ source port** (`HttpRuntime.cs`), back to the reference source's own lines. Off 
 subdirectories for renames is one inotify watch per directory (`fs.inotify.max_user_watches`). **Test:**
 `RecyclingTests.BinAndAppCodeChangesRestartTheApplication` (a file written in `bin_dotnet`; `App_Code/DomainState.cs`
 touched), each needing a new worker process.
+
+## System.Drawing moves to drawingForCore (2 Nov 2026)
+
+System.Drawing is no longer built here (#53). [drawingForCore](https://github.com/jabba2324/drawingForCore) lifts the
+same System.Drawing.Common 6.0, engine and tests with the same scripts, and its CI runs the suite on Linux and
+Windows with the same results (3,882 tests in CI, 151 known failures). It publishes `drawingForCore.Common`
+(System.Drawing.Common) and `drawingForCore` (System.Drawing) as NuGet packages on a feed on GitHub Pages
+(https://jabba2324.github.io/drawingForCore/index.json): 0.1.0 for .NET 11, then 0.2.0, the `net10.0` build webForCore
+uses since it moved to .NET 10 LTS (above).
+
+- **Removed:** `src/webForCore.System.Drawing.Common`, `src/WebFormsForCore.Drawing`,
+  `test/webForCore.System.Drawing.Common.Tests` and the three test projects only it used (`TestUtilities`,
+  `Microsoft.DotNet.XUnitExtensions`, `Microsoft.DotNet.RemoteExecutor`); `lift_drawing.py`, `lift_drawing_tests.py`,
+  the engine in `tools/lift/additions/System.Drawing.Common`, their manifests, the known-failures list,
+  `check_failures.py`, `fetch-test-fonts.sh` and CI's font step. `docs/lifted-changes.md`: 4,085 files lifted (was
+  4,517), 254 changed (was 265).
+- **References:** the 17 projects that referenced `src/WebFormsForCore.Drawing` reference the `drawingForCore` package,
+  and System.Web references `drawingForCore.Common`, at `$(DrawingForCoreVersion)` (`Directory.Build.props`).
+  `nuget.config` adds drawingForCore's feed, and so do the three projects that reference it and set
+  `RestoreSources` (AspNetCompiler, Configuration, TestApp) and the package smoke test's `nuget.config`. `lift_project.py`, `gen_csproj.py` and `lift_mono_tests.py` write the package reference
+  (lifting System.Web.Helpers and System.Web.Mvc.Test again gives the committed files).
+- **One definition of each type:** the fork's System.Drawing defined `FontConverter`, `ToolboxBitmapAttribute` and
+  `BitmapSuffixInSatelliteAssemblyAttribute`, which System.Drawing.Common also defines, so the projects that saw both
+  hid one behind an extern alias. drawingForCore's System.Drawing forwards them instead. The compiler finds no type
+  through a forward, so System.Web's reference to System.Drawing.Common is now `Aliases="global,Common"` (the lifted
+  ResX code keeps `Common::`), Web.Extensions no longer gives System.Drawing.Common the alias `Core`, and DynamicData
+  no longer drops it. DataVisualization keeps `Aliases="WfcDrawing"` on System.Drawing.
+- **A local checkout:** `-p:DrawingForCoreSource=<checkout>` (`Directory.Build.targets`) turns each drawingForCore
+  package reference into a reference to the checkout's project, keeping its aliases.
+- **Feed:** `.github/workflows/feed.yml` publishes webForCore's own feed
+  (https://jabba2324.github.io/webForCore/index.json) after each release, as drawingForCore's does: Sleet builds a static NuGet v3 feed from the latest five releases'
+  packages and deploys it to GitHub Pages.
+- **Tests:** System.Web.Helpers.Test (WebImage, Chart) 418 of 418 and System.Web.MonoTests 2,628 of 2,634 (6
+  skipped), as before; the System.Drawing.Common.dll they load is the package's. The full run is CI's.
+- **Not caused by this:** locally, `WebFormsForCore.TestApp` fails to build because NuGet's global cache holds
+  upstream's WebFormsForCore.Build 1.7.0-rc3 from nuget.org, whose designer task starts `dotnet.exe`. CI builds it.

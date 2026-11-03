@@ -17,7 +17,7 @@ in the code; the rest are from `LIFT.md`.
 - [ASP.NET Web API (lifted)](#aspnet-web-api-lifted)
 - [OWIN / Katana (lifted)](#owin--katana-lifted)
 - [SignalR 2 and ASP.NET Identity 2 (lifted)](#signalr-2-and-aspnet-identity-2-lifted)
-- [System.Drawing (lifted, new engine)](#systemdrawing-lifted-new-engine)
+- [System.Drawing (drawingForCore)](#systemdrawing-drawingforcore)
 - [Other assemblies](#other-assemblies)
 
 ## Summary of what doesn't work
@@ -216,11 +216,13 @@ HttpListener host uses Katana's Mono code paths. `HostString` accepts hosts that
 | Microsoft.AspNet.SignalR.Client 2.4.3 | `Microsoft.AspNet.SignalR.Client` (+ `.Hubs`, `.Http`, `.Transports`) | The JavaScript client is the app's own script, unchanged |
 | Microsoft.AspNet.Identity.Core / .EntityFramework / .Owin 2 | `Microsoft.AspNet.Identity`, `.EntityFramework`, `.Owin` | On Entity Framework 6.5; LocalDB is Windows only, so use SQL Server or another provider. Token providers use the DPAPI emulation |
 
-## System.Drawing (lifted, new engine)
+## System.Drawing (drawingForCore)
 
-System.Drawing.Common 6.0 (Microsoft's managed code) over a GDI+ engine written on SkiaSharp. Namespaces
-`System.Drawing`, `.Drawing2D`, `.Imaging`, `.Printing`, `.Text`, `.Design`. The `System.Drawing` assembly
-(`src/WebFormsForCore.Drawing`) forwards .NET Framework's System.Drawing types to it.
+System.Drawing.Common 6.0 (Microsoft's managed code) over a GDI+ engine written on SkiaSharp, from
+[drawingForCore](https://github.com/jabba2324/drawingForCore)'s packages (`drawingForCore`, `drawingForCore.Common`),
+which the `webForCore` package depends on. Namespaces `System.Drawing`, `.Drawing2D`, `.Imaging`, `.Printing`, `.Text`,
+`.Design`. The `System.Drawing` assembly forwards .NET Framework's System.Drawing types to it. drawingForCore's README
+has the full list of what works.
 
 Caveats:
 - **Not implemented:** metafiles (EMF/WMF); multi-frame saving (`SaveAdd`); `GetEncoderParameterList`; graphics on

@@ -41,7 +41,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\WebFormsForCore.Drawing\WebFormsForCore.Drawing.csproj" />
+      <PackageReference Include="drawingForCore" Version="$(DrawingForCoreVersion)" />
       <ProjectReference Include="..\WebFormsForCore.Web.Extensions\WebFormsForCore.Web.Extensions.csproj" />
       <ProjectReference Include="..\WebFormsForCore.Web\WebFormsForCore.Web.csproj" />
     </ItemGroup>
@@ -54,7 +54,6 @@
             <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Web' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'(?i)[\\/]microsoft\.netcore\.app\.ref[\\/]'))" />
             <!-- Do not import System.Drawing from dotnet -->
             <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Drawing' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'(?i)[\\/]microsoft\.netcore\.app\.ref[\\/]'))" />
-            <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Drawing.Common'" />
         </ItemGroup>
     </Target>
 

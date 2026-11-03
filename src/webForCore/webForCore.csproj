@@ -33,7 +33,7 @@
     <ProjectReference Include="..\WebFormsForCore.Net.Http.WebRequest\WebFormsForCore.Net.Http.WebRequest.csproj" />
     <ProjectReference Include="..\WebFormsForCore.Web.RegularExpressions\WebFormsForCore.Web.RegularExpressions.csproj" />
     <ProjectReference Include="..\WebFormsForCore.Serialization.Formatters\WebFormsForCore.Serialization.Formatters.csproj" />
-    <ProjectReference Include="..\WebFormsForCore.Drawing\WebFormsForCore.Drawing.csproj" />
+    <PackageReference Include="drawingForCore" Version="$(DrawingForCoreVersion)" />
     <ProjectReference Include="..\WebFormsForCore.Compilers\WebFormsForCore.Compilers.csproj" />
     <!-- System.Web loads System.Web.DynamicData for every data control with ItemType (EnableDynamicData), as on .NET
          Framework, where it is in the GAC (#8). -->

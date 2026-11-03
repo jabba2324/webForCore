@@ -13,20 +13,20 @@ legal advice: for a product decision, have counsel review NOTICE and this page.
 
 | Part | Where | Licence | Commercial use |
 | --- | --- | --- | --- |
-| webForCore's own code (hosting layer, IIS modules, webforcore-host, DPAPI emulation, System.Drawing engine, Microsoft.Web.Infrastructure, generated resource accessors, tools, docs, tests) | throughout; files marked `webForCore` | MIT | ✅ Yes |
+| webForCore's own code (hosting layer, IIS modules, webforcore-host, DPAPI emulation, Microsoft.Web.Infrastructure, generated resource accessors, tools, docs, tests) | throughout; files marked `webForCore` | MIT | ✅ Yes |
 | WebFormsForCore's port of System.Web, System.Configuration, System.Web.ApplicationServices, System.Web.Extensions, System.Web.Services, Mobile, DataVisualization and aspnet_compiler, from Microsoft's .NET Framework Reference Source | `src/WebFormsForCore.*` (originals copied by the lift scripts are under `ReferenceSource/` folders) | MIT (Microsoft's Reference Source; port © Simon Jakob Egli) | ✅ Yes |
 | ASP.NET MVC 5, Web API 2, Web Pages, Razor, Helpers, CORS, MVC Futures | `src/webForCore.System.Web.*`, `src/webForCore.System.Net.Http.Formatting`, `src/webForCore.Microsoft.Web.Mvc` | Apache 2.0 (© .NET Foundation) | ✅ Yes |
 | Katana (Microsoft.Owin and friends) | `src/webForCore.Microsoft.Owin*` | Apache 2.0 (© .NET Foundation) | ✅ Yes |
 | SignalR 2 | `src/webForCore.Microsoft.AspNet.SignalR.*` | Apache 2.0 (© .NET Foundation) | ✅ Yes |
 | ASP.NET Identity 2 | `src/webForCore.Microsoft.AspNet.Identity.*` | MIT (© Microsoft) | ✅ Yes |
-| System.Drawing.Common 6.0 | `src/webForCore.System.Drawing.Common` | MIT (© .NET Foundation) | ✅ Yes |
 | ResX reader and writer (from dotnet/winforms) | `src/WebFormsForCore.Web/WebFormsForCore/System.Resources/winforms` | MIT (© .NET Foundation) | ✅ Yes |
 | StronglyTypedResourceBuilder (from Mono); Mono code in System.Web, WebGrease and the SoapFormatter | `src/WebFormsForCore.Web/WebFormsForCore/mono` and others | MIT (© Novell and others) | ✅ Yes |
-| BinaryFormatter port, FontConverter (from .NET) | `src/WebFormsForCore.Serialization.Formatters`, `src/WebFormsForCore.Drawing` | MIT (© .NET Foundation) | ✅ Yes |
+| BinaryFormatter port (from .NET) | `src/WebFormsForCore.Serialization.Formatters` | MIT (© .NET Foundation) | ✅ Yes |
 | ASP.NET Web Optimization, WebGrease, Microsoft Ajax Minifier | `src/WebFormsForCore.Web.Optimization*`, `src/WebFormsForCore.WebGrease` | Apache 2.0 (© Microsoft) | ✅ Yes |
 | Redesigner (build-time designer file generator) | `src/WebFormsForCore.Build/Redesigner` | BSD 3-Clause (© Sean Werkema) | ✅ Yes |
 | Roslyn compilers (binaries) | `src/WebFormsForCore.Compilers` | MIT (© .NET Foundation) | ✅ Yes |
-| Dependencies from NuGet: SkiaSharp, EntityFramework 6, Newtonsoft.Json, CoreWCF, System.Data.SqlClient, ... | restored at build time | MIT or Apache 2.0, each package's own | ✅ Yes |
+| System.Drawing and System.Drawing.Common 6.0 with a GDI+ engine on SkiaSharp: [drawingForCore](https://github.com/jabba2324/drawingForCore)'s packages | restored at build time | MIT (© .NET Foundation and drawingForCore's contributors) | ✅ Yes |
+| Dependencies from NuGet: EntityFramework 6, Newtonsoft.Json, CoreWCF, System.Data.SqlClient, ... | restored at build time | MIT or Apache 2.0, each package's own | ✅ Yes |
 | Tests lifted from Microsoft and Mono | `test/webForCore.*` | Apache 2.0 or MIT | ✅ Yes (not shipped in packages) |
 
 ### What the permissive licences ask of you
@@ -42,9 +42,8 @@ satisfies all three. None of the three requires you to release your own source c
 **Trademarks** aren't licensed: don't present your product as Microsoft's or as "ASP.NET", even though the
 assemblies keep Microsoft's names for compatibility.
 
-The test suites need two things that aren't in the repository: the System.Drawing test fonts, which
-`tools/ci/fetch-test-fonts.sh` downloads (their licence text forbids redistribution), and SQL Server for the Identity
-tests, which runs as a container (Developer edition, not shipped).
+The test suites need one thing that isn't in the repository: SQL Server for the Identity tests, which runs as a
+container (Developer edition, not shipped).
 
 ## What was replaced
 

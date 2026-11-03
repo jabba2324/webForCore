@@ -4,7 +4,7 @@
         <netlatest>net10.0</netlatest>
 
         <LangVersion>14</LangVersion>
-        <Version>0.6.0</Version>
+        <Version>0.7.0</Version>
         <AssemblyVersion>11.0.0.0</AssemblyVersion>
         <AssemblyFileVersion>11.0.0.0</AssemblyFileVersion>
         <FileVersion>11.0.0.0</FileVersion>
@@ -17,11 +17,16 @@
         <RepositoryUrl>https://github.com/jabba2324/webForCore</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+        <!-- System.Drawing and System.Drawing.Common: drawingForCore's packages (https://github.com/jabba2324/drawingForCore,
+             feed in nuget.config). -p:DrawingForCoreSource=<checkout> builds a local checkout's projects instead
+             (Directory.Build.targets). -->
+        <DrawingForCoreVersion>0.2.0</DrawingForCoreVersion>
     </PropertyGroup>
 
     <!-- webForCore: a package's licence follows its code's origin (NOTICE). Lifted ASP.NET Web Stack, Katana and SignalR
-         projects are Apache-2.0; ASP.NET Identity and System.Drawing.Common are MIT, as is WebFormsForCore's own code. -->
-    <PropertyGroup Condition="$(MSBuildProjectName.StartsWith('webForCore.')) And !$(MSBuildProjectName.StartsWith('webForCore.Microsoft.AspNet.Identity')) And !$(MSBuildProjectName.StartsWith('webForCore.System.Drawing.Common'))">
+         projects are Apache-2.0; ASP.NET Identity is MIT, as is WebFormsForCore's own code. -->
+    <PropertyGroup Condition="$(MSBuildProjectName.StartsWith('webForCore.')) And !$(MSBuildProjectName.StartsWith('webForCore.Microsoft.AspNet.Identity'))">
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     </PropertyGroup>
 </Project>

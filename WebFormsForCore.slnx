@@ -24,9 +24,6 @@
   <Project Path="src/WebFormsForCore.Configuration/WebFormsForCore.Configuration.csproj">
     <BuildDependency Project="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
   </Project>
-  <Project Path="src/WebFormsForCore.Drawing/WebFormsForCore.Drawing.csproj">
-    <BuildDependency Project="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
-  </Project>
   <Project Path="src/WebFormsForCore.Serialization.Formatters/WebFormsForCore.Serialization.Formatters.csproj">
     <BuildDependency Project="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
   </Project>
@@ -91,7 +88,6 @@
     <Project Path="src/webForCore.System.Web.WebPages.Razor/webForCore.System.Web.WebPages.Razor.csproj" />
     <Project Path="src/webForCore.System.Web.Mvc/webForCore.System.Web.Mvc.csproj" />
     <Project Path="src/webForCore.System.Web.Helpers/webForCore.System.Web.Helpers.csproj" />
-    <Project Path="src/webForCore.System.Drawing.Common/webForCore.System.Drawing.Common.csproj" />
     <Project Path="src/webForCore.Microsoft.Owin.Cors/webForCore.Microsoft.Owin.Cors.csproj" />
     <Project Path="src/webForCore.Microsoft.AspNet.SignalR.Core/webForCore.Microsoft.AspNet.SignalR.Core.csproj" />
     <Project Path="src/webForCore.Microsoft.AspNet.SignalR.SystemWeb/webForCore.Microsoft.AspNet.SignalR.SystemWeb.csproj" />
@@ -116,10 +112,6 @@
     <Project Path="test/webForCore.Microsoft.AspNet.SignalR.Tests.Common/webForCore.Microsoft.AspNet.SignalR.Tests.Common.csproj" />
     <Project Path="test/webForCore.Microsoft.AspNet.SignalR.Tests/webForCore.Microsoft.AspNet.SignalR.Tests.csproj" />
     <Project Path="test/webForCore.Identity.Test/webForCore.Identity.Test.csproj" />
-    <Project Path="test/webForCore.Microsoft.DotNet.XUnitExtensions/webForCore.Microsoft.DotNet.XUnitExtensions.csproj" />
-    <Project Path="test/webForCore.Microsoft.DotNet.RemoteExecutor/webForCore.Microsoft.DotNet.RemoteExecutor.csproj" />
-    <Project Path="test/webForCore.TestUtilities/webForCore.TestUtilities.csproj" />
-    <Project Path="test/webForCore.System.Drawing.Common.Tests/webForCore.System.Drawing.Common.Tests.csproj" />
     <Project Path="test/webForCore.System.Net.Http.Formatting.Test/webForCore.System.Net.Http.Formatting.Test.csproj" />
     <Project Path="test/webForCore.System.Web.Razor.Test/webForCore.System.Web.Razor.Test.csproj" />
     <Project Path="test/webForCore.System.Web.Http.Test/webForCore.System.Web.Http.Test.csproj" />

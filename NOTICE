@@ -26,13 +26,6 @@ Summary
   ASP.NET SignalR 2.4.3                       src|test/webForCore.Microsoft.AspNet.SignalR* Apache-2.0 (.NET Foundation)
   ASP.NET Identity 2                          src/webForCore.Microsoft.AspNet.Identity.*,   MIT (Microsoft)
                                               test/webForCore.Identity.Test
-  System.Drawing.Common 6.0 and its tests     src/webForCore.System.Drawing.Common,         MIT (.NET Foundation)
-                                              test/webForCore.System.Drawing.Common.Tests,
-                                              test/webForCore.TestUtilities
-  .NET Arcade (XUnitExtensions,               test/webForCore.Microsoft.DotNet.*            MIT (.NET Foundation)
-    RemoteExecutor)
-  .NET Runtime Assets (test data)             test/webForCore.System.Drawing.Common.Tests/  MIT (.NET Foundation)
-                                              TestData
   Mono System.Web tests                       test/webForCore.System.Web.MonoTests          MIT (Novell, Xamarin and
                                                                                             contributors)
   Mono class library code                     src/WebFormsForCore.Web (Mono.Security,       MIT (Novell, Ximian)
@@ -40,8 +33,8 @@ Summary
                                               ResourceBuilder), Serialization.Formatters
   dotnet/winforms ResX classes                src/WebFormsForCore.Web/WebFormsForCore/      MIT (.NET Foundation)
                                               System.Resources/winforms
-  dotnet/runtime BinaryFormatter, FontConverter src/WebFormsForCore.Serialization.Formatters MIT (.NET Foundation)
-                                              /Serialization, src/WebFormsForCore.Drawing
+  dotnet/runtime BinaryFormatter             src/WebFormsForCore.Serialization.Formatters  MIT (.NET Foundation)
+                                              /Serialization
   SoapFormatter (novotnyllc/SoapFormatter)    src/WebFormsForCore.Serialization.Formatters  MIT (Novell, Ximian,
                                               /SoapFormatter                                Microsoft)
   RoslynCodeDomProvider                       src/WebFormsForCore.Web/WebFormsForCore/      MIT (Microsoft)
@@ -55,8 +48,10 @@ Summary
                                                                                             Mono parts MIT
   Redesigner                                  src/WebFormsForCore.Build/Redesigner          BSD-3-Clause (Sean Werkema)
   JavaScript libraries in the TestApp         Bootstrap, jQuery, Modernizr                  MIT (their authors)
-  SkiaSharp (NuGet), Skia                     package dependency of System.Drawing.Common   MIT (Microsoft, Xamarin);
-                                                                                            BSD-3-Clause (Google)
+  drawingForCore (NuGet): System.Drawing,     package dependency (System.Drawing)           MIT (.NET Foundation,
+    System.Drawing.Common 6.0 on SkiaSharp                                                  drawingForCore
+                                                                                            contributors); see its
+                                                                                            NOTICE
 
 Details
 -------
@@ -108,36 +103,10 @@ per-file source is recorded in tools/lift/manifests/System.Web.MonoTests.tsv.
 Files without their own header (test-helpers/NunitHelpers.cs) are covered by Mono's repository LICENSE, which
 places the class libraries under the MIT License.
 
-This product includes software from .NET (https://github.com/dotnet/runtime, branch release/6.0, commit 76b9680):
-System.Drawing.Common 6.0 (src/libraries/System.Drawing.Common/src and the two Common/src interop files it uses),
-licensed under the MIT License:
-
-    Licensed to the .NET Foundation under one or more agreements.
-    The .NET Foundation licenses this file to you under the MIT license.
-
-It lives in src/webForCore.System.Drawing.Common; each file keeps its original header. The copy is made by
-tools/lift/lift_drawing.py, which lists every change, and the per-file source is recorded in
-tools/lift/manifests/System.Drawing.Common.tsv. The GDI+ engine in SkiaGdiPlus/ (from
-tools/lift/additions/System.Drawing.Common/) is webForCore's own, under the MIT License. The assembly carries
-System.Drawing.Common's public key token (cc7b13ffcd2ddd51) so that references to it resolve; it is not signed by
-Microsoft. It uses SkiaSharp (https://github.com/mono/SkiaSharp, MIT License, Copyright (c) 2015-2016 Xamarin, Inc.,
-Copyright (c) 2017-2018 Microsoft Corporation) and the Skia native library it ships (BSD 3-Clause, Copyright (c)
-2011 Google Inc.).
-
-System.Drawing.Common 6.0's tests (src/libraries/System.Drawing.Common/tests, the Common/tests files they link, and
-src/libraries/Common/tests/TestUtilities with the Common/src interop files it links), from the same dotnet/runtime
-commit and under the same license, live in test/webForCore.System.Drawing.Common.Tests and test/webForCore.TestUtilities.
-They run on Microsoft.DotNet.XUnitExtensions and Microsoft.DotNet.RemoteExecutor from the .NET Arcade SDK
-(https://github.com/dotnet/arcade, branch release/6.0, commit 565a8005, src/Microsoft.DotNet.XUnitExtensions/src and
-src/Microsoft.DotNet.RemoteExecutor/src; test/webForCore.Microsoft.DotNet.XUnitExtensions and
-test/webForCore.Microsoft.DotNet.RemoteExecutor), and use test data from .NET Runtime Assets
-(https://github.com/dotnet/runtime-assets, branch release/6.0, commit 848e27e: System.Drawing.Common.TestData,
-System.ComponentModel.TypeConverter.TestData, System.Windows.Extensions.TestData; in the tests' TestData folder). Both
-are licensed under the MIT License, Copyright (c) .NET Foundation and Contributors. The copy is made by
-tools/lift/lift_drawing_tests.py, which lists every change, and the per-file source is recorded in
-tools/lift/manifests/System.Drawing.Common.Tests.tsv. The test data's fonts (Code New Roman, (c) 2015 TypoStyle Co.)
-are not committed: the font's own licence text both grants the SIL Open Font License 1.1 and forbids redistribution;
-the lift script copies them for local test runs.
+System.Drawing and System.Drawing.Common come from drawingForCore's packages, a package dependency
+(https://github.com/jabba2324/drawingForCore): System.Drawing.Common 6.0 from .NET (MIT License, Copyright (c) .NET
+Foundation and Contributors) with a GDI+ engine on SkiaSharp (MIT License). Its NOTICE lists its components, including
+SkiaSharp and Skia. Up to webForCore 0.6.0 they were built in this repository.
 
 This product includes software from ASP.NET SignalR (https://github.com/SignalR/SignalR, tag 2.4.3, commit
 7f53f26), licensed under the Apache License, Version 2.0 (see LICENSE-APACHE-2.0.txt), Copyright (c) .NET
@@ -170,13 +139,12 @@ Corporation) is the origin of src/WebFormsForCore.Web/WebFormsForCore/CodeDom. T
 src/WebFormsForCore.Compilers (https://github.com/dotnet/roslyn, MIT License, Copyright (c) .NET Foundation and
 Contributors) are redistributed unmodified.
 
-The BinaryFormatter port in src/WebFormsForCore.Serialization.Formatters/Serialization and FontConverter in
-src/WebFormsForCore.Drawing come from .NET (https://github.com/dotnet/runtime, MIT License, Copyright (c) .NET
-Foundation and Contributors). The SoapFormatter in src/WebFormsForCore.Serialization.Formatters/SoapFormatter comes
-from https://github.com/novotnyllc/SoapFormatter, which combines Mono code (MIT License, Copyright (c) 2004 Novell,
-Inc., Ximian) and Reference Source code (MIT License, Microsoft). Mono's MIT-licensed code is also in
-src/WebFormsForCore.Web/WebFormsForCore (ManagedProtection.Mono.cs, ProtectedDataPortable.cs: Copyright (c) 2005
-Novell, Inc., Sebastien Pouliot).
+The BinaryFormatter port in src/WebFormsForCore.Serialization.Formatters/Serialization comes from .NET
+(https://github.com/dotnet/runtime, MIT License, Copyright (c) .NET Foundation and Contributors). The SoapFormatter
+in src/WebFormsForCore.Serialization.Formatters/SoapFormatter comes from https://github.com/novotnyllc/SoapFormatter,
+which combines Mono code (MIT License, Copyright (c) 2004 Novell, Inc., Ximian) and Reference Source code (MIT
+License, Microsoft). Mono's MIT-licensed code is also in src/WebFormsForCore.Web/WebFormsForCore
+(ManagedProtection.Mono.cs, ProtectedDataPortable.cs: Copyright (c) 2005 Novell, Inc., Sebastien Pouliot).
 
 The TestApp (src/WebFormsForCore.TestApp) includes Bootstrap 5.2.3 (MIT, The Bootstrap Authors), jQuery 3.4.1 and
 3.7.1 (MIT, OpenJS Foundation), Modernizr 2.8.3 (MIT) and Microsoft's ASP.NET ScriptManager scripts.

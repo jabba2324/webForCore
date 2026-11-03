@@ -13,7 +13,10 @@ a real application behave more like it did on .NET Framework 4.8 and IIS 10, and
    [smoke test](https://github.com/jabba2324/webForCore-smoke-test) migrate applications that use them. Nothing in
    webForCore depends on it: not its code, packages, tests, CI or documentation. A problem a third-party library has on
    webForCore is fixed in webForCore's own code if it is webForCore's, and otherwise documented with a workaround.
-   NuGet dependencies of Microsoft's libraries (SkiaSharp, Newtonsoft.Json, ...) and build-only tools are fine.
+   NuGet dependencies of Microsoft's libraries (Newtonsoft.Json, ...) and build-only tools are fine, and so is
+   [drawingForCore](https://github.com/jabba2324/drawingForCore) (System.Drawing), which only ships Microsoft's code
+   and its own GDI+ engine. A System.Drawing problem is fixed there; build webForCore against a checkout of it with
+   `-p:DrawingForCoreSource=../drawingForCore` to try the fix here before it is released.
 
 2. **Every change comes with a test.** A fix has a regression test that fails without it and passes with it; a feature
    has tests of its behaviour. Run the test against the code before your change and say in the pull request that it
@@ -28,7 +31,7 @@ a real application behave more like it did on .NET Framework 4.8 and IIS 10, and
    open-source applications and files what breaks; its issues and `FINDINGS.md` are a good source.
 
 4. **Avoid changing Microsoft's code at all costs.** Most of webForCore is Microsoft's own source, lifted unchanged
-   (ASP.NET Web Stack, Katana, SignalR, Identity, System.Drawing) or ported from the .NET Framework reference source
+   (ASP.NET Web Stack, Katana, SignalR, Identity) or ported from the .NET Framework reference source
    (System.Web, System.Configuration). Its value is that it *is* Microsoft's behaviour. Before touching those files,
    look for a fix in webForCore's own code: the hosting layer (`src/WebFormsForCore.Web/WebFormsForCore/AspNetCoreHosting`,
    the IIS modules), the host (`src/WebFormsForCore.Host`), the build targets (`src/webForCore.WebStack.targets`), the lift scripts'
