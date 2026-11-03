@@ -5,11 +5,12 @@
 webForCore runs Web Forms, MVC 5, Web API 2, Web Pages, SignalR 2, OWIN/Katana and ASP.NET Identity 2 apps on
 .NET 10. It is built from Microsoft's own code: System.Web and System.Configuration from the .NET Framework reference
 source (through [WebFormsForCore](https://github.com/webformsforcore/WebFormsForCore), which this project forks), and
-the ASP.NET libraries Microsoft open-sourced. Those libraries are lifted file by file from Microsoft's repositories
-and tested with Microsoft's own test suites. The parts IIS used to provide (request filtering, URL Rewrite, default
-documents, custom errors, compression, logging) run in front of the app on Kestrel and are
-configured from the app's existing `<system.webServer>` section, and `webforcore-host` plays the application pool's
-part: it runs the app in worker processes and recycles them when the app restarts.
+the ASP.NET libraries Microsoft open-sourced. Those libraries are compiled from submodules of Microsoft's repositories
+(cleared-down forks in the [xforcore](https://github.com/xforcore) org) and tested with Microsoft's own test suites.
+The parts IIS used to provide (request filtering, URL Rewrite, default documents, custom errors, compression, logging)
+run in front of the app on Kestrel and are configured from the app's existing `<system.webServer>` section, and
+`webforcore-host` plays the application pool's part: it runs the app in worker processes and recycles them when the
+app restarts.
 
 webForCore ships only Microsoft assemblies, and nothing in it depends on a third-party build of a library.
 
@@ -116,7 +117,7 @@ The full guide is [docs/MIGRATING.md](docs/MIGRATING.md). In outline:
 | --- | --- |
 | [webForCore-smoke-test](https://github.com/xforcore/webForCore-smoke-test) | Real open-source ASP.NET 4.x applications migrated with webForCore's release packages, following [docs/MIGRATING.md](docs/MIGRATING.md), then built, run and probed over HTTP. Its findings become this repository's issues, and its results are in its `RESULTS.md` |
 | [webForCore-thirdparty](https://github.com/xforcore/webForCore-thirdparty) | Builds of third-party libraries for webForCore (WebActivatorEx, WebActivator 1.x, AJAX Control Toolkit), made for the smoke test from webForCore's released packages |
-| [drawingForCore](https://github.com/xforcore/drawingForCore) | System.Drawing.Common 6.0 on .NET 11 for Linux, macOS and Windows, with GDI+ written on SkiaSharp, and Microsoft's tests for it. Moved out of this repository (#53); webForCore uses its packages |
+| [drawingForCore](https://github.com/xforcore/drawingForCore) | System.Drawing.Common 6.0 on .NET 10 for Linux, macOS and Windows, with GDI+ written on SkiaSharp, and Microsoft's tests for it. Moved out of this repository (#53); webForCore uses its packages |
 
 The first two build on webForCore's releases; webForCore doesn't depend on them. webForCore depends on drawingForCore.
 
@@ -147,9 +148,9 @@ and CONTRIBUTING.md rule 5.
 
 webForCore is a fork of [WebFormsForCore](https://github.com/webformsforcore/WebFormsForCore) by Simon Jakob Egli,
 which ported System.Web and its companions from the .NET Framework reference source to .NET and first ran Web Forms
-on ASP.NET Core. webForCore adds the lifted Microsoft libraries and their tests, the IIS layer, the host and its worker processes,
-System.Drawing on SkiaSharp (now [drawingForCore](https://github.com/xforcore/drawingForCore)), and the compatibility work recorded in [LIFT.md](LIFT.md).
+on ASP.NET Core. webForCore adds Microsoft's open-source ASP.NET libraries and their tests, the IIS layer, the host
+and its worker processes, System.Drawing on SkiaSharp (now [drawingForCore](https://github.com/xforcore/drawingForCore)),
+and the compatibility work recorded in [LIFT.md](LIFT.md).
 
-The lifted code is © Microsoft and the .NET Foundation (ASP.NET Web Stack, Katana, SignalR, ASP.NET Identity) and
-the Mono project (System.Web tests). See [NOTICE](NOTICE) for every component, its source
-and its licence.
+The upstream code is © Microsoft and the .NET Foundation (ASP.NET Web Stack, Katana, SignalR, ASP.NET Identity) and
+the Mono project (System.Web tests). See [NOTICE](NOTICE) for every component, its source and its licence.

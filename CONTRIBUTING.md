@@ -5,9 +5,10 @@ a real application behave more like it did on .NET Framework 4.8 and IIS 10, and
 
 ## The principles
 
-1. **Only Microsoft assemblies.** webForCore contains and ships Microsoft's assemblies only: Microsoft's source lifted
-   from its repositories, the port of the .NET Framework reference source, and assemblies with Microsoft's names that
-   webForCore writes in their place (facades, `Microsoft.Web.Infrastructure`, `System.Net.Http.WebRequest`). Builds
+1. **Only Microsoft assemblies.** webForCore contains and ships Microsoft's assemblies only: Microsoft's source built
+   from submodules of its repositories, the port of the .NET Framework reference source, and assemblies with
+   Microsoft's names that webForCore writes in their place (facades, `Microsoft.Web.Infrastructure`,
+   `System.Net.Http.WebRequest`). Builds
    of third-party libraries for webForCore (WebActivatorEx, AjaxControlToolkit) are in
    [webForCore-thirdparty](https://github.com/xforcore/webForCore-thirdparty), which exists only to help the
    [smoke test](https://github.com/xforcore/webForCore-smoke-test) migrate applications that use them. Nothing in
@@ -48,9 +49,9 @@ a real application behave more like it did on .NET Framework 4.8 and IIS 10, and
 ## How webForCore's own code is written
 
 These rules are for the code webForCore writes itself: the hosting layer and the host, the IIS modules, shims and
-facades, build tasks and tools. They don't apply to Microsoft's code that is lifted or ported unchanged (principle 4
-keeps that as it is). The aim is a runtime that is credible and stable: code a reviewer can see is correct, that keeps
-working when .NET is patched, and that fails safely.
+facades, build tasks and tools. They don't apply to Microsoft's code that is built from the submodules or ported
+unchanged (principle 4 keeps that as it is). The aim is a runtime that is credible and stable: code a reviewer can
+see is correct, that keeps working when .NET is patched, and that fails safely.
 
 6. **No reflection into .NET's internals.** Don't read, write or call non-public members of the runtime, the shared
    framework, ASP.NET Core or any other library, and don't depend on their private names or layout. They change in
@@ -78,8 +79,8 @@ working when .NET is patched, and that fails safely.
    fine: JavaScript, TypeScript, CSS, HTML and anything else that runs in the browser (such as the client scripts and
    styles System.Web and the other libraries serve) is part of the product, not tooling.
 
-Code written before rules 6–8 that breaks them is listed in #57, and Python written before rule 9 in #63. Each item is
-removed or replaced when it is next changed. New code doesn't add to either list.
+Code written before rules 6–8 that breaks them is listed in #57. Each item is removed or replaced when it is next
+changed, and new code doesn't add to the list. The Python written before rule 9 was converted to C# or removed (#63).
 
 ## Where tests go
 
@@ -87,7 +88,7 @@ removed or replaced when it is next changed. New code doesn't add to either list
 | --- | --- |
 | Behaviour of a running application (System.Web, the hosting layer, IIS modules, configuration) | A page in `test/webForCore.IIS.Sample` (problems found in applications go in `regressions/`) and a test in `test/webForCore.IIS.Gate.Tests` (`RegressionTests` for those), or the MVC, Web API and Web Pages gate suites |
 | How an application builds or what the packages contain | `tools/ci/package-smoke` (Web Forms) or `tools/ci/package-smoke-mvc` (MVC, OWIN and third-party packages): applications outside this repository's build files that use only the packages |
-| A lifted library | Its upstream test suite, lifted with it; add webForCore's test next to it if upstream has none |
+| A library from a submodule | Its upstream test suite, from the same submodule; add webForCore's test next to it if upstream has none |
 
 The suites and how to run them are in [`docs/TESTING.md`](docs/TESTING.md). Run at least the suites your change can
 affect, and the whole set (`tools/ci/run-tests.sh`) before a release.
@@ -108,5 +109,5 @@ webForCore keeps belongs in one of them, with the reason and what an application
 - CI (`.github/workflows/ci.yml`) builds, runs every suite, packs the packages and runs the package smoke test, on Linux
   and on Windows (a development environment, #46); both must pass.
 
-Licences: webForCore's own code is MIT; lifted code keeps its licence ([`docs/LICENSING.md`](docs/LICENSING.md)).
+Licences: webForCore's own code is MIT; Microsoft's code keeps its licence ([`docs/LICENSING.md`](docs/LICENSING.md)).
 Contributions are accepted under the licence of the file they change.
