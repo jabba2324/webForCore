@@ -1928,11 +1928,19 @@ scale-out.
 - Keep the C# version the code was written for: C# 14's span conversions resolve some calls differently (YAF.NET's
   ServiceStack.Text). C# 11's ref safety applies on .NET 7 and later whatever the version.
 
-### Not fixed: #41
+### Not fixed: #41 (documented)
 
-`Assembly.GetTypes()` on System.Data.SqlClient 4.9.1 throws on .NET 11 (`SqlGuidCaster`), so applications that scan
-every loaded assembly fail (Opserver). The options (lift and fix SqlClient, move to Microsoft.Data.SqlClient, or
-document it) are in the issue.
+`Assembly.GetTypes()` on System.Data.SqlClient throws on .NET (`SqlGuidCaster`), so applications that scan every
+loaded assembly fail (Opserver). It isn't new in .NET 11: every .NET build of the package (4.4.3 to 4.9.1, Linux and
+Windows) has the type, and .NET 8, 10 and 11 refuse its layout, because .NET's `SqlGuid` holds a `Guid?` where the
+type overlays a `byte[]`. The type is dead code: its only user, `SqlTypeWorkarounds.SqlGuidCtor`, has no callers, so
+reading and writing GUIDs works. Microsoft.Data.SqlClient fixed it in 5.2; the deprecated System.Data.SqlClient hasn't.
+
+For now the workaround (catch `ReflectionTypeLoadException`, use `e.Types`) is in `docs/MIGRATING.md`, step 6, and
+`RegressionTests.ScanningEveryAssemblyNeedsTheReflectionTypeLoadExceptionWorkaround` pins both the exception and the
+workaround (`regressions/AssemblyScan.aspx`). Fixing it means lifting System.Data.SqlClient from
+dotnet/maintenance-packages and deleting the type; moving to Microsoft.Data.SqlClient would change parity and still
+leave EF6 6.5.1's System.Data.SqlClient 4.8.6 in applications. Which one is the maintainer's decision (in the issue).
 
 ## A race in Microsoft's MVC tests (1 Nov 2026)
 
