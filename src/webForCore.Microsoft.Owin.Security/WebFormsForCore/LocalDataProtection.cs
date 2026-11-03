@@ -1,6 +1,6 @@
 // webForCore: DPAPI and CAPI key containers where Windows has them and Linux does not.
-// Licensed under the MIT license. This file is compiled into System.Configuration (public) and, copied by
-// tools/lift/lift_project.py, into Microsoft.Owin.Security (internal); both read the same key files.
+// Licensed under the MIT license. This file is compiled into System.Configuration (public) and, as an identical copy in
+// the other project, into Microsoft.Owin.Security (internal); both read the same key files, so keep the two the same.
 using System;
 using System.IO;
 using System.Linq;

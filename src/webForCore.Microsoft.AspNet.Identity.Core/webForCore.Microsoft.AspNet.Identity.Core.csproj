@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <!-- Lifted from aspnet/AspNetIdentity b7fc094 (src/Microsoft.AspNet.Identity.Core) by tools/lift/lift_aspnet.py.
+  <!-- From aspnet/AspNetIdentity b7fc094 (src/Microsoft.AspNet.Identity.Core) by way of the external/AspNetIdentity submodule (xforcore/AspNetIdentity's webforcore branch, #61).
        MIT License and NOTICE at the repo root. Generated; do not edit. -->
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>

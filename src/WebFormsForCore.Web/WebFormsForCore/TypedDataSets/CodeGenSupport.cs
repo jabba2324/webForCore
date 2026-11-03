@@ -1,5 +1,5 @@
 // webForCore (MIT): what the Reference Source's TypedDataSetGenerator (ReferenceSource/datacache.cs) took from System.Data's
-// internals, from public members instead (tools/lift/lift_strb.py applies the replacements).
+// internals, from public members instead (the replacements are commits on xforcore/referencesource's webforcore branch).
 using System.Collections;
 using System.Globalization;
 using System.Text;

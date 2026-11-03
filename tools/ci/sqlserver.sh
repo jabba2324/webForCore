@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Starts SQL Server 2022 (Developer edition) in a container for the tests that need a database (Identity.Test's
 # Entity Framework tests): 127.0.0.1,14333, login sa, password below. Local test use only.
-# Usage: tools/lift/sqlserver.sh [start|stop]
+# Usage: tools/ci/sqlserver.sh [start|stop]
 set -euo pipefail
 NAME=webforcore-sqlserver
 PASSWORD='webForCore-Test1!'

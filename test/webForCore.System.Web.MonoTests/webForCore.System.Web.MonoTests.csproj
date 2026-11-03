@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <!-- Lifted from mono/mono 0f53e9e (mcs/class/System.Web/Test, MIT) by tools/lift/lift_mono_tests.py. See NOTICE. -->
+  <!-- From mono/mono 0f53e9e (mcs/class/System.Web/Test, MIT) by way of the external/mono submodule (xforcore/mono's webforcore branch, #61). See NOTICE. -->
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <!-- The TARGET_DOTNET serialization baselines (OutputCacheTest) were recorded on .NET Framework from a test assembly

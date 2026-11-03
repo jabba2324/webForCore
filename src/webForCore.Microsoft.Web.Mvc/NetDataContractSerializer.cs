@@ -1,6 +1,6 @@
 // webForCore: the NetDataContractSerializer that MvcSerializer (Html.Serialize, [Deserialize]) uses, which .NET does not
-// have. MIT license. Copied into src/webForCore.Microsoft.Web.Mvc by tools/lift/lift_project.py; MvcSerializer finds it
-// by its simple name, so the lifted MvcSerializer.cs is unchanged.
+// have. MIT license. MvcSerializer finds it by its simple name, so Microsoft's
+// MvcSerializer.cs (external/AspNetWebStack) is unchanged.
 //
 // NetDataContractSerializer was DataContractSerializer writing each object's .NET type and assembly, so a graph read
 // back without a list of known types. A DataContractResolver does the same here: types the data contract serializer

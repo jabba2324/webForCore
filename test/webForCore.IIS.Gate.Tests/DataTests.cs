@@ -28,7 +28,7 @@ namespace IISGate
         }
 
         // A Visual Studio DataSet in App_Code (CatalogData.xsd), compiled with the site: the typed DataSet and its
-        // TableAdapters against SQL Server (127.0.0.1,14333: tools/lift/sqlserver.sh locally, a service in CI).
+        // TableAdapters against SQL Server (127.0.0.1,14333: tools/ci/sqlserver.sh locally, a service in CI).
         [Fact]
         public async Task TypedDataSetAndTableAdapters()
         {

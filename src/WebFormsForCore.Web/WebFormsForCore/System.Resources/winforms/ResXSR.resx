@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- webForCore: the strings of dotnet/winforms' SR.resx (MIT) that its ResX classes use; written by tools/lift/lift_resx.py. -->
+<!-- webForCore: the strings of dotnet/winforms' SR.resx (MIT) that its ResX classes use; kept by hand since #61. -->
 <root>
   <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
   <resheader name="version"><value>2.0</value></resheader>

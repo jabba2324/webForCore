@@ -1,7 +1,7 @@
 // WebFormsForCore's additions to aspnet_compiler (MIT license, Copyright (c) Simon Jakob Egli; webForCore): multiple
 // bin folders and target frameworks (-b, -t), precompilation in its own load context, and error events for the MSBuild
-// task. The rest of Precompiler is Microsoft's aspnet_compiler.cs (ReferenceSource/aspnet_compiler, MIT), lifted by
-// tools/lift/lift_aspnet_compiler.py.
+// task. The rest of Precompiler is Microsoft's aspnet_compiler.cs (ReferenceSource/aspnet_compiler, MIT), from the
+// external/referencesource submodule.
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
