@@ -1,11 +1,13 @@
 <%@ Page Language="C#" %>
+<%@ Import Namespace="System.Collections.Generic" %>
 <%@ Import Namespace="System.Linq" %>
 <%@ Import Namespace="System.Reflection" %>
 <script runat="server">
-    // Issue #41 (not fixed, documented in docs/MIGRATING.md): Assembly.GetTypes() on System.Data.SqlClient throws on .NET.
-    // Its .NET build has SqlGuidCaster, an explicit-layout type the runtime refuses to load, so a scan of every loaded
-    // assembly fails (Opserver finds its tabs that way). This page pins both the difference and the documented
-    // workaround: catch ReflectionTypeLoadException and use the types that did load.
+    // Issue #41 (Opserver): Assembly.GetTypes() on Microsoft's System.Data.SqlClient packages throws on .NET. Their .NET
+    // build has SqlGuidCaster, an explicit-layout type the runtime refuses to load, so a scan of every loaded assembly
+    // failed (Opserver finds its tabs that way). webForCore builds System.Data.SqlClient from Microsoft's source with
+    // that type fixed: GetTypes() works on it, and a scan of every assembly the application has loaded, written as
+    // Opserver writes it (no catch for ReflectionTypeLoadException), finds every type.
     protected void Page_Load(object sender, EventArgs e)
     {
         Response.ContentType = "text/plain";
@@ -13,8 +15,8 @@
 
         try
         {
-            sqlClient.GetTypes();
-            Response.Write("GetTypes: ok\n");
+            var types = sqlClient.GetTypes();
+            Response.Write("GetTypes: ok, has SqlConnection: " + types.Contains(typeof(System.Data.SqlClient.SqlConnection)) + "\n");
         }
         catch (ReflectionTypeLoadException ex)
         {
@@ -23,19 +25,22 @@
                 string.Join(", ", missing) + "\n");
         }
 
-        Response.Write("GetExportedTypes has SqlConnection: " +
-            sqlClient.GetExportedTypes().Contains(typeof(System.Data.SqlClient.SqlConnection)) + "\n");
-
-        // The workaround from docs/MIGRATING.md, as an application would write it.
-        var failures = 0;
-        var all = AppDomain.CurrentDomain.GetAssemblies().SelectMany(a =>
+        var all = new List<Type>();
+        var failures = new List<string>();
+        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        foreach (var assembly in assemblies)
         {
-            try { return a.GetTypes(); }
-            catch (ReflectionTypeLoadException ex) { return ex.Types.Where(t => t != null).ToArray(); }
-            catch (Exception) { failures++; return Type.EmptyTypes; }
-        }).ToList();
+            try { all.AddRange(assembly.GetTypes()); }
+            catch (ReflectionTypeLoadException ex)
+            {
+                failures.Add(assembly.GetName().Name + " (" + string.Join(", ",
+                    ex.LoaderExceptions.OfType<TypeLoadException>().Select(l => l.TypeName).Distinct()) + ")");
+            }
+        }
+        Response.Write("assemblies scanned: " + assemblies.Length + "\n");
         Response.Write("scan finds SqlConnection: " + all.Contains(typeof(System.Data.SqlClient.SqlConnection)) + "\n");
         Response.Write("scan finds this page: " + all.Contains(GetType()) + "\n");
-        Response.Write("scan failures: " + failures + "\n");
+        Response.Write("scan failures: " + failures.Count + "\n");
+        foreach (var failure in failures) Response.Write("failed: " + failure + "\n");
     }
 </script>

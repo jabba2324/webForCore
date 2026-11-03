@@ -252,21 +252,20 @@ namespace IISGate
             Assert.Contains("is App_Data: True", body);
         }
 
-        // #41 (a difference webForCore keeps for now, documented in docs/MIGRATING.md): Assembly.GetTypes() on
-        // System.Data.SqlClient throws on .NET, Linux and Windows, because of SqlGuidCaster, so Opserver's scan of every
-        // loaded assembly for its tab controllers failed on every page. The documented workaround (catch
-        // ReflectionTypeLoadException and use e.Types) must find the types. If SqlClient is fixed, the first assertion
-        // fails: update MIGRATING.md with it.
+        // #41: Assembly.GetTypes() on Microsoft's System.Data.SqlClient throws on .NET, Linux and Windows, because of
+        // SqlGuidCaster, so Opserver's scan of every loaded assembly for its tab controllers failed on every page.
+        // webForCore builds System.Data.SqlClient from Microsoft's source with the type fixed: GetTypes() works on it, and
+        // a scan of every assembly loaded in the application, with no workaround, has no failures.
         [Fact]
-        public async Task ScanningEveryAssemblyNeedsTheReflectionTypeLoadExceptionWorkaround()
+        public async Task ScanningEveryAssemblyFindsEveryType()
         {
             var (response, body) = await Get("/regressions/AssemblyScan.aspx");
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.Contains("GetTypes: ReflectionTypeLoadException, 1 not loaded: SqlGuidCaster\n", body);
-            Assert.Contains("GetExportedTypes has SqlConnection: True", body);
+            Assert.Contains("GetTypes: ok, has SqlConnection: True\n", body);
             Assert.Contains("scan finds SqlConnection: True", body);
             Assert.Contains("scan finds this page: True", body);
-            Assert.Contains("scan failures: 0", body);
+            Assert.Contains("scan failures: 0\n", body);
+            Assert.DoesNotContain("failed: ", body);
         }
     }
 }

@@ -364,23 +364,16 @@ Fix what the blocker search found (see [NAMESPACES.md](NAMESPACES.md) for replac
   Check pages that format numbers and dates.
 - **BinaryFormatter:** code that calls `System.Runtime.Serialization.Formatters.Binary.BinaryFormatter` directly
   should use `WebFormsForCore.Serialization.Formatters.Binary.BinaryFormatter`.
-- **Scanning every loaded assembly's types** (#41). `Assembly.GetTypes()` on System.Data.SqlClient throws on .NET,
-  on Linux and on Windows: `ReflectionTypeLoadException ... Could not load type 'SqlGuidCaster' ... contains an object
-  field at offset 0 that is incorrectly aligned or overlapped by a non-object field`. Every System.Data.SqlClient
-  version for .NET has this unused type, and every webForCore application has the assembly. On .NET Framework, SqlClient
-  is in System.Data.dll, which hasn't got it, so the scan worked. Code that calls `GetTypes()` on every assembly in
-  `AppDomain.CurrentDomain.GetAssemblies()` (Opserver finds its tabs that way; DI containers' assembly scanning,
-  AutoMapper profiles, MEF and plugin loaders often do too) fails. Catch the exception and use the types that loaded:
-  ```csharp
-  static Type[] LoadableTypes(Assembly a)
-  {
-      try { return a.GetTypes(); }
-      catch (ReflectionTypeLoadException e) { return e.Types.Where(t => t != null).ToArray(); }
-  }
-  // AppDomain.CurrentDomain.GetAssemblies().SelectMany(LoadableTypes)
-  ```
-  `GetExportedTypes()` works, so a scan for public types can use it instead. MVC, Web API and SignalR already catch the
-  exception in their own scans.
+- **Scanning every loaded assembly's types** (#41, fixed). `Assembly.GetTypes()` on Microsoft's System.Data.SqlClient
+  packages throws on .NET, on Linux and on Windows: `ReflectionTypeLoadException ... Could not load type
+  'SqlGuidCaster' ... contains an object field at offset 0 that is incorrectly aligned or overlapped by a non-object
+  field`. Every System.Data.SqlClient package for .NET (4.4.3 to 4.9.1) has this unused type, so code that calls
+  `GetTypes()` on every assembly in `AppDomain.CurrentDomain.GetAssemblies()` failed (Opserver finds its tabs that way;
+  DI containers' assembly scanning, AutoMapper profiles, MEF and plugin loaders often do too). webForCore builds
+  System.Data.SqlClient from Microsoft's source with the type fixed (`webForCore.Data.SqlClient`, which `webForCore.Web`
+  brings), and leaves the `System.Data.SqlClient` package that Entity Framework and others bring out of the build, so
+  such scans work without changes. An application still on an earlier webForCore can catch the exception and use the
+  types that loaded (`e.Types.Where(t => t != null)`).
 
 ## 7. Run and compare
 
@@ -428,4 +421,4 @@ The first request compiles pages, as on IIS. Then compare the responses recorded
 | Logins lost after a restart | No explicit `<machineKey>` |
 | `PlatformNotSupportedException` | A Windows-only API: see [NAMESPACES.md](NAMESPACES.md) |
 | 503 right after a deploy | Another process is compiling the same site folder |
-| `ReflectionTypeLoadException`: `Could not load type 'SqlGuidCaster'` | The application calls `GetTypes()` on every loaded assembly: see "Scanning every loaded assembly's types" (step 6) |
+| `ReflectionTypeLoadException`: `Could not load type 'SqlGuidCaster'` | Microsoft's `System.Data.SqlClient` is in the application, not webForCore's (an earlier webForCore, or a build without `webForCore.Web.targets`): see "Scanning every loaded assembly's types" (step 6) |
