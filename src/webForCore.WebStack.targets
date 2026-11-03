@@ -76,6 +76,30 @@
     </ItemGroup>
   </Target>
 
+  <!-- webForCore builds System.Data.SqlClient from Microsoft's source, fixed (#41): Microsoft's packages, 4.4.3 to 4.9.1,
+       contain a type .NET 8 and later can't load, so Assembly.GetTypes() on the assembly threw a
+       ReflectionTypeLoadException, and every application that scans its loaded assemblies failed. Entity Framework 6
+       and other packages bring Microsoft's System.Data.SqlClient back transitively. Its windows and unix builds are
+       runtime targets (runtimes/win/lib/..., runtimes/unix/lib/...) at other paths than webForCore's, so the SDK's
+       conflict resolution doesn't see them as conflicts and package overrides can't remove them: deps.json would list
+       both packages' builds, and the host would load whichever came first. Wherever webForCore's System.Data.SqlClient is
+       in the build (the webForCore.Data.SqlClient package, which webForCore.Web depends on, or this repository's
+       project), drop every asset of Microsoft's package, compile, runtime and runtime targets, as soon as NuGet's assets
+       are resolved: nothing of it reaches the compiler, the output, deps.json or a publish. -->
+  <Target Name="WebForCoreDropSystemDataSqlClientPackage" AfterTargets="ResolvePackageAssets" DependsOnTargets="IncludeTransitiveProjectReferences" Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">
+    <ItemGroup>
+      <_WebForCoreSqlClient Include="@(ResolvedCompileFileDefinitions);@(RuntimeCopyLocalItems)" Condition="'%(NuGetPackageId)' == 'webForCore.Data.SqlClient'" />
+      <_WebForCoreSqlClient Include="@(ProjectReference)" Condition="'%(Filename)' == 'webForCore.System.Data.SqlClient'" />
+    </ItemGroup>
+    <ItemGroup Condition="'@(_WebForCoreSqlClient)' != ''">
+      <ResolvedCompileFileDefinitions Remove="@(ResolvedCompileFileDefinitions)" Condition="'%(NuGetPackageId)' == 'System.Data.SqlClient'" />
+      <RuntimeCopyLocalItems Remove="@(RuntimeCopyLocalItems)" Condition="'%(NuGetPackageId)' == 'System.Data.SqlClient'" />
+      <RuntimeTargetsCopyLocalItems Remove="@(RuntimeTargetsCopyLocalItems)" Condition="'%(NuGetPackageId)' == 'System.Data.SqlClient'" />
+      <NativeCopyLocalItems Remove="@(NativeCopyLocalItems)" Condition="'%(NuGetPackageId)' == 'System.Data.SqlClient'" />
+      <ResourceCopyLocalItems Remove="@(ResourceCopyLocalItems)" Condition="'%(NuGetPackageId)' == 'System.Data.SqlClient'" />
+    </ItemGroup>
+  </Target>
+
   <!-- The shared framework also has System.Web, System.Drawing and System.Configuration facades. At startup the host
        keeps whichever copy has the higher assemblyVersion in deps.json, but the SDK writes no assemblyVersion for
        project references, so the framework facade won and the fork's System.Web failed to load ("conflicts with what

@@ -33,3 +33,8 @@
 	url = https://github.com/xforcore/mono.git
 	branch = webforcore
 	shallow = true
+[submodule "external/maintenance-packages"]
+	path = external/maintenance-packages
+	url = https://github.com/xforcore/maintenance-packages.git
+	branch = webforcore
+	shallow = true

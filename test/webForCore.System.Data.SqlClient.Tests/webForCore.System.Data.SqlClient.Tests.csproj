@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- From dotnet/maintenance-packages e699209 (src/System.Data.SqlClient/tests) by way of the
+       external/maintenance-packages submodule (xforcore/maintenance-packages' webforcore branch, #41). MIT licence; see
+       NOTICE at the repo root. Upstream's FunctionalTests that need only xunit: the others need its TDS test server,
+       RemoteExecutor or Arcade's xunit extensions (ConditionalFact, PlatformSpecific, OuterLoop), which aren't on
+       nuget.org. AssemblyTests.cs is webForCore's. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>System.Data.SqlClient.Tests</AssemblyName>
+    <RootNamespace>System.Data.SqlClient.Tests</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <!-- Upstream's list (System.Data.SqlClient.Tests.csproj). -->
+    <NoWarn>$(NoWarn);CA1001;CA1051;CA1068;CA1069;CA1304;CA1309;CA1310;CA1311;CA1419;CA1507;CA1510;CA1512;CA1513;CA1711;CA1716;CA1805;CA1806;CA1816;CA1822;CA1830;CA1834;CA1835;CA1836;CA1840;CA1844;CA1852;CA1859;CA1861;CA1862;CA1863;CA1866;CA2016;CA2101;CA2200;CA2201;CA2208;CA2211;CA2219;CA2241;CA2249;CA2251;CA5366;CS0168;CS0618;CS0649;IDE0073;SYSLIB0004;SYSLIB0023;nullable;xUnit1031</NoWarn>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <MpTests>../../external/maintenance-packages/src/System.Data.SqlClient/tests/</MpTests>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(MpTests)FunctionalTests/AADAccessTokenTest.cs" Link="FunctionalTests/AADAccessTokenTest.cs" />
+    <Compile Include="$(MpTests)FunctionalTests/CloneTests.cs" Link="FunctionalTests/CloneTests.cs" />
+    <Compile Include="$(MpTests)FunctionalTests/BaseProviderAsyncTest/BaseProviderAsyncTest.cs" Link="FunctionalTests/BaseProviderAsyncTest/BaseProviderAsyncTest.cs" />
+    <Compile Include="$(MpTests)FunctionalTests/BaseProviderAsyncTest/MockCommand.cs" Link="FunctionalTests/BaseProviderAsyncTest/MockCommand.cs" />
+    <Compile Include="$(MpTests)FunctionalTests/BaseProviderAsyncTest/MockConnection.cs" Link="FunctionalTests/BaseProviderAsyncTest/MockConnection.cs" />
+    <Compile Include="$(MpTests)FunctionalTests/BaseProviderAsyncTest/MockDataReader.cs" Link="FunctionalTests/BaseProviderAsyncTest/MockDataReader.cs" />
+    <Compile Include="$(MpTests)FunctionalTests/SqlCredentialTest.cs" Link="FunctionalTests/SqlCredentialTest.cs" />
+    <Compile Include="$(MpTests)FunctionalTests/AmbientTransactionFailureTest.cs" Link="FunctionalTests/AmbientTransactionFailureTest.cs" />
+    <Compile Include="$(MpTests)FunctionalTests/SqlBulkCopyColumnMappingCollectionTest.cs" Link="FunctionalTests/SqlBulkCopyColumnMappingCollectionTest.cs" />
+    <Compile Include="$(MpTests)FunctionalTests/SqlDataRecordTest.cs" Link="FunctionalTests/SqlDataRecordTest.cs" />
+    <Compile Include="$(MpTests)FunctionalTests/SqlMetaDataTest.cs" Link="FunctionalTests/SqlMetaDataTest.cs" />
+    <Compile Include="$(MpTests)FunctionalTests/SqlParameterTest.cs" Link="FunctionalTests/SqlParameterTest.cs" />
+    <Compile Include="$(MpTests)FunctionalTests/SqlClientFactoryTest.cs" Link="FunctionalTests/SqlClientFactoryTest.cs" />
+    <Compile Include="$(MpTests)FunctionalTests/SqlConnectionTest.RetrieveStatistics.cs" Link="FunctionalTests/SqlConnectionTest.RetrieveStatistics.cs" />
+    <Compile Include="$(MpTests)FunctionalTests/SqlErrorCollectionTest.cs" Link="FunctionalTests/SqlErrorCollectionTest.cs" />
+    <Compile Include="$(MpTests)FunctionalTests/SqlFacetAttributeTest.cs" Link="FunctionalTests/SqlFacetAttributeTest.cs" />
+    <!-- Upstream builds it as its own assembly (ManualTests/SQL/UdtTest/UDTs/Address/Address.csproj). -->
+    <Compile Include="$(MpTests)ManualTests/SQL/UdtTest/UDTs/Address/Address.cs" Link="UDTs/Address.cs" />
+    <Compile Include="../../external/maintenance-packages/src/Common/tests/TestUtilities/System/AssertExtensions.cs" Link="Common/System/AssertExtensions.cs" />
+    <Compile Include="AssemblyTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/webForCore.System.Data.SqlClient/webForCore.System.Data.SqlClient.csproj" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+  </ItemGroup>
+</Project>

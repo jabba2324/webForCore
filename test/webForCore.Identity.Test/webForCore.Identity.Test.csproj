@@ -74,7 +74,7 @@
     <PackageReference Include="EntityFramework" Version="6.5.1" />
     <PackageReference Include="Owin" Version="1.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
+    <ProjectReference Include="../../src/webForCore.System.Data.SqlClient/webForCore.System.Data.SqlClient.csproj" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />

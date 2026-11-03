@@ -19,6 +19,7 @@ legal advice: for a product decision, have counsel review NOTICE and this page.
 | Katana (Microsoft.Owin and friends) | `src/webForCore.Microsoft.Owin*` | Apache 2.0 (© .NET Foundation) | ✅ Yes |
 | SignalR 2 | `src/webForCore.Microsoft.AspNet.SignalR.*` | Apache 2.0 (© .NET Foundation) | ✅ Yes |
 | ASP.NET Identity 2 | `src/webForCore.Microsoft.AspNet.Identity.*` | MIT (© Microsoft) | ✅ Yes |
+| System.Data.SqlClient 4.9.1 (from dotnet/maintenance-packages) | `src/webForCore.System.Data.SqlClient` (the source comes from the `external/maintenance-packages` submodule) | MIT (© .NET Foundation) | ✅ Yes |
 | ResX reader and writer (from dotnet/winforms) | `src/WebFormsForCore.Web/WebFormsForCore/System.Resources/winforms` | MIT (© .NET Foundation) | ✅ Yes |
 | StronglyTypedResourceBuilder (from Mono); Mono code in System.Web, WebGrease and the SoapFormatter | `src/WebFormsForCore.Web/WebFormsForCore/mono` and others | MIT (© Novell and others) | ✅ Yes |
 | BinaryFormatter port (from .NET) | `src/WebFormsForCore.Serialization.Formatters` | MIT (© .NET Foundation) | ✅ Yes |
@@ -26,7 +27,7 @@ legal advice: for a product decision, have counsel review NOTICE and this page.
 | Redesigner (build-time designer file generator) | `src/WebFormsForCore.Build/Redesigner` | BSD 3-Clause (© Sean Werkema) | ✅ Yes |
 | Roslyn compilers (binaries) | `src/WebFormsForCore.Compilers` | MIT (© .NET Foundation) | ✅ Yes |
 | System.Drawing and System.Drawing.Common 6.0 with a GDI+ engine on SkiaSharp: [drawingForCore](https://github.com/xforcore/drawingForCore)'s packages | restored at build time | MIT (© .NET Foundation and drawingForCore's contributors) | ✅ Yes |
-| Dependencies from NuGet: EntityFramework 6, Newtonsoft.Json, CoreWCF, System.Data.SqlClient, ... | restored at build time | MIT or Apache 2.0, each package's own | ✅ Yes |
+| Dependencies from NuGet: EntityFramework 6, Newtonsoft.Json, CoreWCF, ... | restored at build time | MIT or Apache 2.0, each package's own | ✅ Yes |
 | Tests from Microsoft and Mono (submodules) | `test/webForCore.*` | Apache 2.0 or MIT | ✅ Yes (not shipped in packages) |
 
 ### What the permissive licences ask of you

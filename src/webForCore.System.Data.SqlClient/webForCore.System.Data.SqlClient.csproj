@@ -1,0 +1,653 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- From dotnet/maintenance-packages e699209 (System.Data.SqlClient 4.9.1) by way of the external/maintenance-packages
+       submodule (xforcore/maintenance-packages' webforcore branch, #41). MIT licence; see NOTICE at the repo root.
+       Microsoft's package has a windows and a unix build of the assembly (runtimes/win and runtimes/unix); this project
+       builds the one for the platform it builds on, which the projects that reference it use, and then the other, for the
+       package. -p:SqlClientPlatform=windows|unix chooses. -->
+  <PropertyGroup>
+    <SqlClientPlatform Condition="'$(SqlClientPlatform)' == '' AND $([MSBuild]::IsOSPlatform('Windows'))">windows</SqlClientPlatform>
+    <SqlClientPlatform Condition="'$(SqlClientPlatform)' == ''">unix</SqlClientPlatform>
+    <_SqlClientOtherPlatform Condition="'$(SqlClientPlatform)' == 'windows'">unix</_SqlClientOtherPlatform>
+    <_SqlClientOtherPlatform Condition="'$(SqlClientPlatform)' != 'windows'">windows</_SqlClientOtherPlatform>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)$(Configuration)/$(SqlClientPlatform)/</IntermediateOutputPath>
+    <OutputPath>bin/$(Configuration)/$(SqlClientPlatform)/</OutputPath>
+
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>System.Data.SqlClient</AssemblyName>
+    <RootNamespace>System.Data.SqlClient</RootNamespace>
+    <PackageId>webForCore.Data.SqlClient</PackageId>
+    <Description>System.Data.SqlClient</Description>
+    <PackageDescription>System.Data.SqlClient for webForCore: Microsoft's System.Data.SqlClient 4.9.1 (dotnet/maintenance-packages), with Assembly.GetTypes() fixed on .NET 8 and later (#41). Replaces the System.Data.SqlClient package in applications that use webForCore.</PackageDescription>
+    <PackageTags>webforms;aspnet;sqlclient;porting;net10</PackageTags>
+    <!-- Microsoft's code; MIT, as in dotnet/maintenance-packages (Directory.Build.props makes webForCore.* Apache-2.0). -->
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- Microsoft's identity: the assembly version of the package's .NET builds, and Microsoft's public key
+         (PublicKeyToken=b03f5f7f11d50a3a, FakeStrongName below). -->
+    <AssemblyVersion>4.6.1.6</AssemblyVersion>
+    <!-- Above Microsoft's 4.9.1 (4.900.126.11103), so that this build wins wherever file versions decide. -->
+    <FileVersion>4.901.0.0</FileVersion>
+    <InformationalVersion>4.9.1+webForCore</InformationalVersion>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>../SigningKey/WebFormsForCore.snk</AssemblyOriginatorKeyFile>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <!-- Upstream's list; CA1416, as upstream's windows and unix builds are -windows and -unix target frameworks; CA2022,
+         which the .NET 10 SDK's analyzers added. -->
+    <NoWarn>$(NoWarn);CA1001;CA1068;CA1069;CA1309;CA1310;CA1419;CA1510;CA1711;CA1805;CA1806;CA1816;CA1822;CA1830;CA1834;CA1835;CA1836;CA1840;CA1844;CA1852;CA1853;CA1854;CA1859;CA1863;CA2016;CA2020;CA2101;CA2200;CA2201;CA2208;CA2219;CA2249;CA2251;CA5366;CS0168;CS0618;CS0649;CS0672;IDE0073;SYSLIB0004;SYSLIB0051;nullable;CA1416;CS1591;CA2022</NoWarn>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <!-- The assembly's company, product and copyright are Microsoft's (below); the package's are webForCore's. -->
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+
+    <!-- The package is laid out as Microsoft's: lib/ (the unix build, for compiling), runtimes/unix/lib/ and
+         runtimes/win/lib/ (WebForCoreSqlClientPackageFiles below). -->
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IncludeSymbols>false</IncludeSymbols>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);WebForCoreSqlClientPackageFiles</TargetsForTfmSpecificContentInPackage>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+
+    <MpSrc>../../external/maintenance-packages/src/System.Data.SqlClient/src/</MpSrc>
+    <MpCommon>../../external/maintenance-packages/src/Common/</MpCommon>
+  </PropertyGroup>
+
+  <!-- The assembly attributes of upstream's builds (its Directory.Build.props and .targets and the Arcade SDK), but for
+       SupportedOSPlatform("Windows"/"unix"), which its -windows and -unix target frameworks add: here the unix build is
+       also the package's compile reference (upstream's is a build without the attribute), and with it every call into
+       SqlClient would be a CA1416 warning. -->
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyCompanyAttribute"><_Parameter1>Microsoft Corporation</_Parameter1></AssemblyAttribute>
+    <AssemblyAttribute Include="System.Reflection.AssemblyProductAttribute"><_Parameter1>Microsoft® .NET</_Parameter1></AssemblyAttribute>
+    <AssemblyAttribute Include="System.Reflection.AssemblyCopyrightAttribute"><_Parameter1>© Microsoft Corporation. All rights reserved.</_Parameter1></AssemblyAttribute>
+    <AssemblyAttribute Include="System.CLSCompliantAttribute">
+      <_Parameter1>true</_Parameter1>
+      <_Parameter1_IsLiteral>true</_Parameter1_IsLiteral>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Reflection.AssemblyDefaultAliasAttribute">
+      <_Parameter1>System.Data.SqlClient</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Resources.NeutralResourcesLanguageAttribute">
+      <_Parameter1>en-US</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.InteropServices.DefaultDllImportSearchPathsAttribute">
+      <_Parameter1>System.Runtime.InteropServices.DllImportSearchPath.AssemblyDirectory | System.Runtime.InteropServices.DllImportSearchPath.System32</_Parameter1>
+      <_Parameter1_IsLiteral>true</_Parameter1_IsLiteral>
+    </AssemblyAttribute>
+    <AssemblyMetadata Include="PreferInbox" Value="True" />
+    <AssemblyMetadata Include="Serviceable" Value="True" />
+  </ItemGroup>
+
+  <!-- The string resources, as upstream's eng/resources.targets embeds them; SR's properties are generated below. -->
+  <ItemGroup>
+    <EmbeddedResource Include="$(MpSrc)Resources/Strings.resx" LogicalName="FxResources.System.Data.SqlClient.SR.resources" Link="Resources/Strings.resx" />
+    <Compile Include="$(MpCommon)src/System/SR.cs" Link="Resources/Common/SR.cs" />
+    <Compile Include="$(MpSrc)System.Data.SqlClient.TypeForwards.cs" Link="System.Data.SqlClient.TypeForwards.cs" />
+  </ItemGroup>
+
+  <!-- Upstream's src/System.Data.SqlClient/src/System.Data.SqlClient.csproj, its .NET items: TargetPlatformIdentifier
+       is SqlClientPlatform here. -->
+  <ItemGroup>
+    <Compile Include="$(MpSrc)System/Data/SqlClient/PoolBlockingPeriod.cs" />
+    <Compile Include="$(MpSrc)Microsoft/SqlServer/Server/SqlFacetAttribute.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="$(MpSrc)Microsoft/SqlServer/Server/ITypedGetters.cs" />
+    <Compile Include="$(MpSrc)Microsoft/SqlServer/Server/ITypedGettersV3.cs" />
+    <Compile Include="$(MpSrc)Microsoft/SqlServer/Server/ITypedSetters.cs" />
+    <Compile Include="$(MpSrc)Microsoft/SqlServer/Server/ITypedSettersV3.cs" />
+    <Compile Include="$(MpSrc)Microsoft/SqlServer/Server/ExtendedClrTypeCode.cs" />
+    <Compile Include="$(MpSrc)Microsoft/SqlServer/Server/MemoryRecordBuffer.cs" />
+    <Compile Include="$(MpSrc)Microsoft/SqlServer/Server/MetadataUtilsSmi.cs" />
+    <Compile Include="$(MpSrc)Microsoft/SqlServer/Server/SmiEventSink.cs" />
+    <Compile Include="$(MpSrc)Microsoft/SqlServer/Server/SmiEventSink_Default.cs" />
+    <Compile Include="$(MpSrc)Microsoft/SqlServer/Server/SmiGettersStream.cs" />
+    <Compile Include="$(MpSrc)Microsoft/SqlServer/Server/SmiMetaData.cs" />
+    <Compile Include="$(MpSrc)Microsoft/SqlServer/Server/SmiMetaDataProperty.cs" />
+    <Compile Include="$(MpSrc)Microsoft/SqlServer/Server/SmiRecordBuffer.cs" />
+    <Compile Include="$(MpSrc)Microsoft/SqlServer/Server/SmiSettersStream.cs" />
+    <Compile Include="$(MpSrc)Microsoft/SqlServer/Server/SmiTypedGetterSetter.cs" />
+    <Compile Include="$(MpSrc)Microsoft/SqlServer/Server/SmiXetterAccessMap.cs" />
+    <Compile Include="$(MpSrc)Microsoft/SqlServer/Server/SmiXetterTypeCode.cs" />
+    <Compile Include="$(MpSrc)Microsoft/SqlServer/Server/SqlDataRecord.cs" />
+    <Compile Include="$(MpSrc)Microsoft/SqlServer/Server/SqlRecordBuffer.cs" />
+    <Compile Include="$(MpSrc)Microsoft/SqlServer/Server/ValueUtilsSmi.cs" />
+    <Compile Include="$(MpSrc)System/Data/DataException.cs" />
+    <Compile Include="$(MpSrc)System/Data/OperationAbortedException.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlDbColumn.cs" />
+    <Compile Include="$(MpSrc)System/Data/Common/ActivityCorrelator.cs" />
+    <Compile Include="$(MpCommon)src/System/Data/Common/AdapterUtil.cs">
+      <Link>System/Data/Common/AdapterUtil.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Data/Common/AdapterUtil.Drivers.cs">
+      <Link>System/Data/Common/AdapterUtil.Drivers.cs</Link>
+    </Compile>
+    <Compile Include="$(MpSrc)System/Data/Common/AdapterUtil.SqlClient.cs" />
+    <Compile Include="$(MpSrc)System/Data/Common/SR.cs" />
+    <Compile Include="$(MpSrc)System/Data/Common/DbConnectionOptions.cs" />
+    <Compile Include="$(MpCommon)src/System/Data/Common/DbConnectionOptions.Common.cs">
+      <Link>System/Data/Common/DbConnectionOptions.Common.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Data/Common/DbConnectionPoolKey.cs">
+      <Link>System/Data/Common/DbConnectionPoolKey.cs</Link>
+    </Compile>
+    <Compile Include="$(MpSrc)System/Data/Common/DbConnectionStringCommon.cs" />
+    <Compile Include="$(MpCommon)src/System/Data/Common/FieldNameLookup.cs">
+      <Link>System/Data/Common/FieldNameLookup.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Data/Common/BasicFieldNameLookup.cs">
+      <Link>System/Data/Common/BasicFieldNameLookup.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Data/Common/MultipartIdentifier.cs">
+      <Link>System/Data/Common/MultipartIdentifier.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Data/Common/NameValuePair.cs">
+      <Link>System/Data/Common/NameValuePair.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Data/ProviderBase/DbConnectionInternal.cs">
+      <Link>Common/System/Data/ProviderBase/DbConnectionInternal.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Data/ProviderBase/DbConnectionFactory.cs">
+      <Link>Common/System/Data/ProviderBase/DbConnectionFactory.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Data/ProviderBase/DbConnectionPoolGroup.cs">
+      <Link>Common/System/Data/ProviderBase/DbConnectionPoolGroup.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Data/ProviderBase/TimeoutTimer.cs">
+      <Link>Common/System/Data/ProviderBase/TimeoutTimer.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Data/ProviderBase/DbReferenceCollection.cs">
+      <Link>Common/System/Data/ProviderBase/DbReferenceCollection.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Data/ProviderBase/DbMetaDataFactory.cs">
+      <Link>Common/System/Data/ProviderBase/DbMetaDataFactory.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Data/ProviderBase/DbConnectionClosed.cs">
+      <Link>Common/System/Data/ProviderBase/DbConnectionClosed.cs</Link>
+    </Compile>
+    <Compile Include="$(MpSrc)System/Data/ProviderBase/DbConnectionClosed.cs" />
+    <Compile Include="$(MpSrc)System/Data/ProviderBase/DbConnectionFactory.cs" />
+    <Compile Include="$(MpSrc)System/Data/ProviderBase/DbConnectionInternal.cs" />
+    <Compile Include="$(MpSrc)System/Data/ProviderBase/DbConnectionPool.cs" />
+    <Compile Include="$(MpSrc)System/Data/ProviderBase/DbConnectionPoolGroupProviderInfo.cs" />
+    <Compile Include="$(MpSrc)System/Data/ProviderBase/DbConnectionPoolIdentity.cs" />
+    <Compile Include="$(MpSrc)System/Data/ProviderBase/DbConnectionPoolOptions.cs" />
+    <Compile Include="$(MpSrc)System/Data/ProviderBase/DbConnectionPoolProviderInfo.cs" />
+    <Compile Include="$(MpSrc)System/Data/Sql/IBinarySerialize.cs" />
+    <Compile Include="$(MpSrc)System/Data/Sql/InvalidUdtException.cs" />
+    <Compile Include="$(MpSrc)System/Data/Sql/SqlFunctionAttribute.cs" />
+    <Compile Include="$(MpSrc)System/Data/Sql/SqlMetaData.cs" />
+    <Compile Include="$(MpSrc)System/Data/Sql/SqlMethodAttribute.cs" />
+    <Compile Include="$(MpSrc)System/Data/Sql/SqlNorm.cs" />
+    <Compile Include="$(MpSrc)System/Data/Sql/SqlNotificationRequest.cs" />
+    <Compile Include="$(MpSrc)System/Data/Sql/SqlSer.cs" />
+    <Compile Include="$(MpSrc)System/Data/Sql/SqlUserDefinedAggregateAttribute.cs" />
+    <Compile Include="$(MpSrc)System/Data/Sql/SqlUserDefinedTypeAttribute.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/ApplicationIntent.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/LocalDBAPI.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/ParameterPeekAheadValue.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/RowsCopiedEventArgs.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/RowsCopiedEventHandler.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SortOrder.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlBuffer.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlBulkCopy.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlBulkCopyColumnMapping.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlBulkCopyColumnMappingCollection.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlBulkCopyOptions.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlCachedBuffer.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlClientDiagnosticListenerExtensions.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlClientFactory.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlClientMetaDataCollectionNames.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlCommand.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlCommandBuilder.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlCommandSet.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlConnection.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlConnectionFactory.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlConnectionHelper.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlConnectionPoolGroupProviderInfo.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlConnectionPoolKey.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlConnectionPoolProviderInfo.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlConnectionString.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlConnectionStringBuilder.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlConnectionTimeoutErrorInternal.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlDataAdapter.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlDataReader.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlDependency.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlDependencyListener.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlDependencyUtils.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlDependencyUtils.AppDomain.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlDelegatedTransaction.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlEnums.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlError.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlErrorCollection.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlException.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlInfoMessageEvent.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlInfoMessageEventHandler.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlInternalConnection.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlInternalConnectionTds.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlInternalTransaction.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlMetadataFactory.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlNotificationEventArgs.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlNotificationInfo.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlNotificationSource.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlNotificationType.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/OnChangedEventHandler.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlParameter.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlParameterCollection.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlParameterCollectionHelper.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlParameterHelper.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlReferenceCollection.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlRowUpdatedEvent.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlRowUpdatedEventHandler.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlRowUpdatingEvent.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlRowUpdatingEventHandler.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlSequentialStream.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlSequentialTextReader.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlStatistics.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlStream.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlTransaction.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlUdtInfo.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlUtil.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/TdsEnums.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/TdsParameterSetter.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/TdsParser.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/TdsParser.RegisterEncoding.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/TdsParserHelperClasses.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/TdsParserSessionPool.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/TdsParserStateObject.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/TdsParserStaticMethods.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/TdsRecordBufferSetter.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/TdsValueSetter.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlTypes/SqlTypeWorkarounds.cs" />
+    <Compile Include="$(MpCommon)src/System/Data/Common/SQLResource.cs">
+      <Link>System/Data/SQLTypes/SQLResource.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/NotImplemented.cs" />
+    <Compile Include="$(MpCommon)src/CoreLib/System/Threading/Tasks/TaskToApm.cs">
+      <Link>Common/CoreLib/System/Threading/Tasks/TaskToApm.cs</Link>
+    </Compile>
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SNI/SNIError.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SNI/SNIHandle.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SNI/SNILoadHandle.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SNI/SNIMarsConnection.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SNI/SNIMarsHandle.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SNI/SNIMarsQueuedPacket.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SNI/SNINpHandle.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SNI/SNIPacket.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SNI/SNIProxy.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SNI/SNITcpHandle.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SNI/SslOverTdsStream.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SNI/SNICommon.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SNI/SspiClientContextStatus.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SNI/SSRP.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/TdsParserStateObjectManaged.cs" />
+    <Compile Include="$(MpSrc)Interop/SNINativeMethodWrapper.Common.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlCredential.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(SqlClientPlatform)' != 'windows'">
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlFileStream.Unsupported.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(SqlClientPlatform)' == 'windows'">
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlFileStream.Windows.cs" />
+    <Compile Include="$(MpCommon)src/CoreLib/Interop/Windows/Kernel32/Interop.FileTypes.cs">
+      <Link>Common/CoreLib/Interop/Windows/Kernel32/Interop.FileTypes.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/CoreLib/Interop/Windows/Kernel32/Interop.GetFileType_SafeHandle.cs">
+      <Link>Common/CoreLib/Interop/Windows/Kernel32/Interop.GetFileType_SafeHandle.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/CoreLib/Interop/Windows/Kernel32/Interop.SetThreadErrorMode.cs">
+      <Link>Common/CoreLib/Interop/Windows/Kernel32/Interop.SetThreadErrorMode.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/CoreLib/System/IO/PathInternal.Windows.cs">
+      <Link>Common/CoreLib/System/IO/PathInternal.Windows.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/CoreLib/System/Text/ValueStringBuilder.cs">
+      <Link>CoreLib/System/Text/ValueStringBuilder.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/Interop.Errors.cs">
+      <Link>Common/Interop/Windows/Interop.Errors.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/Interop.UNICODE_STRING.cs">
+      <Link>Common/Interop/Windows/Interop.UNICODE_STRING.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/Interop.OBJECT_ATTRIBUTES.cs">
+      <Link>Common/Interop/Windows/Interop.OBJECT_ATTRIBUTES.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/Kernel32/Interop.IoControlCodeAccess.cs">
+      <Link>Common/Interop/Windows/Kernel32/Interop.IoControlCodeAccess.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/Kernel32/Interop.CTL_CODE.cs">
+      <Link>Common/Interop/Windows/Kernel32/Interop.CTL_CODE.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/Kernel32/Interop.DeviceIoControl.cs">
+      <Link>Common/Interop/Windows/Kernel32/Interop.DeviceIoControl.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/Kernel32/Interop.FileOperations.cs">
+      <Link>Common/Interop/Windows/Kernel32/Interop.FileOperations.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/Kernel32/Interop.IoControlTransferType.cs">
+      <Link>Common/Interop/Windows/Kernel32/Interop.IoControlTransferType.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/NtDll/Interop.FILE_FULL_EA_INFORMATION.cs">
+      <Link>Common/Interop/Windows/NtDll/Interop.FILE_FULL_EA_INFORMATION.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/NtDll/Interop.IO_STATUS_BLOCK.cs">
+      <Link>Common/Interop/Windows/NtDll/Interop.IO_STATUS_BLOCK.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/NtDll/Interop.NtCreateFile.cs">
+      <Link>Common/Interop/Windows/NtDll/Interop.NtCreateFile.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/NtDll/Interop.RtlNtStatusToDosError.cs">
+      <Link>Common/Interop/Windows/Interop.RtlNtStatusToDosError.cs</Link>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="$(MpSrc)System/Data/Common/DbConnectionStringCommon.NetCoreApp.cs" />
+    <Compile Include="$(MpSrc)System/Data/ProviderBase/DbConnectionPool.NetCoreApp.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlConnectionString.NetCoreApp.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlConnectionStringBuilder.NetCoreApp.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SqlDelegatedTransaction.NetCoreApp.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/TdsParser.NetCoreApp.cs" />
+  </ItemGroup>
+
+  <!-- Manage the SNI toggle for Windows netstandard and UWP -->
+  <ItemGroup Condition="'$(SqlClientPlatform)' == 'windows'">
+    <!-- Manage the SNI toggle for Windows netstandard and UWP -->
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SNI/SNITcpHandle.Windows.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/TdsParserStateObjectFactory.Windows.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/PacketHandle.Windows.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SessionHandle.Windows.cs" />
+  </ItemGroup>
+
+  <!-- Assets needed on Windows but should be avoided on UAP to avoid sni.dll -->
+  <ItemGroup Condition="'$(SqlClientPlatform)' == 'windows'">
+    <Compile Include="$(MpSrc)System/Data/SqlClient/TdsParserStateObjectNative.cs" />
+    <Compile Include="$(MpSrc)Interop/SNINativeMethodWrapper.Windows.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/TdsParserSafeHandles.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/LocalDBAPI.Windows.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SNI/LocalDB.Windows.cs" />
+    <Compile Include="$(MpSrc)System/Data/ProviderBase/DbConnectionPoolIdentity.Windows.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/TdsParser.Windows.cs" />
+    <Compile Include="$(MpCommon)src/Interop/Windows/Kernel32/Interop.LoadLibraryEx.cs">
+      <Link>Common/Interop/Windows/Kernel32/Interop.LoadLibraryEx.cs</Link>
+    </Compile>
+    <Compile Include="$(MpSrc)System/Data/SqlClient/LocalDBAPI.Common.cs" />
+    <Compile Include="$(MpCommon)src/Interop/Windows/Kernel32/Interop.FreeLibrary.cs">
+      <Link>Common/Interop/Windows/Kernel32/Interop.FreeLibrary.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/Kernel32/Interop.GetProcAddress.cs">
+      <Link>Common/Interop/Windows/Kernel32/Interop.GetProcAddress.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/CoreLib/Microsoft/Win32/SafeHandles/SafeLibraryHandle.cs">
+      <Link>Common/CoreLib/Microsoft/Win32/SafeHandles/SafeLibraryHandle.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Net/Security/SecurityBufferType.Windows.cs">
+      <Link>Common/System/Net/Security/SecurityBufferType.Windows.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Net/Security/SecurityBuffer.Windows.cs">
+      <Link>Common/System/Net/Security/SecurityBuffer.Windows.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/SChannel/Interop.SecPkgContext_ApplicationProtocol.cs">
+      <Link>Common/Interop/Windows/SChannel/Interop.SecPkgContext_ApplicationProtocol.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Net/Security/NegotiateStreamPal.Windows.cs">
+      <Link>Common/System/Net/Security/NegotiateStreamPal.Windows.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/SspiCli/SafeDeleteContext.cs">
+      <Link>Common/Interop/Windows/sspicliSafeDeleteContext.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/SspiCli/SecuritySafeHandles.cs">
+      <Link>Common/Interop/Windows/SspiCli/SecuritySafeHandles.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/SspiCli/Interop.SSPI.cs">
+      <Link>Common/Interop/Windows/SspiCli/Interop.SSPI.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Net/Security/SecurityContextTokenHandle.cs">
+      <Link>Common/System/Net/Security/SecurityContextTokenHandle.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/Interop.Libraries.cs">
+      <Link>Common/Interop/Windows/Interop.Libraries.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/SChannel/Interop.SECURITY_STATUS.cs">
+      <Link>Common/Interop/Windows/SChannel/Interop.SECURITY_STATUS.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/SspiCli/SecPkgContext_Bindings.cs">
+      <Link>Common/Interop/Windows/SspiCli/SecPkgContext_Bindings.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Net/DebugCriticalHandleZeroOrMinusOneIsInvalid.cs">
+      <Link>Common/System/Net/DebugCriticalHandleZeroOrMinusOneIsInvalid.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Net/Security/NetEventSource.Security.cs">
+      <Link>Common/System/Net/Security/NetEventSource.Security.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Net/Security/NetEventSource.Security.Windows.cs">
+      <Link>Common/System/Net/Security/NetEventSource.Security.Windows.cs</Link>
+    </Compile>
+    <Compile Include="$(MpSrc)Common/Interop/Windows/Kernel32/Interop.CloseHandle.cs" />
+    <Compile Include="$(MpSrc)Common/Interop/Windows/SspiCli/GlobalSSPI.cs" />
+    <Compile Include="$(MpSrc)Common/Interop/Windows/SspiCli/SSPIInterface.cs" />
+    <Compile Include="$(MpSrc)Common/Interop/Windows/SspiCli/SecurityPackageInfoClass.cs" />
+    <Compile Include="$(MpCommon)src/Interop/Windows/SspiCli/SecurityPackageInfo.cs">
+      <Link>Common/Interop/Windows/SspiCli/SecurityPackageInfo.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/SspiCli/SSPIAuthType.cs">
+      <Link>Common/Interop/Windows/SspiCli/SSPIAuthType.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/SspiCli/SSPISecureChannelType.cs">
+      <Link>Common/Interop/Windows/SspiCli/SSPISecureChannelType.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/SspiCli/SSPIWrapper.cs">
+      <Link>Common/Interop/Windows/SspiCli/SSPIWrapper.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/SspiCli/SecPkgContext_Sizes.cs">
+      <Link>Common/Interop/Windows/SspiCli/SecPkgContext_Sizes.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/SspiCli/SecPkgContext_StreamSizes.cs">
+      <Link>Common/Interop/Windows/SspiCli/SecPkgContext_StreamSizes.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/SspiCli/SecPkgContext_NegotiationInfoW.cs">
+      <Link>Common/Interop/Windows/SspiCli/SecPkgContext_NegotiationInfoW.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/SChannel/SecPkgContext_ConnectionInfo.cs">
+      <Link>Common/Interop/Windows/SChannel/SecPkgContext_ConnectionInfo.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/SChannel/SecPkgContext_CipherInfo.cs">
+      <Link>Common/Interop/Windows/SChannel/SecPkgContext_CipherInfo.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/SspiCli/NegotiationInfoClass.cs">
+      <Link>Common/Interop/Windows/SspiCli/NegotiationInfoClass.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/Crypt32/Interop.certificates.cs">
+      <Link>Common/Interop/Windows/Crypt32/Interop.certificates.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Windows/Crypt32/Interop.certificates_types.cs">
+      <Link>Common/Interop/Windows/Crypt32/Interop.certificates_types.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Net/ContextFlagsAdapterPal.Windows.cs">
+      <Link>Common/System/Net/ContextFlagsAdapterPal.Windows.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Net/SecurityStatusAdapterPal.Windows.cs">
+      <Link>Common/System/Net/SecurityStatusAdapterPal.Windows.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Collections/Generic/BidirectionalDictionary.cs">
+      <Link>Common/System/Collections/Generic/BidirectionalDictionary.cs</Link>
+    </Compile>
+  </ItemGroup>
+
+  <!-- Common (Windows and Unix) dependencies for MANAGED_SNI build -->
+  <ItemGroup>
+    <Compile Include="$(MpCommon)src/System/Net/ContextFlagsPal.cs">
+      <Link>Common/System/Net/ContextFlagsPal.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Net/SecurityStatusPal.cs">
+      <Link>Common/System/Net/SecurityStatusPal.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Net/DebugSafeHandle.cs">
+      <Link>Common/System/Net/DebugSafeHandle.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Net/DebugCriticalHandleMinusOneIsInvalid.cs">
+      <Link>Common/System/Net/DebugCriticalHandleMinusOneIsInvalid.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Net/Logging/NetEventSource.Common.cs">
+      <Link>Common/System/Net/Logging/NetEventSource.Common.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Net/Logging/DebugThreadTracking.cs">
+      <Link>Common/System/Net/Logging/DebugThreadTracking.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Net/InternalException.cs">
+      <Link>Common/System/Net/InternalException.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Net/NegotiationInfoClass.cs">
+      <Link>Common/System/Net/NegotiationInfoClass.cs</Link>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(SqlClientPlatform)' != 'windows'">
+    <Compile Include="$(MpSrc)System/Data/ProviderBase/DbConnectionPoolIdentity.Unix.cs" />
+    <Compile Include="$(MpSrc)Interop/SNINativeMethodWrapper.Unix.cs" />
+    <Compile Include="$(MpCommon)src/System/Net/Security/NegotiateStreamPal.Unix.cs">
+      <Link>Common/System/Net/Security/NegotiateStreamPal.Unix.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Net/Security/Unix/SafeDeleteContext.cs">
+      <Link>Common/System/Net/Security/Unix/SafeDeleteContext.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Net/Security/Unix/SafeFreeCredentials.cs">
+      <Link>Common/System/Net/Security/Unix/SafeFreeCredentials.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Microsoft/Win32/SafeHandles/GssSafeHandles.cs">
+      <Link>Common/Microsoft/Win32/SafeHandles/GssSafeHandles.cs</Link>
+    </Compile>
+    <Compile Include="$(MpSrc)Common/Interop/Unix/System.Net.Security.Native/Interop.NetSecurityNative.Extended.cs" />
+    <Compile Include="$(MpCommon)src/Interop/Unix/System.Net.Security.Native/Interop.NetSecurityNative.cs">
+      <Link>Common/Interop/Unix/System.Net.Security.Native/Interop.NetSecurityNative.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Unix/System.Net.Security.Native/Interop.NetSecurityNative.IsNtlmInstalled.cs">
+      <Link>Common/Interop/Unix/System.Net.Security.Native/Interop.NetSecurityNative.IsNtlmInstalled.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Net/Security/Unix/SafeFreeNegoCredentials.cs">
+      <Link>Common/System/Net/Security/Unix/SafeFreeNegoCredentials.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Net/Security/Unix/SecChannelBindings.cs">
+      <Link>Common/System/Net/Security/Unix/SecChannelBindings.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Unix/Interop.Libraries.cs">
+      <Link>Common/Interop/Unix/Interop.Libraries.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Unix/System.Net.Security.Native/Interop.GssBuffer.cs">
+      <Link>Common/Interop/Unix/System.Net.Security.Native/Interop.GssBuffer.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Net/Security/Unix/SafeDeleteNegoContext.cs">
+      <Link>Common/System/Net/Security/Unix/SafeDeleteNegoContext.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/Interop/Unix/System.Net.Security.Native/Interop.GssApiException.cs">
+      <Link>Common/Interop/Unix/System.Net.Security.Native/Interop.GssApiException.cs</Link>
+    </Compile>
+    <Compile Include="$(MpCommon)src/System/Net/ContextFlagsAdapterPal.Unix.cs">
+      <Link>Common/System/Net/ContextFlagsAdapterPal.Unix.cs</Link>
+    </Compile>
+    <Compile Include="$(MpSrc)System/Data/SqlClient/TdsParserStateObjectFactory.Managed.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/TdsParser.Unix.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/LocalDBAPI.Unix.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SNI/LocalDB.Unix.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SNI/SNITcpHandle.Unix.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/PacketHandle.Unix.cs" />
+    <Compile Include="$(MpSrc)System/Data/SqlClient/SessionHandle.Unix.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="$(MpSrc)Resources/System.Data.SqlClient.SqlMetaData.xml">
+      <LogicalName>System.Data.SqlClient.SqlMetaData.xml</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="runtime.native.System.Data.SqlClient.sni" Version="4.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="/" Visible="false" />
+  </ItemGroup>
+
+  <Import Project="$(MpSrc)GenerateThisAssemblyCs.targets" />
+  <Import Project="../../lib/WebFormsForCore.Build/netstandard2.0/FakeStrongName.targets" />
+
+  <PropertyGroup>
+    <StrongNamePublicKey>002400000480000094000000060200000024000052534131000400000100010007D1FA57C4AED9F0A32E84AA0FAEFD0DE9E8FD6AEC8F87FB03766C834C99921EB23BE79AD9D5DCC1DD9AD236132102900B723CF980957FC4E177108FC607774F29E8320E92EA05ECE4E821C0A5EFE8F1645C4C0C93C1AB99285D622CAA652C1DFAD63D745D6F2DE5F17E5EAF0FC4963D261C8A12436518206DC093344D5AD293</StrongNamePublicKey>
+    <StrongNamePublicKeyToken>b03f5f7f11d50a3a</StrongNamePublicKeyToken>
+  </PropertyGroup>
+
+  <!-- SR's properties from Strings.resx, as the Arcade SDK's GenerateResxSource writes them for upstream
+       (GenerateResxSourceOmitGetResourceString: SR.cs has GetResourceString). -->
+  <UsingTask TaskName="WebForCoreGenerateSR" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)/Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <ResxFile ParameterType="System.String" Required="true" />
+      <OutputFile ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Linq" />
+      <Using Namespace="System.Text" />
+      <Using Namespace="System.Xml.Linq" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        var code = new StringBuilder();
+        code.Append("// <auto-generated/>\n");
+        code.Append("namespace FxResources.System.Data.SqlClient { internal static class SR { } }\n");
+        code.Append("namespace System\n{\n    internal static partial class SR\n    {\n");
+        code.Append("        private static global::System.Resources.ResourceManager s_resourceManager;\n");
+        code.Append("        internal static global::System.Resources.ResourceManager ResourceManager => s_resourceManager ?? (s_resourceManager = new global::System.Resources.ResourceManager(typeof(FxResources.System.Data.SqlClient.SR)));\n");
+        foreach (var data in XDocument.Load(ResxFile).Root.Elements("data"))
+        {
+            string name = (string)data.Attribute("name");
+            code.Append("        internal static string @" + name + " => GetResourceString(\"" + name + "\");\n");
+        }
+        code.Append("    }\n}\n");
+        string text = code.ToString();
+        if (!File.Exists(OutputFile) || File.ReadAllText(OutputFile) != text)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(OutputFile));
+            File.WriteAllText(OutputFile, text);
+        }
+      ]]></Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="WebForCoreGenerateSR" BeforeTargets="CoreCompile" Inputs="$(MpSrc)Resources/Strings.resx" Outputs="$(IntermediateOutputPath)SR.g.cs">
+    <WebForCoreGenerateSR ResxFile="$(MpSrc)Resources/Strings.resx" OutputFile="$(IntermediateOutputPath)SR.g.cs" />
+  </Target>
+  <ItemGroup>
+    <Compile Include="$(IntermediateOutputPath)SR.g.cs" Visible="false" />
+  </ItemGroup>
+
+  <!-- The other platform's build, for the package. Projects that reference this one use the build for the platform
+       they are built on. -->
+  <Target Name="WebForCoreBuildOtherSqlClientPlatform" AfterTargets="Build" Condition="'$(_SqlClientOtherPlatformBuild)' != 'true' AND '$(DesignTimeBuild)' != 'true' AND '$(BuildingInsideVisualStudio)' != 'true'">
+    <MSBuild Projects="$(MSBuildProjectFullPath)" Targets="Build" Properties="SqlClientPlatform=$(_SqlClientOtherPlatform);_SqlClientOtherPlatformBuild=true" />
+  </Target>
+
+  <Target Name="WebForCoreSqlClientPackageFiles">
+    <MSBuild Projects="$(MSBuildProjectFullPath)" Targets="GetTargetPath" Properties="SqlClientPlatform=unix;_SqlClientOtherPlatformBuild=true">
+      <Output TaskParameter="TargetOutputs" ItemName="_SqlClientUnix" />
+    </MSBuild>
+    <MSBuild Projects="$(MSBuildProjectFullPath)" Targets="GetTargetPath" Properties="SqlClientPlatform=windows;_SqlClientOtherPlatformBuild=true">
+      <Output TaskParameter="TargetOutputs" ItemName="_SqlClientWindows" />
+    </MSBuild>
+    <Error Condition="!Exists('@(_SqlClientUnix)') OR !Exists('@(_SqlClientWindows)')" Text="Build both of System.Data.SqlClient's platforms before packing: @(_SqlClientUnix) @(_SqlClientWindows)" />
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="@(_SqlClientUnix->'%(FullPath)')" PackagePath="lib/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Include="$(MpSrc)System.Data.SqlClient.xml" PackagePath="lib/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Include="@(_SqlClientUnix->'%(FullPath)')" PackagePath="runtimes/unix/lib/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Include="@(_SqlClientWindows->'%(FullPath)')" PackagePath="runtimes/win/lib/$(TargetFramework)/" />
+    </ItemGroup>
+  </Target>
+</Project>

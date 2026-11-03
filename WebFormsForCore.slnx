@@ -72,6 +72,9 @@
     <BuildDependency Project="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
   </Project>
   <Project Path="src/webForCore/webForCore.csproj" />
+  <Project Path="src/webForCore.System.Data.SqlClient/webForCore.System.Data.SqlClient.csproj">
+    <BuildDependency Project="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
+  </Project>
   <Project Path="src/WebFormsForCore.WebGrease/WebFormsForCore.WebGrease.csproj">
     <BuildDependency Project="src/WebFormsForCore.Build/WebFormsForCore.Build.csproj" />
   </Project>
@@ -112,6 +115,7 @@
     <Project Path="test/webForCore.Microsoft.AspNet.SignalR.Tests.Common/webForCore.Microsoft.AspNet.SignalR.Tests.Common.csproj" />
     <Project Path="test/webForCore.Microsoft.AspNet.SignalR.Tests/webForCore.Microsoft.AspNet.SignalR.Tests.csproj" />
     <Project Path="test/webForCore.Identity.Test/webForCore.Identity.Test.csproj" />
+    <Project Path="test/webForCore.System.Data.SqlClient.Tests/webForCore.System.Data.SqlClient.Tests.csproj" />
     <Project Path="test/webForCore.System.Net.Http.Formatting.Test/webForCore.System.Net.Http.Formatting.Test.csproj" />
     <Project Path="test/webForCore.System.Web.Razor.Test/webForCore.System.Web.Razor.Test.csproj" />
     <Project Path="test/webForCore.System.Web.Http.Test/webForCore.System.Web.Http.Test.csproj" />

@@ -55,7 +55,10 @@ that references only the `webForCore` package from that folder is built, started
 compiled from App_Code, and with `relaxedUrlToFileSystemMapping` on, map a path (`MapPath.aspx`). Then `tools/ci/package-smoke-mvc`, an MVC 5 and OWIN app with the third-party packages real
 applications have (Unity.Mvc, WebActivatorEx, Katana's Google provider) as they have them, must render Razor views with webForCore's MVC, Razor, Web Pages and Helpers in its `deps.json`,
 construct a controller through Unity (started from `Application_Start`, since WebActivatorEx's start methods don't
-run on webForCore), and redirect a Google challenge.
+run on webForCore), and redirect a Google challenge. It also has Entity Framework 6.5.1, which brings Microsoft's
+`System.Data.SqlClient` 4.8.6: none of that package may be in the output or `deps.json`, and `/Scan` must find
+webForCore's System.Data.SqlClient, Entity Framework bound to it, and `Assembly.GetTypes()` working on every loaded
+assembly (#41).
 
 ## The suites
 
@@ -81,6 +84,7 @@ run on webForCore), and redirect a Google challenge.
 | Microsoft.Owin.Security.Tests | Katana | 118 | 114 | 4 | Cookie, OAuth and other authentication middleware |
 | Microsoft.AspNet.SignalR.Tests | SignalR 2.4.3 | 489 | 487 | 2 | SignalR server and client |
 | Identity.Test | ASP.NET Identity 2 | 311 | 311 | 0 | Identity on Entity Framework 6 against SQL Server |
+| System.Data.SqlClient.Tests | dotnet/maintenance-packages (`FunctionalTests`) | 143 | 143 | 0 | System.Data.SqlClient without a server: parameters, `SqlDataRecord`, metadata, bulk copy mappings, errors, statistics, credentials, async provider base classes. Only upstream's tests that need nothing but xunit: the rest need its TDS test server, RemoteExecutor or Arcade's xunit extensions, which aren't on nuget.org. With webForCore's `AssemblyTests` (4): `GetTypes()` works, and Microsoft's identity is kept (#41) |
 
 Every skip is the upstream project's own (`Skip=` in its source, or a category Microsoft excludes on Linux). None was
 added to hide a failure.
