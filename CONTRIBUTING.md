@@ -50,7 +50,7 @@ a real application behave more like it did on .NET Framework 4.8 and IIS 10, and
 ## How webForCore's own code is written
 
 These rules are for the code webForCore writes itself: the hosting layer and the host, the IIS modules, shims and
-facades, build tasks and scripts. They don't apply to Microsoft's code that is lifted or ported unchanged (principle 4
+facades, build tasks and tools. They don't apply to Microsoft's code that is lifted or ported unchanged (principle 4
 keeps that as it is). The aim is a runtime that is credible and stable: code a reviewer can see is correct, that keeps
 working when .NET is patched, and that fails safely.
 
@@ -73,8 +73,15 @@ working when .NET is patched, and that fails safely.
    to reason about. For example, the host forwards each request to the worker process over HTTP instead of handing
    sockets between processes. When performance does need work, the pull request includes the measurement.
 
-Code written before these rules that breaks them is listed in #57. It is removed or replaced when it is next changed.
-New code doesn't add to it.
+9. **Programs and tools are .NET.** Everything this repository builds, and every tool it uses (CI helpers, generators,
+   checks), is written in C# as a project or as a file-based app run with `dotnet run tool.cs`. No Python, Node.js,
+   Ruby, Perl or other general-purpose language. Shell scripts (bash, PowerShell) and CI YAML are fine as glue that
+   calls dotnet, git, gh and curl. Anything that parses data or makes decisions belongs in C#. Front-end code is
+   fine: JavaScript, TypeScript, CSS, HTML and anything else that runs in the browser (such as the client scripts and
+   styles System.Web and the other libraries serve) is part of the product, not tooling.
+
+Code written before rules 6–8 that breaks them is listed in #57, and Python written before rule 9 in #63. Each item is
+removed or replaced when it is next changed. New code doesn't add to either list.
 
 ## Where tests go
 
