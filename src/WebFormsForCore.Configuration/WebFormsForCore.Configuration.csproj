@@ -167,4 +167,97 @@
         <StrongNamePublicKeyToken>cc7b13ffcd2ddd51</StrongNamePublicKeyToken>
     </PropertyGroup>
 
+
+  <!-- From the external/referencesource submodule (#61): the files that were lifted into this project, at their old paths. -->
+  <ItemGroup>
+    <Compile Include="../../external/referencesource/System.Configuration/System/Configuration/ConfigXmlAttribute.cs" Link="ReferenceSource/System.Configuration/System/Configuration/ConfigXmlAttribute.cs" />
+    <Compile Include="../../external/referencesource/System.Configuration/System/Configuration/ConfigXmlCDataSection.cs" Link="ReferenceSource/System.Configuration/System/Configuration/ConfigXmlCDataSection.cs" />
+    <Compile Include="../../external/referencesource/System.Configuration/System/Configuration/ConfigXmlComment.cs" Link="ReferenceSource/System.Configuration/System/Configuration/ConfigXmlComment.cs" />
+    <Compile Include="../../external/referencesource/System.Configuration/System/Configuration/ConfigXmlElement.cs" Link="ReferenceSource/System.Configuration/System/Configuration/ConfigXmlElement.cs" />
+    <Compile Include="../../external/referencesource/System.Configuration/System/Configuration/ConfigXmlSignificantWhitespace.cs" Link="ReferenceSource/System.Configuration/System/Configuration/ConfigXmlSignificantWhitespace.cs" />
+    <Compile Include="../../external/referencesource/System.Configuration/System/Configuration/ConfigXmlText.cs" Link="ReferenceSource/System.Configuration/System/Configuration/ConfigXmlText.cs" />
+    <Compile Include="../../external/referencesource/System.Configuration/System/Configuration/ConfigXmlWhitespace.cs" Link="ReferenceSource/System.Configuration/System/Configuration/ConfigXmlWhitespace.cs" />
+    <Compile Include="../../external/referencesource/System/compmod/system/configuration/appsettingsreader.cs" Link="ReferenceSource/System/compmod/system/configuration/appsettingsreader.cs" />
+    <Compile Include="../../external/referencesource/System/misc/SecurityUtils.cs" Link="ReferenceSource/System/misc/SecurityUtils.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/AuthenticationModuleElement.cs" Link="ReferenceSource/System/net/System/Net/Configuration/AuthenticationModuleElement.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/AuthenticationModuleElementCollection.cs" Link="ReferenceSource/System/net/System/Net/Configuration/AuthenticationModuleElementCollection.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/AuthenticationModulesSection.cs" Link="ReferenceSource/System/net/System/Net/Configuration/AuthenticationModulesSection.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/BypassElement.cs" Link="ReferenceSource/System/net/System/Net/Configuration/BypassElement.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/BypassElementCollection.cs" Link="ReferenceSource/System/net/System/Net/Configuration/BypassElementCollection.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/ConfigurationStrings.cs" Link="ReferenceSource/System/net/System/Net/Configuration/ConfigurationStrings.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/ConnectionManagementElement.cs" Link="ReferenceSource/System/net/System/Net/Configuration/ConnectionManagementElement.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/ConnectionManagementElementCollection.cs" Link="ReferenceSource/System/net/System/Net/Configuration/ConnectionManagementElementCollection.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/ConnectionManagementSection.cs" Link="ReferenceSource/System/net/System/Net/Configuration/ConnectionManagementSection.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/DefaultProxySection.cs" Link="ReferenceSource/System/net/System/Net/Configuration/DefaultProxySection.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/FtpCachePolicyElement.cs" Link="ReferenceSource/System/net/System/Net/Configuration/FtpCachePolicyElement.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/HttpCachePolicyElement.cs" Link="ReferenceSource/System/net/System/Net/Configuration/HttpCachePolicyElement.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/HttpListenerElement.cs" Link="ReferenceSource/System/net/System/Net/Configuration/HttpListenerElement.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/HttpListenerTimeoutsElement.cs" Link="ReferenceSource/System/net/System/Net/Configuration/HttpListenerTimeoutsElement.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/HttpWebRequestElement.cs" Link="ReferenceSource/System/net/System/Net/Configuration/HttpWebRequestElement.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/IdnElement.cs" Link="ReferenceSource/System/net/System/Net/Configuration/IdnElement.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/Ipv6Element.cs" Link="ReferenceSource/System/net/System/Net/Configuration/Ipv6Element.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/IriParsingElement.cs" Link="ReferenceSource/System/net/System/Net/Configuration/IriParsingElement.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/MailSettingsSection.cs" Link="ReferenceSource/System/net/System/Net/Configuration/MailSettingsSection.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/ModuleElement.cs" Link="ReferenceSource/System/net/System/Net/Configuration/ModuleElement.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/NetSectionGroup.cs" Link="ReferenceSource/System/net/System/Net/Configuration/NetSectionGroup.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/PerformanceCountersElement.cs" Link="ReferenceSource/System/net/System/Net/Configuration/PerformanceCountersElement.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/ProxyElement.cs" Link="ReferenceSource/System/net/System/Net/Configuration/ProxyElement.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/RequestCachingSection.cs" Link="ReferenceSource/System/net/System/Net/Configuration/RequestCachingSection.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/SchemeSettingElement.cs" Link="ReferenceSource/System/net/System/Net/Configuration/SchemeSettingElement.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/SchemeSettingElementCollection.cs" Link="ReferenceSource/System/net/System/Net/Configuration/SchemeSettingElementCollection.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/ServicePointManagerElement.cs" Link="ReferenceSource/System/net/System/Net/Configuration/ServicePointManagerElement.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/SettingsSection.cs" Link="ReferenceSource/System/net/System/Net/Configuration/SettingsSection.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/SmtpNetworkElement.cs" Link="ReferenceSource/System/net/System/Net/Configuration/SmtpNetworkElement.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/SmtpSection.cs" Link="ReferenceSource/System/net/System/Net/Configuration/SmtpSection.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/SmtpSpecifiedPickupDirectoryElement.cs" Link="ReferenceSource/System/net/System/Net/Configuration/SmtpSpecifiedPickupDirectoryElement.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/SocketElement.cs" Link="ReferenceSource/System/net/System/Net/Configuration/SocketElement.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/TimeoutValidationAttribute.cs" Link="ReferenceSource/System/net/System/Net/Configuration/TimeoutValidationAttribute.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/UriSection.cs" Link="ReferenceSource/System/net/System/Net/Configuration/UriSection.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/UriSectionData.cs" Link="ReferenceSource/System/net/System/Net/Configuration/UriSectionData.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/UriSectionReader.cs" Link="ReferenceSource/System/net/System/Net/Configuration/UriSectionReader.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/WebProxyScriptElement.cs" Link="ReferenceSource/System/net/System/Net/Configuration/WebProxyScriptElement.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/WebRequestModuleElement.cs" Link="ReferenceSource/System/net/System/Net/Configuration/WebRequestModuleElement.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/WebRequestModuleElementCollection.cs" Link="ReferenceSource/System/net/System/Net/Configuration/WebRequestModuleElementCollection.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/WebRequestModulesSection.cs" Link="ReferenceSource/System/net/System/Net/Configuration/WebRequestModulesSection.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/WebUtilityElement.cs" Link="ReferenceSource/System/net/System/Net/Configuration/WebUtilityElement.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/UnicodeDecodingConformance.cs" Link="ReferenceSource/System/net/System/Net/UnicodeDecodingConformance.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/Net/UnicodeEncodingConformance.cs" Link="ReferenceSource/System/net/System/Net/UnicodeEncodingConformance.cs" />
+    <Compile Include="../../external/referencesource/System/net/System/UriEnumTypes.cs" Link="ReferenceSource/System/net/System/UriEnumTypes.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/ApplicationSettingsBase.cs" Link="ReferenceSource/System/sys/system/configuration/ApplicationSettingsBase.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/ClientSettingsStore.cs" Link="ReferenceSource/System/sys/system/configuration/ClientSettingsStore.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/ConfigXmlDocument.cs" Link="ReferenceSource/System/sys/system/configuration/ConfigXmlDocument.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/ConfigurationException.cs" Link="ReferenceSource/System/sys/system/configuration/ConfigurationException.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/ConfigurationManagerInternalFactory.cs" Link="ReferenceSource/System/sys/system/configuration/ConfigurationManagerInternalFactory.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/ConfigurationSettings.cs" Link="ReferenceSource/System/sys/system/configuration/ConfigurationSettings.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/DictionarySectionHandler.cs" Link="ReferenceSource/System/sys/system/configuration/DictionarySectionHandler.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/HandlerBase.cs" Link="ReferenceSource/System/sys/system/configuration/HandlerBase.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/IApplicationSettingsProvider.cs" Link="ReferenceSource/System/sys/system/configuration/IApplicationSettingsProvider.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/IConfigurationSectionHandler.cs" Link="ReferenceSource/System/sys/system/configuration/IConfigurationSectionHandler.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/IConfigurationSystem.cs" Link="ReferenceSource/System/sys/system/configuration/IConfigurationSystem.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/IPersistSettings.cs" Link="ReferenceSource/System/sys/system/configuration/IPersistSettings.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/ISettingsProviderService.cs" Link="ReferenceSource/System/sys/system/configuration/ISettingsProviderService.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/IgnoreSectionHandler.cs" Link="ReferenceSource/System/sys/system/configuration/IgnoreSectionHandler.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/LocalFileSettingsProvider.cs" Link="ReferenceSource/System/sys/system/configuration/LocalFileSettingsProvider.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/NameValueFileSectionHandler.cs" Link="ReferenceSource/System/sys/system/configuration/NameValueFileSectionHandler.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/NameValueSectionHandler.cs" Link="ReferenceSource/System/sys/system/configuration/NameValueSectionHandler.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/ReadOnlyNameValueCollection.cs" Link="ReferenceSource/System/sys/system/configuration/ReadOnlyNameValueCollection.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/SettingsAttributeDictionary.cs" Link="ReferenceSource/System/sys/system/configuration/SettingsAttributeDictionary.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/SettingsAttributes.cs" Link="ReferenceSource/System/sys/system/configuration/SettingsAttributes.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/SettingsBase.cs" Link="ReferenceSource/System/sys/system/configuration/SettingsBase.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/SettingsContext.cs" Link="ReferenceSource/System/sys/system/configuration/SettingsContext.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/SettingsProperty.cs" Link="ReferenceSource/System/sys/system/configuration/SettingsProperty.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/SettingsPropertyCollection.cs" Link="ReferenceSource/System/sys/system/configuration/SettingsPropertyCollection.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/SettingsPropertyIsReadOnlyException.cs" Link="ReferenceSource/System/sys/system/configuration/SettingsPropertyIsReadOnlyException.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/SettingsPropertyNotFoundException.cs" Link="ReferenceSource/System/sys/system/configuration/SettingsPropertyNotFoundException.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/SettingsPropertyValue.cs" Link="ReferenceSource/System/sys/system/configuration/SettingsPropertyValue.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/SettingsPropertyValueCollection.cs" Link="ReferenceSource/System/sys/system/configuration/SettingsPropertyValueCollection.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/SettingsPropertyWrongTypeException.cs" Link="ReferenceSource/System/sys/system/configuration/SettingsPropertyWrongTypeException.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/SettingsProvider.cs" Link="ReferenceSource/System/sys/system/configuration/SettingsProvider.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/SettingsProviderCollection.cs" Link="ReferenceSource/System/sys/system/configuration/SettingsProviderCollection.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/SettingsSerializeAs.cs" Link="ReferenceSource/System/sys/system/configuration/SettingsSerializeAs.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/SingleTagSectionHandler.cs" Link="ReferenceSource/System/sys/system/configuration/SingleTagSectionHandler.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/internal/ConfigurationManagerHelper.cs" Link="ReferenceSource/System/sys/system/configuration/internal/ConfigurationManagerHelper.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/sections/ClientSettingsGroups.cs" Link="ReferenceSource/System/sys/system/configuration/sections/ClientSettingsGroups.cs" />
+    <Compile Include="../../external/referencesource/System/sys/system/configuration/sections/ClientSettingsSection.cs" Link="ReferenceSource/System/sys/system/configuration/sections/ClientSettingsSection.cs" />
+  </ItemGroup>
 </Project>

@@ -54,6 +54,30 @@
     </ItemGroup>
     <ItemGroup>
         <!-- The Reference Source's ApplicationServicesStrings.Designer.cs looks its strings up by this name. -->
-        <EmbeddedResource Update="ApplicationServicesStrings.resx" LogicalName="System.Web.ApplicationServicesStrings.resources" />
+        <EmbeddedResource Include="../../external/referencesource/System.Web.ApplicationServices/ApplicationServicesStrings.resx" Link="ApplicationServicesStrings.resx" LogicalName="System.Web.ApplicationServicesStrings.resources" />
     </ItemGroup>
+
+  <!-- From the external/referencesource submodule (#61): the files that were lifted into this project, at their old paths. -->
+  <ItemGroup>
+    <Compile Include="../../external/referencesource/System.Web.ApplicationServices/ApplicationServicesStrings.Designer.cs" Link="ApplicationServicesStrings.Designer.cs" />
+    <Compile Include="../../external/referencesource/System.Web.ApplicationServices/Configuration/MembershipPasswordCompatibilityMode.cs" Link="Configuration/MembershipPasswordCompatibilityMode.cs" />
+    <Compile Include="../../external/referencesource/System.Web.ApplicationServices/Hosting/CustomLoaderAttribute.cs" Link="Hosting/CustomLoaderAttribute.cs" />
+    <Compile Include="../../external/referencesource/System.Web.ApplicationServices/Hosting/CustomLoaderHelper.cs" Link="Hosting/CustomLoaderHelper.cs" />
+    <Compile Include="../../external/referencesource/System.Web.ApplicationServices/Hosting/ICustomLoaderHelperFunctions.cs" Link="Hosting/ICustomLoaderHelperFunctions.cs" />
+    <Compile Include="../../external/referencesource/System.Web.ApplicationServices/Security/DefaultMembershipAdapter.cs" Link="Security/DefaultMembershipAdapter.cs" />
+    <Compile Include="../../external/referencesource/System.Web.ApplicationServices/Security/IMembershipAdapter.cs" Link="Security/IMembershipAdapter.cs" />
+    <Compile Include="../../external/referencesource/System.Web.ApplicationServices/Security/MembershipCreateStatus.cs" Link="Security/MembershipCreateStatus.cs" />
+    <Compile Include="../../external/referencesource/System.Web.ApplicationServices/Security/MembershipCreateUserException.cs" Link="Security/MembershipCreateUserException.cs" />
+    <Compile Include="../../external/referencesource/System.Web.ApplicationServices/Security/MembershipPasswordException.cs" Link="Security/MembershipPasswordException.cs" />
+    <Compile Include="../../external/referencesource/System.Web.ApplicationServices/Security/MembershipPasswordFormat.cs" Link="Security/MembershipPasswordFormat.cs" />
+    <Compile Include="../../external/referencesource/System.Web.ApplicationServices/Security/MembershipProvider.cs" Link="Security/MembershipProvider.cs" />
+    <Compile Include="../../external/referencesource/System.Web.ApplicationServices/Security/MembershipProviderCollection.cs" Link="Security/MembershipProviderCollection.cs" />
+    <Compile Include="../../external/referencesource/System.Web.ApplicationServices/Security/MembershipUser.cs" Link="Security/MembershipUser.cs" />
+    <Compile Include="../../external/referencesource/System.Web.ApplicationServices/Security/MembershipUserCollection.cs" Link="Security/MembershipUserCollection.cs" />
+    <Compile Include="../../external/referencesource/System.Web.ApplicationServices/Security/MembershipValidatePasswordEventHandler.cs" Link="Security/MembershipValidatePasswordEventHandler.cs" />
+    <Compile Include="../../external/referencesource/System.Web.ApplicationServices/Security/RoleProvider.cs" Link="Security/RoleProvider.cs" />
+    <Compile Include="../../external/referencesource/System.Web.ApplicationServices/Security/ValidatePasswordEventArgs.cs" Link="Security/ValidatePasswordEventArgs.cs" />
+    <Compile Include="../../external/referencesource/System.Web.ApplicationServices/Util/SecurityServices.cs" Link="Util/SecurityServices.cs" />
+    <Compile Include="../../external/referencesource/System.Web.ApplicationServices/Util/SystemWebProxy.cs" Link="Util/SystemWebProxy.cs" />
+  </ItemGroup>
 </Project>
