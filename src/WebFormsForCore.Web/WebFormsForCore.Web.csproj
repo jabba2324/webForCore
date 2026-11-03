@@ -95,14 +95,16 @@
         <PackageReference Include="System.Runtime.Caching" Version="10.0.14" />
         <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.14" />
         <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
-        <!-- webForCore: System.Drawing.Common 6.0 with GDI+ on SkiaSharp (src/webForCore.System.Drawing.Common), not the Windows-only package. -->
-        <ProjectReference Include="..\webForCore.System.Drawing.Common\webForCore.System.Drawing.Common.csproj" Aliases="Common" />
+        <!-- webForCore: System.Drawing.Common 6.0 with GDI+ on SkiaSharp (drawingForCore), not the Windows-only package.
+             Global as well as Common: drawingForCore's System.Drawing only forwards FontConverter and ToolboxBitmapAttribute
+             here, and the compiler finds no type by a forward. -->
+        <PackageReference Include="drawingForCore.Common" Version="$(DrawingForCoreVersion)" Aliases="global,Common" />
         <PackageReference Include="System.Data.OleDb" Version="10.0.14" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\WebFormsForCore.Compilers\WebFormsForCore.Compilers.csproj" Condition="'$(TargetFramework)' != 'net48'" />
-        <ProjectReference Include="..\WebFormsForCore.Drawing\WebFormsForCore.Drawing.csproj" Condition="'$(TargetFramework)' != 'net48'" />
+        <PackageReference Include="drawingForCore" Version="$(DrawingForCoreVersion)" Condition="'$(TargetFramework)' != 'net48'" />
         <ProjectReference Include="..\WebFormsForCore.Configuration\WebFormsForCore.Configuration.csproj" Condition="'$(TargetFramework)' != 'net48'" />
         <ProjectReference Include="..\WebFormsForCore.Serialization.Formatters\WebFormsForCore.Serialization.Formatters.csproj" Condition="'$(TargetFramework)' != 'net48'" />
         <ProjectReference Include="..\WebFormsForCore.Web.ApplicationServices\WebFormsForCore.Web.ApplicationServices.csproj" />

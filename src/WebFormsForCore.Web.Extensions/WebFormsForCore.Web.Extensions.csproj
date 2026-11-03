@@ -236,9 +236,6 @@
             <ReferencePath Condition="'%(FileName)' == 'System.Web.Services.Description'">
                 <Aliases>Core</Aliases>
             </ReferencePath>
-            <ReferencePath Condition="'%(FileName)' == 'System.Drawing.Common'">
-                <Aliases>Core</Aliases>
-            </ReferencePath>
             <!-- Do not import System.Web -->
             <ReferencePath Remove="%(Identity)" Condition="'%(FileName)' == 'System.Web' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(Identity),'(?i)[\\/]microsoft\.netcore\.app\.ref[\\/]'))" />
         </ItemGroup>

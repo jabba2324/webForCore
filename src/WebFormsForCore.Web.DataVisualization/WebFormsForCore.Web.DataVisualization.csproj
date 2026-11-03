@@ -43,9 +43,9 @@
     <!-- webForCore: the project had no System.Web/System.Drawing references, so WebForm\ could not compile. -->
     <ItemGroup>
         <ProjectReference Include="..\WebFormsForCore.Web\WebFormsForCore.Web.csproj" />
-        <!-- The chart code needs System.Drawing.Common (Graphics, Bitmap); the fork's attribute-only System.Drawing
-             duplicates FontConverter and ToolboxBitmapAttribute, so keep it out of the global namespace. -->
-        <ProjectReference Include="..\WebFormsForCore.Drawing\WebFormsForCore.Drawing.csproj" Aliases="WfcDrawing" />
+        <!-- The chart code needs System.Drawing.Common (Graphics, Bitmap), which drawingForCore's System.Drawing brings;
+             System.Drawing itself (type forwards only) stays out of the global namespace. -->
+        <PackageReference Include="drawingForCore" Version="$(DrawingForCoreVersion)" Aliases="WfcDrawing" />
         <Compile Include="..\WebFormsForCore.Web\WebFormsForCore\AssemblyRef.cs" Link="Properties\AssemblyRef.cs" />
         <!-- Chart.DataBindTable/DataSource support SqlCommand/SqlDataReader/SqlDataAdapter; a separate package on modern .NET -->
         <PackageReference Include="System.Data.SqlClient" Version="4.9.1" />

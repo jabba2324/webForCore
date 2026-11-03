@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Builds and runs tools/ci/package-smoke, an application that uses webForCore through its packages only, against the
-# packages in <package folder> (and nuget.org for everything else), then requests its pages and checks where the W3C
-# log went.
+# packages in <package folder> (drawingForCore's feed for System.Drawing, nuget.org for everything else), then requests
+# its pages and checks where the W3C log went.
 # Usage: tools/ci/package-smoke.sh <package folder> <version>
 set -euo pipefail
 # pwd -W: the Windows form of the path under Git Bash (#46), since it is written into nuget.config.
@@ -25,10 +25,12 @@ cat > nuget.config <<CONFIG
     <clear />
     <add key="webForCore" value="$packages" />
     <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+    <add key="drawingForCore" value="https://jabba2324.github.io/drawingForCore/index.json" />
   </packageSources>
   <packageSourceMapping>
     <packageSource key="webForCore"><package pattern="webForCore" /><package pattern="webForCore.*" /></packageSource>
     <packageSource key="nuget.org"><package pattern="*" /></packageSource>
+    <packageSource key="drawingForCore"><package pattern="drawingForCore" /><package pattern="drawingForCore.*" /></packageSource>
   </packageSourceMapping>
 </configuration>
 CONFIG

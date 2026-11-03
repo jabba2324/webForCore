@@ -6,15 +6,15 @@ where .NET's base class library behaves differently from .NET Framework's; those
 [lifted-changes.md](lifted-changes.md). On top of them, webForCore's own **gate suites** run real sample applications
 on Kestrel and check them over HTTP against IIS's documented behaviour.
 
-**Latest run (round 19, 31 Oct 2026, Linux x64, Release): 27,299 tests in 24 suites. 27,113 pass, 35 are skipped
-with a reason, and 151 fail, all of them known System.Drawing differences (141 are metafiles).** In the full run one
-more test failed, a race between three of Microsoft's MVC Futures test classes over a static setting; they now share an
-xUnit collection, and Microsoft.Web.Mvc.Test passed in three runs since.
+**Latest run (0.7.0, 3 Nov 2026, Linux x64, .NET 10.0.14, Release): 23,447 tests in 24 suites. 23,423 pass, 24 are
+skipped with a reason, and none fail.** System.Drawing.Common's own tests run in
+[drawingForCore](https://github.com/jabba2324/drawingForCore)'s CI. System.Web.MonoTests skips 11 (6 before 0.7.0): Mono's 5
+`SimpleWorkerRequestTest` tests that create application hosts need an AppDomain per host, and are skipped again now that
+webForCore has no in-process AppDomains (LIFT.md).
 
 ## Running the tests
 
 ```bash
-tools/ci/fetch-test-fonts.sh     # System.Drawing's test fonts (not redistributable, so not committed); before the build
 dotnet build src/WebFormsForCore.Build/WebFormsForCore.Build.csproj -c Release
 dotnet build WebFormsForCore.slnx -c Release
 tools/lift/sqlserver.sh          # SQL Server in a container for Identity.Test (podman or docker)
@@ -24,15 +24,16 @@ tools/ci/run-tests.sh            # every suite; .trx files and summary.md in ./T
 One suite: `dotnet test test/webForCore.<Suite>/webForCore.<Suite>.csproj -c Release`.
 
 CI (`.github/workflows/ci.yml`) runs the same script on Ubuntu 24.04 for every push and pull request, with SQL Server
-as a service container. A suite fails CI on any failing test, except System.Drawing.Common.Tests: there, CI fails only
-on a failure that isn't in `tools/ci/known-failures/System.Drawing.Common.Tests.txt`, and it reports known failures
-that now pass, so the list only shrinks.
+as a service container. A suite fails CI on any failing test.
+
+System.Drawing and System.Drawing.Common come from [drawingForCore](https://github.com/jabba2324/drawingForCore)'s
+packages, and Microsoft's System.Drawing.Common tests run in that repository's CI, with its known failures. Here,
+WebImage and Chart (System.Web.Helpers.Test), and the gate samples, test webForCore's use of it.
 
 Windows is supported as a development environment (#46). CI's `build-windows` job runs the same script on Windows Server
 2025 under Git Bash, with SQL Server Express on the same address and login in place of the container
 (`tools/ci/sqlserver-windows.ps1`), and then packs and runs the package smoke test. The results match Linux's: every
-suite passes, and System.Drawing runs the same selection with the same known failures, since its GDI+ engine is
-webForCore's on both. Two IIS gate tests run only off Windows, because on Windows protected configuration uses Windows'
+suite passes. Two IIS gate tests run only off Windows, because on Windows protected configuration uses Windows'
 own key containers and DPAPI, as on .NET Framework: `AppReadsProtectedSections` (the sample's sections are encrypted with
 key files and the DPAPI emulation) and `RegIISProtectExportImportUnprotect` (it would create key containers in the
 machine's store). To run the suites on Windows: Git for Windows, Python 3 (as `python3`), the SDK in `global.json`, and
@@ -59,14 +60,14 @@ run on webForCore), and redirect a Google challenge.
 
 | Suite | Upstream | Tests | Passed | Skipped | What it exercises |
 | --- | --- | ---: | ---: | ---: | --- |
-| System.Web.MonoTests | Mono `mcs/class/System.Web/Test` | 2,634 | 2,628 | 6 | System.Web itself: HttpRequest/Response, caching, configuration, controls, forms authentication, hosting, HttpUtility. Corrected to Microsoft's 4.5+ behaviour where Mono's implementation differed |
+| System.Web.MonoTests | Mono `mcs/class/System.Web/Test` | 2,634 | 2,623 | 11 | System.Web itself: HttpRequest/Response, caching, configuration, controls, forms authentication, hosting, HttpUtility. Corrected to Microsoft's 4.5+ behaviour where Mono's implementation differed |
 | System.Web.Mvc.Test | AspNetWebStack | 5,498 | 5,498 | 0 | MVC 5 |
 | Microsoft.Web.Mvc.Test | AspNetWebStack | 456 | 456 | 0 | MVC Futures |
 | System.Web.Razor.Test | AspNetWebStack | 1,460 | 1,460 | 0 | Razor 3 parser and code generator |
 | System.Web.WebPages.Test | AspNetWebStack | 973 | 971 | 2 | Web Pages |
 | System.Web.WebPages.Razor.Test | AspNetWebStack | 46 | 45 | 1 | Web Pages' Razor host |
 | System.Web.WebPages.Deployment.Test | AspNetWebStack | 52 | 48 | 4 | Web Pages deployment and version checks |
-| System.Web.Helpers.Test | AspNetWebStack | 418 | 418 | 0 | WebGrid, Chart, WebImage, Crypto, JSON (on the SkiaSharp System.Drawing) |
+| System.Web.Helpers.Test | AspNetWebStack | 418 | 418 | 0 | WebGrid, Chart, WebImage, Crypto, JSON (on drawingForCore's System.Drawing) |
 | System.Web.Http.Test | AspNetWebStack | 3,157 | 3,157 | 0 | Web API 2 |
 | System.Web.Http.WebHost.Test | AspNetWebStack | 343 | 343 | 0 | Web API on System.Web |
 | System.Web.Http.Owin.Test | AspNetWebStack | 243 | 243 | 0 | Web API on OWIN |
@@ -77,18 +78,15 @@ run on webForCore), and redirect a Google challenge.
 | Microsoft.Owin.Security.Tests | Katana | 118 | 114 | 4 | Cookie, OAuth and other authentication middleware |
 | Microsoft.AspNet.SignalR.Tests | SignalR 2.4.3 | 489 | 487 | 2 | SignalR server and client |
 | Identity.Test | ASP.NET Identity 2 | 311 | 311 | 0 | Identity on Entity Framework 6 against SQL Server |
-| System.Drawing.Common.Tests | dotnet/runtime 6.0 | 3,883 | 3,716 | 16 | System.Drawing on the SkiaSharp GDI+ engine (Microsoft's Linux selection); 151 known failures |
 
 Every skip is the upstream project's own (`Skip=` in its source, or a category Microsoft excludes on Linux). None was
-added to hide a failure. The System.Drawing failures are 141 metafile tests (EMF/WMF aren't implemented), 8
-deliberate differences from libgdiplus or .NET Core, 1 comparison against Windows' pixels and 1 premultiplied-alpha
-rounding difference; they are listed in `tools/lift/test-results/2026-10-30.md`.
+added to hide a failure.
 
 ### webForCore's own
 
 | Suite | Tests | What it checks |
 | --- | ---: | --- |
-| IIS.Gate.Tests | 103 | `test/webForCore.IIS.Sample` under `webforcore-host`, compiled from an empty Temporary ASP.NET Files each run: `RegressionTests` (22) for problems real applications hit (`regressions/`, one test per issue, each naming the application); each `<system.webServer>` feature against IIS 10's documented behaviour (request filtering, rewrite rules, redirects, default documents, errors, IP restrictions, directory browsing, compression, logging), the connection details the host forwards (and that clients can't forge them), WebSockets, HTTPS and client certificates, timeouts, SignalR, bundling, protected configuration, integrated-pipeline APIs, precompiled sites (`aspnetcore_compiler`: fixed, updatable, compile errors, usage), ASMX (SOAP 1.1/1.2, faults, HTTP POST, WSDL, help page, JSON), ASP.NET AJAX (ScriptResource.axd, UpdatePanel partial postback, page methods), `System.Web.Mail`, `<system.net>` (mail settings through a PasswordRecovery postback to a fake SMTP server, the default proxy through a fake proxy), `<DbProviderFactories>`, data binding over app types, a Visual Studio typed DataSet with TableAdapters against SQL Server, and restarts (`RecyclingTests`): `UnloadAppDomain` starts the application in a new worker process, every request during a restart under load is answered, Web.config changing while the next worker starts ends in a serving worker (#49), a worker that exits is replaced, and a WebSocket outlasting `shutdownTimeout` is aborted |
+| IIS.Gate.Tests | 106 | `test/webForCore.IIS.Sample` under `webforcore-host`, compiled from an empty Temporary ASP.NET Files each run: `RegressionTests` (23) for problems real applications hit (`regressions/`, one test per issue, each naming the application); each `<system.webServer>` feature against IIS 10's documented behaviour (request filtering, rewrite rules, redirects, default documents, errors, IP restrictions, directory browsing, compression, logging), the connection details the host forwards (and that clients can't forge them), WebSockets, HTTPS and client certificates, timeouts, SignalR, bundling, protected configuration, integrated-pipeline APIs, precompiled sites (`aspnetcore_compiler`: fixed, updatable, compile errors, usage), ASMX (SOAP 1.1/1.2, faults, HTTP POST, WSDL, help page, JSON), ASP.NET AJAX (ScriptResource.axd, UpdatePanel partial postback, page methods), `System.Web.Mail`, `<system.net>` (mail settings through a PasswordRecovery postback to a fake SMTP server, the default proxy through a fake proxy), `<DbProviderFactories>`, data binding over app types, a Visual Studio typed DataSet with TableAdapters against SQL Server, and restarts (`RecyclingTests`): `UnloadAppDomain` starts the application in a new worker process, every request during a restart under load is answered, Web.config changing while the next worker starts ends in a serving worker (#49), a worker that exits is replaced, `bin` and `App_Code` changes restart the application (#51), and a WebSocket outlasting `shutdownTimeout` is aborted |
 | WebApi.Gate.Tests | 67 | `test/webForCore.WebApi.Sample` (Visual Studio's Web API template and the "Getting Started" tutorial's controllers). Each request runs through System.Web and through OWIN, and is compared with an oracle: the same controllers in Web API's in-memory server, without System.Web. Status, media type, body, Location and Allow must match. Also: a restart, which runs the application in a new worker process |
 | Mvc.Gate.Tests | 65 | `test/webForCore.Mvc.Sample` and `test/webForCore.WebPages.Sample`: model binding, validation, post-redirect-get with TempData, `Html.Serialize`/`[Deserialize]` state (and tampering), anti-forgery tokens, filters, error pages, layouts, display and editor templates, Razor features, MVC Futures, Web Pages, that source files aren't served, and that a restart runs the application in a new worker process |
 | Host.Tests | 3 | `webforcore-host` itself (`test/webForCore.Host.Sample`): rapid-fail protection stops starting workers that keep crashing, workers stop when the host ends, and an application run without the host stops when it restarts |
@@ -96,15 +94,16 @@ rounding difference; they are listed in `tools/lift/test-results/2026-10-30.md`.
 
 ## Code coverage
 
-Measured over all 24 suites with `dotnet-coverage` (`tools/ci/coverage.sh`, round 13), including the sample apps
-the gate suites start in their own processes. Line coverage of the production assemblies (tests, samples and NuGet
-dependencies excluded):
+Measured over all 24 suites with `dotnet-coverage` (`tools/ci/coverage.sh`, round 13), including the sample apps the
+gate suites start in their own processes. System.Drawing.Common, System.Drawing and their suite have moved to
+drawingForCore since, so they are left out of the figures below. Line coverage of the production assemblies (tests,
+samples and NuGet dependencies excluded):
 
 | | Coverable lines | Covered | Line coverage |
 | --- | ---: | ---: | ---: |
-| Lifted Microsoft code (Web Stack, Katana, SignalR, Identity, System.Drawing.Common) | 77,188 | 60,422 | **78.3%** |
-| WebFormsForCore's port (System.Web and companions) and webForCore's tools | 301,611 | 59,361 | **19.7%** |
-| **All** | **378,799** | **119,783** | **31.6%** |
+| Lifted Microsoft code (Web Stack, Katana, SignalR, Identity) | 64,168 | 50,659 | **78.9%** |
+| WebFormsForCore's port (System.Web and companions) and webForCore's tools | 301,396 | 59,361 | **19.7%** |
+| **All** | **365,564** | **110,020** | **30.1%** |
 
 The lifted libraries come with Microsoft's own suites, so their coverage is close to what Microsoft had: MVC 91%,
 Web API 91%, Razor 90%, Formatting 90%. The port is the weak spot:
@@ -136,7 +135,6 @@ Per assembly:
 | Microsoft.Owin.Security.Cookies | lifted | 328 | 253 | 77.1% |
 | Microsoft.Owin.Security.OAuth | lifted | 871 | 790 | 90.7% |
 | Microsoft.Web.Mvc | lifted | 2,964 | 1,654 | 55.8% |
-| System.Drawing.Common | lifted | 13,020 | 9,763 | 75.0% |
 | System.Net.Http.Formatting | lifted | 4,141 | 3,724 | 89.9% |
 | System.Web.Cors | lifted | 216 | 216 | 100.0% |
 | System.Web.Helpers | lifted | 2,146 | 1,696 | 79.0% |
@@ -152,7 +150,6 @@ Per assembly:
 | aspnetcore_compiler | port | 476 | 168 | 35.3% |
 | WebFormsForCore.Compilers | port | 51 | 40 | 78.4% |
 | System.Configuration.ConfigurationManager | port | 14,125 | 5,530 | 39.2% |
-| System.Drawing | port | 215 | 0 | 0.0% |
 | webforcore-regiis | port | 54 | 44 | 81.5% |
 | WebFormsForCore.Serialization.Formatters | port | 6,111 | 2,944 | 48.2% |
 | System.Web | port | 146,216 | 40,667 | 27.8% |
@@ -164,7 +161,7 @@ Per assembly:
 | System.Web.RegularExpressions | port | 3,407 | 946 | 27.8% |
 | System.Web.Services | port | 18,737 | 0 | 0.0% |
 | WebGrease | port | 41,858 | 3,121 | 7.5% |
-| **Total** | | **378,799** | **119,783** | **31.6%** |
+| **Total** | | **365,564** | **110,020** | **30.1%** |
 
 Branch coverage isn't reported: dotnet-coverage's Cobertura output has no branch data. To measure again:
 `dotnet tool install -g dotnet-coverage`, build in Release, then `tools/ci/coverage.sh` (about 10 minutes).
@@ -173,5 +170,4 @@ Branch coverage isn't reported: dotnet-coverage's Cobertura output has no branch
 
 - `tools/lift/test-results/2026-10-30.md`: results of each round, including failures grouped by message.
 - `LIFT.md`: why each test was corrected or skipped.
-- `tools/lift/trx_summary.py` and `trx_failures.py` summarise `.trx` files; `tools/ci/check_failures.py` compares a
-  run with the known-failures list.
+- `tools/lift/trx_summary.py` and `trx_failures.py` summarise `.trx` files.

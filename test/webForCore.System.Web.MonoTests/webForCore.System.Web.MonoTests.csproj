@@ -222,7 +222,7 @@
     <ProjectReference Include="..\..\src\WebFormsForCore.Web.Services\WebFormsForCore.Web.Services.csproj" />
     <ProjectReference Include="..\..\src\WebFormsForCore.Web.ApplicationServices\WebFormsForCore.Web.ApplicationServices.csproj" />
     <ProjectReference Include="..\..\src\WebFormsForCore.Configuration\WebFormsForCore.Configuration.csproj" />
-    <ProjectReference Include="..\..\src\WebFormsForCore.Drawing\WebFormsForCore.Drawing.csproj" />
+    <PackageReference Include="drawingForCore" Version="$(DrawingForCoreVersion)" />
     <PackageReference Include="System.Data.SqlClient" Version="4.9.1" />
     <PackageReference Include="NUnit" Version="3.14.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />

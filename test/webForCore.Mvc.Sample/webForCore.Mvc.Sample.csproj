@@ -38,7 +38,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\WebFormsForCore.Configuration\WebFormsForCore.Configuration.csproj" />
-    <ProjectReference Include="..\..\src\WebFormsForCore.Drawing\WebFormsForCore.Drawing.csproj" />
+    <PackageReference Include="drawingForCore" Version="$(DrawingForCoreVersion)" />
     <ProjectReference Include="..\..\src\WebFormsForCore.Serialization.Formatters\WebFormsForCore.Serialization.Formatters.csproj" />
     <ProjectReference Include="..\..\src\WebFormsForCore.Web\WebFormsForCore.Web.csproj" />
     <ProjectReference Include="..\..\src\WebFormsForCore.Web.ApplicationServices\WebFormsForCore.Web.ApplicationServices.csproj" />

@@ -261,7 +261,7 @@ def lift(name, cfg, roots, fork):
         refs.append(os.path.relpath(os.path.join(fork, path), dest).replace("\\", "/"))
     test_packages = TEST_PACKAGES
     if cfg.get("xunit"):
-        # The adapter of xunit 2.4's time (3.x runs some 2.4 test cases it should skip; see lift_drawing_tests.py).
+        # The adapter of xunit 2.4's time (3.x runs some 2.4 test cases it should skip; see drawingForCore's lift_drawing_tests.py).
         test_packages = [(i, cfg["xunit"] if i == "xunit" else "2.4.5" if i == "xunit.runner.visualstudio" else v) for i, v in TEST_PACKAGES]
     packages = list(cfg.get("packages", [])) + (test_packages if cfg.get("test") and not cfg.get("library") else [])
     src_label = {"signalr": "SignalR/SignalR", "identity": "aspnet/AspNetIdentity"}[repo_key]

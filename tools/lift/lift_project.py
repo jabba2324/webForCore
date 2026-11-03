@@ -668,8 +668,8 @@ FIXUPS["System.Web.WebPages.Test"] = [("Html/InputHelperTest.cs",) + USING("Syst
 
 NO_SXS = ("side-by-side Web Pages versions (another System.Web.WebPages.Deployment loaded next to this one, as from the GAC): .NET has no "
           "GAC and an AssemblyLoadContext holds one version of a name.")
-# WebImage and Chart run on System.Drawing.Common with GDI+ on SkiaSharp (src/webForCore.System.Drawing.Common,
-# tools/lift/lift_drawing.py). libgdiplus was tried first and rejected (LIFT.md).
+# WebImage and Chart run on System.Drawing.Common with GDI+ on SkiaSharp (drawingForCore's packages,
+# https://github.com/jabba2324/drawingForCore). libgdiplus was tried first and rejected (LIFT.md).
 TRANSFORMS["System.Web.Helpers.Test"] = []
 # Windows paths in the test data (tests only): a drive-rooted path is rooted on Windows, so WebImage takes it as a file
 # path; on Linux it is not. "x:\dir\file.jpg" becomes "/x/dir/file.jpg", rooted on both. ChartTest strips the drive
@@ -1304,9 +1304,14 @@ def lift(name, cfg, roots, spike, fork, commits):
         notes.append(f"compiled out {rel}: {signature}")
 
     refs = []
+    # System.Drawing is drawingForCore's package (#53), whether the spike output names it as the fork's old project or as
+    # the package.
+    drawing = any(p["Identity"] == "drawingForCore" for p in items.get("PackageReference", []))
     for pr in items.get("ProjectReference", []):
         full = pr["FullPath"] if os.path.isabs(pr["FullPath"]) else os.path.join(fork, pr["FullPath"])
-        if full.startswith(os.path.join(fork, "src") + os.sep):
+        if os.path.basename(full) == "WebFormsForCore.Drawing.csproj":
+            drawing = True
+        elif full.startswith(os.path.join(fork, "src") + os.sep):
             refs.append(os.path.relpath(full, dest_dir))
         else:
             sib = os.path.basename(full)[:-len(".csproj")].replace(".ns2_0", "")
@@ -1325,9 +1330,11 @@ def lift(name, cfg, roots, spike, fork, commits):
         if p["Identity"] in PACKAGE_TO_PROJECT:
             sib = PACKAGE_TO_PROJECT[p["Identity"]]
             refs.append(os.path.relpath(os.path.join(project_dir(fork, sib), f"webForCore.{sib}.csproj"), dest_dir))
-    pkgs = [(p["Identity"], PACKAGE_VERSION_OVERRIDES.get(p["Identity"], p["Version"]))
-            for p in items.get("PackageReference", [])
-            if p.get("Version") and p["Identity"] not in DROP_PACKAGES and p["Identity"] not in PACKAGE_TO_PROJECT]
+    pkgs = [("drawingForCore", "$(DrawingForCoreVersion)")] if drawing else []
+    pkgs += [(p["Identity"], PACKAGE_VERSION_OVERRIDES.get(p["Identity"], p["Version"]))
+             for p in items.get("PackageReference", [])
+             if p.get("Version") and p["Identity"] not in DROP_PACKAGES and p["Identity"] not in PACKAGE_TO_PROJECT
+             and p["Identity"] != "drawingForCore"]
     pkgs += list(cfg.get("packages", []))
     if cfg.get("test") and cfg.get("runner", True):
         pkgs += [(i, v) for i, v in PACKAGE_VERSION_OVERRIDES.items() if i not in {p for p, _ in pkgs}]
