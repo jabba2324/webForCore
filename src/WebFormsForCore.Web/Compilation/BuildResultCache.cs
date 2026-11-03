@@ -706,7 +706,8 @@ namespace System.Web.Compilation
 
 			try
 			{
-				f.Delete();
+				// webForCore (#89): not while a worker has it loaded, as on Windows (CodegenFileLocks).
+				CodegenFileLocks.Delete(f.FullName);
 				Debug.Trace("DiskBuildResultCache", "TryDeleteFile removed " + f.Name);
 				return true;
 			}
@@ -729,7 +730,8 @@ namespace System.Web.Compilation
 			{
 				try
 				{
-					File.Delete(baseName);
+					// webForCore (#89): not while a worker has it loaded, as on Windows (CodegenFileLocks).
+					CodegenFileLocks.Delete(baseName);
 					Debug.Trace("DiskBuildResultCache", "CheckAndRemoveDotDeleteFile deleted " + baseName);
 				}
 				catch
@@ -789,6 +791,9 @@ namespace System.Web.Compilation
 			Debug.Assert(cacheDir == HttpRuntime.CodegenDirInternal);
 
 			EnsureDiskCacheDirectoryCreated();
+
+			// webForCore (#89): hold the assemblies this worker loads from the folder, so that the next worker leaves them.
+			CodegenFileLocks.Start(cacheDir);
 
 			FindSatelliteDirectories();
 		}

@@ -401,9 +401,10 @@ The first request compiles pages, as on IIS. Then compare the responses recorded
   `WebForCore:Host` section ([IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md#process-model)).
 - **In front:** a reverse proxy (nginx, Apache, a load balancer) for TLS and the public port, or the host's own HTTPS.
 - **Recycling:** a `web.config`, `bin` or `App_Code` change restarts the app in a new worker process, as IIS did; no
-  request fails, and those that arrive meanwhile wait for the new worker. Set time, request or memory recycling with
-  `UseWebForms(o => o.Recycling(...))`. Run without the host (`dotnet bin_dotnet/YourApp.dll`), the app stops when it
-  restarts, for whatever started it to start it again.
+  request fails (the old worker finishes against the assemblies it compiled, #89), and those that arrive meanwhile
+  wait for the new worker. Set time, request or memory recycling with `UseWebForms(o => o.Recycling(...))`. Run without
+  the host (`dotnet bin_dotnet/YourApp.dll`), the app stops when it restarts, for whatever started it to start it
+  again.
 - **Precompilation** (optional): `aspnetcore_compiler -v / -p <site> -b bin_dotnet [-u] <target>`, then copy the build
   into `<target>/bin_dotnet`. Use `-u` for updatable sites.
 - **Scaling out:** use out-of-process session state (Redis or SQL Server through ASP.NET Core's distributed cache) and
