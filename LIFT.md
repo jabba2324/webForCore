@@ -2143,3 +2143,29 @@ files, and 5 change commits. `external/SignalR` is xforcore/SignalR's `webforcor
 and 3 change commits. Their 9 projects compile from the submodules, and the 571 lifted copies and the 9 manifests are
 gone. The report now covers 3,135 lifted files, 235 changed. Tests are unchanged: Identity.Test 311/311 against SQL
 Server; Microsoft.AspNet.SignalR.Tests 487 pass, 2 skipped, of 489.
+
+## Web Stack from a submodule (#61, 3 Nov 2026)
+
+`external/AspNetWebStack` is xforcore/AspNetWebStack's `webforcore` branch:
+- upstream `2106565`;
+- 2,719 files;
+- 148 change commits;
+- one commit that gives `NoCshtmlConfigv1` the casing its test project uses (`V1`), which the lift used to resolve.
+
+Its 27 projects compile from the submodule, and the 2,819 lifted copies and 27 manifests are gone. Files that more
+than one project uses, such as `src/Common`, are linked from the one copy. The report now covers 316 lifted files
+(referencesource, winforms, mono), 85 of them changed. All 15 suites are unchanged:
+- System.Web.Mvc.Test 5,498;
+- Microsoft.Web.Mvc.Test 456;
+- System.Web.Razor.Test 1,460;
+- System.Web.WebPages.Test 971 + 2 skipped;
+- WebPages.Razor 45 + 1 skipped;
+- Deployment 48 + 4 skipped;
+- Helpers 418;
+- System.Web.Http.Test 3,157;
+- WebHost 343;
+- Owin 243;
+- CORS 124 + 72;
+- System.Net.Http.Formatting.Test 6,445;
+- WebApi.Gate 67;
+- Mvc.Gate 65.

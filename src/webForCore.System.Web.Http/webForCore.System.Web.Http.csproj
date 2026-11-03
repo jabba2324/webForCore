@@ -27,399 +27,399 @@
   <Import Project="../webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="AcceptVerbsAttribute.cs" />
-    <Compile Include="ActionNameAttribute.cs" />
-    <Compile Include="AllowAnonymousAttribute.cs" />
-    <Compile Include="ApiController.cs" />
-    <Compile Include="AuthorizeAttribute.cs" />
-    <Compile Include="Batch/BatchExecutionOrder.cs" />
-    <Compile Include="Batch/BatchHttpRequestContext.cs" />
-    <Compile Include="Batch/BatchHttpRequestMessageExtensions.cs" />
-    <Compile Include="Batch/DefaultHttpBatchHandler.cs" />
-    <Compile Include="Batch/HttpBatchHandler.cs" />
-    <Compile Include="Common/CollectionExtensions.cs" />
-    <Compile Include="Common/DictionaryExtensions.cs" />
-    <Compile Include="Common/Error.cs" />
-    <Compile Include="Common/HttpMethodHelper.cs" />
-    <Compile Include="Common/ListWrapperCollection.cs" />
-    <Compile Include="Common/PrefixContainer.cs" />
-    <Compile Include="Common/TaskHelpers.cs" />
-    <Compile Include="Common/TaskHelpersExtensions.cs" />
-    <Compile Include="Common/TypeExtensions.cs" />
-    <Compile Include="Controllers/ActionFilterResult.cs" />
-    <Compile Include="Controllers/ApiControllerActionInvoker.cs" />
-    <Compile Include="Controllers/ApiControllerActionSelector.cs" />
-    <Compile Include="Controllers/AuthenticationFilterResult.cs" />
-    <Compile Include="Controllers/AuthorizationFilterResult.cs" />
-    <Compile Include="Controllers/CandidateAction.cs" />
-    <Compile Include="Controllers/ExceptionFilterResult.cs" />
-    <Compile Include="Controllers/FilterGrouping.cs" />
-    <Compile Include="Controllers/HttpActionBinding.cs" />
-    <Compile Include="Controllers/HttpActionContext.cs" />
-    <Compile Include="Controllers/HttpActionContextExtensions.cs" />
-    <Compile Include="Controllers/HttpActionDescriptor.cs" />
-    <Compile Include="Controllers/HttpActionDescriptorExtensions.cs" />
-    <Compile Include="Controllers/HttpControllerContext.cs" />
-    <Compile Include="Controllers/HttpControllerDescriptor.cs" />
-    <Compile Include="Controllers/HttpControllerDescriptorExtensions.cs" />
-    <Compile Include="Controllers/HttpControllerSettings.cs" />
-    <Compile Include="Controllers/HttpParameterBinding.cs" />
-    <Compile Include="Controllers/HttpParameterDescriptor.cs" />
-    <Compile Include="Controllers/HttpParameterDescriptorExtensions.cs" />
-    <Compile Include="Controllers/HttpRequestContext.cs" />
-    <Compile Include="Controllers/IActionHttpMethodProvider.cs" />
-    <Compile Include="Controllers/IActionResultConverter.cs" />
-    <Compile Include="Controllers/IActionValueBinder.cs" />
-    <Compile Include="Controllers/IControllerConfiguration.cs" />
-    <Compile Include="Controllers/IHttpActionInvoker.cs" />
-    <Compile Include="Controllers/IHttpActionSelector.cs" />
-    <Compile Include="Controllers/IHttpController.cs" />
-    <Compile Include="Controllers/ReflectedHttpActionDescriptor.cs" />
-    <Compile Include="Controllers/ReflectedHttpParameterDescriptor.cs" />
-    <Compile Include="Controllers/RequestBackedHttpRequestContext.cs" />
-    <Compile Include="Controllers/ResponseMessageResultConverter.cs" />
-    <Compile Include="Controllers/ValueResultConverter.cs" />
-    <Compile Include="Controllers/VoidResultConverter.cs" />
-    <Compile Include="Dependencies/EmptyResolver.cs" />
-    <Compile Include="Dependencies/IDependencyResolver.cs" />
-    <Compile Include="Dependencies/IDependencyScope.cs" />
-    <Compile Include="Description/ApiDescription.cs" />
-    <Compile Include="Description/ApiExplorer.cs" />
-    <Compile Include="Description/ApiExplorerSettingsAttribute.cs" />
-    <Compile Include="Description/ApiParameterDescription.cs" />
-    <Compile Include="Description/ApiParameterSource.cs" />
-    <Compile Include="Description/IApiExplorer.cs" />
-    <Compile Include="Description/IDocumentationProvider.cs" />
-    <Compile Include="Description/ResponseDescription.cs" />
-    <Compile Include="Description/ResponseTypeAttribute.cs" />
-    <Compile Include="Dispatcher/DefaultAssembliesResolver.cs" />
-    <Compile Include="Dispatcher/DefaultHttpControllerActivator.cs" />
-    <Compile Include="Dispatcher/DefaultHttpControllerSelector.cs" />
-    <Compile Include="Dispatcher/DefaultHttpControllerTypeResolver.cs" />
-    <Compile Include="Dispatcher/HttpControllerDispatcher.cs" />
-    <Compile Include="Dispatcher/HttpControllerTypeCache.cs" />
-    <Compile Include="Dispatcher/HttpRoutingDispatcher.cs" />
-    <Compile Include="Dispatcher/IAssembliesResolver.cs" />
-    <Compile Include="Dispatcher/IHttpControllerActivator.cs" />
-    <Compile Include="Dispatcher/IHttpControllerSelector.cs" />
-    <Compile Include="Dispatcher/IHttpControllerTypeResolver.cs" />
-    <Compile Include="EmptyReadOnlyDictionary.cs" />
-    <Compile Include="ExceptionHandling/CompositeExceptionLogger.cs" />
-    <Compile Include="ExceptionHandling/DefaultExceptionHandler.cs" />
-    <Compile Include="ExceptionHandling/EmptyExceptionHandler.cs" />
-    <Compile Include="ExceptionHandling/ExceptionCatchBlocks.cs" />
-    <Compile Include="ExceptionHandling/ExceptionContext.cs" />
-    <Compile Include="ExceptionHandling/ExceptionContextCatchBlock.cs" />
-    <Compile Include="ExceptionHandling/ExceptionHandler.cs" />
-    <Compile Include="ExceptionHandling/ExceptionHandlerContext.cs" />
-    <Compile Include="ExceptionHandling/ExceptionHandlerExtensions.cs" />
-    <Compile Include="ExceptionHandling/ExceptionLogger.cs" />
-    <Compile Include="ExceptionHandling/ExceptionLoggerContext.cs" />
-    <Compile Include="ExceptionHandling/ExceptionLoggerExtensions.cs" />
-    <Compile Include="ExceptionHandling/ExceptionServices.cs" />
-    <Compile Include="ExceptionHandling/IExceptionHandler.cs" />
-    <Compile Include="ExceptionHandling/IExceptionLogger.cs" />
-    <Compile Include="ExceptionHandling/LastChanceExceptionHandler.cs" />
-    <Compile Include="Filters/ActionDescriptorFilterProvider.cs" />
-    <Compile Include="Filters/ActionFilterAttribute.cs" />
-    <Compile Include="Filters/AuthorizationFilterAttribute.cs" />
-    <Compile Include="Filters/ConfigurationFilterProvider.cs" />
-    <Compile Include="Filters/ExceptionFilterAttribute.cs" />
-    <Compile Include="Filters/FilterAttribute.cs" />
-    <Compile Include="Filters/FilterInfo.cs" />
-    <Compile Include="Filters/FilterInfoComparer.cs" />
-    <Compile Include="Filters/FilterScope.cs" />
-    <Compile Include="Filters/HttpActionExecutedContext.cs" />
-    <Compile Include="Filters/HttpAuthenticationChallengeContext.cs" />
-    <Compile Include="Filters/HttpAuthenticationContext.cs" />
-    <Compile Include="Filters/HttpFilterCollection.cs" />
-    <Compile Include="Filters/IActionFilter.cs" />
-    <Compile Include="Filters/IAuthenticationFilter.cs" />
-    <Compile Include="Filters/IAuthorizationFilter.cs" />
-    <Compile Include="Filters/IExceptionFilter.cs" />
-    <Compile Include="Filters/IFilter.cs" />
-    <Compile Include="Filters/IFilterProvider.cs" />
-    <Compile Include="Filters/IOverrideFilter.cs" />
-    <Compile Include="FromBodyAttribute.cs" />
-    <Compile Include="FromUriAttribute.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Hosting/HttpPropertyKeys.cs" />
-    <Compile Include="Hosting/IHostBufferPolicySelector.cs" />
-    <Compile Include="Hosting/SuppressHostPrincipalMessageHandler.cs" />
-    <Compile Include="HttpBindNeverAttribute.cs" />
-    <Compile Include="HttpBindRequiredAttribute.cs" />
-    <Compile Include="HttpConfiguration.cs" />
-    <Compile Include="HttpConfigurationExtensions.cs" />
-    <Compile Include="HttpDeleteAttribute.cs" />
-    <Compile Include="HttpError.cs" />
-    <Compile Include="HttpErrorKeys.cs" />
-    <Compile Include="HttpGetAttribute.cs" />
-    <Compile Include="HttpHeadAttribute.cs" />
-    <Compile Include="HttpOptionsAttribute.cs" />
-    <Compile Include="HttpPatchAttribute.cs" />
-    <Compile Include="HttpPostAttribute.cs" />
-    <Compile Include="HttpPutAttribute.cs" />
-    <Compile Include="HttpRequestMessageExtensions.cs" />
-    <Compile Include="HttpResponseException.cs" />
-    <Compile Include="HttpResponseMessageExtensions.cs" />
-    <Compile Include="HttpRouteCollection.cs" />
-    <Compile Include="HttpRouteCollectionExtensions.cs" />
-    <Compile Include="HttpServer.cs" />
-    <Compile Include="IHttpActionResult.cs" />
-    <Compile Include="IncludeErrorDetailPolicy.cs" />
-    <Compile Include="Internal/CollectionModelBinderUtil.cs" />
-    <Compile Include="Internal/HttpParameterBindingExtensions.cs" />
-    <Compile Include="Internal/MemberInfoExtensions.cs" />
-    <Compile Include="Internal/ParameterInfoExtensions.cs" />
-    <Compile Include="Internal/TypeActivator.cs" />
-    <Compile Include="Internal/TypeDescriptorHelper.cs" />
-    <Compile Include="Internal/TypeHelper.cs" />
-    <Compile Include="Metadata/EfficientTypePropertyKey.cs" />
-    <Compile Include="Metadata/ModelMetadata.cs" />
-    <Compile Include="Metadata/ModelMetadataProvider.cs" />
-    <Compile Include="Metadata/Providers/AssociatedMetadataProvider.cs" />
-    <Compile Include="Metadata/Providers/CachedDataAnnotationsMetadataAttributes.cs" />
-    <Compile Include="Metadata/Providers/CachedDataAnnotationsModelMetadata.cs" />
-    <Compile Include="Metadata/Providers/CachedModelMetadata.cs" />
-    <Compile Include="Metadata/Providers/DataAnnotationsModelMetadataProvider.cs" />
-    <Compile Include="Metadata/Providers/EmptyMetadataProvider.cs" />
-    <Compile Include="ModelBinding/Binders/ArrayModelBinder.cs" />
-    <Compile Include="ModelBinding/Binders/ArrayModelBinderProvider.cs" />
-    <Compile Include="ModelBinding/Binders/CollectionModelBinder.cs" />
-    <Compile Include="ModelBinding/Binders/CollectionModelBinderProvider.cs" />
-    <Compile Include="ModelBinding/Binders/ComplexModelDto.cs" />
-    <Compile Include="ModelBinding/Binders/ComplexModelDtoModelBinder.cs" />
-    <Compile Include="ModelBinding/Binders/ComplexModelDtoModelBinderProvider.cs" />
-    <Compile Include="ModelBinding/Binders/ComplexModelDtoResult.cs" />
-    <Compile Include="ModelBinding/Binders/CompositeModelBinder.cs" />
-    <Compile Include="ModelBinding/Binders/CompositeModelBinderProvider.cs" />
-    <Compile Include="ModelBinding/Binders/DictionaryModelBinder.cs" />
-    <Compile Include="ModelBinding/Binders/DictionaryModelBinderProvider.cs" />
-    <Compile Include="ModelBinding/Binders/KeyValuePairModelBinder.cs" />
-    <Compile Include="ModelBinding/Binders/KeyValuePairModelBinderProvider.cs" />
-    <Compile Include="ModelBinding/Binders/MutableObjectModelBinder.cs" />
-    <Compile Include="ModelBinding/Binders/MutableObjectModelBinderProvider.cs" />
-    <Compile Include="ModelBinding/Binders/SimpleModelBinderProvider.cs" />
-    <Compile Include="ModelBinding/Binders/TypeConverterModelBinder.cs" />
-    <Compile Include="ModelBinding/Binders/TypeConverterModelBinderProvider.cs" />
-    <Compile Include="ModelBinding/Binders/TypeMatchModelBinder.cs" />
-    <Compile Include="ModelBinding/Binders/TypeMatchModelBinderProvider.cs" />
-    <Compile Include="ModelBinding/CancellationTokenParameterBinding.cs" />
-    <Compile Include="ModelBinding/CustomModelBinderAttribute.cs" />
-    <Compile Include="ModelBinding/DefaultActionValueBinder.cs" />
-    <Compile Include="ModelBinding/ErrorParameterBinding.cs" />
-    <Compile Include="ModelBinding/FormDataCollectionExtensions.cs" />
-    <Compile Include="ModelBinding/FormatterParameterBinding.cs" />
-    <Compile Include="ModelBinding/HttpBindingBehavior.cs" />
-    <Compile Include="ModelBinding/HttpBindingBehaviorAttribute.cs" />
-    <Compile Include="ModelBinding/HttpRequestParameterBinding.cs" />
-    <Compile Include="ModelBinding/IModelBinder.cs" />
-    <Compile Include="ModelBinding/IValueProviderParameterBinding.cs" />
-    <Compile Include="ModelBinding/JQueryMVCFormUrlEncodedFormatter.cs" />
-    <Compile Include="ModelBinding/ModelBinderAttribute.cs" />
-    <Compile Include="ModelBinding/ModelBinderConfig.cs" />
-    <Compile Include="ModelBinding/ModelBinderErrorMessageProvider.cs" />
-    <Compile Include="ModelBinding/ModelBinderParameterBinding.cs" />
-    <Compile Include="ModelBinding/ModelBinderProvider.cs" />
-    <Compile Include="ModelBinding/ModelBindingContext.cs" />
-    <Compile Include="ModelBinding/ModelBindingHelper.cs" />
-    <Compile Include="ModelBinding/ModelError.cs" />
-    <Compile Include="ModelBinding/ModelErrorCollection.cs" />
-    <Compile Include="ModelBinding/ModelState.cs" />
-    <Compile Include="ModelBinding/ModelStateDictionary.cs" />
-    <Compile Include="ModelBinding/ParameterBindingRulesCollection.cs" />
-    <Compile Include="NonActionAttribute.cs" />
-    <Compile Include="OverrideActionFiltersAttribute.cs" />
-    <Compile Include="OverrideAuthenticationAttribute.cs" />
-    <Compile Include="OverrideAuthorizationAttribute.cs" />
-    <Compile Include="OverrideExceptionFiltersAttribute.cs" />
-    <Compile Include="ParameterBindingAttribute.cs" />
-    <Compile Include="Properties/AssemblyInfo.cs" />
-    <Compile Include="Properties/CommonAssemblyInfo.cs" />
-    <Compile Include="Properties/CommonWebApiResources.Designer.cs" />
-    <Compile Include="Properties/SRResources.Designer.cs" />
-    <Compile Include="Results/BadRequestErrorMessageResult.cs" />
-    <Compile Include="Results/BadRequestResult.cs" />
-    <Compile Include="Results/ConflictResult.cs" />
-    <Compile Include="Results/CreatedAtRouteNegotiatedContentResult.cs" />
-    <Compile Include="Results/CreatedNegotiatedContentResult.cs" />
-    <Compile Include="Results/ExceptionResult.cs" />
-    <Compile Include="Results/FormattedContentResult.cs" />
-    <Compile Include="Results/InternalServerErrorResult.cs" />
-    <Compile Include="Results/InvalidModelStateResult.cs" />
-    <Compile Include="Results/JsonResult.cs" />
-    <Compile Include="Results/NegotiatedContentResult.cs" />
-    <Compile Include="Results/NotFoundResult.cs" />
-    <Compile Include="Results/OkNegotiatedContentResult.cs" />
-    <Compile Include="Results/OkResult.cs" />
-    <Compile Include="Results/RedirectResult.cs" />
-    <Compile Include="Results/RedirectToRouteResult.cs" />
-    <Compile Include="Results/ResponseMessageResult.cs" />
-    <Compile Include="Results/StatusCodeResult.cs" />
-    <Compile Include="Results/UnauthorizedResult.cs" />
-    <Compile Include="RouteAttribute.cs" />
-    <Compile Include="RouteParameter.cs" />
-    <Compile Include="RoutePrefixAttribute.cs" />
-    <Compile Include="Routing/AttributeRoutingMapper.cs" />
-    <Compile Include="Routing/BoundRouteTemplate.cs" />
-    <Compile Include="Routing/Constraints/AlphaRouteConstraint.cs" />
-    <Compile Include="Routing/Constraints/BoolRouteConstraint.cs" />
-    <Compile Include="Routing/Constraints/CompoundRouteConstraint.cs" />
-    <Compile Include="Routing/Constraints/DateTimeRouteConstraint.cs" />
-    <Compile Include="Routing/Constraints/DecimalRouteConstraint.cs" />
-    <Compile Include="Routing/Constraints/DoubleRouteConstraint.cs" />
-    <Compile Include="Routing/Constraints/FloatRouteConstraint.cs" />
-    <Compile Include="Routing/Constraints/GuidRouteConstraint.cs" />
-    <Compile Include="Routing/Constraints/IntRouteConstraint.cs" />
-    <Compile Include="Routing/Constraints/LengthRouteConstraint.cs" />
-    <Compile Include="Routing/Constraints/LongRouteConstraint.cs" />
-    <Compile Include="Routing/Constraints/MaxLengthRouteConstraint.cs" />
-    <Compile Include="Routing/Constraints/MaxRouteConstraint.cs" />
-    <Compile Include="Routing/Constraints/MinLengthRouteConstraint.cs" />
-    <Compile Include="Routing/Constraints/MinRouteConstraint.cs" />
-    <Compile Include="Routing/Constraints/OptionalRouteConstraint.cs" />
-    <Compile Include="Routing/Constraints/RangeRouteConstraintBase.cs" />
-    <Compile Include="Routing/Constraints/RegexRouteConstraint.cs" />
-    <Compile Include="Routing/DefaultDirectRouteProvider.cs" />
-    <Compile Include="Routing/DefaultInlineConstraintResolver.cs" />
-    <Compile Include="Routing/DirectRouteBuilder.cs" />
-    <Compile Include="Routing/DirectRouteFactoryContext.cs" />
-    <Compile Include="Routing/HttpMethodConstraint.cs" />
-    <Compile Include="Routing/HttpParsedRoute.cs" />
-    <Compile Include="Routing/HttpRoute.cs" />
-    <Compile Include="Routing/HttpRouteData.cs" />
-    <Compile Include="Routing/HttpRouteDataExtensions.cs" />
-    <Compile Include="Routing/HttpRouteDirection.cs" />
-    <Compile Include="Routing/HttpRouteExtensions.cs" />
-    <Compile Include="Routing/HttpRouteValueDictionary.cs" />
-    <Compile Include="Routing/HttpVirtualPathData.cs" />
-    <Compile Include="Routing/IDirectRouteBuilder.cs" />
-    <Compile Include="Routing/IDirectRouteFactory.cs" />
-    <Compile Include="Routing/IDirectRouteProvider.cs" />
-    <Compile Include="Routing/IHttpRoute.cs" />
-    <Compile Include="Routing/IHttpRouteConstraint.cs" />
-    <Compile Include="Routing/IHttpRouteData.cs" />
-    <Compile Include="Routing/IHttpRouteInfoProvider.cs" />
-    <Compile Include="Routing/IHttpVirtualPathData.cs" />
-    <Compile Include="Routing/IInlineConstraintResolver.cs" />
-    <Compile Include="Routing/IRoutePrefix.cs" />
-    <Compile Include="Routing/InlineRouteTemplateParser.cs" />
-    <Compile Include="Routing/LinkGenerationRoute.cs" />
-    <Compile Include="Routing/MediaTypeFormatterExtensions.cs" />
-    <Compile Include="Routing/PathContentSegment.cs" />
-    <Compile Include="Routing/PathLiteralSubsegment.cs" />
-    <Compile Include="Routing/PathParameterSubsegment.cs" />
-    <Compile Include="Routing/PathSegment.cs" />
-    <Compile Include="Routing/PathSeparatorSegment.cs" />
-    <Compile Include="Routing/PathSubsegment.cs" />
-    <Compile Include="Routing/PropertyHelper.cs" />
-    <Compile Include="Routing/RouteCollectionRoute.cs" />
-    <Compile Include="Routing/RouteDataTokenKeys.cs" />
-    <Compile Include="Routing/RouteEntry.cs" />
-    <Compile Include="Routing/RouteFactoryAttribute.cs" />
-    <Compile Include="Routing/RouteInfoDirectRouteFactory.cs" />
-    <Compile Include="Routing/RouteParser.cs" />
-    <Compile Include="Routing/RoutePrecedence.cs" />
-    <Compile Include="Routing/RouteValueKeys.cs" />
-    <Compile Include="Routing/RoutingContext.cs" />
-    <Compile Include="Routing/StopRoutingHandler.cs" />
-    <Compile Include="Routing/SubRouteCollection.cs" />
-    <Compile Include="Routing/UriPathExtensionMapping.cs" />
-    <Compile Include="Routing/UrlHelper.cs" />
-    <Compile Include="Services/ControllerServices.cs" />
-    <Compile Include="Services/Decorator.cs" />
-    <Compile Include="Services/DefaultServices.cs" />
-    <Compile Include="Services/IDecorator.cs" />
-    <Compile Include="Services/ServicesContainer.cs" />
-    <Compile Include="ServicesExtensions.cs" />
-    <Compile Include="SingleResult.cs" />
-    <Compile Include="SingleResultOfT.cs" />
-    <Compile Include="Tracing/FormattingUtilities.cs" />
-    <Compile Include="Tracing/IFormatterTracer.cs" />
-    <Compile Include="Tracing/ITraceManager.cs" />
-    <Compile Include="Tracing/ITraceWriter.cs" />
-    <Compile Include="Tracing/ITraceWriterExtensions.cs" />
-    <Compile Include="Tracing/TraceCategories.cs" />
-    <Compile Include="Tracing/TraceKind.cs" />
-    <Compile Include="Tracing/TraceKindHelper.cs" />
-    <Compile Include="Tracing/TraceLevel.cs" />
-    <Compile Include="Tracing/TraceLevelHelper.cs" />
-    <Compile Include="Tracing/TraceManager.cs" />
-    <Compile Include="Tracing/TraceRecord.cs" />
-    <Compile Include="Tracing/TraceWriterExceptionMapper.cs" />
-    <Compile Include="Tracing/Tracers/ActionFilterAttributeTracer.cs" />
-    <Compile Include="Tracing/Tracers/ActionFilterTracer.cs" />
-    <Compile Include="Tracing/Tracers/ActionValueBinderTracer.cs" />
-    <Compile Include="Tracing/Tracers/AuthenticationFilterTracer.cs" />
-    <Compile Include="Tracing/Tracers/AuthorizationFilterAttributeTracer.cs" />
-    <Compile Include="Tracing/Tracers/AuthorizationFilterTracer.cs" />
-    <Compile Include="Tracing/Tracers/BufferedMediaTypeFormatterTracer.cs" />
-    <Compile Include="Tracing/Tracers/ContentNegotiatorTracer.cs" />
-    <Compile Include="Tracing/Tracers/DefaultHttpControllerTypeResolverTracer.cs" />
-    <Compile Include="Tracing/Tracers/ExceptionFilterAttributeTracer.cs" />
-    <Compile Include="Tracing/Tracers/ExceptionFilterTracer.cs" />
-    <Compile Include="Tracing/Tracers/FilterTracer.cs" />
-    <Compile Include="Tracing/Tracers/FormUrlEncodedMediaTypeFormatterTracer.cs" />
-    <Compile Include="Tracing/Tracers/FormatterLoggerTraceWrapper.cs" />
-    <Compile Include="Tracing/Tracers/FormatterParameterBindingTracer.cs" />
-    <Compile Include="Tracing/Tracers/HttpActionBindingTracer.cs" />
-    <Compile Include="Tracing/Tracers/HttpActionDescriptorTracer.cs" />
-    <Compile Include="Tracing/Tracers/HttpActionInvokerTracer.cs" />
-    <Compile Include="Tracing/Tracers/HttpActionSelectorTracer.cs" />
-    <Compile Include="Tracing/Tracers/HttpControllerActivatorTracer.cs" />
-    <Compile Include="Tracing/Tracers/HttpControllerDescriptorTracer.cs" />
-    <Compile Include="Tracing/Tracers/HttpControllerSelectorTracer.cs" />
-    <Compile Include="Tracing/Tracers/HttpControllerTracer.cs" />
-    <Compile Include="Tracing/Tracers/HttpParameterBindingTracer.cs" />
-    <Compile Include="Tracing/Tracers/JsonMediaTypeFormatterTracer.cs" />
-    <Compile Include="Tracing/Tracers/MediaTypeFormatterTracer.cs" />
-    <Compile Include="Tracing/Tracers/MessageHandlerTracer.cs" />
-    <Compile Include="Tracing/Tracers/OverrideFilterTracer.cs" />
-    <Compile Include="Tracing/Tracers/RequestMessageHandlerTracer.cs" />
-    <Compile Include="Tracing/Tracers/XmlMediaTypeFormatterTracer.cs" />
-    <Compile Include="Validation/BodyModelValidatorContext.cs" />
-    <Compile Include="Validation/DefaultBodyModelValidator.cs" />
-    <Compile Include="Validation/IBodyModelValidator.cs" />
-    <Compile Include="Validation/IBodyModelValidatorKeyBuilder.cs" />
-    <Compile Include="Validation/IModelValidatorCache.cs" />
-    <Compile Include="Validation/ModelStateFormatterLogger.cs" />
-    <Compile Include="Validation/ModelValidatedEventArgs.cs" />
-    <Compile Include="Validation/ModelValidatingEventArgs.cs" />
-    <Compile Include="Validation/ModelValidationNode.cs" />
-    <Compile Include="Validation/ModelValidationRequiredMemberSelector.cs" />
-    <Compile Include="Validation/ModelValidationResult.cs" />
-    <Compile Include="Validation/ModelValidator.cs" />
-    <Compile Include="Validation/ModelValidatorCache.cs" />
-    <Compile Include="Validation/ModelValidatorProvider.cs" />
-    <Compile Include="Validation/Providers/AssociatedValidatorProvider.cs" />
-    <Compile Include="Validation/Providers/DataAnnotationsModelValidatorProvider.cs" />
-    <Compile Include="Validation/Providers/DataMemberModelValidatorProvider.cs" />
-    <Compile Include="Validation/Providers/InvalidModelValidatorProvider.cs" />
-    <Compile Include="Validation/Providers/RequiredMemberModelValidatorProvider.cs" />
-    <Compile Include="Validation/ReferenceEqualityComparer.cs" />
-    <Compile Include="Validation/Validators/DataAnnotationsModelValidator.cs" />
-    <Compile Include="Validation/Validators/ErrorModelValidator.cs" />
-    <Compile Include="Validation/Validators/RequiredMemberModelValidator.cs" />
-    <Compile Include="Validation/Validators/ValidatableObjectAdapter.cs" />
-    <Compile Include="ValueProviders/IEnumerableValueProvider.cs" />
-    <Compile Include="ValueProviders/IUriValueProviderFactory.cs" />
-    <Compile Include="ValueProviders/IValueProvider.cs" />
-    <Compile Include="ValueProviders/Providers/CompositeValueProvider.cs" />
-    <Compile Include="ValueProviders/Providers/CompositeValueProviderFactory.cs" />
-    <Compile Include="ValueProviders/Providers/ElementalValueProvider.cs" />
-    <Compile Include="ValueProviders/Providers/NameValuePairsValueProvider.cs" />
-    <Compile Include="ValueProviders/Providers/QueryStringValueProvider.cs" />
-    <Compile Include="ValueProviders/Providers/QueryStringValueProviderFactory.cs" />
-    <Compile Include="ValueProviders/Providers/RouteDataValueProvider.cs" />
-    <Compile Include="ValueProviders/Providers/RouteDataValueProviderFactory.cs" />
-    <Compile Include="ValueProviders/ValueProviderAttribute.cs" />
-    <Compile Include="ValueProviders/ValueProviderFactory.cs" />
-    <Compile Include="ValueProviders/ValueProviderResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/AcceptVerbsAttribute.cs" Link="AcceptVerbsAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ActionNameAttribute.cs" Link="ActionNameAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/AllowAnonymousAttribute.cs" Link="AllowAnonymousAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ApiController.cs" Link="ApiController.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/AuthorizeAttribute.cs" Link="AuthorizeAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Batch/BatchExecutionOrder.cs" Link="Batch/BatchExecutionOrder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Batch/BatchHttpRequestContext.cs" Link="Batch/BatchHttpRequestContext.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Batch/BatchHttpRequestMessageExtensions.cs" Link="Batch/BatchHttpRequestMessageExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Batch/DefaultHttpBatchHandler.cs" Link="Batch/DefaultHttpBatchHandler.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Batch/HttpBatchHandler.cs" Link="Batch/HttpBatchHandler.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/CollectionExtensions.cs" Link="Common/CollectionExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/DictionaryExtensions.cs" Link="Common/DictionaryExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Error.cs" Link="Common/Error.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/HttpMethodHelper.cs" Link="Common/HttpMethodHelper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/ListWrapperCollection.cs" Link="Common/ListWrapperCollection.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/PrefixContainer.cs" Link="Common/PrefixContainer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/TaskHelpers.cs" Link="Common/TaskHelpers.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/TaskHelpersExtensions.cs" Link="Common/TaskHelpersExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/TypeExtensions.cs" Link="Common/TypeExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/ActionFilterResult.cs" Link="Controllers/ActionFilterResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/ApiControllerActionInvoker.cs" Link="Controllers/ApiControllerActionInvoker.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/ApiControllerActionSelector.cs" Link="Controllers/ApiControllerActionSelector.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/AuthenticationFilterResult.cs" Link="Controllers/AuthenticationFilterResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/AuthorizationFilterResult.cs" Link="Controllers/AuthorizationFilterResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/CandidateAction.cs" Link="Controllers/CandidateAction.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/ExceptionFilterResult.cs" Link="Controllers/ExceptionFilterResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/FilterGrouping.cs" Link="Controllers/FilterGrouping.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/HttpActionBinding.cs" Link="Controllers/HttpActionBinding.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/HttpActionContext.cs" Link="Controllers/HttpActionContext.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/HttpActionContextExtensions.cs" Link="Controllers/HttpActionContextExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/HttpActionDescriptor.cs" Link="Controllers/HttpActionDescriptor.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/HttpActionDescriptorExtensions.cs" Link="Controllers/HttpActionDescriptorExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/HttpControllerContext.cs" Link="Controllers/HttpControllerContext.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/HttpControllerDescriptor.cs" Link="Controllers/HttpControllerDescriptor.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/HttpControllerDescriptorExtensions.cs" Link="Controllers/HttpControllerDescriptorExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/HttpControllerSettings.cs" Link="Controllers/HttpControllerSettings.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/HttpParameterBinding.cs" Link="Controllers/HttpParameterBinding.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/HttpParameterDescriptor.cs" Link="Controllers/HttpParameterDescriptor.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/HttpParameterDescriptorExtensions.cs" Link="Controllers/HttpParameterDescriptorExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/HttpRequestContext.cs" Link="Controllers/HttpRequestContext.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/IActionHttpMethodProvider.cs" Link="Controllers/IActionHttpMethodProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/IActionResultConverter.cs" Link="Controllers/IActionResultConverter.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/IActionValueBinder.cs" Link="Controllers/IActionValueBinder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/IControllerConfiguration.cs" Link="Controllers/IControllerConfiguration.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/IHttpActionInvoker.cs" Link="Controllers/IHttpActionInvoker.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/IHttpActionSelector.cs" Link="Controllers/IHttpActionSelector.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/IHttpController.cs" Link="Controllers/IHttpController.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/ReflectedHttpActionDescriptor.cs" Link="Controllers/ReflectedHttpActionDescriptor.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/ReflectedHttpParameterDescriptor.cs" Link="Controllers/ReflectedHttpParameterDescriptor.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/RequestBackedHttpRequestContext.cs" Link="Controllers/RequestBackedHttpRequestContext.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/ResponseMessageResultConverter.cs" Link="Controllers/ResponseMessageResultConverter.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/ValueResultConverter.cs" Link="Controllers/ValueResultConverter.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Controllers/VoidResultConverter.cs" Link="Controllers/VoidResultConverter.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Dependencies/EmptyResolver.cs" Link="Dependencies/EmptyResolver.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Dependencies/IDependencyResolver.cs" Link="Dependencies/IDependencyResolver.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Dependencies/IDependencyScope.cs" Link="Dependencies/IDependencyScope.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Description/ApiDescription.cs" Link="Description/ApiDescription.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Description/ApiExplorer.cs" Link="Description/ApiExplorer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Description/ApiExplorerSettingsAttribute.cs" Link="Description/ApiExplorerSettingsAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Description/ApiParameterDescription.cs" Link="Description/ApiParameterDescription.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Description/ApiParameterSource.cs" Link="Description/ApiParameterSource.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Description/IApiExplorer.cs" Link="Description/IApiExplorer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Description/IDocumentationProvider.cs" Link="Description/IDocumentationProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Description/ResponseDescription.cs" Link="Description/ResponseDescription.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Description/ResponseTypeAttribute.cs" Link="Description/ResponseTypeAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Dispatcher/DefaultAssembliesResolver.cs" Link="Dispatcher/DefaultAssembliesResolver.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Dispatcher/DefaultHttpControllerActivator.cs" Link="Dispatcher/DefaultHttpControllerActivator.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Dispatcher/DefaultHttpControllerSelector.cs" Link="Dispatcher/DefaultHttpControllerSelector.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Dispatcher/DefaultHttpControllerTypeResolver.cs" Link="Dispatcher/DefaultHttpControllerTypeResolver.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Dispatcher/HttpControllerDispatcher.cs" Link="Dispatcher/HttpControllerDispatcher.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Dispatcher/HttpControllerTypeCache.cs" Link="Dispatcher/HttpControllerTypeCache.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Dispatcher/HttpRoutingDispatcher.cs" Link="Dispatcher/HttpRoutingDispatcher.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Dispatcher/IAssembliesResolver.cs" Link="Dispatcher/IAssembliesResolver.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Dispatcher/IHttpControllerActivator.cs" Link="Dispatcher/IHttpControllerActivator.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Dispatcher/IHttpControllerSelector.cs" Link="Dispatcher/IHttpControllerSelector.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Dispatcher/IHttpControllerTypeResolver.cs" Link="Dispatcher/IHttpControllerTypeResolver.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/EmptyReadOnlyDictionary.cs" Link="EmptyReadOnlyDictionary.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ExceptionHandling/CompositeExceptionLogger.cs" Link="ExceptionHandling/CompositeExceptionLogger.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ExceptionHandling/DefaultExceptionHandler.cs" Link="ExceptionHandling/DefaultExceptionHandler.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ExceptionHandling/EmptyExceptionHandler.cs" Link="ExceptionHandling/EmptyExceptionHandler.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ExceptionHandling/ExceptionCatchBlocks.cs" Link="ExceptionHandling/ExceptionCatchBlocks.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ExceptionHandling/ExceptionContext.cs" Link="ExceptionHandling/ExceptionContext.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ExceptionHandling/ExceptionContextCatchBlock.cs" Link="ExceptionHandling/ExceptionContextCatchBlock.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ExceptionHandling/ExceptionHandler.cs" Link="ExceptionHandling/ExceptionHandler.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ExceptionHandling/ExceptionHandlerContext.cs" Link="ExceptionHandling/ExceptionHandlerContext.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ExceptionHandling/ExceptionHandlerExtensions.cs" Link="ExceptionHandling/ExceptionHandlerExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ExceptionHandling/ExceptionLogger.cs" Link="ExceptionHandling/ExceptionLogger.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ExceptionHandling/ExceptionLoggerContext.cs" Link="ExceptionHandling/ExceptionLoggerContext.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ExceptionHandling/ExceptionLoggerExtensions.cs" Link="ExceptionHandling/ExceptionLoggerExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ExceptionHandling/ExceptionServices.cs" Link="ExceptionHandling/ExceptionServices.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ExceptionHandling/IExceptionHandler.cs" Link="ExceptionHandling/IExceptionHandler.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ExceptionHandling/IExceptionLogger.cs" Link="ExceptionHandling/IExceptionLogger.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ExceptionHandling/LastChanceExceptionHandler.cs" Link="ExceptionHandling/LastChanceExceptionHandler.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Filters/ActionDescriptorFilterProvider.cs" Link="Filters/ActionDescriptorFilterProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Filters/ActionFilterAttribute.cs" Link="Filters/ActionFilterAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Filters/AuthorizationFilterAttribute.cs" Link="Filters/AuthorizationFilterAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Filters/ConfigurationFilterProvider.cs" Link="Filters/ConfigurationFilterProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Filters/ExceptionFilterAttribute.cs" Link="Filters/ExceptionFilterAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Filters/FilterAttribute.cs" Link="Filters/FilterAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Filters/FilterInfo.cs" Link="Filters/FilterInfo.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Filters/FilterInfoComparer.cs" Link="Filters/FilterInfoComparer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Filters/FilterScope.cs" Link="Filters/FilterScope.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Filters/HttpActionExecutedContext.cs" Link="Filters/HttpActionExecutedContext.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Filters/HttpAuthenticationChallengeContext.cs" Link="Filters/HttpAuthenticationChallengeContext.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Filters/HttpAuthenticationContext.cs" Link="Filters/HttpAuthenticationContext.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Filters/HttpFilterCollection.cs" Link="Filters/HttpFilterCollection.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Filters/IActionFilter.cs" Link="Filters/IActionFilter.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Filters/IAuthenticationFilter.cs" Link="Filters/IAuthenticationFilter.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Filters/IAuthorizationFilter.cs" Link="Filters/IAuthorizationFilter.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Filters/IExceptionFilter.cs" Link="Filters/IExceptionFilter.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Filters/IFilter.cs" Link="Filters/IFilter.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Filters/IFilterProvider.cs" Link="Filters/IFilterProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Filters/IOverrideFilter.cs" Link="Filters/IOverrideFilter.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/FromBodyAttribute.cs" Link="FromBodyAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/FromUriAttribute.cs" Link="FromUriAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Hosting/HttpPropertyKeys.cs" Link="Hosting/HttpPropertyKeys.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Hosting/IHostBufferPolicySelector.cs" Link="Hosting/IHostBufferPolicySelector.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Hosting/SuppressHostPrincipalMessageHandler.cs" Link="Hosting/SuppressHostPrincipalMessageHandler.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/HttpBindNeverAttribute.cs" Link="HttpBindNeverAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/HttpBindRequiredAttribute.cs" Link="HttpBindRequiredAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/HttpConfiguration.cs" Link="HttpConfiguration.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/HttpConfigurationExtensions.cs" Link="HttpConfigurationExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/HttpDeleteAttribute.cs" Link="HttpDeleteAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/HttpError.cs" Link="HttpError.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/HttpErrorKeys.cs" Link="HttpErrorKeys.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/HttpGetAttribute.cs" Link="HttpGetAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/HttpHeadAttribute.cs" Link="HttpHeadAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/HttpOptionsAttribute.cs" Link="HttpOptionsAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/HttpPatchAttribute.cs" Link="HttpPatchAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/HttpPostAttribute.cs" Link="HttpPostAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/HttpPutAttribute.cs" Link="HttpPutAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/HttpRequestMessageExtensions.cs" Link="HttpRequestMessageExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/HttpResponseException.cs" Link="HttpResponseException.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/HttpResponseMessageExtensions.cs" Link="HttpResponseMessageExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/HttpRouteCollection.cs" Link="HttpRouteCollection.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/HttpRouteCollectionExtensions.cs" Link="HttpRouteCollectionExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/HttpServer.cs" Link="HttpServer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/IHttpActionResult.cs" Link="IHttpActionResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/IncludeErrorDetailPolicy.cs" Link="IncludeErrorDetailPolicy.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Internal/CollectionModelBinderUtil.cs" Link="Internal/CollectionModelBinderUtil.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Internal/HttpParameterBindingExtensions.cs" Link="Internal/HttpParameterBindingExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Internal/MemberInfoExtensions.cs" Link="Internal/MemberInfoExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Internal/ParameterInfoExtensions.cs" Link="Internal/ParameterInfoExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Internal/TypeActivator.cs" Link="Internal/TypeActivator.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Internal/TypeDescriptorHelper.cs" Link="Internal/TypeDescriptorHelper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Internal/TypeHelper.cs" Link="Internal/TypeHelper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/EfficientTypePropertyKey.cs" Link="Metadata/EfficientTypePropertyKey.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Metadata/ModelMetadata.cs" Link="Metadata/ModelMetadata.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Metadata/ModelMetadataProvider.cs" Link="Metadata/ModelMetadataProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Metadata/Providers/AssociatedMetadataProvider.cs" Link="Metadata/Providers/AssociatedMetadataProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Metadata/Providers/CachedDataAnnotationsMetadataAttributes.cs" Link="Metadata/Providers/CachedDataAnnotationsMetadataAttributes.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Metadata/Providers/CachedDataAnnotationsModelMetadata.cs" Link="Metadata/Providers/CachedDataAnnotationsModelMetadata.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Metadata/Providers/CachedModelMetadata.cs" Link="Metadata/Providers/CachedModelMetadata.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Metadata/Providers/DataAnnotationsModelMetadataProvider.cs" Link="Metadata/Providers/DataAnnotationsModelMetadataProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Metadata/Providers/EmptyMetadataProvider.cs" Link="Metadata/Providers/EmptyMetadataProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/Binders/ArrayModelBinder.cs" Link="ModelBinding/Binders/ArrayModelBinder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/Binders/ArrayModelBinderProvider.cs" Link="ModelBinding/Binders/ArrayModelBinderProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/Binders/CollectionModelBinder.cs" Link="ModelBinding/Binders/CollectionModelBinder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/Binders/CollectionModelBinderProvider.cs" Link="ModelBinding/Binders/CollectionModelBinderProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/Binders/ComplexModelDto.cs" Link="ModelBinding/Binders/ComplexModelDto.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/Binders/ComplexModelDtoModelBinder.cs" Link="ModelBinding/Binders/ComplexModelDtoModelBinder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/Binders/ComplexModelDtoModelBinderProvider.cs" Link="ModelBinding/Binders/ComplexModelDtoModelBinderProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/Binders/ComplexModelDtoResult.cs" Link="ModelBinding/Binders/ComplexModelDtoResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/Binders/CompositeModelBinder.cs" Link="ModelBinding/Binders/CompositeModelBinder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/Binders/CompositeModelBinderProvider.cs" Link="ModelBinding/Binders/CompositeModelBinderProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/Binders/DictionaryModelBinder.cs" Link="ModelBinding/Binders/DictionaryModelBinder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/Binders/DictionaryModelBinderProvider.cs" Link="ModelBinding/Binders/DictionaryModelBinderProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/Binders/KeyValuePairModelBinder.cs" Link="ModelBinding/Binders/KeyValuePairModelBinder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/Binders/KeyValuePairModelBinderProvider.cs" Link="ModelBinding/Binders/KeyValuePairModelBinderProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/Binders/MutableObjectModelBinder.cs" Link="ModelBinding/Binders/MutableObjectModelBinder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/Binders/MutableObjectModelBinderProvider.cs" Link="ModelBinding/Binders/MutableObjectModelBinderProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/Binders/SimpleModelBinderProvider.cs" Link="ModelBinding/Binders/SimpleModelBinderProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/Binders/TypeConverterModelBinder.cs" Link="ModelBinding/Binders/TypeConverterModelBinder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/Binders/TypeConverterModelBinderProvider.cs" Link="ModelBinding/Binders/TypeConverterModelBinderProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/Binders/TypeMatchModelBinder.cs" Link="ModelBinding/Binders/TypeMatchModelBinder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/Binders/TypeMatchModelBinderProvider.cs" Link="ModelBinding/Binders/TypeMatchModelBinderProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/CancellationTokenParameterBinding.cs" Link="ModelBinding/CancellationTokenParameterBinding.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/CustomModelBinderAttribute.cs" Link="ModelBinding/CustomModelBinderAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/DefaultActionValueBinder.cs" Link="ModelBinding/DefaultActionValueBinder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/ErrorParameterBinding.cs" Link="ModelBinding/ErrorParameterBinding.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/FormDataCollectionExtensions.cs" Link="ModelBinding/FormDataCollectionExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/FormatterParameterBinding.cs" Link="ModelBinding/FormatterParameterBinding.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/HttpBindingBehavior.cs" Link="ModelBinding/HttpBindingBehavior.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/HttpBindingBehaviorAttribute.cs" Link="ModelBinding/HttpBindingBehaviorAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/HttpRequestParameterBinding.cs" Link="ModelBinding/HttpRequestParameterBinding.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/IModelBinder.cs" Link="ModelBinding/IModelBinder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/IValueProviderParameterBinding.cs" Link="ModelBinding/IValueProviderParameterBinding.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/JQueryMVCFormUrlEncodedFormatter.cs" Link="ModelBinding/JQueryMVCFormUrlEncodedFormatter.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/ModelBinderAttribute.cs" Link="ModelBinding/ModelBinderAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/ModelBinderConfig.cs" Link="ModelBinding/ModelBinderConfig.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/ModelBinderErrorMessageProvider.cs" Link="ModelBinding/ModelBinderErrorMessageProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/ModelBinderParameterBinding.cs" Link="ModelBinding/ModelBinderParameterBinding.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/ModelBinderProvider.cs" Link="ModelBinding/ModelBinderProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/ModelBindingContext.cs" Link="ModelBinding/ModelBindingContext.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/ModelBindingHelper.cs" Link="ModelBinding/ModelBindingHelper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/ModelError.cs" Link="ModelBinding/ModelError.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/ModelErrorCollection.cs" Link="ModelBinding/ModelErrorCollection.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/ModelState.cs" Link="ModelBinding/ModelState.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/ModelStateDictionary.cs" Link="ModelBinding/ModelStateDictionary.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ModelBinding/ParameterBindingRulesCollection.cs" Link="ModelBinding/ParameterBindingRulesCollection.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/NonActionAttribute.cs" Link="NonActionAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/OverrideActionFiltersAttribute.cs" Link="OverrideActionFiltersAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/OverrideAuthenticationAttribute.cs" Link="OverrideAuthenticationAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/OverrideAuthorizationAttribute.cs" Link="OverrideAuthorizationAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/OverrideExceptionFiltersAttribute.cs" Link="OverrideExceptionFiltersAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ParameterBindingAttribute.cs" Link="ParameterBindingAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/CommonAssemblyInfo.cs" Link="Properties/CommonAssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/CommonWebApiResources.Designer.cs" Link="Properties/CommonWebApiResources.Designer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Properties/SRResources.Designer.cs" Link="Properties/SRResources.Designer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Results/BadRequestErrorMessageResult.cs" Link="Results/BadRequestErrorMessageResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Results/BadRequestResult.cs" Link="Results/BadRequestResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Results/ConflictResult.cs" Link="Results/ConflictResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Results/CreatedAtRouteNegotiatedContentResult.cs" Link="Results/CreatedAtRouteNegotiatedContentResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Results/CreatedNegotiatedContentResult.cs" Link="Results/CreatedNegotiatedContentResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Results/ExceptionResult.cs" Link="Results/ExceptionResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Results/FormattedContentResult.cs" Link="Results/FormattedContentResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Results/InternalServerErrorResult.cs" Link="Results/InternalServerErrorResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Results/InvalidModelStateResult.cs" Link="Results/InvalidModelStateResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Results/JsonResult.cs" Link="Results/JsonResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Results/NegotiatedContentResult.cs" Link="Results/NegotiatedContentResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Results/NotFoundResult.cs" Link="Results/NotFoundResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Results/OkNegotiatedContentResult.cs" Link="Results/OkNegotiatedContentResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Results/OkResult.cs" Link="Results/OkResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Results/RedirectResult.cs" Link="Results/RedirectResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Results/RedirectToRouteResult.cs" Link="Results/RedirectToRouteResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Results/ResponseMessageResult.cs" Link="Results/ResponseMessageResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Results/StatusCodeResult.cs" Link="Results/StatusCodeResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Results/UnauthorizedResult.cs" Link="Results/UnauthorizedResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/RouteAttribute.cs" Link="RouteAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/RouteParameter.cs" Link="RouteParameter.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/RoutePrefixAttribute.cs" Link="RoutePrefixAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/AttributeRoutingMapper.cs" Link="Routing/AttributeRoutingMapper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/BoundRouteTemplate.cs" Link="Routing/BoundRouteTemplate.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/Constraints/AlphaRouteConstraint.cs" Link="Routing/Constraints/AlphaRouteConstraint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/Constraints/BoolRouteConstraint.cs" Link="Routing/Constraints/BoolRouteConstraint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/Constraints/CompoundRouteConstraint.cs" Link="Routing/Constraints/CompoundRouteConstraint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/Constraints/DateTimeRouteConstraint.cs" Link="Routing/Constraints/DateTimeRouteConstraint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/Constraints/DecimalRouteConstraint.cs" Link="Routing/Constraints/DecimalRouteConstraint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/Constraints/DoubleRouteConstraint.cs" Link="Routing/Constraints/DoubleRouteConstraint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/Constraints/FloatRouteConstraint.cs" Link="Routing/Constraints/FloatRouteConstraint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/Constraints/GuidRouteConstraint.cs" Link="Routing/Constraints/GuidRouteConstraint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/Constraints/IntRouteConstraint.cs" Link="Routing/Constraints/IntRouteConstraint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/Constraints/LengthRouteConstraint.cs" Link="Routing/Constraints/LengthRouteConstraint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/Constraints/LongRouteConstraint.cs" Link="Routing/Constraints/LongRouteConstraint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/Constraints/MaxLengthRouteConstraint.cs" Link="Routing/Constraints/MaxLengthRouteConstraint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/Constraints/MaxRouteConstraint.cs" Link="Routing/Constraints/MaxRouteConstraint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/Constraints/MinLengthRouteConstraint.cs" Link="Routing/Constraints/MinLengthRouteConstraint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/Constraints/MinRouteConstraint.cs" Link="Routing/Constraints/MinRouteConstraint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/Constraints/OptionalRouteConstraint.cs" Link="Routing/Constraints/OptionalRouteConstraint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/Constraints/RangeRouteConstraintBase.cs" Link="Routing/Constraints/RangeRouteConstraintBase.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/Constraints/RegexRouteConstraint.cs" Link="Routing/Constraints/RegexRouteConstraint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/DefaultDirectRouteProvider.cs" Link="Routing/DefaultDirectRouteProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/DefaultInlineConstraintResolver.cs" Link="Routing/DefaultInlineConstraintResolver.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/DirectRouteBuilder.cs" Link="Routing/DirectRouteBuilder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/DirectRouteFactoryContext.cs" Link="Routing/DirectRouteFactoryContext.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/HttpMethodConstraint.cs" Link="Routing/HttpMethodConstraint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/HttpParsedRoute.cs" Link="Routing/HttpParsedRoute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/HttpRoute.cs" Link="Routing/HttpRoute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/HttpRouteData.cs" Link="Routing/HttpRouteData.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/HttpRouteDataExtensions.cs" Link="Routing/HttpRouteDataExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/HttpRouteDirection.cs" Link="Routing/HttpRouteDirection.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/HttpRouteExtensions.cs" Link="Routing/HttpRouteExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/HttpRouteValueDictionary.cs" Link="Routing/HttpRouteValueDictionary.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/HttpVirtualPathData.cs" Link="Routing/HttpVirtualPathData.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/IDirectRouteBuilder.cs" Link="Routing/IDirectRouteBuilder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/IDirectRouteFactory.cs" Link="Routing/IDirectRouteFactory.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/IDirectRouteProvider.cs" Link="Routing/IDirectRouteProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/IHttpRoute.cs" Link="Routing/IHttpRoute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/IHttpRouteConstraint.cs" Link="Routing/IHttpRouteConstraint.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/IHttpRouteData.cs" Link="Routing/IHttpRouteData.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/IHttpRouteInfoProvider.cs" Link="Routing/IHttpRouteInfoProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/IHttpVirtualPathData.cs" Link="Routing/IHttpVirtualPathData.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/IInlineConstraintResolver.cs" Link="Routing/IInlineConstraintResolver.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/IRoutePrefix.cs" Link="Routing/IRoutePrefix.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/InlineRouteTemplateParser.cs" Link="Routing/InlineRouteTemplateParser.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/LinkGenerationRoute.cs" Link="Routing/LinkGenerationRoute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/MediaTypeFormatterExtensions.cs" Link="Routing/MediaTypeFormatterExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/PathContentSegment.cs" Link="Routing/PathContentSegment.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/PathLiteralSubsegment.cs" Link="Routing/PathLiteralSubsegment.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/PathParameterSubsegment.cs" Link="Routing/PathParameterSubsegment.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/PathSegment.cs" Link="Routing/PathSegment.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/PathSeparatorSegment.cs" Link="Routing/PathSeparatorSegment.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/PathSubsegment.cs" Link="Routing/PathSubsegment.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/PropertyHelper.cs" Link="Routing/PropertyHelper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/RouteCollectionRoute.cs" Link="Routing/RouteCollectionRoute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/RouteDataTokenKeys.cs" Link="Routing/RouteDataTokenKeys.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/RouteEntry.cs" Link="Routing/RouteEntry.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/RouteFactoryAttribute.cs" Link="Routing/RouteFactoryAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/RouteInfoDirectRouteFactory.cs" Link="Routing/RouteInfoDirectRouteFactory.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/RouteParser.cs" Link="Routing/RouteParser.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/RoutePrecedence.cs" Link="Routing/RoutePrecedence.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/RouteValueKeys.cs" Link="Routing/RouteValueKeys.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/RoutingContext.cs" Link="Routing/RoutingContext.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/StopRoutingHandler.cs" Link="Routing/StopRoutingHandler.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/Routing/SubRouteCollection.cs" Link="Routing/SubRouteCollection.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/UriPathExtensionMapping.cs" Link="Routing/UriPathExtensionMapping.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Routing/UrlHelper.cs" Link="Routing/UrlHelper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Services/ControllerServices.cs" Link="Services/ControllerServices.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Services/Decorator.cs" Link="Services/Decorator.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Services/DefaultServices.cs" Link="Services/DefaultServices.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Services/IDecorator.cs" Link="Services/IDecorator.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Services/ServicesContainer.cs" Link="Services/ServicesContainer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ServicesExtensions.cs" Link="ServicesExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/SingleResult.cs" Link="SingleResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/SingleResultOfT.cs" Link="SingleResultOfT.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/FormattingUtilities.cs" Link="Tracing/FormattingUtilities.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/IFormatterTracer.cs" Link="Tracing/IFormatterTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/ITraceManager.cs" Link="Tracing/ITraceManager.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/ITraceWriter.cs" Link="Tracing/ITraceWriter.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/ITraceWriterExtensions.cs" Link="Tracing/ITraceWriterExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/TraceCategories.cs" Link="Tracing/TraceCategories.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/TraceKind.cs" Link="Tracing/TraceKind.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/TraceKindHelper.cs" Link="Tracing/TraceKindHelper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/TraceLevel.cs" Link="Tracing/TraceLevel.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/TraceLevelHelper.cs" Link="Tracing/TraceLevelHelper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/TraceManager.cs" Link="Tracing/TraceManager.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/TraceRecord.cs" Link="Tracing/TraceRecord.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/Common/TraceWriterExceptionMapper.cs" Link="Tracing/TraceWriterExceptionMapper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/ActionFilterAttributeTracer.cs" Link="Tracing/Tracers/ActionFilterAttributeTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/ActionFilterTracer.cs" Link="Tracing/Tracers/ActionFilterTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/ActionValueBinderTracer.cs" Link="Tracing/Tracers/ActionValueBinderTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/AuthenticationFilterTracer.cs" Link="Tracing/Tracers/AuthenticationFilterTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/AuthorizationFilterAttributeTracer.cs" Link="Tracing/Tracers/AuthorizationFilterAttributeTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/AuthorizationFilterTracer.cs" Link="Tracing/Tracers/AuthorizationFilterTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/BufferedMediaTypeFormatterTracer.cs" Link="Tracing/Tracers/BufferedMediaTypeFormatterTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/ContentNegotiatorTracer.cs" Link="Tracing/Tracers/ContentNegotiatorTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/DefaultHttpControllerTypeResolverTracer.cs" Link="Tracing/Tracers/DefaultHttpControllerTypeResolverTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/ExceptionFilterAttributeTracer.cs" Link="Tracing/Tracers/ExceptionFilterAttributeTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/ExceptionFilterTracer.cs" Link="Tracing/Tracers/ExceptionFilterTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/FilterTracer.cs" Link="Tracing/Tracers/FilterTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/FormUrlEncodedMediaTypeFormatterTracer.cs" Link="Tracing/Tracers/FormUrlEncodedMediaTypeFormatterTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/FormatterLoggerTraceWrapper.cs" Link="Tracing/Tracers/FormatterLoggerTraceWrapper.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/FormatterParameterBindingTracer.cs" Link="Tracing/Tracers/FormatterParameterBindingTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/HttpActionBindingTracer.cs" Link="Tracing/Tracers/HttpActionBindingTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/HttpActionDescriptorTracer.cs" Link="Tracing/Tracers/HttpActionDescriptorTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/HttpActionInvokerTracer.cs" Link="Tracing/Tracers/HttpActionInvokerTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/HttpActionSelectorTracer.cs" Link="Tracing/Tracers/HttpActionSelectorTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/HttpControllerActivatorTracer.cs" Link="Tracing/Tracers/HttpControllerActivatorTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/HttpControllerDescriptorTracer.cs" Link="Tracing/Tracers/HttpControllerDescriptorTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/HttpControllerSelectorTracer.cs" Link="Tracing/Tracers/HttpControllerSelectorTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/HttpControllerTracer.cs" Link="Tracing/Tracers/HttpControllerTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/HttpParameterBindingTracer.cs" Link="Tracing/Tracers/HttpParameterBindingTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/JsonMediaTypeFormatterTracer.cs" Link="Tracing/Tracers/JsonMediaTypeFormatterTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/MediaTypeFormatterTracer.cs" Link="Tracing/Tracers/MediaTypeFormatterTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/MessageHandlerTracer.cs" Link="Tracing/Tracers/MessageHandlerTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/OverrideFilterTracer.cs" Link="Tracing/Tracers/OverrideFilterTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/RequestMessageHandlerTracer.cs" Link="Tracing/Tracers/RequestMessageHandlerTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Tracing/Tracers/XmlMediaTypeFormatterTracer.cs" Link="Tracing/Tracers/XmlMediaTypeFormatterTracer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Validation/BodyModelValidatorContext.cs" Link="Validation/BodyModelValidatorContext.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Validation/DefaultBodyModelValidator.cs" Link="Validation/DefaultBodyModelValidator.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Validation/IBodyModelValidator.cs" Link="Validation/IBodyModelValidator.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Validation/IBodyModelValidatorKeyBuilder.cs" Link="Validation/IBodyModelValidatorKeyBuilder.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Validation/IModelValidatorCache.cs" Link="Validation/IModelValidatorCache.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Validation/ModelStateFormatterLogger.cs" Link="Validation/ModelStateFormatterLogger.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Validation/ModelValidatedEventArgs.cs" Link="Validation/ModelValidatedEventArgs.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Validation/ModelValidatingEventArgs.cs" Link="Validation/ModelValidatingEventArgs.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Validation/ModelValidationNode.cs" Link="Validation/ModelValidationNode.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Validation/ModelValidationRequiredMemberSelector.cs" Link="Validation/ModelValidationRequiredMemberSelector.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Validation/ModelValidationResult.cs" Link="Validation/ModelValidationResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Validation/ModelValidator.cs" Link="Validation/ModelValidator.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Validation/ModelValidatorCache.cs" Link="Validation/ModelValidatorCache.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Validation/ModelValidatorProvider.cs" Link="Validation/ModelValidatorProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Validation/Providers/AssociatedValidatorProvider.cs" Link="Validation/Providers/AssociatedValidatorProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Validation/Providers/DataAnnotationsModelValidatorProvider.cs" Link="Validation/Providers/DataAnnotationsModelValidatorProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Validation/Providers/DataMemberModelValidatorProvider.cs" Link="Validation/Providers/DataMemberModelValidatorProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Validation/Providers/InvalidModelValidatorProvider.cs" Link="Validation/Providers/InvalidModelValidatorProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Validation/Providers/RequiredMemberModelValidatorProvider.cs" Link="Validation/Providers/RequiredMemberModelValidatorProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Validation/ReferenceEqualityComparer.cs" Link="Validation/ReferenceEqualityComparer.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Validation/Validators/DataAnnotationsModelValidator.cs" Link="Validation/Validators/DataAnnotationsModelValidator.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Validation/Validators/ErrorModelValidator.cs" Link="Validation/Validators/ErrorModelValidator.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Validation/Validators/RequiredMemberModelValidator.cs" Link="Validation/Validators/RequiredMemberModelValidator.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/Validation/Validators/ValidatableObjectAdapter.cs" Link="Validation/Validators/ValidatableObjectAdapter.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ValueProviders/IEnumerableValueProvider.cs" Link="ValueProviders/IEnumerableValueProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ValueProviders/IUriValueProviderFactory.cs" Link="ValueProviders/IUriValueProviderFactory.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ValueProviders/IValueProvider.cs" Link="ValueProviders/IValueProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ValueProviders/Providers/CompositeValueProvider.cs" Link="ValueProviders/Providers/CompositeValueProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ValueProviders/Providers/CompositeValueProviderFactory.cs" Link="ValueProviders/Providers/CompositeValueProviderFactory.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ValueProviders/Providers/ElementalValueProvider.cs" Link="ValueProviders/Providers/ElementalValueProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ValueProviders/Providers/NameValuePairsValueProvider.cs" Link="ValueProviders/Providers/NameValuePairsValueProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ValueProviders/Providers/QueryStringValueProvider.cs" Link="ValueProviders/Providers/QueryStringValueProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ValueProviders/Providers/QueryStringValueProviderFactory.cs" Link="ValueProviders/Providers/QueryStringValueProviderFactory.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ValueProviders/Providers/RouteDataValueProvider.cs" Link="ValueProviders/Providers/RouteDataValueProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ValueProviders/Providers/RouteDataValueProviderFactory.cs" Link="ValueProviders/Providers/RouteDataValueProviderFactory.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ValueProviders/ValueProviderAttribute.cs" Link="ValueProviders/ValueProviderAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ValueProviders/ValueProviderFactory.cs" Link="ValueProviders/ValueProviderFactory.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Http/ValueProviders/ValueProviderResult.cs" Link="ValueProviders/ValueProviderResult.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Properties/CommonWebApiResources.resx" LogicalName="System.Web.Http.Properties.CommonWebApiResources.resources" />
-    <EmbeddedResource Include="Properties/SRResources.resx" LogicalName="System.Web.Http.Properties.SRResources.resources" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/src/Common/CommonWebApiResources.resx" Link="Properties/CommonWebApiResources.resx" LogicalName="System.Web.Http.Properties.CommonWebApiResources.resources" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/src/System.Web.Http/Properties/SRResources.resx" Link="Properties/SRResources.resx" LogicalName="System.Web.Http.Properties.SRResources.resources" />
   </ItemGroup>
 
   <ItemGroup>

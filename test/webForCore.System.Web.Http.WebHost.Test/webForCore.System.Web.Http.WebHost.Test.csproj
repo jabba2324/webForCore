@@ -29,25 +29,25 @@
   <Import Project="../../src/webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="BatchingTest.cs" />
-    <Compile Include="GlobalConfigurationTest.cs" />
-    <Compile Include="HttpControllerHandlerTest.cs" />
-    <Compile Include="HttpRequestMessageExtensions.cs" />
-    <Compile Include="Properties/AssemblyInfo.cs" />
-    <Compile Include="RouteCollectionExtensionsTest.cs" />
-    <Compile Include="Routing/HostedHttpRouteCollectionTest.cs" />
-    <Compile Include="Routing/HostedUrlHelperTest.cs" />
-    <Compile Include="Routing/HttpContextBaseExtensionsTest.cs" />
-    <Compile Include="Routing/HttpRequestMessageWrapperTest.cs" />
-    <Compile Include="Routing/HttpRouteExceptionHandlerTests.cs" />
-    <Compile Include="Routing/HttpRouteExceptionRouteHandlerTests.cs" />
-    <Compile Include="Routing/HttpWebRouteTests.cs" />
-    <Compile Include="SeekableBufferedRequestStreamTest.cs" />
-    <Compile Include="SuppressFormsAuthRedirectHelperTest.cs" />
-    <Compile Include="WebHostBufferPolicySelectorTest.cs" />
-    <Compile Include="WebHostExceptionCatchBlocksTests.cs" />
-    <Compile Include="WebHostExceptionHandlerTests.cs" />
-    <Compile Include="WebHostHttpRequestContextTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.WebHost.Test/BatchingTest.cs" Link="BatchingTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.WebHost.Test/GlobalConfigurationTest.cs" Link="GlobalConfigurationTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.WebHost.Test/HttpControllerHandlerTest.cs" Link="HttpControllerHandlerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.WebHost.Test/HttpRequestMessageExtensions.cs" Link="HttpRequestMessageExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.WebHost.Test/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.WebHost.Test/RouteCollectionExtensionsTest.cs" Link="RouteCollectionExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.WebHost.Test/Routing/HostedHttpRouteCollectionTest.cs" Link="Routing/HostedHttpRouteCollectionTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.WebHost.Test/Routing/HostedUrlHelperTest.cs" Link="Routing/HostedUrlHelperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.WebHost.Test/Routing/HttpContextBaseExtensionsTest.cs" Link="Routing/HttpContextBaseExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.WebHost.Test/Routing/HttpRequestMessageWrapperTest.cs" Link="Routing/HttpRequestMessageWrapperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.WebHost.Test/Routing/HttpRouteExceptionHandlerTests.cs" Link="Routing/HttpRouteExceptionHandlerTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.WebHost.Test/Routing/HttpRouteExceptionRouteHandlerTests.cs" Link="Routing/HttpRouteExceptionRouteHandlerTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.WebHost.Test/Routing/HttpWebRouteTests.cs" Link="Routing/HttpWebRouteTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.WebHost.Test/SeekableBufferedRequestStreamTest.cs" Link="SeekableBufferedRequestStreamTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.WebHost.Test/SuppressFormsAuthRedirectHelperTest.cs" Link="SuppressFormsAuthRedirectHelperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.WebHost.Test/WebHostBufferPolicySelectorTest.cs" Link="WebHostBufferPolicySelectorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.WebHost.Test/WebHostExceptionCatchBlocksTests.cs" Link="WebHostExceptionCatchBlocksTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.WebHost.Test/WebHostExceptionHandlerTests.cs" Link="WebHostExceptionHandlerTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Http.WebHost.Test/WebHostHttpRequestContextTests.cs" Link="WebHostHttpRequestContextTests.cs" />
   </ItemGroup>
 
   <ItemGroup>

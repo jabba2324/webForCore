@@ -29,15 +29,15 @@
   <Import Project="../../src/webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="PreApplicationStartCodeTest.cs" />
-    <Compile Include="RazorBuildProviderTest.cs" />
-    <Compile Include="WebCodeRazorEngineHostTest.cs" />
-    <Compile Include="WebPageRazorEngineHostTest.cs" />
-    <Compile Include="WebRazorHostFactoryTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Razor.Test/PreApplicationStartCodeTest.cs" Link="PreApplicationStartCodeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Razor.Test/RazorBuildProviderTest.cs" Link="RazorBuildProviderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Razor.Test/WebCodeRazorEngineHostTest.cs" Link="WebCodeRazorEngineHostTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Razor.Test/WebPageRazorEngineHostTest.cs" Link="WebPageRazorEngineHostTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.WebPages.Razor.Test/WebRazorHostFactoryTest.cs" Link="WebRazorHostFactoryTest.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="app.config" Link="testhost.dll.config" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../external/AspNetWebStack/test/System.Web.WebPages.Razor.Test/app.config" Link="testhost.dll.config" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

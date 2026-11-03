@@ -29,115 +29,115 @@
   <Import Project="../../src/webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="ByteRangeStreamContentTest.cs" />
-    <Compile Include="CustomMultipartFormDataRemoteStreamProvider.cs" />
-    <Compile Include="DataSets/HttpTestData.cs" />
-    <Compile Include="DataSets/Types/DataContractEnum.cs" />
-    <Compile Include="DataSets/Types/DataContractType.cs" />
-    <Compile Include="DataSets/Types/DerivedDataContractType.cs" />
-    <Compile Include="DataSets/Types/DerivedFormUrlEncodedMediaTypeFormatter.cs" />
-    <Compile Include="DataSets/Types/DerivedJsonMediaTypeFormatter.cs" />
-    <Compile Include="DataSets/Types/DerivedWcfPocoType.cs" />
-    <Compile Include="DataSets/Types/DerivedXmlMediaTypeFormatter.cs" />
-    <Compile Include="DataSets/Types/DerivedXmlSerializableType.cs" />
-    <Compile Include="DataSets/Types/INotJsonSerializable.cs" />
-    <Compile Include="DataSets/Types/WcfPocoType.cs" />
-    <Compile Include="DataSets/Types/XmlSerializableType.cs" />
-    <Compile Include="ExceptionAssertionsTest.cs" />
-    <Compile Include="Formatting/BsonMediaTypeFormatterTests.cs" />
-    <Compile Include="Formatting/BufferedMediaTypeFormatterTests.cs" />
-    <Compile Include="Formatting/ContentNegotiationResultTest.cs" />
-    <Compile Include="Formatting/DataContractJsonMediaTypeFormatterTests.cs" />
-    <Compile Include="Formatting/DefaultContentNegotiatorTests.cs" />
-    <Compile Include="Formatting/FormDataCollectionTests.cs" />
-    <Compile Include="Formatting/FormUrlEncodedFromContentTests.cs" />
-    <Compile Include="Formatting/FormUrlEncodedFromUriQueryTests.cs" />
-    <Compile Include="Formatting/FormUrlEncodedJsonTests.cs" />
-    <Compile Include="Formatting/FormUrlEncodedMediaTypeFormatterTests.cs" />
-    <Compile Include="Formatting/JsonMediaTypeFormatterTests.cs" />
-    <Compile Include="Formatting/JsonNetSerializationTest.cs" />
-    <Compile Include="Formatting/JsonNetValidationTest.cs" />
-    <Compile Include="Formatting/MediaTypeConstantsTests.cs" />
-    <Compile Include="Formatting/MediaTypeFormatterCollectionTests.cs" />
-    <Compile Include="Formatting/MediaTypeFormatterExtensionsTests.cs" />
-    <Compile Include="Formatting/MediaTypeFormatterMatchTest.cs" />
-    <Compile Include="Formatting/MediaTypeFormatterTestBase.cs" />
-    <Compile Include="Formatting/MediaTypeFormatterTests.cs" />
-    <Compile Include="Formatting/MediaTypeHeaderValueExtensionsTests.cs" />
-    <Compile Include="Formatting/MediaTypeMappingTests.cs" />
-    <Compile Include="Formatting/MediaTypeWithQualityHeaderValueComparerTests.cs" />
-    <Compile Include="Formatting/ParsedMediaTypeHeaderValueTests.cs" />
-    <Compile Include="Formatting/Parsers/FormUrlEncodedParserTests.cs" />
-    <Compile Include="Formatting/Parsers/HttpRequestHeaderParserTests.cs" />
-    <Compile Include="Formatting/Parsers/HttpRequestLineParserTests.cs" />
-    <Compile Include="Formatting/Parsers/HttpResponseHeaderParserTests.cs" />
-    <Compile Include="Formatting/Parsers/HttpStatusLineParserTests.cs" />
-    <Compile Include="Formatting/Parsers/InternetMessageFormatHeaderParserTests.cs" />
-    <Compile Include="Formatting/Parsers/MimeMultipartParserTests.cs" />
-    <Compile Include="Formatting/QueryStringMappingTests.cs" />
-    <Compile Include="Formatting/RequestHeaderMappingTests.cs" />
-    <Compile Include="Formatting/SerializerConsistencyTests.cs" />
-    <Compile Include="Formatting/StringComparisonHelperTest.cs" />
-    <Compile Include="Formatting/StringWithQualityHeaderValueComparerTests.cs" />
-    <Compile Include="Formatting/XmlHttpRequestHeaderMappingTest.cs" />
-    <Compile Include="Formatting/XmlMediaTypeFormatterTests.cs" />
-    <Compile Include="Formatting/XmlSerializerMediaTypeFormatterTests.cs" />
-    <Compile Include="FormattingUtilitiesTests.cs" />
-    <Compile Include="Handlers/HttpProgressEventArgsTest.cs" />
-    <Compile Include="Handlers/ProgressContentTest.cs" />
-    <Compile Include="Handlers/ProgressMessageHandlerTest.cs" />
-    <Compile Include="Handlers/ProgressStreamTest.cs" />
-    <Compile Include="Handlers/ProgressWriteAsyncResultTest.cs" />
-    <Compile Include="Headers/CookieHeaderValueTest.cs" />
-    <Compile Include="Headers/CookieStateTest.cs" />
-    <Compile Include="HttpClientExtensionsTest.cs" />
-    <Compile Include="HttpClientFactoryTest.cs" />
-    <Compile Include="HttpContentExtensionsTest.cs" />
-    <Compile Include="HttpContentFormDataExtensionsTest.cs" />
-    <Compile Include="HttpContentMessageExtensionsTests.cs" />
-    <Compile Include="HttpContentMultipartExtensionsTests.cs" />
-    <Compile Include="HttpHeaderExtensionsTest.cs" />
-    <Compile Include="HttpMessageContentTests.cs" />
-    <Compile Include="HttpRequestHeadersExtensionsTest.cs" />
-    <Compile Include="HttpRequestMessageCommonExtensionsTest.cs" />
-    <Compile Include="HttpResponseHeadersExtensionsTest.cs" />
-    <Compile Include="HttpUnsortedRequestTest.cs" />
-    <Compile Include="HttpUnsortedResponseTest.cs" />
-    <Compile Include="Internal/AsyncResultTest.cs" />
-    <Compile Include="Internal/ByteRangeStreamTest.cs" />
-    <Compile Include="Internal/ConcurrentDictionaryTests.cs" />
-    <Compile Include="Internal/DelegatingStreamTest.cs" />
-    <Compile Include="Internal/HttpValueCollectionTest.cs" />
-    <Compile Include="Internal/NonClosingDelegatingStreamTest.cs" />
-    <Compile Include="Internal/TranscodingStreamTests.cs" />
-    <Compile Include="InvalidByteRangeExceptionTest.cs" />
-    <Compile Include="MimeBodyPartTest.cs" />
-    <Compile Include="Mocks/MockAsyncCallback.cs" />
-    <Compile Include="Mocks/MockCompletedAsyncResult.cs" />
-    <Compile Include="Mocks/MockContentNegotiator.cs" />
-    <Compile Include="Mocks/MockDelegatingHandler.cs" />
-    <Compile Include="Mocks/MockDelegatingStream.cs" />
-    <Compile Include="Mocks/MockHttpContent.cs" />
-    <Compile Include="Mocks/MockMediaTypeFormatter.cs" />
-    <Compile Include="Mocks/MockMediaTypeMapping.cs" />
-    <Compile Include="Mocks/MockNonClosingDelegatingStream.cs" />
-    <Compile Include="Mocks/MockProgressEventHandler.cs" />
-    <Compile Include="Mocks/TestableHttpMessageHandler.cs" />
-    <Compile Include="MultipartFileDataTest.cs" />
-    <Compile Include="MultipartFileStreamProviderTests.cs" />
-    <Compile Include="MultipartFormDataRemoteStreamProviderTests.cs" />
-    <Compile Include="MultipartFormDataStreamProviderTests.cs" />
-    <Compile Include="MultipartMemoryStreamProviderTests.cs" />
-    <Compile Include="MultipartRelatedStreamProviderTests.cs" />
-    <Compile Include="MultipartRemoteFileDataTests.cs" />
-    <Compile Include="MultipartStreamProviderTestBase.cs" />
-    <Compile Include="ObjectContentOfTTests.cs" />
-    <Compile Include="ObjectContentTests.cs" />
-    <Compile Include="ParserData.cs" />
-    <Compile Include="PushStreamContentTest.cs" />
-    <Compile Include="RemoteStreamInfoTests.cs" />
-    <Compile Include="UriExtensionsTests.cs" />
-    <Compile Include="UriQueryDataSet.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/ByteRangeStreamContentTest.cs" Link="ByteRangeStreamContentTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/CustomMultipartFormDataRemoteStreamProvider.cs" Link="CustomMultipartFormDataRemoteStreamProvider.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/DataSets/HttpTestData.cs" Link="DataSets/HttpTestData.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/DataSets/Types/DataContractEnum.cs" Link="DataSets/Types/DataContractEnum.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/DataSets/Types/DataContractType.cs" Link="DataSets/Types/DataContractType.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/DataSets/Types/DerivedDataContractType.cs" Link="DataSets/Types/DerivedDataContractType.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/DataSets/Types/DerivedFormUrlEncodedMediaTypeFormatter.cs" Link="DataSets/Types/DerivedFormUrlEncodedMediaTypeFormatter.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/DataSets/Types/DerivedJsonMediaTypeFormatter.cs" Link="DataSets/Types/DerivedJsonMediaTypeFormatter.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/DataSets/Types/DerivedWcfPocoType.cs" Link="DataSets/Types/DerivedWcfPocoType.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/DataSets/Types/DerivedXmlMediaTypeFormatter.cs" Link="DataSets/Types/DerivedXmlMediaTypeFormatter.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/DataSets/Types/DerivedXmlSerializableType.cs" Link="DataSets/Types/DerivedXmlSerializableType.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/DataSets/Types/INotJsonSerializable.cs" Link="DataSets/Types/INotJsonSerializable.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/DataSets/Types/WcfPocoType.cs" Link="DataSets/Types/WcfPocoType.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/DataSets/Types/XmlSerializableType.cs" Link="DataSets/Types/XmlSerializableType.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.ns2_0.Test/ExceptionAssertionsTest.cs" Link="ExceptionAssertionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/BsonMediaTypeFormatterTests.cs" Link="Formatting/BsonMediaTypeFormatterTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/BufferedMediaTypeFormatterTests.cs" Link="Formatting/BufferedMediaTypeFormatterTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/ContentNegotiationResultTest.cs" Link="Formatting/ContentNegotiationResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/DataContractJsonMediaTypeFormatterTests.cs" Link="Formatting/DataContractJsonMediaTypeFormatterTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/DefaultContentNegotiatorTests.cs" Link="Formatting/DefaultContentNegotiatorTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/FormDataCollectionTests.cs" Link="Formatting/FormDataCollectionTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/FormUrlEncodedFromContentTests.cs" Link="Formatting/FormUrlEncodedFromContentTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/FormUrlEncodedFromUriQueryTests.cs" Link="Formatting/FormUrlEncodedFromUriQueryTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/FormUrlEncodedJsonTests.cs" Link="Formatting/FormUrlEncodedJsonTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/FormUrlEncodedMediaTypeFormatterTests.cs" Link="Formatting/FormUrlEncodedMediaTypeFormatterTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/JsonMediaTypeFormatterTests.cs" Link="Formatting/JsonMediaTypeFormatterTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/JsonNetSerializationTest.cs" Link="Formatting/JsonNetSerializationTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/JsonNetValidationTest.cs" Link="Formatting/JsonNetValidationTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/MediaTypeConstantsTests.cs" Link="Formatting/MediaTypeConstantsTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/MediaTypeFormatterCollectionTests.cs" Link="Formatting/MediaTypeFormatterCollectionTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/MediaTypeFormatterExtensionsTests.cs" Link="Formatting/MediaTypeFormatterExtensionsTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/MediaTypeFormatterMatchTest.cs" Link="Formatting/MediaTypeFormatterMatchTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/MediaTypeFormatterTestBase.cs" Link="Formatting/MediaTypeFormatterTestBase.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/MediaTypeFormatterTests.cs" Link="Formatting/MediaTypeFormatterTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/MediaTypeHeaderValueExtensionsTests.cs" Link="Formatting/MediaTypeHeaderValueExtensionsTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/MediaTypeMappingTests.cs" Link="Formatting/MediaTypeMappingTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/MediaTypeWithQualityHeaderValueComparerTests.cs" Link="Formatting/MediaTypeWithQualityHeaderValueComparerTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/ParsedMediaTypeHeaderValueTests.cs" Link="Formatting/ParsedMediaTypeHeaderValueTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/Parsers/FormUrlEncodedParserTests.cs" Link="Formatting/Parsers/FormUrlEncodedParserTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/Parsers/HttpRequestHeaderParserTests.cs" Link="Formatting/Parsers/HttpRequestHeaderParserTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/Parsers/HttpRequestLineParserTests.cs" Link="Formatting/Parsers/HttpRequestLineParserTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/Parsers/HttpResponseHeaderParserTests.cs" Link="Formatting/Parsers/HttpResponseHeaderParserTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/Parsers/HttpStatusLineParserTests.cs" Link="Formatting/Parsers/HttpStatusLineParserTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/Parsers/InternetMessageFormatHeaderParserTests.cs" Link="Formatting/Parsers/InternetMessageFormatHeaderParserTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/Parsers/MimeMultipartParserTests.cs" Link="Formatting/Parsers/MimeMultipartParserTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/QueryStringMappingTests.cs" Link="Formatting/QueryStringMappingTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/RequestHeaderMappingTests.cs" Link="Formatting/RequestHeaderMappingTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/SerializerConsistencyTests.cs" Link="Formatting/SerializerConsistencyTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/StringComparisonHelperTest.cs" Link="Formatting/StringComparisonHelperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/StringWithQualityHeaderValueComparerTests.cs" Link="Formatting/StringWithQualityHeaderValueComparerTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/XmlHttpRequestHeaderMappingTest.cs" Link="Formatting/XmlHttpRequestHeaderMappingTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/XmlMediaTypeFormatterTests.cs" Link="Formatting/XmlMediaTypeFormatterTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Formatting/XmlSerializerMediaTypeFormatterTests.cs" Link="Formatting/XmlSerializerMediaTypeFormatterTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/FormattingUtilitiesTests.cs" Link="FormattingUtilitiesTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Handlers/HttpProgressEventArgsTest.cs" Link="Handlers/HttpProgressEventArgsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Handlers/ProgressContentTest.cs" Link="Handlers/ProgressContentTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Handlers/ProgressMessageHandlerTest.cs" Link="Handlers/ProgressMessageHandlerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Handlers/ProgressStreamTest.cs" Link="Handlers/ProgressStreamTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Handlers/ProgressWriteAsyncResultTest.cs" Link="Handlers/ProgressWriteAsyncResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Headers/CookieHeaderValueTest.cs" Link="Headers/CookieHeaderValueTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Headers/CookieStateTest.cs" Link="Headers/CookieStateTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/HttpClientExtensionsTest.cs" Link="HttpClientExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/HttpClientFactoryTest.cs" Link="HttpClientFactoryTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/HttpContentExtensionsTest.cs" Link="HttpContentExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/HttpContentFormDataExtensionsTest.cs" Link="HttpContentFormDataExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/HttpContentMessageExtensionsTests.cs" Link="HttpContentMessageExtensionsTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/HttpContentMultipartExtensionsTests.cs" Link="HttpContentMultipartExtensionsTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/HttpHeaderExtensionsTest.cs" Link="HttpHeaderExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/HttpMessageContentTests.cs" Link="HttpMessageContentTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/HttpRequestHeadersExtensionsTest.cs" Link="HttpRequestHeadersExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/HttpRequestMessageCommonExtensionsTest.cs" Link="HttpRequestMessageCommonExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/HttpResponseHeadersExtensionsTest.cs" Link="HttpResponseHeadersExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/HttpUnsortedRequestTest.cs" Link="HttpUnsortedRequestTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/HttpUnsortedResponseTest.cs" Link="HttpUnsortedResponseTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Internal/AsyncResultTest.cs" Link="Internal/AsyncResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Internal/ByteRangeStreamTest.cs" Link="Internal/ByteRangeStreamTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Internal/ConcurrentDictionaryTests.cs" Link="Internal/ConcurrentDictionaryTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Internal/DelegatingStreamTest.cs" Link="Internal/DelegatingStreamTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Internal/HttpValueCollectionTest.cs" Link="Internal/HttpValueCollectionTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Internal/NonClosingDelegatingStreamTest.cs" Link="Internal/NonClosingDelegatingStreamTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Internal/TranscodingStreamTests.cs" Link="Internal/TranscodingStreamTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/InvalidByteRangeExceptionTest.cs" Link="InvalidByteRangeExceptionTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/MimeBodyPartTest.cs" Link="MimeBodyPartTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Mocks/MockAsyncCallback.cs" Link="Mocks/MockAsyncCallback.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Mocks/MockCompletedAsyncResult.cs" Link="Mocks/MockCompletedAsyncResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Mocks/MockContentNegotiator.cs" Link="Mocks/MockContentNegotiator.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Mocks/MockDelegatingHandler.cs" Link="Mocks/MockDelegatingHandler.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Mocks/MockDelegatingStream.cs" Link="Mocks/MockDelegatingStream.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Mocks/MockHttpContent.cs" Link="Mocks/MockHttpContent.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Mocks/MockMediaTypeFormatter.cs" Link="Mocks/MockMediaTypeFormatter.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Mocks/MockMediaTypeMapping.cs" Link="Mocks/MockMediaTypeMapping.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Mocks/MockNonClosingDelegatingStream.cs" Link="Mocks/MockNonClosingDelegatingStream.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Mocks/MockProgressEventHandler.cs" Link="Mocks/MockProgressEventHandler.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/Mocks/TestableHttpMessageHandler.cs" Link="Mocks/TestableHttpMessageHandler.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/MultipartFileDataTest.cs" Link="MultipartFileDataTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/MultipartFileStreamProviderTests.cs" Link="MultipartFileStreamProviderTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/MultipartFormDataRemoteStreamProviderTests.cs" Link="MultipartFormDataRemoteStreamProviderTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/MultipartFormDataStreamProviderTests.cs" Link="MultipartFormDataStreamProviderTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/MultipartMemoryStreamProviderTests.cs" Link="MultipartMemoryStreamProviderTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/MultipartRelatedStreamProviderTests.cs" Link="MultipartRelatedStreamProviderTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/MultipartRemoteFileDataTests.cs" Link="MultipartRemoteFileDataTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/MultipartStreamProviderTestBase.cs" Link="MultipartStreamProviderTestBase.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/ObjectContentOfTTests.cs" Link="ObjectContentOfTTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/ObjectContentTests.cs" Link="ObjectContentTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/ParserData.cs" Link="ParserData.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/PushStreamContentTest.cs" Link="PushStreamContentTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/RemoteStreamInfoTests.cs" Link="RemoteStreamInfoTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/UriExtensionsTests.cs" Link="UriExtensionsTests.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Net.Http.Formatting.Test/UriQueryDataSet.cs" Link="UriQueryDataSet.cs" />
   </ItemGroup>
 
   <ItemGroup>

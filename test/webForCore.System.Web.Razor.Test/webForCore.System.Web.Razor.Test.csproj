@@ -29,296 +29,296 @@
   <Import Project="../../src/webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="CSharpRazorCodeLanguageTest.cs" />
-    <Compile Include="CodeCompileUnitExtensions.cs" />
-    <Compile Include="Editor/RazorEditorParserTest.cs" />
-    <Compile Include="Framework/BlockExtensions.cs" />
-    <Compile Include="Framework/BlockTypes.cs" />
-    <Compile Include="Framework/CodeParserTestBase.cs" />
-    <Compile Include="Framework/CsHtmlCodeParserTestBase.cs" />
-    <Compile Include="Framework/CsHtmlMarkupParserTestBase.cs" />
-    <Compile Include="Framework/ErrorCollector.cs" />
-    <Compile Include="Framework/MarkupParserTestBase.cs" />
-    <Compile Include="Framework/ParserTestBase.cs" />
-    <Compile Include="Framework/RawTextSymbol.cs" />
-    <Compile Include="Framework/TestSpanBuilder.cs" />
-    <Compile Include="Framework/VBHtmlCodeParserTestBase.cs" />
-    <Compile Include="Framework/VBHtmlMarkupParserTestBase.cs" />
-    <Compile Include="Generator/CSharpRazorCodeGeneratorTest.cs" />
-    <Compile Include="Generator/GeneratedCodeMappingTest.cs" />
-    <Compile Include="Generator/PaddingTest.cs" />
-    <Compile Include="Generator/RazorCodeGeneratorTest.cs" />
-    <Compile Include="Generator/TabTest.cs" />
-    <Compile Include="Generator/TestSpan.cs" />
-    <Compile Include="Generator/VBRazorCodeGeneratorTest.cs" />
-    <Compile Include="Parser/BlockTest.cs" />
-    <Compile Include="Parser/CSharp/CSharpAutoCompleteTest.cs" />
-    <Compile Include="Parser/CSharp/CSharpBlockTest.cs" />
-    <Compile Include="Parser/CSharp/CSharpDirectivesTest.cs" />
-    <Compile Include="Parser/CSharp/CSharpErrorTest.cs" />
-    <Compile Include="Parser/CSharp/CSharpExplicitExpressionTest.cs" />
-    <Compile Include="Parser/CSharp/CSharpHelperTest.cs" />
-    <Compile Include="Parser/CSharp/CSharpImplicitExpressionTest.cs" />
-    <Compile Include="Parser/CSharp/CSharpLayoutDirectiveTest.cs" />
-    <Compile Include="Parser/CSharp/CSharpNestedStatementsTest.cs" />
-    <Compile Include="Parser/CSharp/CSharpRazorCommentsTest.cs" />
-    <Compile Include="Parser/CSharp/CSharpReservedWordsTest.cs" />
-    <Compile Include="Parser/CSharp/CSharpSectionTest.cs" />
-    <Compile Include="Parser/CSharp/CSharpSpecialBlockTest.cs" />
-    <Compile Include="Parser/CSharp/CSharpStatementTest.cs" />
-    <Compile Include="Parser/CSharp/CSharpTemplateTest.cs" />
-    <Compile Include="Parser/CSharp/CSharpToMarkupSwitchTest.cs" />
-    <Compile Include="Parser/CSharp/CSharpVerbatimBlockTest.cs" />
-    <Compile Include="Parser/CSharp/CSharpWhitespaceHandlingTest.cs" />
-    <Compile Include="Parser/CSharp/CsHtmlDocumentTest.cs" />
-    <Compile Include="Parser/CallbackParserListenerTest.cs" />
-    <Compile Include="Parser/Html/HtmlAttributeTest.cs" />
-    <Compile Include="Parser/Html/HtmlBlockTest.cs" />
-    <Compile Include="Parser/Html/HtmlDocumentTest.cs" />
-    <Compile Include="Parser/Html/HtmlErrorTest.cs" />
-    <Compile Include="Parser/Html/HtmlParserTestUtils.cs" />
-    <Compile Include="Parser/Html/HtmlTagsTest.cs" />
-    <Compile Include="Parser/Html/HtmlToCodeSwitchTest.cs" />
-    <Compile Include="Parser/Html/HtmlUrlAttributeTest.cs" />
-    <Compile Include="Parser/ParserContextTest.cs" />
-    <Compile Include="Parser/ParserVisitorExtensionsTest.cs" />
-    <Compile Include="Parser/PartialParsing/CSharpPartialParsingTest.cs" />
-    <Compile Include="Parser/PartialParsing/PartialParsingTestBase.cs" />
-    <Compile Include="Parser/PartialParsing/VBPartialParsingTest.cs" />
-    <Compile Include="Parser/RazorParserTest.cs" />
-    <Compile Include="Parser/VB/VBAutoCompleteTest.cs" />
-    <Compile Include="Parser/VB/VBBlockTest.cs" />
-    <Compile Include="Parser/VB/VBContinueStatementTest.cs" />
-    <Compile Include="Parser/VB/VBDirectiveTest.cs" />
-    <Compile Include="Parser/VB/VBErrorTest.cs" />
-    <Compile Include="Parser/VB/VBExitStatementTest.cs" />
-    <Compile Include="Parser/VB/VBExplicitExpressionTest.cs" />
-    <Compile Include="Parser/VB/VBExpressionTest.cs" />
-    <Compile Include="Parser/VB/VBExpressionsInCodeTest.cs" />
-    <Compile Include="Parser/VB/VBHelperTest.cs" />
-    <Compile Include="Parser/VB/VBHtmlDocumentTest.cs" />
-    <Compile Include="Parser/VB/VBImplicitExpressionTest.cs" />
-    <Compile Include="Parser/VB/VBLayoutDirectiveTest.cs" />
-    <Compile Include="Parser/VB/VBNestedStatementsTest.cs" />
-    <Compile Include="Parser/VB/VBRazorCommentsTest.cs" />
-    <Compile Include="Parser/VB/VBReservedWordsTest.cs" />
-    <Compile Include="Parser/VB/VBSectionTest.cs" />
-    <Compile Include="Parser/VB/VBSpecialKeywordsTest.cs" />
-    <Compile Include="Parser/VB/VBStatementTest.cs" />
-    <Compile Include="Parser/VB/VBTemplateTest.cs" />
-    <Compile Include="Parser/VB/VBToMarkupSwitchTest.cs" />
-    <Compile Include="Parser/WhitespaceRewriterTest.cs" />
-    <Compile Include="RazorCodeLanguageTest.cs" />
-    <Compile Include="RazorDirectiveAttributeTest.cs" />
-    <Compile Include="RazorEngineHostTest.cs" />
-    <Compile Include="RazorTemplateEngineTest.cs" />
-    <Compile Include="StringTextBuffer.cs" />
-    <Compile Include="Text/BufferingTextReaderTest.cs" />
-    <Compile Include="Text/LineTrackingStringBufferTest.cs" />
-    <Compile Include="Text/LookaheadTextReaderTestBase.cs" />
-    <Compile Include="Text/SourceLocationTest.cs" />
-    <Compile Include="Text/SourceLocationTrackerTest.cs" />
-    <Compile Include="Text/TextBufferReaderTest.cs" />
-    <Compile Include="Text/TextChangeTest.cs" />
-    <Compile Include="Text/TextReaderExtensionsTest.cs" />
-    <Compile Include="Tokenizer/CSharpTokenizerCommentTest.cs" />
-    <Compile Include="Tokenizer/CSharpTokenizerIdentifierTest.cs" />
-    <Compile Include="Tokenizer/CSharpTokenizerLiteralTest.cs" />
-    <Compile Include="Tokenizer/CSharpTokenizerOperatorsTest.cs" />
-    <Compile Include="Tokenizer/CSharpTokenizerTest.cs" />
-    <Compile Include="Tokenizer/CSharpTokenizerTestBase.cs" />
-    <Compile Include="Tokenizer/HtmlTokenizerTest.cs" />
-    <Compile Include="Tokenizer/HtmlTokenizerTestBase.cs" />
-    <Compile Include="Tokenizer/TokenizerLookaheadTest.cs" />
-    <Compile Include="Tokenizer/TokenizerTestBase.cs" />
-    <Compile Include="Tokenizer/VBTokenizerCommentTest.cs" />
-    <Compile Include="Tokenizer/VBTokenizerIdentifierTest.cs" />
-    <Compile Include="Tokenizer/VBTokenizerLiteralTest.cs" />
-    <Compile Include="Tokenizer/VBTokenizerOperatorsTest.cs" />
-    <Compile Include="Tokenizer/VBTokenizerTest.cs" />
-    <Compile Include="Tokenizer/VBTokenizerTestBase.cs" />
-    <Compile Include="Utils/DisposableActionTest.cs" />
-    <Compile Include="Utils/EnumerableUtils.cs" />
-    <Compile Include="Utils/MiscAssert.cs" />
-    <Compile Include="Utils/MiscUtils.cs" />
-    <Compile Include="Utils/SpanAssert.cs" />
-    <Compile Include="VBRazorCodeLanguageTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/CSharpRazorCodeLanguageTest.cs" Link="CSharpRazorCodeLanguageTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/CodeCompileUnitExtensions.cs" Link="CodeCompileUnitExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Editor/RazorEditorParserTest.cs" Link="Editor/RazorEditorParserTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Framework/BlockExtensions.cs" Link="Framework/BlockExtensions.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Framework/BlockTypes.cs" Link="Framework/BlockTypes.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Framework/CodeParserTestBase.cs" Link="Framework/CodeParserTestBase.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Framework/CsHtmlCodeParserTestBase.cs" Link="Framework/CsHtmlCodeParserTestBase.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Framework/CsHtmlMarkupParserTestBase.cs" Link="Framework/CsHtmlMarkupParserTestBase.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Framework/ErrorCollector.cs" Link="Framework/ErrorCollector.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Framework/MarkupParserTestBase.cs" Link="Framework/MarkupParserTestBase.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Framework/ParserTestBase.cs" Link="Framework/ParserTestBase.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Framework/RawTextSymbol.cs" Link="Framework/RawTextSymbol.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Framework/TestSpanBuilder.cs" Link="Framework/TestSpanBuilder.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Framework/VBHtmlCodeParserTestBase.cs" Link="Framework/VBHtmlCodeParserTestBase.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Framework/VBHtmlMarkupParserTestBase.cs" Link="Framework/VBHtmlMarkupParserTestBase.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Generator/CSharpRazorCodeGeneratorTest.cs" Link="Generator/CSharpRazorCodeGeneratorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Generator/GeneratedCodeMappingTest.cs" Link="Generator/GeneratedCodeMappingTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Generator/PaddingTest.cs" Link="Generator/PaddingTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Generator/RazorCodeGeneratorTest.cs" Link="Generator/RazorCodeGeneratorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Generator/TabTest.cs" Link="Generator/TabTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Generator/TestSpan.cs" Link="Generator/TestSpan.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Generator/VBRazorCodeGeneratorTest.cs" Link="Generator/VBRazorCodeGeneratorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/BlockTest.cs" Link="Parser/BlockTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/CSharp/CSharpAutoCompleteTest.cs" Link="Parser/CSharp/CSharpAutoCompleteTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/CSharp/CSharpBlockTest.cs" Link="Parser/CSharp/CSharpBlockTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/CSharp/CSharpDirectivesTest.cs" Link="Parser/CSharp/CSharpDirectivesTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/CSharp/CSharpErrorTest.cs" Link="Parser/CSharp/CSharpErrorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/CSharp/CSharpExplicitExpressionTest.cs" Link="Parser/CSharp/CSharpExplicitExpressionTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/CSharp/CSharpHelperTest.cs" Link="Parser/CSharp/CSharpHelperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/CSharp/CSharpImplicitExpressionTest.cs" Link="Parser/CSharp/CSharpImplicitExpressionTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/CSharp/CSharpLayoutDirectiveTest.cs" Link="Parser/CSharp/CSharpLayoutDirectiveTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/CSharp/CSharpNestedStatementsTest.cs" Link="Parser/CSharp/CSharpNestedStatementsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/CSharp/CSharpRazorCommentsTest.cs" Link="Parser/CSharp/CSharpRazorCommentsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/CSharp/CSharpReservedWordsTest.cs" Link="Parser/CSharp/CSharpReservedWordsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/CSharp/CSharpSectionTest.cs" Link="Parser/CSharp/CSharpSectionTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/CSharp/CSharpSpecialBlockTest.cs" Link="Parser/CSharp/CSharpSpecialBlockTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/CSharp/CSharpStatementTest.cs" Link="Parser/CSharp/CSharpStatementTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/CSharp/CSharpTemplateTest.cs" Link="Parser/CSharp/CSharpTemplateTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/CSharp/CSharpToMarkupSwitchTest.cs" Link="Parser/CSharp/CSharpToMarkupSwitchTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/CSharp/CSharpVerbatimBlockTest.cs" Link="Parser/CSharp/CSharpVerbatimBlockTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/CSharp/CSharpWhitespaceHandlingTest.cs" Link="Parser/CSharp/CSharpWhitespaceHandlingTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/CSharp/CsHtmlDocumentTest.cs" Link="Parser/CSharp/CsHtmlDocumentTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/CallbackParserListenerTest.cs" Link="Parser/CallbackParserListenerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/Html/HtmlAttributeTest.cs" Link="Parser/Html/HtmlAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/Html/HtmlBlockTest.cs" Link="Parser/Html/HtmlBlockTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/Html/HtmlDocumentTest.cs" Link="Parser/Html/HtmlDocumentTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/Html/HtmlErrorTest.cs" Link="Parser/Html/HtmlErrorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/Html/HtmlParserTestUtils.cs" Link="Parser/Html/HtmlParserTestUtils.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/Html/HtmlTagsTest.cs" Link="Parser/Html/HtmlTagsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/Html/HtmlToCodeSwitchTest.cs" Link="Parser/Html/HtmlToCodeSwitchTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/Html/HtmlUrlAttributeTest.cs" Link="Parser/Html/HtmlUrlAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/ParserContextTest.cs" Link="Parser/ParserContextTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/ParserVisitorExtensionsTest.cs" Link="Parser/ParserVisitorExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/PartialParsing/CSharpPartialParsingTest.cs" Link="Parser/PartialParsing/CSharpPartialParsingTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/PartialParsing/PartialParsingTestBase.cs" Link="Parser/PartialParsing/PartialParsingTestBase.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/PartialParsing/VBPartialParsingTest.cs" Link="Parser/PartialParsing/VBPartialParsingTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/RazorParserTest.cs" Link="Parser/RazorParserTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/VB/VBAutoCompleteTest.cs" Link="Parser/VB/VBAutoCompleteTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/VB/VBBlockTest.cs" Link="Parser/VB/VBBlockTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/VB/VBContinueStatementTest.cs" Link="Parser/VB/VBContinueStatementTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/VB/VBDirectiveTest.cs" Link="Parser/VB/VBDirectiveTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/VB/VBErrorTest.cs" Link="Parser/VB/VBErrorTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/VB/VBExitStatementTest.cs" Link="Parser/VB/VBExitStatementTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/VB/VBExplicitExpressionTest.cs" Link="Parser/VB/VBExplicitExpressionTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/VB/VBExpressionTest.cs" Link="Parser/VB/VBExpressionTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/VB/VBExpressionsInCodeTest.cs" Link="Parser/VB/VBExpressionsInCodeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/VB/VBHelperTest.cs" Link="Parser/VB/VBHelperTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/VB/VBHtmlDocumentTest.cs" Link="Parser/VB/VBHtmlDocumentTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/VB/VBImplicitExpressionTest.cs" Link="Parser/VB/VBImplicitExpressionTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/VB/VBLayoutDirectiveTest.cs" Link="Parser/VB/VBLayoutDirectiveTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/VB/VBNestedStatementsTest.cs" Link="Parser/VB/VBNestedStatementsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/VB/VBRazorCommentsTest.cs" Link="Parser/VB/VBRazorCommentsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/VB/VBReservedWordsTest.cs" Link="Parser/VB/VBReservedWordsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/VB/VBSectionTest.cs" Link="Parser/VB/VBSectionTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/VB/VBSpecialKeywordsTest.cs" Link="Parser/VB/VBSpecialKeywordsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/VB/VBStatementTest.cs" Link="Parser/VB/VBStatementTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/VB/VBTemplateTest.cs" Link="Parser/VB/VBTemplateTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/VB/VBToMarkupSwitchTest.cs" Link="Parser/VB/VBToMarkupSwitchTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Parser/WhitespaceRewriterTest.cs" Link="Parser/WhitespaceRewriterTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/RazorCodeLanguageTest.cs" Link="RazorCodeLanguageTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/RazorDirectiveAttributeTest.cs" Link="RazorDirectiveAttributeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/RazorEngineHostTest.cs" Link="RazorEngineHostTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/RazorTemplateEngineTest.cs" Link="RazorTemplateEngineTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/StringTextBuffer.cs" Link="StringTextBuffer.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Text/BufferingTextReaderTest.cs" Link="Text/BufferingTextReaderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Text/LineTrackingStringBufferTest.cs" Link="Text/LineTrackingStringBufferTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Text/LookaheadTextReaderTestBase.cs" Link="Text/LookaheadTextReaderTestBase.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Text/SourceLocationTest.cs" Link="Text/SourceLocationTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Text/SourceLocationTrackerTest.cs" Link="Text/SourceLocationTrackerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Text/TextBufferReaderTest.cs" Link="Text/TextBufferReaderTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Text/TextChangeTest.cs" Link="Text/TextChangeTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Text/TextReaderExtensionsTest.cs" Link="Text/TextReaderExtensionsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Tokenizer/CSharpTokenizerCommentTest.cs" Link="Tokenizer/CSharpTokenizerCommentTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Tokenizer/CSharpTokenizerIdentifierTest.cs" Link="Tokenizer/CSharpTokenizerIdentifierTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Tokenizer/CSharpTokenizerLiteralTest.cs" Link="Tokenizer/CSharpTokenizerLiteralTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Tokenizer/CSharpTokenizerOperatorsTest.cs" Link="Tokenizer/CSharpTokenizerOperatorsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Tokenizer/CSharpTokenizerTest.cs" Link="Tokenizer/CSharpTokenizerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Tokenizer/CSharpTokenizerTestBase.cs" Link="Tokenizer/CSharpTokenizerTestBase.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Tokenizer/HtmlTokenizerTest.cs" Link="Tokenizer/HtmlTokenizerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Tokenizer/HtmlTokenizerTestBase.cs" Link="Tokenizer/HtmlTokenizerTestBase.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Tokenizer/TokenizerLookaheadTest.cs" Link="Tokenizer/TokenizerLookaheadTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Tokenizer/TokenizerTestBase.cs" Link="Tokenizer/TokenizerTestBase.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Tokenizer/VBTokenizerCommentTest.cs" Link="Tokenizer/VBTokenizerCommentTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Tokenizer/VBTokenizerIdentifierTest.cs" Link="Tokenizer/VBTokenizerIdentifierTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Tokenizer/VBTokenizerLiteralTest.cs" Link="Tokenizer/VBTokenizerLiteralTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Tokenizer/VBTokenizerOperatorsTest.cs" Link="Tokenizer/VBTokenizerOperatorsTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Tokenizer/VBTokenizerTest.cs" Link="Tokenizer/VBTokenizerTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Tokenizer/VBTokenizerTestBase.cs" Link="Tokenizer/VBTokenizerTestBase.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Utils/DisposableActionTest.cs" Link="Utils/DisposableActionTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Utils/EnumerableUtils.cs" Link="Utils/EnumerableUtils.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Utils/MiscAssert.cs" Link="Utils/MiscAssert.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Utils/MiscUtils.cs" Link="Utils/MiscUtils.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/Utils/SpanAssert.cs" Link="Utils/SpanAssert.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/VBRazorCodeLanguageTest.cs" Link="VBRazorCodeLanguageTest.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/Blocks.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/CodeBlock.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/CodeBlockAtEOF.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/Comments.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/ConditionalAttributes.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/DesignTime.Tabs.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/DesignTime.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/EmptyCodeBlock.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/EmptyExplicitExpression.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/EmptyImplicitExpression.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/EmptyImplicitExpressionInCode.Tabs.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/EmptyImplicitExpressionInCode.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/ExplicitExpression.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/ExplicitExpressionAtEOF.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/ExpressionsInCode.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/FunctionsBlock.DesignTime.Tabs.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/FunctionsBlock.DesignTime.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/FunctionsBlock.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/FunctionsBlockMinimal.DesignTime.Tabs.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/FunctionsBlock_Tabs.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/Helpers.Instance.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/Helpers.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/HelpersMissingCloseParen.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/HelpersMissingName.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/HelpersMissingOpenBrace.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/HelpersMissingOpenParen.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/HiddenSpansInCode.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/HtmlCommentWithQuote_Double.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/HtmlCommentWithQuote_Single.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/ImplicitExpression.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/ImplicitExpressionAtEOF.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/Imports.DesignTime.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/Imports.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/Inherits.Designtime.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/Inherits.Runtime.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/InlineBlocks.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/Instrumented.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/LayoutDirective.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/MarkupInCodeBlock.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/NestedCodeBlocks.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/NestedHelpers.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/NoLinePragmas.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/OpenedIf.DesignTime.Tabs.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/OpenedIf.DesignTime.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/ParserError.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/RazorComments.DesignTime.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/RazorComments.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/ResolveUrl.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/Sections.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/SimpleUnspacedIf.DesignTime.Tabs.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/Templates.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/UnfinishedExpressionInCode.Tabs.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Output/UnfinishedExpressionInCode.cs" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/Blocks.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/CodeBlock.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/CodeBlockAtEOF.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/ConditionalAttributes.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/DesignTime.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/EmptyCodeBlock.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/EmptyExplicitExpression.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/EmptyImplicitExpression.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/EmptyImplicitExpressionInCode.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/ExplicitExpression.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/ExplicitExpressionAtEOF.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/ExpressionsInCode.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/FunctionsBlock.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/FunctionsBlockMinimal.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/FunctionsBlock_Tabs.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/Helpers.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/HelpersMissingCloseParen.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/HelpersMissingName.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/HelpersMissingOpenBrace.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/HelpersMissingOpenParen.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/HiddenSpansInCode.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/HtmlCommentWithQuote_Double.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/HtmlCommentWithQuote_Single.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/ImplicitExpression.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/ImplicitExpressionAtEOF.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/Imports.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/Inherits.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/InlineBlocks.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/Instrumented.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/LayoutDirective.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/MarkupInCodeBlock.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/NestedCodeBlocks.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/NestedHelpers.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/NoLinePragmas.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/OpenedIf.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/ParserError.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/RazorComments.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/ResolveUrl.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/Sections.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/SimpleUnspacedIf.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/Templates.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/CS/Source/UnfinishedExpressionInCode.cshtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/Blocks.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/CodeBlock.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/CodeBlockAtEOF.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/Comments.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/ConditionalAttributes.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/DesignTime.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/EmptyExplicitExpression.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/EmptyImplicitExpression.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/EmptyImplicitExpressionInCode.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/EmptySection.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/ExplicitExpression.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/ExplicitExpressionAtEOF.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/ExpressionsInCode.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/FunctionsBlock.DesignTime.Tabs.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/FunctionsBlock.DesignTime.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/FunctionsBlock.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/Helpers.Instance.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/Helpers.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/HelpersMissingCloseParen.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/HelpersMissingName.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/HelpersMissingOpenParen.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/ImplicitExpression.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/ImplicitExpressionAtEOF.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/Imports.DesignTime.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/Imports.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/Inherits.Designtime.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/Inherits.Runtime.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/Instrumented.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/LayoutDirective.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/MarkupInCodeBlock.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/NestedCodeBlocks.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/NestedHelpers.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/NoLinePragmas.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/Options.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/ParserError.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/RazorComments.DesignTime.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/RazorComments.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/ResolveUrl.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/Sections.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/Templates.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Output/UnfinishedExpressionInCode.vb" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/Blocks.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/CodeBlock.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/CodeBlockAtEOF.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/ConditionalAttributes.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/DesignTime.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/EmptyExplicitExpression.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/EmptyImplicitExpression.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/EmptyImplicitExpressionInCode.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/EmptySection.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/ExplicitExpression.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/ExplicitExpressionAtEOF.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/ExpressionsInCode.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/FunctionsBlock.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/Helpers.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/HelpersMissingCloseParen.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/HelpersMissingName.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/HelpersMissingOpenParen.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/ImplicitExpression.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/ImplicitExpressionAtEOF.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/Imports.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/Inherits.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/Instrumented.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/LayoutDirective.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/MarkupInCodeBlock.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/NestedCodeBlocks.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/NestedHelpers.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/NoLinePragmas.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/Options.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/ParserError.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/RazorComments.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/ResolveUrl.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/Sections.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/Templates.vbhtml" />
-    <EmbeddedResource Include="TestFiles/CodeGenerator/VB/Source/UnfinishedExpressionInCode.vbhtml" />
-    <EmbeddedResource Include="TestFiles/DesignTime/Simple.cshtml" />
-    <EmbeddedResource Include="TestFiles/DesignTime/Simple.txt" />
-    <EmbeddedResource Include="TestFiles/nested-1000.html" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/Blocks.cs" Link="TestFiles/CodeGenerator/CS/Output/Blocks.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/CodeBlock.cs" Link="TestFiles/CodeGenerator/CS/Output/CodeBlock.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/CodeBlockAtEOF.cs" Link="TestFiles/CodeGenerator/CS/Output/CodeBlockAtEOF.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/Comments.cs" Link="TestFiles/CodeGenerator/CS/Output/Comments.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/ConditionalAttributes.cs" Link="TestFiles/CodeGenerator/CS/Output/ConditionalAttributes.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/DesignTime.Tabs.cs" Link="TestFiles/CodeGenerator/CS/Output/DesignTime.Tabs.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/DesignTime.cs" Link="TestFiles/CodeGenerator/CS/Output/DesignTime.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/EmptyCodeBlock.cs" Link="TestFiles/CodeGenerator/CS/Output/EmptyCodeBlock.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/EmptyExplicitExpression.cs" Link="TestFiles/CodeGenerator/CS/Output/EmptyExplicitExpression.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/EmptyImplicitExpression.cs" Link="TestFiles/CodeGenerator/CS/Output/EmptyImplicitExpression.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/EmptyImplicitExpressionInCode.Tabs.cs" Link="TestFiles/CodeGenerator/CS/Output/EmptyImplicitExpressionInCode.Tabs.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/EmptyImplicitExpressionInCode.cs" Link="TestFiles/CodeGenerator/CS/Output/EmptyImplicitExpressionInCode.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/ExplicitExpression.cs" Link="TestFiles/CodeGenerator/CS/Output/ExplicitExpression.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/ExplicitExpressionAtEOF.cs" Link="TestFiles/CodeGenerator/CS/Output/ExplicitExpressionAtEOF.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/ExpressionsInCode.cs" Link="TestFiles/CodeGenerator/CS/Output/ExpressionsInCode.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/FunctionsBlock.DesignTime.Tabs.cs" Link="TestFiles/CodeGenerator/CS/Output/FunctionsBlock.DesignTime.Tabs.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/FunctionsBlock.DesignTime.cs" Link="TestFiles/CodeGenerator/CS/Output/FunctionsBlock.DesignTime.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/FunctionsBlock.cs" Link="TestFiles/CodeGenerator/CS/Output/FunctionsBlock.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/FunctionsBlockMinimal.DesignTime.Tabs.cs" Link="TestFiles/CodeGenerator/CS/Output/FunctionsBlockMinimal.DesignTime.Tabs.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/FunctionsBlock_Tabs.cs" Link="TestFiles/CodeGenerator/CS/Output/FunctionsBlock_Tabs.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/Helpers.Instance.cs" Link="TestFiles/CodeGenerator/CS/Output/Helpers.Instance.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/Helpers.cs" Link="TestFiles/CodeGenerator/CS/Output/Helpers.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/HelpersMissingCloseParen.cs" Link="TestFiles/CodeGenerator/CS/Output/HelpersMissingCloseParen.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/HelpersMissingName.cs" Link="TestFiles/CodeGenerator/CS/Output/HelpersMissingName.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/HelpersMissingOpenBrace.cs" Link="TestFiles/CodeGenerator/CS/Output/HelpersMissingOpenBrace.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/HelpersMissingOpenParen.cs" Link="TestFiles/CodeGenerator/CS/Output/HelpersMissingOpenParen.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/HiddenSpansInCode.cs" Link="TestFiles/CodeGenerator/CS/Output/HiddenSpansInCode.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/HtmlCommentWithQuote_Double.cs" Link="TestFiles/CodeGenerator/CS/Output/HtmlCommentWithQuote_Double.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/HtmlCommentWithQuote_Single.cs" Link="TestFiles/CodeGenerator/CS/Output/HtmlCommentWithQuote_Single.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/ImplicitExpression.cs" Link="TestFiles/CodeGenerator/CS/Output/ImplicitExpression.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/ImplicitExpressionAtEOF.cs" Link="TestFiles/CodeGenerator/CS/Output/ImplicitExpressionAtEOF.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/Imports.DesignTime.cs" Link="TestFiles/CodeGenerator/CS/Output/Imports.DesignTime.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/Imports.cs" Link="TestFiles/CodeGenerator/CS/Output/Imports.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/Inherits.Designtime.cs" Link="TestFiles/CodeGenerator/CS/Output/Inherits.Designtime.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/Inherits.Runtime.cs" Link="TestFiles/CodeGenerator/CS/Output/Inherits.Runtime.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/InlineBlocks.cs" Link="TestFiles/CodeGenerator/CS/Output/InlineBlocks.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/Instrumented.cs" Link="TestFiles/CodeGenerator/CS/Output/Instrumented.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/LayoutDirective.cs" Link="TestFiles/CodeGenerator/CS/Output/LayoutDirective.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/MarkupInCodeBlock.cs" Link="TestFiles/CodeGenerator/CS/Output/MarkupInCodeBlock.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/NestedCodeBlocks.cs" Link="TestFiles/CodeGenerator/CS/Output/NestedCodeBlocks.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/NestedHelpers.cs" Link="TestFiles/CodeGenerator/CS/Output/NestedHelpers.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/NoLinePragmas.cs" Link="TestFiles/CodeGenerator/CS/Output/NoLinePragmas.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/OpenedIf.DesignTime.Tabs.cs" Link="TestFiles/CodeGenerator/CS/Output/OpenedIf.DesignTime.Tabs.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/OpenedIf.DesignTime.cs" Link="TestFiles/CodeGenerator/CS/Output/OpenedIf.DesignTime.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/ParserError.cs" Link="TestFiles/CodeGenerator/CS/Output/ParserError.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/RazorComments.DesignTime.cs" Link="TestFiles/CodeGenerator/CS/Output/RazorComments.DesignTime.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/RazorComments.cs" Link="TestFiles/CodeGenerator/CS/Output/RazorComments.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/ResolveUrl.cs" Link="TestFiles/CodeGenerator/CS/Output/ResolveUrl.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/Sections.cs" Link="TestFiles/CodeGenerator/CS/Output/Sections.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/SimpleUnspacedIf.DesignTime.Tabs.cs" Link="TestFiles/CodeGenerator/CS/Output/SimpleUnspacedIf.DesignTime.Tabs.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/Templates.cs" Link="TestFiles/CodeGenerator/CS/Output/Templates.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/UnfinishedExpressionInCode.Tabs.cs" Link="TestFiles/CodeGenerator/CS/Output/UnfinishedExpressionInCode.Tabs.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Output/UnfinishedExpressionInCode.cs" Link="TestFiles/CodeGenerator/CS/Output/UnfinishedExpressionInCode.cs" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/Blocks.cshtml" Link="TestFiles/CodeGenerator/CS/Source/Blocks.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/CodeBlock.cshtml" Link="TestFiles/CodeGenerator/CS/Source/CodeBlock.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/CodeBlockAtEOF.cshtml" Link="TestFiles/CodeGenerator/CS/Source/CodeBlockAtEOF.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/ConditionalAttributes.cshtml" Link="TestFiles/CodeGenerator/CS/Source/ConditionalAttributes.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/DesignTime.cshtml" Link="TestFiles/CodeGenerator/CS/Source/DesignTime.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/EmptyCodeBlock.cshtml" Link="TestFiles/CodeGenerator/CS/Source/EmptyCodeBlock.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/EmptyExplicitExpression.cshtml" Link="TestFiles/CodeGenerator/CS/Source/EmptyExplicitExpression.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/EmptyImplicitExpression.cshtml" Link="TestFiles/CodeGenerator/CS/Source/EmptyImplicitExpression.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/EmptyImplicitExpressionInCode.cshtml" Link="TestFiles/CodeGenerator/CS/Source/EmptyImplicitExpressionInCode.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/ExplicitExpression.cshtml" Link="TestFiles/CodeGenerator/CS/Source/ExplicitExpression.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/ExplicitExpressionAtEOF.cshtml" Link="TestFiles/CodeGenerator/CS/Source/ExplicitExpressionAtEOF.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/ExpressionsInCode.cshtml" Link="TestFiles/CodeGenerator/CS/Source/ExpressionsInCode.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/FunctionsBlock.cshtml" Link="TestFiles/CodeGenerator/CS/Source/FunctionsBlock.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/FunctionsBlockMinimal.cshtml" Link="TestFiles/CodeGenerator/CS/Source/FunctionsBlockMinimal.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/FunctionsBlock_Tabs.cshtml" Link="TestFiles/CodeGenerator/CS/Source/FunctionsBlock_Tabs.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/Helpers.cshtml" Link="TestFiles/CodeGenerator/CS/Source/Helpers.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/HelpersMissingCloseParen.cshtml" Link="TestFiles/CodeGenerator/CS/Source/HelpersMissingCloseParen.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/HelpersMissingName.cshtml" Link="TestFiles/CodeGenerator/CS/Source/HelpersMissingName.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/HelpersMissingOpenBrace.cshtml" Link="TestFiles/CodeGenerator/CS/Source/HelpersMissingOpenBrace.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/HelpersMissingOpenParen.cshtml" Link="TestFiles/CodeGenerator/CS/Source/HelpersMissingOpenParen.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/HiddenSpansInCode.cshtml" Link="TestFiles/CodeGenerator/CS/Source/HiddenSpansInCode.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/HtmlCommentWithQuote_Double.cshtml" Link="TestFiles/CodeGenerator/CS/Source/HtmlCommentWithQuote_Double.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/HtmlCommentWithQuote_Single.cshtml" Link="TestFiles/CodeGenerator/CS/Source/HtmlCommentWithQuote_Single.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/ImplicitExpression.cshtml" Link="TestFiles/CodeGenerator/CS/Source/ImplicitExpression.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/ImplicitExpressionAtEOF.cshtml" Link="TestFiles/CodeGenerator/CS/Source/ImplicitExpressionAtEOF.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/Imports.cshtml" Link="TestFiles/CodeGenerator/CS/Source/Imports.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/Inherits.cshtml" Link="TestFiles/CodeGenerator/CS/Source/Inherits.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/InlineBlocks.cshtml" Link="TestFiles/CodeGenerator/CS/Source/InlineBlocks.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/Instrumented.cshtml" Link="TestFiles/CodeGenerator/CS/Source/Instrumented.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/LayoutDirective.cshtml" Link="TestFiles/CodeGenerator/CS/Source/LayoutDirective.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/MarkupInCodeBlock.cshtml" Link="TestFiles/CodeGenerator/CS/Source/MarkupInCodeBlock.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/NestedCodeBlocks.cshtml" Link="TestFiles/CodeGenerator/CS/Source/NestedCodeBlocks.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/NestedHelpers.cshtml" Link="TestFiles/CodeGenerator/CS/Source/NestedHelpers.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/NoLinePragmas.cshtml" Link="TestFiles/CodeGenerator/CS/Source/NoLinePragmas.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/OpenedIf.cshtml" Link="TestFiles/CodeGenerator/CS/Source/OpenedIf.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/ParserError.cshtml" Link="TestFiles/CodeGenerator/CS/Source/ParserError.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/RazorComments.cshtml" Link="TestFiles/CodeGenerator/CS/Source/RazorComments.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/ResolveUrl.cshtml" Link="TestFiles/CodeGenerator/CS/Source/ResolveUrl.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/Sections.cshtml" Link="TestFiles/CodeGenerator/CS/Source/Sections.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/SimpleUnspacedIf.cshtml" Link="TestFiles/CodeGenerator/CS/Source/SimpleUnspacedIf.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/Templates.cshtml" Link="TestFiles/CodeGenerator/CS/Source/Templates.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/CS/Source/UnfinishedExpressionInCode.cshtml" Link="TestFiles/CodeGenerator/CS/Source/UnfinishedExpressionInCode.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/Blocks.vb" Link="TestFiles/CodeGenerator/VB/Output/Blocks.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/CodeBlock.vb" Link="TestFiles/CodeGenerator/VB/Output/CodeBlock.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/CodeBlockAtEOF.vb" Link="TestFiles/CodeGenerator/VB/Output/CodeBlockAtEOF.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/Comments.vb" Link="TestFiles/CodeGenerator/VB/Output/Comments.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/ConditionalAttributes.vb" Link="TestFiles/CodeGenerator/VB/Output/ConditionalAttributes.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/DesignTime.vb" Link="TestFiles/CodeGenerator/VB/Output/DesignTime.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/EmptyExplicitExpression.vb" Link="TestFiles/CodeGenerator/VB/Output/EmptyExplicitExpression.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/EmptyImplicitExpression.vb" Link="TestFiles/CodeGenerator/VB/Output/EmptyImplicitExpression.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/EmptyImplicitExpressionInCode.vb" Link="TestFiles/CodeGenerator/VB/Output/EmptyImplicitExpressionInCode.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/EmptySection.vb" Link="TestFiles/CodeGenerator/VB/Output/EmptySection.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/ExplicitExpression.vb" Link="TestFiles/CodeGenerator/VB/Output/ExplicitExpression.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/ExplicitExpressionAtEOF.vb" Link="TestFiles/CodeGenerator/VB/Output/ExplicitExpressionAtEOF.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/ExpressionsInCode.vb" Link="TestFiles/CodeGenerator/VB/Output/ExpressionsInCode.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/FunctionsBlock.DesignTime.Tabs.vb" Link="TestFiles/CodeGenerator/VB/Output/FunctionsBlock.DesignTime.Tabs.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/FunctionsBlock.DesignTime.vb" Link="TestFiles/CodeGenerator/VB/Output/FunctionsBlock.DesignTime.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/FunctionsBlock.vb" Link="TestFiles/CodeGenerator/VB/Output/FunctionsBlock.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/Helpers.Instance.vb" Link="TestFiles/CodeGenerator/VB/Output/Helpers.Instance.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/Helpers.vb" Link="TestFiles/CodeGenerator/VB/Output/Helpers.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/HelpersMissingCloseParen.vb" Link="TestFiles/CodeGenerator/VB/Output/HelpersMissingCloseParen.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/HelpersMissingName.vb" Link="TestFiles/CodeGenerator/VB/Output/HelpersMissingName.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/HelpersMissingOpenParen.vb" Link="TestFiles/CodeGenerator/VB/Output/HelpersMissingOpenParen.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/ImplicitExpression.vb" Link="TestFiles/CodeGenerator/VB/Output/ImplicitExpression.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/ImplicitExpressionAtEOF.vb" Link="TestFiles/CodeGenerator/VB/Output/ImplicitExpressionAtEOF.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/Imports.DesignTime.vb" Link="TestFiles/CodeGenerator/VB/Output/Imports.DesignTime.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/Imports.vb" Link="TestFiles/CodeGenerator/VB/Output/Imports.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/Inherits.Designtime.vb" Link="TestFiles/CodeGenerator/VB/Output/Inherits.Designtime.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/Inherits.Runtime.vb" Link="TestFiles/CodeGenerator/VB/Output/Inherits.Runtime.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/Instrumented.vb" Link="TestFiles/CodeGenerator/VB/Output/Instrumented.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/LayoutDirective.vb" Link="TestFiles/CodeGenerator/VB/Output/LayoutDirective.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/MarkupInCodeBlock.vb" Link="TestFiles/CodeGenerator/VB/Output/MarkupInCodeBlock.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/NestedCodeBlocks.vb" Link="TestFiles/CodeGenerator/VB/Output/NestedCodeBlocks.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/NestedHelpers.vb" Link="TestFiles/CodeGenerator/VB/Output/NestedHelpers.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/NoLinePragmas.vb" Link="TestFiles/CodeGenerator/VB/Output/NoLinePragmas.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/Options.vb" Link="TestFiles/CodeGenerator/VB/Output/Options.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/ParserError.vb" Link="TestFiles/CodeGenerator/VB/Output/ParserError.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/RazorComments.DesignTime.vb" Link="TestFiles/CodeGenerator/VB/Output/RazorComments.DesignTime.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/RazorComments.vb" Link="TestFiles/CodeGenerator/VB/Output/RazorComments.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/ResolveUrl.vb" Link="TestFiles/CodeGenerator/VB/Output/ResolveUrl.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/Sections.vb" Link="TestFiles/CodeGenerator/VB/Output/Sections.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/Templates.vb" Link="TestFiles/CodeGenerator/VB/Output/Templates.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Output/UnfinishedExpressionInCode.vb" Link="TestFiles/CodeGenerator/VB/Output/UnfinishedExpressionInCode.vb" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/Blocks.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/Blocks.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/CodeBlock.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/CodeBlock.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/CodeBlockAtEOF.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/CodeBlockAtEOF.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/ConditionalAttributes.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/ConditionalAttributes.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/DesignTime.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/DesignTime.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/EmptyExplicitExpression.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/EmptyExplicitExpression.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/EmptyImplicitExpression.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/EmptyImplicitExpression.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/EmptyImplicitExpressionInCode.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/EmptyImplicitExpressionInCode.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/EmptySection.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/EmptySection.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/ExplicitExpression.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/ExplicitExpression.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/ExplicitExpressionAtEOF.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/ExplicitExpressionAtEOF.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/ExpressionsInCode.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/ExpressionsInCode.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/FunctionsBlock.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/FunctionsBlock.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/Helpers.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/Helpers.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/HelpersMissingCloseParen.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/HelpersMissingCloseParen.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/HelpersMissingName.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/HelpersMissingName.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/HelpersMissingOpenParen.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/HelpersMissingOpenParen.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/ImplicitExpression.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/ImplicitExpression.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/ImplicitExpressionAtEOF.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/ImplicitExpressionAtEOF.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/Imports.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/Imports.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/Inherits.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/Inherits.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/Instrumented.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/Instrumented.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/LayoutDirective.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/LayoutDirective.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/MarkupInCodeBlock.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/MarkupInCodeBlock.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/NestedCodeBlocks.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/NestedCodeBlocks.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/NestedHelpers.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/NestedHelpers.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/NoLinePragmas.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/NoLinePragmas.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/Options.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/Options.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/ParserError.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/ParserError.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/RazorComments.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/RazorComments.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/ResolveUrl.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/ResolveUrl.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/Sections.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/Sections.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/Templates.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/Templates.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/CodeGenerator/VB/Source/UnfinishedExpressionInCode.vbhtml" Link="TestFiles/CodeGenerator/VB/Source/UnfinishedExpressionInCode.vbhtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/DesignTime/Simple.cshtml" Link="TestFiles/DesignTime/Simple.cshtml" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/DesignTime/Simple.txt" Link="TestFiles/DesignTime/Simple.txt" />
+    <EmbeddedResource Include="../../external/AspNetWebStack/test/System.Web.Razor.Test/TestFiles/nested-1000.html" Link="TestFiles/nested-1000.html" />
   </ItemGroup>
 
   <ItemGroup>

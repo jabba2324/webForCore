@@ -28,72 +28,72 @@
 
   <ItemGroup>
     <Compile Include="AppDomainUtils.cs" />
-    <Compile Include="Assert.cs" />
-    <Compile Include="CultureReplacer.cs" />
-    <Compile Include="DataAttribute.cs" />
-    <Compile Include="DictionaryEqualityComparer.cs" />
-    <Compile Include="EnumHelperTestBase.cs" />
-    <Compile Include="ExceptionAssertions.cs" />
-    <Compile Include="ExceptionUtility.cs" />
-    <Compile Include="FactAttribute.cs" />
-    <Compile Include="FactDiscoverer.cs" />
-    <Compile Include="ForceGCAttribute.cs" />
-    <Compile Include="InlineDataAttribute.cs" />
-    <Compile Include="MatrixTheoryDataSet.cs" />
-    <Compile Include="MemberHelper.cs" />
-    <Compile Include="Microsoft/TestCommon/DataSets/CommonUnitTestDataSets.cs" />
-    <Compile Include="Microsoft/TestCommon/DataSets/RefTypeTestData.cs" />
-    <Compile Include="Microsoft/TestCommon/DataSets/TestData.cs" />
-    <Compile Include="Microsoft/TestCommon/DataSets/TestDataHolder.cs" />
-    <Compile Include="Microsoft/TestCommon/DataSets/TestDataVariations.cs" />
-    <Compile Include="Microsoft/TestCommon/DataSets/ValueTypeTestData.cs" />
-    <Compile Include="Microsoft/TestCommon/GenericTypeAssert.cs" />
-    <Compile Include="Microsoft/TestCommon/HttpAssert.cs" />
-    <Compile Include="Microsoft/TestCommon/MediaTypeAssert.cs" />
-    <Compile Include="Microsoft/TestCommon/MediaTypeHeaderValueComparer.cs" />
-    <Compile Include="Microsoft/TestCommon/ParsedMediaTypeHeaderValue.cs" />
-    <Compile Include="Microsoft/TestCommon/RegexReplacement.cs" />
-    <Compile Include="Microsoft/TestCommon/SerializerAssert.cs" />
-    <Compile Include="Microsoft/TestCommon/StreamAssert.cs" />
-    <Compile Include="Microsoft/TestCommon/TaskAssert.cs" />
-    <Compile Include="Microsoft/TestCommon/TestDataSetAttribute.cs" />
-    <Compile Include="Microsoft/TestCommon/TimeoutConstant.cs" />
-    <Compile Include="Microsoft/TestCommon/TypeAssert.cs" />
-    <Compile Include="Microsoft/TestCommon/Types/ByteEnum.cs" />
-    <Compile Include="Microsoft/TestCommon/Types/FlagsEnum.cs" />
-    <Compile Include="Microsoft/TestCommon/Types/INameAndIdContainer.cs" />
-    <Compile Include="Microsoft/TestCommon/Types/ISerializableType.cs" />
-    <Compile Include="Microsoft/TestCommon/Types/LongEnum.cs" />
-    <Compile Include="Microsoft/TestCommon/Types/SByteEnum.cs" />
-    <Compile Include="Microsoft/TestCommon/Types/ShortEnum.cs" />
-    <Compile Include="Microsoft/TestCommon/Types/SimpleEnum.cs" />
-    <Compile Include="Microsoft/TestCommon/Types/UIntEnum.cs" />
-    <Compile Include="Microsoft/TestCommon/Types/UShortEnum.cs" />
-    <Compile Include="Microsoft/TestCommon/XmlAssert.cs" />
-    <Compile Include="Platform.cs" />
-    <Compile Include="PlatformInfo.cs" />
-    <Compile Include="PortReserver.cs" />
-    <Compile Include="PreAppStartTestHelper.cs" />
-    <Compile Include="PreserveSyncContextAttribute.cs" />
-    <Compile Include="PropertyDataAttribute.cs" />
-    <Compile Include="ReflectionAssert.cs" />
-    <Compile Include="ReplaceCultureAttribute.cs" />
-    <Compile Include="RestoreThreadPrincipalAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Assert.cs" Link="Assert.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/CultureReplacer.cs" Link="CultureReplacer.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/DataAttribute.cs" Link="DataAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/DictionaryEqualityComparer.cs" Link="DictionaryEqualityComparer.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/EnumHelperTestBase.cs" Link="EnumHelperTestBase.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/ExceptionAssertions.cs" Link="ExceptionAssertions.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/ExceptionUtility.cs" Link="ExceptionUtility.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/FactAttribute.cs" Link="FactAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/FactDiscoverer.cs" Link="FactDiscoverer.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/ForceGCAttribute.cs" Link="ForceGCAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/InlineDataAttribute.cs" Link="InlineDataAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/MatrixTheoryDataSet.cs" Link="MatrixTheoryDataSet.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/MemberHelper.cs" Link="MemberHelper.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/DataSets/CommonUnitTestDataSets.cs" Link="Microsoft/TestCommon/DataSets/CommonUnitTestDataSets.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/DataSets/RefTypeTestData.cs" Link="Microsoft/TestCommon/DataSets/RefTypeTestData.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/DataSets/TestData.cs" Link="Microsoft/TestCommon/DataSets/TestData.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/DataSets/TestDataHolder.cs" Link="Microsoft/TestCommon/DataSets/TestDataHolder.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/DataSets/TestDataVariations.cs" Link="Microsoft/TestCommon/DataSets/TestDataVariations.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/DataSets/ValueTypeTestData.cs" Link="Microsoft/TestCommon/DataSets/ValueTypeTestData.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/GenericTypeAssert.cs" Link="Microsoft/TestCommon/GenericTypeAssert.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/HttpAssert.cs" Link="Microsoft/TestCommon/HttpAssert.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/MediaTypeAssert.cs" Link="Microsoft/TestCommon/MediaTypeAssert.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/MediaTypeHeaderValueComparer.cs" Link="Microsoft/TestCommon/MediaTypeHeaderValueComparer.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/ParsedMediaTypeHeaderValue.cs" Link="Microsoft/TestCommon/ParsedMediaTypeHeaderValue.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/RegexReplacement.cs" Link="Microsoft/TestCommon/RegexReplacement.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/SerializerAssert.cs" Link="Microsoft/TestCommon/SerializerAssert.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/StreamAssert.cs" Link="Microsoft/TestCommon/StreamAssert.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/TaskAssert.cs" Link="Microsoft/TestCommon/TaskAssert.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/TestDataSetAttribute.cs" Link="Microsoft/TestCommon/TestDataSetAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/TimeoutConstant.cs" Link="Microsoft/TestCommon/TimeoutConstant.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/TypeAssert.cs" Link="Microsoft/TestCommon/TypeAssert.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/Types/ByteEnum.cs" Link="Microsoft/TestCommon/Types/ByteEnum.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/Types/FlagsEnum.cs" Link="Microsoft/TestCommon/Types/FlagsEnum.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/Types/INameAndIdContainer.cs" Link="Microsoft/TestCommon/Types/INameAndIdContainer.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/Types/ISerializableType.cs" Link="Microsoft/TestCommon/Types/ISerializableType.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/Types/LongEnum.cs" Link="Microsoft/TestCommon/Types/LongEnum.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/Types/SByteEnum.cs" Link="Microsoft/TestCommon/Types/SByteEnum.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/Types/ShortEnum.cs" Link="Microsoft/TestCommon/Types/ShortEnum.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/Types/SimpleEnum.cs" Link="Microsoft/TestCommon/Types/SimpleEnum.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/Types/UIntEnum.cs" Link="Microsoft/TestCommon/Types/UIntEnum.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/Types/UShortEnum.cs" Link="Microsoft/TestCommon/Types/UShortEnum.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Microsoft/TestCommon/XmlAssert.cs" Link="Microsoft/TestCommon/XmlAssert.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/Platform.cs" Link="Platform.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/PlatformInfo.cs" Link="PlatformInfo.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/PortReserver.cs" Link="PortReserver.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/PreAppStartTestHelper.cs" Link="PreAppStartTestHelper.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/PreserveSyncContextAttribute.cs" Link="PreserveSyncContextAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/PropertyDataAttribute.cs" Link="PropertyDataAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/ReflectionAssert.cs" Link="ReflectionAssert.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/ReplaceCultureAttribute.cs" Link="ReplaceCultureAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/RestoreThreadPrincipalAttribute.cs" Link="RestoreThreadPrincipalAttribute.cs" />
     <Compile Include="RuntimeEnvironment.cs" />
-    <Compile Include="SkippedXunitTestCase.cs" />
-    <Compile Include="TestFile.cs" />
-    <Compile Include="TestHelper.cs" />
-    <Compile Include="TheoryAttribute.cs" />
-    <Compile Include="TheoryDataSet.cs" />
-    <Compile Include="TheoryDiscoverer.cs" />
-    <Compile Include="ThreadPoolSyncContext.cs" />
-    <Compile Include="TraitAttribute.cs" />
-    <Compile Include="VersionTestHelper.cs" />
-    <Compile Include="WebUtils.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/SkippedXunitTestCase.cs" Link="SkippedXunitTestCase.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/TestFile.cs" Link="TestFile.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/TestHelper.cs" Link="TestHelper.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/TheoryAttribute.cs" Link="TheoryAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/TheoryDataSet.cs" Link="TheoryDataSet.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/TheoryDiscoverer.cs" Link="TheoryDiscoverer.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/ThreadPoolSyncContext.cs" Link="ThreadPoolSyncContext.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/TraitAttribute.cs" Link="TraitAttribute.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/VersionTestHelper.cs" Link="VersionTestHelper.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/WebUtils.cs" Link="WebUtils.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../external/AspNetWebStack/test/Microsoft.TestCommon/xunit.runner.json" Link="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
