@@ -1100,7 +1100,7 @@ Tests:
 
 System.Drawing.Common 6.0 on libgdiplus was tried and rejected; it was then lifted here with a GDI+ engine written on
 SkiaSharp, together with Microsoft's tests for it. All of that, and its history, is now in
-[drawingForCore](https://github.com/jabba2324/drawingForCore) (its `LIFT.md`); see "System.Drawing moves to
+[drawingForCore](https://github.com/xforcore/drawingForCore) (its `LIFT.md`); see "System.Drawing moves to
 drawingForCore" below.
 
 ## Protected configuration, the integrated pipeline and precompiled sites (30 Oct 2026)
@@ -1535,7 +1535,7 @@ changed, and behaviour changes when upgrading).
 
 ## Fixes from migrating real applications (31 Oct 2026)
 
-The smoke test bed ([jabba2324/webForCore-smoke-test](https://github.com/jabba2324/webForCore-smoke-test)) migrated
+The smoke test bed ([xforcore/webForCore-smoke-test](https://github.com/xforcore/webForCore-smoke-test)) migrated
 open-source ASP.NET 4.x applications with the 0.1.0 packages and filed what failed as issues #1-#15. Each fix below has
 a regression test (most in `IIS.Gate.Tests`' `RegressionTests`, pages in `test/webForCore.IIS.Sample/regressions`) and
 names the applications that hit it.
@@ -1757,7 +1757,7 @@ the repository and its packages:
 - **AjaxControlToolkit** (CodePlex Foundation, BSD 3-Clause), inherited from upstream (a submodule there, vendored
   here), packed as `webForCore.AjaxControlToolkit`, `.StaticResources` and `.HtmlEditor.Sanitizer` since 0.1.0.
 
-Both moved to [jabba2324/webForCore-thirdparty](https://github.com/jabba2324/webForCore-thirdparty), keeping their
+Both moved to [xforcore/webForCore-thirdparty](https://github.com/xforcore/webForCore-thirdparty), keeping their
 package IDs, built against webForCore's released packages (0.3.0) for net11.0 only. That repository exists only to help
 the smoke test migrate applications that use them: **nothing in webForCore depends on it**, not its code, packages,
 tests, CI or user documentation. Only AjaxControlToolkit's three shipped projects moved; its sample site, Jasmine
@@ -2085,11 +2085,11 @@ touched), each needing a new worker process.
 
 ## System.Drawing moves to drawingForCore (2 Nov 2026)
 
-System.Drawing is no longer built here (#53). [drawingForCore](https://github.com/jabba2324/drawingForCore) lifts the
+System.Drawing is no longer built here (#53). [drawingForCore](https://github.com/xforcore/drawingForCore) lifts the
 same System.Drawing.Common 6.0, engine and tests with the same scripts, and its CI runs the suite on Linux and
 Windows with the same results (3,882 tests in CI, 151 known failures). It publishes `drawingForCore.Common`
 (System.Drawing.Common) and `drawingForCore` (System.Drawing) as NuGet packages on a feed on GitHub Pages
-(https://jabba2324.github.io/drawingForCore/index.json): 0.1.0 for .NET 11, then 0.2.0, the `net10.0` build webForCore
+(https://xforcore.github.io/drawingForCore/index.json): 0.1.0 for .NET 11, then 0.2.0, the `net10.0` build webForCore
 uses since it moved to .NET 10 LTS (above).
 
 - **Removed:** `src/webForCore.System.Drawing.Common`, `src/WebFormsForCore.Drawing`,
@@ -2112,7 +2112,7 @@ uses since it moved to .NET 10 LTS (above).
 - **A local checkout:** `-p:DrawingForCoreSource=<checkout>` (`Directory.Build.targets`) turns each drawingForCore
   package reference into a reference to the checkout's project, keeping its aliases.
 - **Feed:** `.github/workflows/feed.yml` publishes webForCore's own feed
-  (https://jabba2324.github.io/webForCore/index.json) after each release, as drawingForCore's does: Sleet builds a static NuGet v3 feed from the latest five releases'
+  (https://xforcore.github.io/webForCore/index.json) after each release, as drawingForCore's does: Sleet builds a static NuGet v3 feed from the latest five releases'
   packages and deploys it to GitHub Pages.
 - **Tests:** System.Web.Helpers.Test (WebImage, Chart) 418 of 418 and System.Web.MonoTests 2,628 of 2,634 (6
   skipped), as before; the System.Drawing.Common.dll they load is the package's. The full run is CI's.

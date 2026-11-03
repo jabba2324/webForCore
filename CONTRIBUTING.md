@@ -9,12 +9,12 @@ a real application behave more like it did on .NET Framework 4.8 and IIS 10, and
    from its repositories, the port of the .NET Framework reference source, and assemblies with Microsoft's names that
    webForCore writes in their place (facades, `Microsoft.Web.Infrastructure`, `System.Net.Http.WebRequest`). Builds
    of third-party libraries for webForCore (WebActivatorEx, AjaxControlToolkit) are in
-   [webForCore-thirdparty](https://github.com/jabba2324/webForCore-thirdparty), which exists only to help the
-   [smoke test](https://github.com/jabba2324/webForCore-smoke-test) migrate applications that use them. Nothing in
+   [webForCore-thirdparty](https://github.com/xforcore/webForCore-thirdparty), which exists only to help the
+   [smoke test](https://github.com/xforcore/webForCore-smoke-test) migrate applications that use them. Nothing in
    webForCore depends on it: not its code, packages, tests, CI or documentation. A problem a third-party library has on
    webForCore is fixed in webForCore's own code if it is webForCore's, and otherwise documented with a workaround.
    NuGet dependencies of Microsoft's libraries (Newtonsoft.Json, ...) and build-only tools are fine, and so is
-   [drawingForCore](https://github.com/jabba2324/drawingForCore) (System.Drawing), which only ships Microsoft's code
+   [drawingForCore](https://github.com/xforcore/drawingForCore) (System.Drawing), which only ships Microsoft's code
    and its own GDI+ engine. A System.Drawing problem is fixed there; build webForCore against a checkout of it with
    `-p:DrawingForCoreSource=../drawingForCore` to try the fix here before it is released.
 
@@ -27,7 +27,7 @@ a real application behave more like it did on .NET Framework 4.8 and IIS 10, and
 3. **Every change names a real application it affects.** Say which open-source (or otherwise describable) application
    hit the problem, what it did there, and what the user saw: "eShopLegacyMVC: every request failed with ...", not
    "ConfigurationManager could be wrong". Synthetic edge cases are fine as extra tests, but the reason for a change is an
-   application that needs it. The [webForCore smoke test](https://github.com/jabba2324/webForCore-smoke-test) migrates
+   application that needs it. The [webForCore smoke test](https://github.com/xforcore/webForCore-smoke-test) migrates
    open-source applications and files what breaks; its issues and `FINDINGS.md` are a good source.
 
 4. **Avoid changing Microsoft's code at all costs.** Most of webForCore is Microsoft's own source, lifted unchanged

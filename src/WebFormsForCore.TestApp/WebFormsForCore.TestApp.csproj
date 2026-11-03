@@ -12,7 +12,7 @@
         <GenerateDependencyFile>true</GenerateDependencyFile>
         <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
         <CopyDebugSymbolFilesFromPackages>true</CopyDebugSymbolFilesFromPackages>
-        <RestoreSources>$(RestoreSources);../../nupkg;https://api.nuget.org/v3/index.json;https://jabba2324.github.io/drawingForCore/index.json</RestoreSources>
+        <RestoreSources>$(RestoreSources);../../nupkg;https://api.nuget.org/v3/index.json;https://xforcore.github.io/drawingForCore/index.json</RestoreSources>
         <UserSecretsId>a4676597-1b2b-4181-854f-0651a19d119b</UserSecretsId>
         <!-- webForCore: build against this tree by default; -p:UseLocalBuild=false uses the nuget.org packages -->
         <UseLocalBuild Condition="'$(UseLocalBuild)' == ''">true</UseLocalBuild>

@@ -219,7 +219,7 @@ HttpListener host uses Katana's Mono code paths. `HostString` accepts hosts that
 ## System.Drawing (drawingForCore)
 
 System.Drawing.Common 6.0 (Microsoft's managed code) over a GDI+ engine written on SkiaSharp, from
-[drawingForCore](https://github.com/jabba2324/drawingForCore)'s packages (`drawingForCore`, `drawingForCore.Common`),
+[drawingForCore](https://github.com/xforcore/drawingForCore)'s packages (`drawingForCore`, `drawingForCore.Common`),
 which the `webForCore` package depends on. Namespaces `System.Drawing`, `.Drawing2D`, `.Imaging`, `.Printing`, `.Text`,
 `.Design`. The `System.Drawing` assembly forwards .NET Framework's System.Drawing types to it. drawingForCore's README
 has the full list of what works.

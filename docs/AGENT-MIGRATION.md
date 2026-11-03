@@ -73,7 +73,7 @@ If webForCore has a release, use its packages (they aren't on nuget.org): downlo
 app's solution and add that folder as a package source in `nuget.config` (`docs/MIGRATING.md` section 1):
 
 ```bash
-gh release download --repo jabba2324/webForCore --pattern '*.nupkg' --dir packages   # latest release
+gh release download --repo xforcore/webForCore --pattern '*.nupkg' --dir packages   # latest release
 ```
 
 The app then uses `PackageReference`s (`webForCore` and the framework packages) instead of project references, and
@@ -81,7 +81,7 @@ no `<Import>` of `webForCore.WebStack.targets`. Otherwise, or if the user asks f
 the app (or use the path the user gives):
 
 ```bash
-git clone https://github.com/jabba2324/webForCore ../webForCore
+git clone https://github.com/xforcore/webForCore ../webForCore
 dotnet build ../webForCore/src/WebFormsForCore.Build/WebFormsForCore.Build.csproj -c Release
 dotnet build ../webForCore/WebFormsForCore.slnx -c Release
 ```
