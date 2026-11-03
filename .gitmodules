@@ -3,3 +3,13 @@
 	url = https://github.com/xforcore/AspNetKatana.git
 	branch = webforcore
 	shallow = true
+[submodule "external/AspNetIdentity"]
+	path = external/AspNetIdentity
+	url = https://github.com/xforcore/AspNetIdentity.git
+	branch = webforcore
+	shallow = true
+[submodule "external/SignalR"]
+	path = external/SignalR
+	url = https://github.com/xforcore/SignalR.git
+	branch = webforcore
+	shallow = true

@@ -29,95 +29,95 @@
   <Import Project="../../src/webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="App_Start/Initializer.cs" />
-    <Compile Include="App_Start/PreSendRequestHeadersModule.cs" />
-    <Compile Include="Connections/AddGroupOnConnectedConnection.cs" />
-    <Compile Include="Connections/AsyncOnConnectedConnection.cs" />
-    <Compile Include="Connections/AuthenticatedEchoConnection.cs" />
-    <Compile Include="Connections/BroadcastConnection.cs" />
-    <Compile Include="Connections/ConnectionThatUsesItems.cs" />
-    <Compile Include="Connections/EchoConnection.cs" />
-    <Compile Include="Connections/ExamineHeadersConnection.cs" />
-    <Compile Include="Connections/ExamineReconnectPath.cs" />
-    <Compile Include="Connections/FallbackToLongPollingConnection.cs" />
-    <Compile Include="Connections/FallbackToLongPollingConnectionThrows.cs" />
-    <Compile Include="Connections/MyBadConnection.cs" />
-    <Compile Include="Connections/MyGroupConnection.cs" />
-    <Compile Include="Connections/MyGroupEchoConnection.cs" />
-    <Compile Include="Connections/MyReconnect.cs" />
-    <Compile Include="Connections/MyRejoinGroupsConnection.cs" />
-    <Compile Include="Connections/MySendingConnection.cs" />
-    <Compile Include="Connections/PreserializedJsonConnection.cs" />
-    <Compile Include="Connections/RedirectionConnection.cs" />
-    <Compile Include="Connections/StatusCodeConnection.cs" />
-    <Compile Include="Connections/SyncErrorConnection.cs" />
-    <Compile Include="Connections/UnusableProtectedConnection.cs" />
-    <Compile Include="Handlers/GCHandler.cs" />
-    <Compile Include="Handlers/HandlerWithSession.cs" />
-    <Compile Include="Handlers/PingHandler.cs" />
-    <Compile Include="Hubs/AuthenticatedEchoHub.cs" />
-    <Compile Include="Hubs/ChatWithGroups.cs" />
-    <Compile Include="Hubs/ClientCallbackHub.cs" />
-    <Compile Include="Hubs/ConnectionDataVerifierHub.cs" />
-    <Compile Include="Hubs/DateAsStringHub.cs" />
-    <Compile Include="Hubs/DelayedOnConnectedHub.cs" />
-    <Compile Include="Hubs/EchoHub.cs" />
-    <Compile Include="Hubs/ExamineHeadersHub.cs" />
-    <Compile Include="Hubs/GroupJoiningHub.cs" />
-    <Compile Include="Hubs/IInvalidClientContract.cs" />
-    <Compile Include="Hubs/IValidClientContract.cs" />
-    <Compile Include="Hubs/InvalidTypedHub.cs" />
-    <Compile Include="Hubs/MyItemsHub.cs" />
-    <Compile Include="Hubs/OnConnectedBufferHub.cs" />
-    <Compile Include="Hubs/ProgressHub.cs" />
-    <Compile Include="Hubs/RedirectTestHub.cs" />
-    <Compile Include="Hubs/ValidTypedHub.cs" />
-    <Compile Include="Infrastructure/AsyncManualResetEvent.cs" />
-    <Compile Include="Infrastructure/CommonCommandLine.cs" />
-    <Compile Include="Infrastructure/CommonLog.cs" />
-    <Compile Include="Infrastructure/CountDownRange.cs" />
-    <Compile Include="Infrastructure/EmptyProtectedData.cs" />
-    <Compile Include="Infrastructure/ExternalTestHost.cs" />
-    <Compile Include="Infrastructure/FakeScaleoutBus.cs" />
-    <Compile Include="Infrastructure/HostType.cs" />
-    <Compile Include="Infrastructure/HostedTest.cs" />
-    <Compile Include="Infrastructure/HostedTestFactory.cs" />
-    <Compile Include="Infrastructure/HttpSysEtwWrapper.cs" />
-    <Compile Include="Infrastructure/ITestHost.cs" />
-    <Compile Include="Infrastructure/MemoryHost.cs" />
-    <Compile Include="Infrastructure/MemoryHostHttpHandler.cs" />
-    <Compile Include="Infrastructure/MemoryTestHost.cs" />
-    <Compile Include="Infrastructure/MessageBusType.cs" />
-    <Compile Include="Infrastructure/NameValueCollectionWrapper.cs" />
-    <Compile Include="Infrastructure/OrderedCountDownRange.cs" />
-    <Compile Include="Infrastructure/OwinTestHost.cs" />
-    <Compile Include="Infrastructure/ProcessExtensions.cs" />
-    <Compile Include="Infrastructure/RequestItemsResponse.cs" />
-    <Compile Include="Infrastructure/SystemNetLogging.cs" />
-    <Compile Include="Infrastructure/TaskExtensions.cs" />
-    <Compile Include="Infrastructure/TestUtilities.cs" />
-    <Compile Include="Infrastructure/TracingTestHost.cs" />
-    <Compile Include="Infrastructure/TransportType.cs" />
-    <Compile Include="TestRequest.cs" />
-    <Compile Include="TestResponse.cs" />
-    <Compile Include="TestTraceManager.cs" />
-    <Compile Include="TestTransport.cs" />
-    <Compile Include="TestTransportManager.cs" />
-    <Compile Include="Hubs/AdminAuthHub.cs" />
-    <Compile Include="Hubs/AuthHub.cs" />
-    <Compile Include="Hubs/AuthorizeClaimsAttribute.cs" />
-    <Compile Include="Hubs/HeaderAuthHub.cs" />
-    <Compile Include="Hubs/IncomingAuthHub.cs" />
-    <Compile Include="Hubs/InheritAuthHub.cs" />
-    <Compile Include="Hubs/InvokeAuthHub.cs" />
-    <Compile Include="Hubs/NoAuthHub.cs" />
-    <Compile Include="Hubs/UserAndRoleAuthHub.cs" />
-    <Compile Include="Hubs/Status.cs" />
-    <Compile Include="Hubs/DemoHub.cs" />
-    <Compile Include="StressServer/StressConnection.cs" />
-    <Compile Include="StressServer/ConcurrentCallsHub.cs" />
-    <Compile Include="StressServer/HubWithGroups.cs" />
-    <Compile Include="StressServer/SimpleEchoHub.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/App_Start/Initializer.cs" Link="App_Start/Initializer.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/App_Start/PreSendRequestHeadersModule.cs" Link="App_Start/PreSendRequestHeadersModule.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Connections/AddGroupOnConnectedConnection.cs" Link="Connections/AddGroupOnConnectedConnection.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Connections/AsyncOnConnectedConnection.cs" Link="Connections/AsyncOnConnectedConnection.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Connections/AuthenticatedEchoConnection.cs" Link="Connections/AuthenticatedEchoConnection.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Connections/BroadcastConnection.cs" Link="Connections/BroadcastConnection.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Connections/ConnectionThatUsesItems.cs" Link="Connections/ConnectionThatUsesItems.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Connections/EchoConnection.cs" Link="Connections/EchoConnection.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Connections/ExamineHeadersConnection.cs" Link="Connections/ExamineHeadersConnection.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Connections/ExamineReconnectPath.cs" Link="Connections/ExamineReconnectPath.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Connections/FallbackToLongPollingConnection.cs" Link="Connections/FallbackToLongPollingConnection.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Connections/FallbackToLongPollingConnectionThrows.cs" Link="Connections/FallbackToLongPollingConnectionThrows.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Connections/MyBadConnection.cs" Link="Connections/MyBadConnection.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Connections/MyGroupConnection.cs" Link="Connections/MyGroupConnection.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Connections/MyGroupEchoConnection.cs" Link="Connections/MyGroupEchoConnection.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Connections/MyReconnect.cs" Link="Connections/MyReconnect.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Connections/MyRejoinGroupsConnection.cs" Link="Connections/MyRejoinGroupsConnection.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Connections/MySendingConnection.cs" Link="Connections/MySendingConnection.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Connections/PreserializedJsonConnection.cs" Link="Connections/PreserializedJsonConnection.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Connections/RedirectionConnection.cs" Link="Connections/RedirectionConnection.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Connections/StatusCodeConnection.cs" Link="Connections/StatusCodeConnection.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Connections/SyncErrorConnection.cs" Link="Connections/SyncErrorConnection.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Connections/UnusableProtectedConnection.cs" Link="Connections/UnusableProtectedConnection.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Handlers/GCHandler.cs" Link="Handlers/GCHandler.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Handlers/HandlerWithSession.cs" Link="Handlers/HandlerWithSession.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Handlers/PingHandler.cs" Link="Handlers/PingHandler.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Hubs/AuthenticatedEchoHub.cs" Link="Hubs/AuthenticatedEchoHub.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Hubs/ChatWithGroups.cs" Link="Hubs/ChatWithGroups.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Hubs/ClientCallbackHub.cs" Link="Hubs/ClientCallbackHub.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Hubs/ConnectionDataVerifierHub.cs" Link="Hubs/ConnectionDataVerifierHub.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Hubs/DateAsStringHub.cs" Link="Hubs/DateAsStringHub.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Hubs/DelayedOnConnectedHub.cs" Link="Hubs/DelayedOnConnectedHub.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Hubs/EchoHub.cs" Link="Hubs/EchoHub.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Hubs/ExamineHeadersHub.cs" Link="Hubs/ExamineHeadersHub.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Hubs/GroupJoiningHub.cs" Link="Hubs/GroupJoiningHub.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Hubs/IInvalidClientContract.cs" Link="Hubs/IInvalidClientContract.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Hubs/IValidClientContract.cs" Link="Hubs/IValidClientContract.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Hubs/InvalidTypedHub.cs" Link="Hubs/InvalidTypedHub.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Hubs/MyItemsHub.cs" Link="Hubs/MyItemsHub.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Hubs/OnConnectedBufferHub.cs" Link="Hubs/OnConnectedBufferHub.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Hubs/ProgressHub.cs" Link="Hubs/ProgressHub.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Hubs/RedirectTestHub.cs" Link="Hubs/RedirectTestHub.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Hubs/ValidTypedHub.cs" Link="Hubs/ValidTypedHub.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/AsyncManualResetEvent.cs" Link="Infrastructure/AsyncManualResetEvent.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/CommonCommandLine.cs" Link="Infrastructure/CommonCommandLine.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/CommonLog.cs" Link="Infrastructure/CommonLog.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/CountDownRange.cs" Link="Infrastructure/CountDownRange.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/EmptyProtectedData.cs" Link="Infrastructure/EmptyProtectedData.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/ExternalTestHost.cs" Link="Infrastructure/ExternalTestHost.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/FakeScaleoutBus.cs" Link="Infrastructure/FakeScaleoutBus.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/HostType.cs" Link="Infrastructure/HostType.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/HostedTest.cs" Link="Infrastructure/HostedTest.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/HostedTestFactory.cs" Link="Infrastructure/HostedTestFactory.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/HttpSysEtwWrapper.cs" Link="Infrastructure/HttpSysEtwWrapper.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/ITestHost.cs" Link="Infrastructure/ITestHost.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/MemoryHost.cs" Link="Infrastructure/MemoryHost.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/MemoryHostHttpHandler.cs" Link="Infrastructure/MemoryHostHttpHandler.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/MemoryTestHost.cs" Link="Infrastructure/MemoryTestHost.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/MessageBusType.cs" Link="Infrastructure/MessageBusType.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/NameValueCollectionWrapper.cs" Link="Infrastructure/NameValueCollectionWrapper.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/OrderedCountDownRange.cs" Link="Infrastructure/OrderedCountDownRange.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/OwinTestHost.cs" Link="Infrastructure/OwinTestHost.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/ProcessExtensions.cs" Link="Infrastructure/ProcessExtensions.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/RequestItemsResponse.cs" Link="Infrastructure/RequestItemsResponse.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/SystemNetLogging.cs" Link="Infrastructure/SystemNetLogging.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/TaskExtensions.cs" Link="Infrastructure/TaskExtensions.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/TestUtilities.cs" Link="Infrastructure/TestUtilities.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/TracingTestHost.cs" Link="Infrastructure/TracingTestHost.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/Infrastructure/TransportType.cs" Link="Infrastructure/TransportType.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/TestRequest.cs" Link="TestRequest.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/TestResponse.cs" Link="TestResponse.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/TestTraceManager.cs" Link="TestTraceManager.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/TestTransport.cs" Link="TestTransport.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests.Common/TestTransportManager.cs" Link="TestTransportManager.cs" />
+    <Compile Include="../../external/SignalR/samples/Microsoft.AspNet.SignalR.Samples/Hubs/Auth/AdminAuthHub.cs" Link="Hubs/AdminAuthHub.cs" />
+    <Compile Include="../../external/SignalR/samples/Microsoft.AspNet.SignalR.Samples/Hubs/Auth/AuthHub.cs" Link="Hubs/AuthHub.cs" />
+    <Compile Include="../../external/SignalR/samples/Microsoft.AspNet.SignalR.Samples/Hubs/Auth/AuthorizeClaimsAttribute.cs" Link="Hubs/AuthorizeClaimsAttribute.cs" />
+    <Compile Include="../../external/SignalR/samples/Microsoft.AspNet.SignalR.Samples/Hubs/Auth/HeaderAuthHub.cs" Link="Hubs/HeaderAuthHub.cs" />
+    <Compile Include="../../external/SignalR/samples/Microsoft.AspNet.SignalR.Samples/Hubs/Auth/IncomingAuthHub.cs" Link="Hubs/IncomingAuthHub.cs" />
+    <Compile Include="../../external/SignalR/samples/Microsoft.AspNet.SignalR.Samples/Hubs/Auth/InheritAuthHub.cs" Link="Hubs/InheritAuthHub.cs" />
+    <Compile Include="../../external/SignalR/samples/Microsoft.AspNet.SignalR.Samples/Hubs/Auth/InvokeAuthHub.cs" Link="Hubs/InvokeAuthHub.cs" />
+    <Compile Include="../../external/SignalR/samples/Microsoft.AspNet.SignalR.Samples/Hubs/Auth/NoAuthHub.cs" Link="Hubs/NoAuthHub.cs" />
+    <Compile Include="../../external/SignalR/samples/Microsoft.AspNet.SignalR.Samples/Hubs/Auth/UserAndRoleAuthHub.cs" Link="Hubs/UserAndRoleAuthHub.cs" />
+    <Compile Include="../../external/SignalR/samples/Microsoft.AspNet.SignalR.Samples/Hubs/ConnectDisconnect/Status.cs" Link="Hubs/Status.cs" />
+    <Compile Include="../../external/SignalR/samples/Microsoft.AspNet.SignalR.Samples/Hubs/DemoHub/DemoHub.cs" Link="Hubs/DemoHub.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.StressServer/Connections/StressConnection.cs" Link="StressServer/StressConnection.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.StressServer/Hubs/ConcurrentCallsHub.cs" Link="StressServer/ConcurrentCallsHub.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.StressServer/Hubs/HubWithGroups.cs" Link="StressServer/HubWithGroups.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.StressServer/Hubs/SimpleEchoHub.cs" Link="StressServer/SimpleEchoHub.cs" />
 
 
 

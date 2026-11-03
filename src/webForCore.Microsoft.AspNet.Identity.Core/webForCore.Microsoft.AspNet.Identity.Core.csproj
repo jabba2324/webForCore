@@ -29,53 +29,53 @@
   <Import Project="../webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="Extensions/IIdentityMessageServiceExtensions.cs" />
-    <Compile Include="TaskExtensions.cs" />
-    <Compile Include="AsyncHelper.cs" />
-    <Compile Include="IIdentityMessageService.cs" />
-    <Compile Include="IUserTokenProvider.cs" />
-    <Compile Include="IUserPhoneNumberStore.cs" />
-    <Compile Include="IUserLockoutStore.cs" />
-    <Compile Include="IUserTwoFactorStore.cs" />
-    <Compile Include="IUserEmailStore.cs" />
-    <Compile Include="IQueryableRoleStore.cs" />
-    <Compile Include="IQueryableUserStore.cs" />
-    <Compile Include="IUserSecurityStampStore.cs" />
-    <Compile Include="IClaimsIdentityFactory.cs" />
-    <Compile Include="Extensions/RoleManagerExtensions.cs" />
-    <Compile Include="IUserPasswordStore.cs" />
-    <Compile Include="PasswordValidator.cs" />
-    <Compile Include="PasswordVerificationResult.cs" />
-    <Compile Include="EmailTokenProvider.cs" />
-    <Compile Include="PhoneNumberTokenProvider.cs" />
-    <Compile Include="TotpSecurityStampBasedTokenProvider.cs" />
-    <Compile Include="Rfc6238AuthenticationService.cs" />
-    <Compile Include="RoleValidator.cs" />
-    <Compile Include="IRoleStore.cs" />
-    <Compile Include="RoleManager.cs" />
-    <Compile Include="IUserRoleStore.cs" />
-    <Compile Include="DefaultAuthenticationTypes.cs" />
-    <Compile Include="Extensions/IdentityExtensions.cs" />
-    <Compile Include="Extensions/UserManagerExtensions.cs" />
-    <Compile Include="ClaimsIdentityFactory.cs" />
-    <Compile Include="Crypto.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="IUserClaimStore.cs" />
-    <Compile Include="IUserLoginStore.cs" />
-    <Compile Include="IPasswordHasher.cs" />
-    <Compile Include="IUserStore.cs" />
-    <Compile Include="PasswordHasher.cs" />
-    <Compile Include="MinimumLengthValidator.cs" />
-    <Compile Include="Resources.Designer.cs" />
-    <Compile Include="IdentityResult.cs" />
-    <Compile Include="IRole.cs" />
-    <Compile Include="IIdentityValidator.cs" />
-    <Compile Include="UserLoginInfo.cs" />
-    <Compile Include="IUser.cs" />
-    <Compile Include="Properties/AssemblyInfo.cs" />
-    <Compile Include="UserManager.cs" />
-    <Compile Include="UserValidator.cs" />
-    <EmbeddedResource Include="Resources.resx" LogicalName="Microsoft.AspNet.Identity.Resources.resources" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/Extensions/IIdentityMessageServiceExtensions.cs" Link="Extensions/IIdentityMessageServiceExtensions.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/TaskExtensions.cs" Link="TaskExtensions.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/AsyncHelper.cs" Link="AsyncHelper.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/IIdentityMessageService.cs" Link="IIdentityMessageService.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/IUserTokenProvider.cs" Link="IUserTokenProvider.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/IUserPhoneNumberStore.cs" Link="IUserPhoneNumberStore.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/IUserLockoutStore.cs" Link="IUserLockoutStore.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/IUserTwoFactorStore.cs" Link="IUserTwoFactorStore.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/IUserEmailStore.cs" Link="IUserEmailStore.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/IQueryableRoleStore.cs" Link="IQueryableRoleStore.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/IQueryableUserStore.cs" Link="IQueryableUserStore.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/IUserSecurityStampStore.cs" Link="IUserSecurityStampStore.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/IClaimsIdentityFactory.cs" Link="IClaimsIdentityFactory.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/Extensions/RoleManagerExtensions.cs" Link="Extensions/RoleManagerExtensions.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/IUserPasswordStore.cs" Link="IUserPasswordStore.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/PasswordValidator.cs" Link="PasswordValidator.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/PasswordVerificationResult.cs" Link="PasswordVerificationResult.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/EmailTokenProvider.cs" Link="EmailTokenProvider.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/PhoneNumberTokenProvider.cs" Link="PhoneNumberTokenProvider.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/TotpSecurityStampBasedTokenProvider.cs" Link="TotpSecurityStampBasedTokenProvider.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/Rfc6238AuthenticationService.cs" Link="Rfc6238AuthenticationService.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/RoleValidator.cs" Link="RoleValidator.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/IRoleStore.cs" Link="IRoleStore.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/RoleManager.cs" Link="RoleManager.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/IUserRoleStore.cs" Link="IUserRoleStore.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/DefaultAuthenticationTypes.cs" Link="DefaultAuthenticationTypes.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/Extensions/IdentityExtensions.cs" Link="Extensions/IdentityExtensions.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/Extensions/UserManagerExtensions.cs" Link="Extensions/UserManagerExtensions.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/ClaimsIdentityFactory.cs" Link="ClaimsIdentityFactory.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/Crypto.cs" Link="Crypto.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/IUserClaimStore.cs" Link="IUserClaimStore.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/IUserLoginStore.cs" Link="IUserLoginStore.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/IPasswordHasher.cs" Link="IPasswordHasher.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/IUserStore.cs" Link="IUserStore.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/PasswordHasher.cs" Link="PasswordHasher.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/MinimumLengthValidator.cs" Link="MinimumLengthValidator.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/Resources.Designer.cs" Link="Resources.Designer.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/IdentityResult.cs" Link="IdentityResult.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/IRole.cs" Link="IRole.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/IIdentityValidator.cs" Link="IIdentityValidator.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/UserLoginInfo.cs" Link="UserLoginInfo.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/IUser.cs" Link="IUser.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/UserManager.cs" Link="UserManager.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/UserValidator.cs" Link="UserValidator.cs" />
+    <EmbeddedResource Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.Core/Resources.resx" Link="Resources.resx" LogicalName="Microsoft.AspNet.Identity.Resources.resources" />
 
 
   </ItemGroup>

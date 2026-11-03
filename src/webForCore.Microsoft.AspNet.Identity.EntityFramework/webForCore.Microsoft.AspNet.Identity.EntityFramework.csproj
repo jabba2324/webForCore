@@ -29,19 +29,19 @@
   <Import Project="../webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="RoleStore.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="UserStore.cs" />
-    <Compile Include="IdentityUserRole.cs" />
-    <Compile Include="EntityStore.cs" />
-    <Compile Include="IdentityDbContext.cs" />
-    <Compile Include="IdentityResources.Designer.cs" />
-    <Compile Include="Properties/AssemblyInfo.cs" />
-    <Compile Include="IdentityRole.cs" />
-    <Compile Include="IdentityUser.cs" />
-    <Compile Include="IdentityUserClaim.cs" />
-    <Compile Include="IdentityUserLogin.cs" />
-    <EmbeddedResource Include="IdentityResources.resx" LogicalName="Microsoft.AspNet.Identity.EntityFramework.IdentityResources.resources" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.EntityFramework/RoleStore.cs" Link="RoleStore.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.EntityFramework/GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.EntityFramework/UserStore.cs" Link="UserStore.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.EntityFramework/IdentityUserRole.cs" Link="IdentityUserRole.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.EntityFramework/EntityStore.cs" Link="EntityStore.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.EntityFramework/IdentityDbContext.cs" Link="IdentityDbContext.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.EntityFramework/IdentityResources.Designer.cs" Link="IdentityResources.Designer.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.EntityFramework/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.EntityFramework/IdentityRole.cs" Link="IdentityRole.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.EntityFramework/IdentityUser.cs" Link="IdentityUser.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.EntityFramework/IdentityUserClaim.cs" Link="IdentityUserClaim.cs" />
+    <Compile Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.EntityFramework/IdentityUserLogin.cs" Link="IdentityUserLogin.cs" />
+    <EmbeddedResource Include="../../external/AspNetIdentity/src/Microsoft.AspNet.Identity.EntityFramework/IdentityResources.resx" Link="IdentityResources.resx" LogicalName="Microsoft.AspNet.Identity.EntityFramework.IdentityResources.resources" />
 
 
   </ItemGroup>

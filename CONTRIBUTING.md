@@ -40,7 +40,7 @@ a real application behave more like it did on .NET Framework 4.8 and IIS 10, and
 5. **When Microsoft's code must change, keep the documentation current.** Keep the change as small as it can be (an
    `#if`, a guarded branch for Linux, not a rewrite) and:
    - mark it with a `// webForCore:` comment saying why, and the issue number;
-   - for code from a submodule in `external/` (Katana so far; the rest follow, #61), make the change a commit on the
+   - for code from a submodule in `external/` (Katana, Identity and SignalR so far; the rest follow, #61), make the change a commit on the
      fork's `webforcore` branch (for example `xforcore/AspNetKatana`), one change per commit with its reason, then
      move the submodule to it in a webForCore pull request with the test;
    - for code still lifted, make the change a fixup in the lift script (`tools/lift/`), not an edit of the lifted file,

@@ -35,8 +35,8 @@
   <Import Project="../webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="RequestExtensions.cs" />
-    <Compile Include="SignalRRouteExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SystemWeb/RequestExtensions.cs" Link="RequestExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SystemWeb/SignalRRouteExtensions.cs" Link="SignalRRouteExtensions.cs" />
 
 
 

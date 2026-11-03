@@ -2135,3 +2135,11 @@ Katana is now a commit on the fork's branch, then a webForCore PR that moves the
 Result (Linux x64, .NET 10.0.14): Microsoft.Owin.Tests 321/321, Microsoft.Owin.Host.SystemWeb.Tests 36/36,
 Microsoft.Owin.Security.Tests 114 pass, 4 skipped of 118. These are the same as before. CI checks out submodules on
 both platforms, and on Windows sets `core.longpaths`.
+
+## Identity and SignalR from submodules (#61, 3 Nov 2026)
+
+These follow Katana. `external/AspNetIdentity` is xforcore/AspNetIdentity's `webforcore` branch: upstream `b7fc094`, 101
+files, and 5 change commits. `external/SignalR` is xforcore/SignalR's `webforcore` branch: upstream `7f53f26`, 456 files,
+and 3 change commits. Their 9 projects compile from the submodules, and the 571 lifted copies and the 9 manifests are
+gone. The report now covers 3,135 lifted files, 235 changed. Tests are unchanged: Identity.Test 311/311 against SQL
+Server; Microsoft.AspNet.SignalR.Tests 487 pass, 2 skipped, of 489.

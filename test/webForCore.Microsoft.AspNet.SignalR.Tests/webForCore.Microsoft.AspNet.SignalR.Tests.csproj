@@ -30,69 +30,69 @@
   <Import Project="../../src/webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="ArrayTextReaderFacts.cs" />
-    <Compile Include="ConfigurationManagerFacts.cs" />
-    <Compile Include="Core/ConnectionExtensionsFacts.cs" />
-    <Compile Include="Core/Hubs/DefaultJavaScriptProxyGeneratorFacts.cs" />
-    <Compile Include="Core/Hubs/Extensions/HubManagerExtensionsFacts.cs" />
-    <Compile Include="Core/Hubs/Extensions/HubTypeExtensions.cs" />
-    <Compile Include="Core/Hubs/Extensions/MethodExtensionsFacts.cs" />
-    <Compile Include="Core/Hubs/HubConnectionContextFacts.cs" />
-    <Compile Include="Core/Hubs/HubContextFacts.cs" />
-    <Compile Include="Core/Hubs/Lookup/DefaultHubManagerFacts.cs" />
-    <Compile Include="Core/Hubs/Lookup/Descriptors/HubDescriptorFacts.cs" />
-    <Compile Include="Core/Hubs/Lookup/HubMethodDispatcherFacts.cs" />
-    <Compile Include="Core/Hubs/Lookup/TestHubDescriptorProvider.cs" />
-    <Compile Include="Core/Hubs/Lookup/TestMethodDescriptorProvider.cs" />
-    <Compile Include="Core/Hubs/TestHubs.cs" />
-    <Compile Include="Core/Transports/ForeverFrameTransportFacts.cs" />
-    <Compile Include="CursorFacts.cs" />
-    <Compile Include="DefaultActionResolverFacts.cs" />
-    <Compile Include="DefaultDependencyResolverFacts.cs" />
-    <Compile Include="DefaultHubResolverFacts.cs" />
-    <Compile Include="GroupManagerFacts.cs" />
-    <Compile Include="Hosting/CookieFacts.cs" />
-    <Compile Include="Hosting/ResponseExtensionsFacts.cs" />
-    <Compile Include="Json/JsonFacts.cs" />
-    <Compile Include="Json/JsonSerializerExtensionFacts.cs" />
-    <Compile Include="MemoryPoolTextWriterFacts.cs" />
-    <Compile Include="Messaging/MessageBrokerFacts.cs" />
-    <Compile Include="Messaging/TestSubscription.cs" />
-    <Compile Include="Owin/ServerRequestFacts.cs" />
-    <Compile Include="Owin/WebSocketFacts.cs" />
-    <Compile Include="PerformanceCounterManagerFacts.cs" />
-    <Compile Include="PersistentConnectionFactoryFacts.cs" />
-    <Compile Include="PersistentConnectionFacts.cs" />
-    <Compile Include="PersistentResponseFacts.cs" />
-    <Compile Include="Server/AckHandlerFacts.cs" />
-    <Compile Include="Server/ConnectionFacts.cs" />
-    <Compile Include="Server/Connections/ConnectionFacts.cs" />
-    <Compile Include="Server/DiffSetFacts.cs" />
-    <Compile Include="Server/DisposerFacts.cs" />
-    <Compile Include="Server/Hubs/HubDispatcherFacts.cs" />
-    <Compile Include="Server/Hubs/HubFacts.cs" />
-    <Compile Include="Server/Hubs/HubProgressFacts.cs" />
-    <Compile Include="Server/Hubs/TypedClientBuilderFacts.cs" />
-    <Compile Include="Server/MessageBusFacts.cs" />
-    <Compile Include="Server/MessageResultExtensions.cs" />
-    <Compile Include="Server/ProtocolResolverFacts.cs" />
-    <Compile Include="Server/ScaleOutMessageBusFacts.cs" />
-    <Compile Include="Server/ScaleoutConfigurationFacts.cs" />
-    <Compile Include="Server/ScaleoutStoreFacts.cs" />
-    <Compile Include="Server/ScaleoutStreamFacts.cs" />
-    <Compile Include="Server/ScaleoutStreamManagerFacts.cs" />
-    <Compile Include="Server/SubscriptionFacts.cs" />
-    <Compile Include="Server/TestSubscriber.cs" />
-    <Compile Include="Server/TopicFacts.cs" />
-    <Compile Include="Server/Transports/ForeverTransportFacts.cs" />
-    <Compile Include="Server/Transports/LongPollingTransportFacts.cs" />
-    <Compile Include="Server/Transports/WebSocketTransportFacts.cs" />
-    <Compile Include="SipHashBasedStringEqualityComparerFacts.cs" />
-    <Compile Include="StringMinifierFacts.cs" />
-    <Compile Include="TaskAsyncHelperFacts.cs" />
-    <Compile Include="TaskQueueFacts.cs" />
-    <Compile Include="TestPerformanceCounterManager.cs" />
-    <Compile Include="Tracing/TraceManagerFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/ArrayTextReaderFacts.cs" Link="ArrayTextReaderFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/ConfigurationManagerFacts.cs" Link="ConfigurationManagerFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Core/ConnectionExtensionsFacts.cs" Link="Core/ConnectionExtensionsFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Core/Hubs/DefaultJavaScriptProxyGeneratorFacts.cs" Link="Core/Hubs/DefaultJavaScriptProxyGeneratorFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Core/Hubs/Extensions/HubManagerExtensionsFacts.cs" Link="Core/Hubs/Extensions/HubManagerExtensionsFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Core/Hubs/Extensions/HubTypeExtensions.cs" Link="Core/Hubs/Extensions/HubTypeExtensions.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Core/Hubs/Extensions/MethodExtensionsFacts.cs" Link="Core/Hubs/Extensions/MethodExtensionsFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Core/Hubs/HubConnectionContextFacts.cs" Link="Core/Hubs/HubConnectionContextFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Core/Hubs/HubContextFacts.cs" Link="Core/Hubs/HubContextFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Core/Hubs/Lookup/DefaultHubManagerFacts.cs" Link="Core/Hubs/Lookup/DefaultHubManagerFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Core/Hubs/Lookup/Descriptors/HubDescriptorFacts.cs" Link="Core/Hubs/Lookup/Descriptors/HubDescriptorFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Core/Hubs/Lookup/HubMethodDispatcherFacts.cs" Link="Core/Hubs/Lookup/HubMethodDispatcherFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Core/Hubs/Lookup/TestHubDescriptorProvider.cs" Link="Core/Hubs/Lookup/TestHubDescriptorProvider.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Core/Hubs/Lookup/TestMethodDescriptorProvider.cs" Link="Core/Hubs/Lookup/TestMethodDescriptorProvider.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Core/Hubs/TestHubs.cs" Link="Core/Hubs/TestHubs.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Core/Transports/ForeverFrameTransportFacts.cs" Link="Core/Transports/ForeverFrameTransportFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/CursorFacts.cs" Link="CursorFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/DefaultActionResolverFacts.cs" Link="DefaultActionResolverFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/DefaultDependencyResolverFacts.cs" Link="DefaultDependencyResolverFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/DefaultHubResolverFacts.cs" Link="DefaultHubResolverFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/GroupManagerFacts.cs" Link="GroupManagerFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Hosting/CookieFacts.cs" Link="Hosting/CookieFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Hosting/ResponseExtensionsFacts.cs" Link="Hosting/ResponseExtensionsFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Json/JsonFacts.cs" Link="Json/JsonFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Json/JsonSerializerExtensionFacts.cs" Link="Json/JsonSerializerExtensionFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/MemoryPoolTextWriterFacts.cs" Link="MemoryPoolTextWriterFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Messaging/MessageBrokerFacts.cs" Link="Messaging/MessageBrokerFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Messaging/TestSubscription.cs" Link="Messaging/TestSubscription.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Owin/ServerRequestFacts.cs" Link="Owin/ServerRequestFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Owin/WebSocketFacts.cs" Link="Owin/WebSocketFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/PerformanceCounterManagerFacts.cs" Link="PerformanceCounterManagerFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/PersistentConnectionFactoryFacts.cs" Link="PersistentConnectionFactoryFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/PersistentConnectionFacts.cs" Link="PersistentConnectionFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/PersistentResponseFacts.cs" Link="PersistentResponseFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Server/AckHandlerFacts.cs" Link="Server/AckHandlerFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Server/ConnectionFacts.cs" Link="Server/ConnectionFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Server/Connections/ConnectionFacts.cs" Link="Server/Connections/ConnectionFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Server/DiffSetFacts.cs" Link="Server/DiffSetFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Server/DisposerFacts.cs" Link="Server/DisposerFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Server/Hubs/HubDispatcherFacts.cs" Link="Server/Hubs/HubDispatcherFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Server/Hubs/HubFacts.cs" Link="Server/Hubs/HubFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Server/Hubs/HubProgressFacts.cs" Link="Server/Hubs/HubProgressFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Server/Hubs/TypedClientBuilderFacts.cs" Link="Server/Hubs/TypedClientBuilderFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Server/MessageBusFacts.cs" Link="Server/MessageBusFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Server/MessageResultExtensions.cs" Link="Server/MessageResultExtensions.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Server/ProtocolResolverFacts.cs" Link="Server/ProtocolResolverFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Server/ScaleOutMessageBusFacts.cs" Link="Server/ScaleOutMessageBusFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Server/ScaleoutConfigurationFacts.cs" Link="Server/ScaleoutConfigurationFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Server/ScaleoutStoreFacts.cs" Link="Server/ScaleoutStoreFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Server/ScaleoutStreamFacts.cs" Link="Server/ScaleoutStreamFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Server/ScaleoutStreamManagerFacts.cs" Link="Server/ScaleoutStreamManagerFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Server/SubscriptionFacts.cs" Link="Server/SubscriptionFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Server/TestSubscriber.cs" Link="Server/TestSubscriber.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Server/TopicFacts.cs" Link="Server/TopicFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Server/Transports/ForeverTransportFacts.cs" Link="Server/Transports/ForeverTransportFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Server/Transports/LongPollingTransportFacts.cs" Link="Server/Transports/LongPollingTransportFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Server/Transports/WebSocketTransportFacts.cs" Link="Server/Transports/WebSocketTransportFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/SipHashBasedStringEqualityComparerFacts.cs" Link="SipHashBasedStringEqualityComparerFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/StringMinifierFacts.cs" Link="StringMinifierFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/TaskAsyncHelperFacts.cs" Link="TaskAsyncHelperFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/TaskQueueFacts.cs" Link="TaskQueueFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/TestPerformanceCounterManager.cs" Link="TestPerformanceCounterManager.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Tests/Tracing/TraceManagerFacts.cs" Link="Tracing/TraceManagerFacts.cs" />
 
 
 

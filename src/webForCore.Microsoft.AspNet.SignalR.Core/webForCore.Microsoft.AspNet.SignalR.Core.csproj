@@ -35,240 +35,240 @@
   <Import Project="../webForCore.WebStack.targets" />
 
   <ItemGroup>
-    <Compile Include="AuthorizeAttribute.cs" />
-    <Compile Include="Configuration/ConfigurationExtensions.cs" />
-    <Compile Include="Configuration/DefaultConfigurationManager.cs" />
-    <Compile Include="Configuration/IConfigurationManager.cs" />
-    <Compile Include="ConnectionConfiguration.cs" />
-    <Compile Include="ConnectionExtensions.cs" />
-    <Compile Include="ConnectionMessage.cs" />
-    <Compile Include="Cookie.cs" />
-    <Compile Include="DefaultDependencyResolver.cs" />
-    <Compile Include="DependencyResolverExtensions.cs" />
-    <Compile Include="GlobalHost.cs" />
-    <Compile Include="GroupManager.cs" />
-    <Compile Include="Hosting/HostContext.cs" />
-    <Compile Include="Hosting/HostDependencyResolverExtensions.cs" />
-    <Compile Include="Hosting/INameValueCollection.cs" />
-    <Compile Include="Hosting/IResponse.cs" />
-    <Compile Include="Hosting/IWebSocket.cs" />
-    <Compile Include="Hosting/PersistentConnectionFactory.cs" />
-    <Compile Include="Hosting/ResponseExtensions.cs" />
-    <Compile Include="Hub.cs" />
-    <Compile Include="HubConfiguration.cs" />
-    <Compile Include="HubException.cs" />
-    <Compile Include="Hub`T.cs" />
-    <Compile Include="Hubs/CallerStateProxy.cs" />
-    <Compile Include="Hubs/ClientHubInvocation.cs" />
-    <Compile Include="Hubs/ClientProxy.cs" />
-    <Compile Include="Hubs/ConnectionIdProxy.cs" />
-    <Compile Include="Hubs/DefaultAssemblyLocator.cs" />
-    <Compile Include="Hubs/DefaultHubActivator.cs" />
-    <Compile Include="Hubs/DefaultJavaScriptProxyGenerator.cs" />
-    <Compile Include="Hubs/DynamicDictionary.cs" />
-    <Compile Include="Hubs/EmptyJavaScriptProxyGenerator.cs" />
-    <Compile Include="Hubs/EnumerableOfAssemblyLocator.cs" />
-    <Compile Include="Hubs/Extensions/HubManagerExtensions.cs" />
-    <Compile Include="Hubs/Extensions/HubTypeExtensions.cs" />
-    <Compile Include="Hubs/Extensions/MethodExtensions.cs" />
-    <Compile Include="Hubs/GroupProxy.cs" />
-    <Compile Include="Hubs/HubBase.cs" />
-    <Compile Include="Hubs/HubCallerContext.cs" />
-    <Compile Include="Hubs/HubConnectionContext.cs" />
-    <Compile Include="Hubs/HubConnectionContextBase.cs" />
-    <Compile Include="Hubs/HubContext.cs" />
-    <Compile Include="Hubs/HubContext`T.cs" />
-    <Compile Include="Hubs/HubDispatcher.cs" />
-    <Compile Include="Hubs/HubInvocationProgress.cs" />
-    <Compile Include="Hubs/HubMethodNameAttribute.cs" />
-    <Compile Include="Hubs/HubNameAttribute.cs" />
-    <Compile Include="Hubs/HubRequest.cs" />
-    <Compile Include="Hubs/HubRequestParser.cs" />
-    <Compile Include="Hubs/HubResponse.cs" />
-    <Compile Include="Hubs/IAssemblyLocator.cs" />
-    <Compile Include="Hubs/IClientProxy.cs" />
-    <Compile Include="Hubs/IHub.cs" />
-    <Compile Include="Hubs/IHubActivator.cs" />
-    <Compile Include="Hubs/IHubCallerConnectionContext.cs" />
-    <Compile Include="Hubs/IHubConnectionContext.cs" />
-    <Compile Include="Hubs/IHubRequestParser.cs" />
-    <Compile Include="Hubs/IJavaScriptMinifier.cs" />
-    <Compile Include="Hubs/IJavaScriptProxyGenerator.cs" />
-    <Compile Include="Hubs/Lookup/DefaultHubManager.cs" />
-    <Compile Include="Hubs/Lookup/DefaultParameterResolver.cs" />
-    <Compile Include="Hubs/Lookup/Descriptors/Descriptor.cs" />
-    <Compile Include="Hubs/Lookup/Descriptors/HubDescriptor.cs" />
-    <Compile Include="Hubs/Lookup/Descriptors/MethodDescriptor.cs" />
-    <Compile Include="Hubs/Lookup/Descriptors/NullMethodDescriptor.cs" />
-    <Compile Include="Hubs/Lookup/Descriptors/ParameterDescriptor.cs" />
-    <Compile Include="Hubs/Lookup/HubMethodDispatcher.cs" />
-    <Compile Include="Hubs/Lookup/IHubDescriptorProvider.cs" />
-    <Compile Include="Hubs/Lookup/IHubManager.cs" />
-    <Compile Include="Hubs/Lookup/IMethodDescriptorProvider.cs" />
-    <Compile Include="Hubs/Lookup/IParameterResolver.cs" />
-    <Compile Include="Hubs/Lookup/ReflectedHubDescriptorProvider.cs" />
-    <Compile Include="Hubs/Lookup/ReflectedMethodDescriptorProvider.cs" />
-    <Compile Include="Hubs/MultipleSignalProxy.cs" />
-    <Compile Include="Hubs/NullClientProxy.cs" />
-    <Compile Include="Hubs/NullJavaScriptMinifier.cs" />
-    <Compile Include="Hubs/Pipeline/Auth/AuthorizeModule.cs" />
-    <Compile Include="Hubs/Pipeline/Auth/IAuthorizeHubConnection.cs" />
-    <Compile Include="Hubs/Pipeline/Auth/IAuthorizeHubMethodInvocation.cs" />
-    <Compile Include="Hubs/Pipeline/Auth/NotAuthorizedException.cs" />
-    <Compile Include="Hubs/Pipeline/ExceptionContext.cs" />
-    <Compile Include="Hubs/Pipeline/HubInvokerContext.cs" />
-    <Compile Include="Hubs/Pipeline/HubOutgoingInvokerContext.cs" />
-    <Compile Include="Hubs/Pipeline/HubOutgoingInvokerContextExtensions.cs" />
-    <Compile Include="Hubs/Pipeline/HubPipeline.cs" />
-    <Compile Include="Hubs/Pipeline/HubPipelineExtensions.cs" />
-    <Compile Include="Hubs/Pipeline/HubPipelineModule.cs" />
-    <Compile Include="Hubs/Pipeline/IHubIncomingInvokerContext.cs" />
-    <Compile Include="Hubs/Pipeline/IHubOutgoingInvokerContext.cs" />
-    <Compile Include="Hubs/Pipeline/IHubPipeline.cs" />
-    <Compile Include="Hubs/Pipeline/IHubPipelineInvoker.cs" />
-    <Compile Include="Hubs/Pipeline/IHubPipelineModule.cs" />
-    <Compile Include="Hubs/ReflectionHelper.cs" />
-    <Compile Include="Hubs/SignalProxy.cs" />
-    <Compile Include="Hubs/StateChangeTracker.cs" />
-    <Compile Include="Hubs/StatefulSignalProxy.cs" />
-    <Compile Include="Hubs/TypedClientBuilder.cs" />
-    <Compile Include="Hubs/TypedHubCallerConnectionContext.cs" />
-    <Compile Include="Hubs/TypedHubConnectionContext.cs" />
-    <Compile Include="Hubs/UserProxy.cs" />
-    <Compile Include="IConnection.cs" />
-    <Compile Include="IConnectionGroupManager.cs" />
-    <Compile Include="IDependencyResolver.cs" />
-    <Compile Include="IGroupManager.cs" />
-    <Compile Include="IHubContext.cs" />
-    <Compile Include="IHubContext`T.cs" />
-    <Compile Include="IPersistentConnectionContext.cs" />
-    <Compile Include="IRequest.cs" />
-    <Compile Include="IUntrackedDisposable.cs" />
-    <Compile Include="IUserIdProvider.cs" />
-    <Compile Include="Infrastructure/AckHandler.cs" />
-    <Compile Include="Infrastructure/AckSubscriber.cs" />
-    <Compile Include="Infrastructure/ArraySegmentTextReader.cs" />
-    <Compile Include="Infrastructure/BinaryMemoryPoolTextWriter.cs" />
-    <Compile Include="Infrastructure/CancellationTokenExtensions.cs" />
-    <Compile Include="Infrastructure/Connection.cs" />
-    <Compile Include="Infrastructure/ConnectionManager.cs" />
-    <Compile Include="Infrastructure/DataProtectionProviderProtectedData.cs" />
-    <Compile Include="Infrastructure/DefaultProtectedData.cs" />
-    <Compile Include="Infrastructure/DiffPair.cs" />
-    <Compile Include="Infrastructure/DiffSet.cs" />
-    <Compile Include="Infrastructure/DispatchingTaskCompletionSource.cs" />
-    <Compile Include="Infrastructure/DisposableAction.cs" />
-    <Compile Include="Infrastructure/Disposer.cs" />
-    <Compile Include="Infrastructure/ExceptionsExtensions.cs" />
-    <Compile Include="Infrastructure/IAckHandler.cs" />
-    <Compile Include="Infrastructure/IBinaryWriter.cs" />
-    <Compile Include="Infrastructure/IConnectionManager.cs" />
-    <Compile Include="Infrastructure/IMemoryPool.cs" />
-    <Compile Include="Infrastructure/IPerformanceCounter.cs" />
-    <Compile Include="Infrastructure/IPerformanceCounterManager.cs" />
-    <Compile Include="Infrastructure/IProtectedData.cs" />
-    <Compile Include="Infrastructure/IStringMinifier.cs" />
-    <Compile Include="Infrastructure/InterlockedHelper.cs" />
-    <Compile Include="Infrastructure/ListHelper.cs" />
-    <Compile Include="Infrastructure/MemoryPool.cs" />
-    <Compile Include="Infrastructure/MemoryPoolTextWriter.cs" />
-    <Compile Include="Infrastructure/MonoUtility.cs" />
-    <Compile Include="Infrastructure/NoOpPerformanceCounter.cs" />
-    <Compile Include="Infrastructure/PerformanceCounterAttribute.cs" />
-    <Compile Include="Infrastructure/PerformanceCounterManager.cs" />
-    <Compile Include="Infrastructure/PerformanceCounterWrapper.cs" />
-    <Compile Include="Infrastructure/PersistentConnectionContext.cs" />
-    <Compile Include="Infrastructure/PrefixHelper.cs" />
-    <Compile Include="Infrastructure/PrincipalUserIdProvider.cs" />
-    <Compile Include="Infrastructure/ProtocolResolver.cs" />
-    <Compile Include="Infrastructure/Purposes.cs" />
-    <Compile Include="Infrastructure/SafeCancellationTokenSource.cs" />
-    <Compile Include="Infrastructure/SafeSet.cs" />
-    <Compile Include="Infrastructure/SipHashBasedStringEqualityComparer.cs" />
-    <Compile Include="Infrastructure/StringMinifier.cs" />
-    <Compile Include="Infrastructure/TaskQueue.cs" />
-    <Compile Include="Json/IJsonValue.cs" />
-    <Compile Include="Json/IJsonWritable.cs" />
-    <Compile Include="Json/JRawValue.cs" />
-    <Compile Include="Json/JsonSerializerExtensions.cs" />
-    <Compile Include="Json/JsonUtility.cs" />
-    <Compile Include="Json/SipHashBasedDictionaryConverter.cs" />
-    <Compile Include="Messaging/Command.cs" />
-    <Compile Include="Messaging/CommandType.cs" />
-    <Compile Include="Messaging/Cursor.cs" />
-    <Compile Include="Messaging/DefaultSubscription.cs" />
-    <Compile Include="Messaging/IMessageBus.cs" />
-    <Compile Include="Messaging/ISubscriber.cs" />
-    <Compile Include="Messaging/ISubscription.cs" />
-    <Compile Include="Messaging/LocalEventKeyInfo.cs" />
-    <Compile Include="Messaging/Message.cs" />
-    <Compile Include="Messaging/MessageBroker.cs" />
-    <Compile Include="Messaging/MessageBus.cs" />
-    <Compile Include="Messaging/MessageBusExtensions.cs" />
-    <Compile Include="Messaging/MessageResult.cs" />
-    <Compile Include="Messaging/MessageStore.cs" />
-    <Compile Include="Messaging/MessageStoreResult.cs" />
-    <Compile Include="Messaging/QueuingBehavior.cs" />
-    <Compile Include="Messaging/ScaleoutConfiguration.cs" />
-    <Compile Include="Messaging/ScaleoutMapping.cs" />
-    <Compile Include="Messaging/ScaleoutMappingStore.cs" />
-    <Compile Include="Messaging/ScaleoutMessage.cs" />
-    <Compile Include="Messaging/ScaleoutMessageBus.cs" />
-    <Compile Include="Messaging/ScaleoutStore.cs" />
-    <Compile Include="Messaging/ScaleoutStream.cs" />
-    <Compile Include="Messaging/ScaleoutStreamManager.cs" />
-    <Compile Include="Messaging/ScaleoutSubscription.cs" />
-    <Compile Include="Messaging/Subscription.cs" />
-    <Compile Include="Messaging/Topic.cs" />
-    <Compile Include="Messaging/TopicLookup.cs" />
-    <Compile Include="Messaging/TopicState.cs" />
-    <Compile Include="Messaging/Volatile.cs" />
-    <Compile Include="Owin/Infrastructure/ByteBuffer.cs" />
-    <Compile Include="Owin/Infrastructure/OwinConstants.cs" />
-    <Compile Include="Owin/Infrastructure/OwinEnvironmentExtensions.cs" />
-    <Compile Include="Owin/Infrastructure/UrlDecoder.cs" />
-    <Compile Include="Owin/Infrastructure/WebSocketConstants.cs" />
-    <Compile Include="Owin/Middleware/HubDispatcherMiddleware.cs" />
-    <Compile Include="Owin/Middleware/PersistentConnectionMiddleware.cs" />
-    <Compile Include="Owin/ObsoleteOwinExtensions.cs" />
-    <Compile Include="Owin/OwinExtensions.cs" />
-    <Compile Include="Owin/OwinWebSocketHandler.cs" />
-    <Compile Include="Owin/ReadableStringCollectionWrapper.cs" />
-    <Compile Include="Owin/RequestExtensions.cs" />
-    <Compile Include="Owin/ServerRequest.cs" />
-    <Compile Include="Owin/ServerResponse.cs" />
-    <Compile Include="Owin/WebSockets/DefaultWebSocketHandler.cs" />
-    <Compile Include="Owin/WebSockets/WebSocketHandler.cs" />
-    <Compile Include="Owin/WebSockets/WebSocketMessage.cs" />
-    <Compile Include="Owin/WebSockets/WebSocketMessageReader.cs" />
-    <Compile Include="PersistentConnection.cs" />
-    <Compile Include="Properties/AssemblyInfo.cs" />
-    <Compile Include="Resources.Designer.cs" />
-    <Compile Include="TaskAsyncHelper.cs" />
-    <Compile Include="TaskAwaiterHelper.cs" />
-    <Compile Include="Tracing/ITraceManager.cs" />
-    <Compile Include="Tracing/TraceManager.cs" />
-    <Compile Include="Tracing/TraceSourceExtensions.cs" />
-    <Compile Include="Transports/ForeverFrameTransport.cs" />
-    <Compile Include="Transports/ForeverTransport.cs" />
-    <Compile Include="Transports/HttpRequestLifeTime.cs" />
-    <Compile Include="Transports/ITrackingConnection.cs" />
-    <Compile Include="Transports/ITransport.cs" />
-    <Compile Include="Transports/ITransportConnection.cs" />
-    <Compile Include="Transports/ITransportHeartBeat.cs" />
-    <Compile Include="Transports/ITransportManager.cs" />
-    <Compile Include="Transports/LongPollingTransport.cs" />
-    <Compile Include="Transports/PersistentResponse.cs" />
-    <Compile Include="Transports/ServerSentEventsTransport.cs" />
-    <Compile Include="Transports/TransportConnectionExtensions.cs" />
-    <Compile Include="Transports/TransportConnectionStates.cs" />
-    <Compile Include="Transports/TransportDisconnectBase.cs" />
-    <Compile Include="Transports/TransportHeartBeat.cs" />
-    <Compile Include="Transports/TransportManager.cs" />
-    <Compile Include="Transports/WebSocketTransport.cs" />
-    <Compile Include="Infrastructure/StreamExtensions.cs" />
-    <EmbeddedResource Include="Resources.resx" LogicalName="Microsoft.AspNet.SignalR.Resources.resources" />
-    <EmbeddedResource Include="Scripts/hubs.js" LogicalName="Microsoft.AspNet.SignalR.Scripts.hubs.js" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/AuthorizeAttribute.cs" Link="AuthorizeAttribute.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Configuration/ConfigurationExtensions.cs" Link="Configuration/ConfigurationExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Configuration/DefaultConfigurationManager.cs" Link="Configuration/DefaultConfigurationManager.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Configuration/IConfigurationManager.cs" Link="Configuration/IConfigurationManager.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/ConnectionConfiguration.cs" Link="ConnectionConfiguration.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/ConnectionExtensions.cs" Link="ConnectionExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/ConnectionMessage.cs" Link="ConnectionMessage.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Cookie.cs" Link="Cookie.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/DefaultDependencyResolver.cs" Link="DefaultDependencyResolver.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/DependencyResolverExtensions.cs" Link="DependencyResolverExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/GlobalHost.cs" Link="GlobalHost.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/GroupManager.cs" Link="GroupManager.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hosting/HostContext.cs" Link="Hosting/HostContext.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hosting/HostDependencyResolverExtensions.cs" Link="Hosting/HostDependencyResolverExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hosting/INameValueCollection.cs" Link="Hosting/INameValueCollection.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hosting/IResponse.cs" Link="Hosting/IResponse.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hosting/IWebSocket.cs" Link="Hosting/IWebSocket.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hosting/PersistentConnectionFactory.cs" Link="Hosting/PersistentConnectionFactory.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hosting/ResponseExtensions.cs" Link="Hosting/ResponseExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hub.cs" Link="Hub.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/HubConfiguration.cs" Link="HubConfiguration.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/HubException.cs" Link="HubException.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hub`T.cs" Link="Hub`T.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/CallerStateProxy.cs" Link="Hubs/CallerStateProxy.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/ClientHubInvocation.cs" Link="Hubs/ClientHubInvocation.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/ClientProxy.cs" Link="Hubs/ClientProxy.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/ConnectionIdProxy.cs" Link="Hubs/ConnectionIdProxy.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/DefaultAssemblyLocator.cs" Link="Hubs/DefaultAssemblyLocator.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/DefaultHubActivator.cs" Link="Hubs/DefaultHubActivator.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/DefaultJavaScriptProxyGenerator.cs" Link="Hubs/DefaultJavaScriptProxyGenerator.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/DynamicDictionary.cs" Link="Hubs/DynamicDictionary.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/EmptyJavaScriptProxyGenerator.cs" Link="Hubs/EmptyJavaScriptProxyGenerator.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/EnumerableOfAssemblyLocator.cs" Link="Hubs/EnumerableOfAssemblyLocator.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Extensions/HubManagerExtensions.cs" Link="Hubs/Extensions/HubManagerExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Extensions/HubTypeExtensions.cs" Link="Hubs/Extensions/HubTypeExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Extensions/MethodExtensions.cs" Link="Hubs/Extensions/MethodExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/GroupProxy.cs" Link="Hubs/GroupProxy.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/HubBase.cs" Link="Hubs/HubBase.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/HubCallerContext.cs" Link="Hubs/HubCallerContext.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/HubConnectionContext.cs" Link="Hubs/HubConnectionContext.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/HubConnectionContextBase.cs" Link="Hubs/HubConnectionContextBase.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/HubContext.cs" Link="Hubs/HubContext.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/HubContext`T.cs" Link="Hubs/HubContext`T.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/HubDispatcher.cs" Link="Hubs/HubDispatcher.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/HubInvocationProgress.cs" Link="Hubs/HubInvocationProgress.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/HubMethodNameAttribute.cs" Link="Hubs/HubMethodNameAttribute.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/HubNameAttribute.cs" Link="Hubs/HubNameAttribute.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/HubRequest.cs" Link="Hubs/HubRequest.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/HubRequestParser.cs" Link="Hubs/HubRequestParser.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/HubResponse.cs" Link="Hubs/HubResponse.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/IAssemblyLocator.cs" Link="Hubs/IAssemblyLocator.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/IClientProxy.cs" Link="Hubs/IClientProxy.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/IHub.cs" Link="Hubs/IHub.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/IHubActivator.cs" Link="Hubs/IHubActivator.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/IHubCallerConnectionContext.cs" Link="Hubs/IHubCallerConnectionContext.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/IHubConnectionContext.cs" Link="Hubs/IHubConnectionContext.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/IHubRequestParser.cs" Link="Hubs/IHubRequestParser.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/IJavaScriptMinifier.cs" Link="Hubs/IJavaScriptMinifier.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/IJavaScriptProxyGenerator.cs" Link="Hubs/IJavaScriptProxyGenerator.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Lookup/DefaultHubManager.cs" Link="Hubs/Lookup/DefaultHubManager.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Lookup/DefaultParameterResolver.cs" Link="Hubs/Lookup/DefaultParameterResolver.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Lookup/Descriptors/Descriptor.cs" Link="Hubs/Lookup/Descriptors/Descriptor.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Lookup/Descriptors/HubDescriptor.cs" Link="Hubs/Lookup/Descriptors/HubDescriptor.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Lookup/Descriptors/MethodDescriptor.cs" Link="Hubs/Lookup/Descriptors/MethodDescriptor.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Lookup/Descriptors/NullMethodDescriptor.cs" Link="Hubs/Lookup/Descriptors/NullMethodDescriptor.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Lookup/Descriptors/ParameterDescriptor.cs" Link="Hubs/Lookup/Descriptors/ParameterDescriptor.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Lookup/HubMethodDispatcher.cs" Link="Hubs/Lookup/HubMethodDispatcher.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Lookup/IHubDescriptorProvider.cs" Link="Hubs/Lookup/IHubDescriptorProvider.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Lookup/IHubManager.cs" Link="Hubs/Lookup/IHubManager.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Lookup/IMethodDescriptorProvider.cs" Link="Hubs/Lookup/IMethodDescriptorProvider.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Lookup/IParameterResolver.cs" Link="Hubs/Lookup/IParameterResolver.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Lookup/ReflectedHubDescriptorProvider.cs" Link="Hubs/Lookup/ReflectedHubDescriptorProvider.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Lookup/ReflectedMethodDescriptorProvider.cs" Link="Hubs/Lookup/ReflectedMethodDescriptorProvider.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/MultipleSignalProxy.cs" Link="Hubs/MultipleSignalProxy.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/NullClientProxy.cs" Link="Hubs/NullClientProxy.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/NullJavaScriptMinifier.cs" Link="Hubs/NullJavaScriptMinifier.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Pipeline/Auth/AuthorizeModule.cs" Link="Hubs/Pipeline/Auth/AuthorizeModule.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Pipeline/Auth/IAuthorizeHubConnection.cs" Link="Hubs/Pipeline/Auth/IAuthorizeHubConnection.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Pipeline/Auth/IAuthorizeHubMethodInvocation.cs" Link="Hubs/Pipeline/Auth/IAuthorizeHubMethodInvocation.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Pipeline/Auth/NotAuthorizedException.cs" Link="Hubs/Pipeline/Auth/NotAuthorizedException.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Pipeline/ExceptionContext.cs" Link="Hubs/Pipeline/ExceptionContext.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Pipeline/HubInvokerContext.cs" Link="Hubs/Pipeline/HubInvokerContext.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Pipeline/HubOutgoingInvokerContext.cs" Link="Hubs/Pipeline/HubOutgoingInvokerContext.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Pipeline/HubOutgoingInvokerContextExtensions.cs" Link="Hubs/Pipeline/HubOutgoingInvokerContextExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Pipeline/HubPipeline.cs" Link="Hubs/Pipeline/HubPipeline.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Pipeline/HubPipelineExtensions.cs" Link="Hubs/Pipeline/HubPipelineExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Pipeline/HubPipelineModule.cs" Link="Hubs/Pipeline/HubPipelineModule.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Pipeline/IHubIncomingInvokerContext.cs" Link="Hubs/Pipeline/IHubIncomingInvokerContext.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Pipeline/IHubOutgoingInvokerContext.cs" Link="Hubs/Pipeline/IHubOutgoingInvokerContext.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Pipeline/IHubPipeline.cs" Link="Hubs/Pipeline/IHubPipeline.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Pipeline/IHubPipelineInvoker.cs" Link="Hubs/Pipeline/IHubPipelineInvoker.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/Pipeline/IHubPipelineModule.cs" Link="Hubs/Pipeline/IHubPipelineModule.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/ReflectionHelper.cs" Link="Hubs/ReflectionHelper.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/SignalProxy.cs" Link="Hubs/SignalProxy.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/StateChangeTracker.cs" Link="Hubs/StateChangeTracker.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/StatefulSignalProxy.cs" Link="Hubs/StatefulSignalProxy.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/TypedClientBuilder.cs" Link="Hubs/TypedClientBuilder.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/TypedHubCallerConnectionContext.cs" Link="Hubs/TypedHubCallerConnectionContext.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/TypedHubConnectionContext.cs" Link="Hubs/TypedHubConnectionContext.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Hubs/UserProxy.cs" Link="Hubs/UserProxy.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/IConnection.cs" Link="IConnection.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/IConnectionGroupManager.cs" Link="IConnectionGroupManager.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/IDependencyResolver.cs" Link="IDependencyResolver.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/IGroupManager.cs" Link="IGroupManager.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/IHubContext.cs" Link="IHubContext.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/IHubContext`T.cs" Link="IHubContext`T.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/IPersistentConnectionContext.cs" Link="IPersistentConnectionContext.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/IRequest.cs" Link="IRequest.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/IUntrackedDisposable.cs" Link="IUntrackedDisposable.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/IUserIdProvider.cs" Link="IUserIdProvider.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/AckHandler.cs" Link="Infrastructure/AckHandler.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/AckSubscriber.cs" Link="Infrastructure/AckSubscriber.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/ArraySegmentTextReader.cs" Link="Infrastructure/ArraySegmentTextReader.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/BinaryMemoryPoolTextWriter.cs" Link="Infrastructure/BinaryMemoryPoolTextWriter.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/CancellationTokenExtensions.cs" Link="Infrastructure/CancellationTokenExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/Connection.cs" Link="Infrastructure/Connection.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/ConnectionManager.cs" Link="Infrastructure/ConnectionManager.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/DataProtectionProviderProtectedData.cs" Link="Infrastructure/DataProtectionProviderProtectedData.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/DefaultProtectedData.cs" Link="Infrastructure/DefaultProtectedData.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/DiffPair.cs" Link="Infrastructure/DiffPair.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/DiffSet.cs" Link="Infrastructure/DiffSet.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/DispatchingTaskCompletionSource.cs" Link="Infrastructure/DispatchingTaskCompletionSource.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/DisposableAction.cs" Link="Infrastructure/DisposableAction.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/Disposer.cs" Link="Infrastructure/Disposer.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/ExceptionsExtensions.cs" Link="Infrastructure/ExceptionsExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/IAckHandler.cs" Link="Infrastructure/IAckHandler.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/IBinaryWriter.cs" Link="Infrastructure/IBinaryWriter.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/IConnectionManager.cs" Link="Infrastructure/IConnectionManager.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/IMemoryPool.cs" Link="Infrastructure/IMemoryPool.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/IPerformanceCounter.cs" Link="Infrastructure/IPerformanceCounter.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/IPerformanceCounterManager.cs" Link="Infrastructure/IPerformanceCounterManager.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/IProtectedData.cs" Link="Infrastructure/IProtectedData.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/IStringMinifier.cs" Link="Infrastructure/IStringMinifier.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/InterlockedHelper.cs" Link="Infrastructure/InterlockedHelper.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/ListHelper.cs" Link="Infrastructure/ListHelper.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/MemoryPool.cs" Link="Infrastructure/MemoryPool.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/MemoryPoolTextWriter.cs" Link="Infrastructure/MemoryPoolTextWriter.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/MonoUtility.cs" Link="Infrastructure/MonoUtility.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/NoOpPerformanceCounter.cs" Link="Infrastructure/NoOpPerformanceCounter.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/PerformanceCounterAttribute.cs" Link="Infrastructure/PerformanceCounterAttribute.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/PerformanceCounterManager.cs" Link="Infrastructure/PerformanceCounterManager.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/PerformanceCounterWrapper.cs" Link="Infrastructure/PerformanceCounterWrapper.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/PersistentConnectionContext.cs" Link="Infrastructure/PersistentConnectionContext.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/PrefixHelper.cs" Link="Infrastructure/PrefixHelper.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/PrincipalUserIdProvider.cs" Link="Infrastructure/PrincipalUserIdProvider.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/ProtocolResolver.cs" Link="Infrastructure/ProtocolResolver.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/Purposes.cs" Link="Infrastructure/Purposes.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/SafeCancellationTokenSource.cs" Link="Infrastructure/SafeCancellationTokenSource.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/SafeSet.cs" Link="Infrastructure/SafeSet.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/SipHashBasedStringEqualityComparer.cs" Link="Infrastructure/SipHashBasedStringEqualityComparer.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/StringMinifier.cs" Link="Infrastructure/StringMinifier.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/TaskQueue.cs" Link="Infrastructure/TaskQueue.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Json/IJsonValue.cs" Link="Json/IJsonValue.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Json/IJsonWritable.cs" Link="Json/IJsonWritable.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Json/JRawValue.cs" Link="Json/JRawValue.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Json/JsonSerializerExtensions.cs" Link="Json/JsonSerializerExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Json/JsonUtility.cs" Link="Json/JsonUtility.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Json/SipHashBasedDictionaryConverter.cs" Link="Json/SipHashBasedDictionaryConverter.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/Command.cs" Link="Messaging/Command.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/CommandType.cs" Link="Messaging/CommandType.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/Cursor.cs" Link="Messaging/Cursor.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/DefaultSubscription.cs" Link="Messaging/DefaultSubscription.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/IMessageBus.cs" Link="Messaging/IMessageBus.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/ISubscriber.cs" Link="Messaging/ISubscriber.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/ISubscription.cs" Link="Messaging/ISubscription.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/LocalEventKeyInfo.cs" Link="Messaging/LocalEventKeyInfo.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/Message.cs" Link="Messaging/Message.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/MessageBroker.cs" Link="Messaging/MessageBroker.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/MessageBus.cs" Link="Messaging/MessageBus.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/MessageBusExtensions.cs" Link="Messaging/MessageBusExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/MessageResult.cs" Link="Messaging/MessageResult.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/MessageStore.cs" Link="Messaging/MessageStore.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/MessageStoreResult.cs" Link="Messaging/MessageStoreResult.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/QueuingBehavior.cs" Link="Messaging/QueuingBehavior.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/ScaleoutConfiguration.cs" Link="Messaging/ScaleoutConfiguration.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/ScaleoutMapping.cs" Link="Messaging/ScaleoutMapping.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/ScaleoutMappingStore.cs" Link="Messaging/ScaleoutMappingStore.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/ScaleoutMessage.cs" Link="Messaging/ScaleoutMessage.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/ScaleoutMessageBus.cs" Link="Messaging/ScaleoutMessageBus.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/ScaleoutStore.cs" Link="Messaging/ScaleoutStore.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/ScaleoutStream.cs" Link="Messaging/ScaleoutStream.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/ScaleoutStreamManager.cs" Link="Messaging/ScaleoutStreamManager.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/ScaleoutSubscription.cs" Link="Messaging/ScaleoutSubscription.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/Subscription.cs" Link="Messaging/Subscription.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/Topic.cs" Link="Messaging/Topic.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/TopicLookup.cs" Link="Messaging/TopicLookup.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/TopicState.cs" Link="Messaging/TopicState.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Messaging/Volatile.cs" Link="Messaging/Volatile.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Owin/Infrastructure/ByteBuffer.cs" Link="Owin/Infrastructure/ByteBuffer.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Owin/Infrastructure/OwinConstants.cs" Link="Owin/Infrastructure/OwinConstants.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Owin/Infrastructure/OwinEnvironmentExtensions.cs" Link="Owin/Infrastructure/OwinEnvironmentExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Owin/Infrastructure/UrlDecoder.cs" Link="Owin/Infrastructure/UrlDecoder.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Owin/Infrastructure/WebSocketConstants.cs" Link="Owin/Infrastructure/WebSocketConstants.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Owin/Middleware/HubDispatcherMiddleware.cs" Link="Owin/Middleware/HubDispatcherMiddleware.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Owin/Middleware/PersistentConnectionMiddleware.cs" Link="Owin/Middleware/PersistentConnectionMiddleware.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Owin/ObsoleteOwinExtensions.cs" Link="Owin/ObsoleteOwinExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Owin/OwinExtensions.cs" Link="Owin/OwinExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Owin/OwinWebSocketHandler.cs" Link="Owin/OwinWebSocketHandler.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Owin/ReadableStringCollectionWrapper.cs" Link="Owin/ReadableStringCollectionWrapper.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Owin/RequestExtensions.cs" Link="Owin/RequestExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Owin/ServerRequest.cs" Link="Owin/ServerRequest.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Owin/ServerResponse.cs" Link="Owin/ServerResponse.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Owin/WebSockets/DefaultWebSocketHandler.cs" Link="Owin/WebSockets/DefaultWebSocketHandler.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Owin/WebSockets/WebSocketHandler.cs" Link="Owin/WebSockets/WebSocketHandler.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Owin/WebSockets/WebSocketMessage.cs" Link="Owin/WebSockets/WebSocketMessage.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Owin/WebSockets/WebSocketMessageReader.cs" Link="Owin/WebSockets/WebSocketMessageReader.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/PersistentConnection.cs" Link="PersistentConnection.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Resources.Designer.cs" Link="Resources.Designer.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/TaskAsyncHelper.cs" Link="TaskAsyncHelper.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/TaskAwaiterHelper.cs" Link="TaskAwaiterHelper.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Tracing/ITraceManager.cs" Link="Tracing/ITraceManager.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Tracing/TraceManager.cs" Link="Tracing/TraceManager.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Tracing/TraceSourceExtensions.cs" Link="Tracing/TraceSourceExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Transports/ForeverFrameTransport.cs" Link="Transports/ForeverFrameTransport.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Transports/ForeverTransport.cs" Link="Transports/ForeverTransport.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Transports/HttpRequestLifeTime.cs" Link="Transports/HttpRequestLifeTime.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Transports/ITrackingConnection.cs" Link="Transports/ITrackingConnection.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Transports/ITransport.cs" Link="Transports/ITransport.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Transports/ITransportConnection.cs" Link="Transports/ITransportConnection.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Transports/ITransportHeartBeat.cs" Link="Transports/ITransportHeartBeat.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Transports/ITransportManager.cs" Link="Transports/ITransportManager.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Transports/LongPollingTransport.cs" Link="Transports/LongPollingTransport.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Transports/PersistentResponse.cs" Link="Transports/PersistentResponse.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Transports/ServerSentEventsTransport.cs" Link="Transports/ServerSentEventsTransport.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Transports/TransportConnectionExtensions.cs" Link="Transports/TransportConnectionExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Transports/TransportConnectionStates.cs" Link="Transports/TransportConnectionStates.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Transports/TransportDisconnectBase.cs" Link="Transports/TransportDisconnectBase.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Transports/TransportHeartBeat.cs" Link="Transports/TransportHeartBeat.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Transports/TransportManager.cs" Link="Transports/TransportManager.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Transports/WebSocketTransport.cs" Link="Transports/WebSocketTransport.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Client/Infrastructure/StreamExtensions.cs" Link="Infrastructure/StreamExtensions.cs" />
+    <EmbeddedResource Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Resources.resx" Link="Resources.resx" LogicalName="Microsoft.AspNet.SignalR.Resources.resources" />
+    <EmbeddedResource Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Scripts/hubs.js" Link="Scripts/hubs.js" LogicalName="Microsoft.AspNet.SignalR.Scripts.hubs.js" />
 
 
   </ItemGroup>
