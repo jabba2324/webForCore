@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Measures line and branch coverage of the production assemblies over every test suite (see docs/TESTING.md).
 # Needs a Release build and dotnet-coverage (dotnet tool install -g dotnet-coverage). Usage: tools/ci/coverage.sh [out]
-# Writes <out>/merged.cobertura.xml and <out>/coverage.md (per assembly, from tools/ci/coverage_summary.py).
+# Writes <out>/merged.cobertura.xml and <out>/coverage.md (per assembly, from tools/ci/coverage_summary.cs).
 set -uo pipefail
 cd "$(dirname "$0")/../.."
 OUT=$(realpath -m "${1:-TestResults/coverage}")
@@ -22,5 +22,5 @@ for s in "${SUITES[@]}"; do
   grep -E '^(Passed|Failed)!' "$OUT/$s.log" | tail -1
 done
 dotnet-coverage merge "$OUT"/*.coverage -f cobertura -o "$OUT/merged.cobertura.xml"
-python3 tools/ci/coverage_summary.py "$OUT/merged.cobertura.xml" > "$OUT/coverage.md"
+dotnet run tools/ci/coverage_summary.cs -- "$OUT/merged.cobertura.xml" > "$OUT/coverage.md"
 cat "$OUT/coverage.md"
