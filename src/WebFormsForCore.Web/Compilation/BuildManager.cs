@@ -3773,6 +3773,26 @@ private static void GetGhostedVirtualPath(ref string virtualPath) {
             {
                 return (Assembly)_assemblyResolveMapping[normalizedName];
             }
+
+#if NETCOREAPP
+            // webForCore (#33): .NET passes the display name ("App_GlobalResources, Culture=neutral, PublicKeyToken=null")
+            // where .NET Framework passed the name the application gave Assembly.Load ("App_GlobalResources"), so the
+            // mapping's fixed names (App_GlobalResources, __code) missed and Assembly.Load threw FileNotFoundException.
+            // mojoPortal's designer-generated resource classes load App_GlobalResources this way in Application_Start.
+            // Look the mapping up by simple name too. AppDomain.AssemblyResolve, unlike AssemblyLoadContext.Resolving,
+            // accepts an assembly whose simple name (App_GlobalResources.xxxxxxxx) differs from the one requested.
+            string simpleName = null;
+            try { simpleName = new AssemblyName(name).Name; }
+            catch (Exception x) when (x is ArgumentException || x is FileLoadException) { }
+            if (simpleName != null)
+            {
+                assembly = (Assembly)_assemblyResolveMapping[simpleName];
+                if (assembly != null)
+                {
+                    return assembly;
+                }
+            }
+#endif
         }
 
 #if NETCOREAPP

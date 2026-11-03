@@ -24,6 +24,8 @@
   <ItemGroup>
     <!-- App_Code and the pages are compiled at run time from the app folder, as on IIS. -->
     <Compile Remove="App_Code\**" />
+    <!-- App_GlobalResources too: System.Web compiles them at run time; GlobalResourcesDesigner.cs loads them by name (#33). -->
+    <EmbeddedResource Remove="App_GlobalResources\**" />
     <Content Remove="bin_dotnet\**" />
     <None Remove="bin_dotnet\**" />
     <Compile Remove="bin_dotnet\**" />

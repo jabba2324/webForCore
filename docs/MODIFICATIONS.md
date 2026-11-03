@@ -3,14 +3,14 @@
 webForCore runs Microsoft's own ASP.NET 4.x libraries rather than reimplementations of them. Where Microsoft published
 the source, webForCore compiles it from a **submodule** in `external/`: a fork of the upstream repository, cleared down
 to the files webForCore uses, at a pinned commit, built for .NET 10 and tested with the upstream project's own tests.
-(Until #61 the files were copied in by lift scripts; `LIFT.md` records that history.) This page explains the rules for
+(Until #61 the files were copied in by lift scripts; git history has that record.) This page explains the rules for
 that code and what had to change.
 
 - **Every change is a commit** on the fork's `webforcore` branch, with its reason in the message:
 
   | Submodule | Fork branch | Upstream commit | Changes |
   | --- | --- | --- | --- |
-  | `external/AspNetWebStack` | [xforcore/AspNetWebStack `webforcore`](https://github.com/xforcore/AspNetWebStack/commits/webforcore) | `2106565` | 148, a casing fix, and upstream's `.gitattributes` kept (Windows line endings for the tests) |
+  | `external/AspNetWebStack` | [xforcore/AspNetWebStack `webforcore`](https://github.com/xforcore/AspNetWebStack/commits/webforcore) | `2106565` | 149, a casing fix, and upstream's `.gitattributes` kept (Windows line endings for the tests) |
   | `external/AspNetKatana` | [xforcore/AspNetKatana `webforcore`](https://github.com/xforcore/AspNetKatana/commits/webforcore) | `096e225` | 10 |
   | `external/SignalR` | [xforcore/SignalR `webforcore`](https://github.com/xforcore/SignalR/commits/webforcore) | `7f53f26` | 3 |
   | `external/AspNetIdentity` | [xforcore/AspNetIdentity `webforcore`](https://github.com/xforcore/AspNetIdentity/commits/webforcore) | `b7fc094` | 5 |
@@ -74,7 +74,7 @@ fixed, or the BCL difference is documented.
 
 | Kind | Examples |
 | --- | --- |
-| **BCL message and type differences** | `ArgumentException.Message` ends with `(Parameter 'name')`; `MediaTypeHeaderValue(null)` throws `ArgumentNullException`; `System.Private.CoreLib` instead of `mscorlib` in assembly-qualified names; the UTF-8 decoder's replacement characters |
+| **BCL message and type differences** | `ArgumentException.Message` ends with `(Parameter 'name')`; `MediaTypeHeaderValue(null)` throws `ArgumentNullException`; `System.Private.CoreLib` instead of `mscorlib` in assembly-qualified names; the UTF-8 decoder's replacement characters; stack frames: a test asserts on MVC's own frame, not on .NET's Activator frames, which the JIT may inline (#74) |
 | **Platform newline and paths** | Razor's generated code and error messages use `\n` on Linux; tests that built Windows paths build them with `Path.Combine`, which gives each platform's separator (#46) |
 | **Test infrastructure** | `RunInSeparateAppDomain` and `AppDomainUtils` on collectible `AssemblyLoadContext`s (`test/webForCore.Microsoft.TestCommon`); xunit 1.9 → 2 (`Assert.ThrowsDelegate`, `Xunit.Extensions`); `PersistedAssemblyBuilder` for `AssemblyBuilderAccess.Save` |
 | **Windows-only test dependencies** | DPAPI in Katana's security tests → `TestDataProtectionProvider` (AES-CBC and HMAC-SHA256); LocalDB → SQL Server in a container (Identity); a test certificate .NET's DER reader rejects outside Windows |
@@ -84,8 +84,8 @@ fixed, or the BCL difference is documented.
 
 ## webForCore's changes to System.Web and the hosting layer
 
-These aren't in the submodules. They change WebFormsForCore's port, and each has a `webForCore:` comment and an
-entry in `LIFT.md`.
+These aren't in the submodules. They change WebFormsForCore's port, and each has a `webForCore:` comment; the
+commit that made it, and its issue, say why.
 
 - **Hosting:** webforcore-host and its worker processes (process recycling, #56), IIS's `<system.webServer>` modules,
   the Kestrel worker request (WebSockets, client certificates, server variables, timeouts, integrated-pipeline APIs).
@@ -97,10 +97,12 @@ entry in `LIFT.md`.
 - **Compilation:** the in-process compiler loads into the app's context, and so does `AssemblyBuilder` with every
   compiled assembly (never CodeDom's `Assembly.LoadFile`, which loaded App_Code a second time, #56); precompilation for .NET
   (`System.Private.CoreLib` as the core library); typed DataSets in App_Code (the Reference Source's
-  `System.Data.TypedDataSetGenerator` and webForCore's TableAdapter generator). Off Windows, when App_Code's new
-  assembly has the path of one already loaded, `CodeDirectoryCompiler` fails at once with the reference source's
-  "already loaded" error: it used to force garbage collections for 3 seconds waiting for it to unload, which it can't
-  in a worker process (#57).
+  `System.Data.TypedDataSetGenerator` and webForCore's TableAdapter generator); `BuildManager.ResolveAssembly` looks the
+  fixed names (`App_GlobalResources`, `App_Code`, `__code`) up by simple name too, because .NET passes the display name,
+  so `Assembly.Load("App_GlobalResources")` finds the compiled assembly, which keeps its random name as on IIS (#33).
+  Off Windows, when App_Code's new assembly has the path of one already loaded, `CodeDirectoryCompiler` fails at
+  once with the reference source's "already loaded" error: it used to force garbage collections for 3 seconds waiting
+  for it to unload, which it can't in a worker process (#57).
 - **Additions removed under CONTRIBUTING.md rules 6 and 7 (#57):** the unused `WebFormsTaskScheduler` (a public type
   .NET Framework's System.Web never had, which reflected into `ThreadPoolTaskScheduler` and `Task`), a debug-only
   `#if DebugWF4C` block in `HttpApplication.ExecuteStep`, and the `GCUtil.Alloc`/`Free` wrappers (`GCUtil`,
@@ -113,6 +115,18 @@ entry in `LIFT.md`.
   keeps new breaks out.
 - **`<system.net>`:** `<defaultProxy>` applied at application start, and `<mailSettings>` used by System.Web's mail
   senders (`WebFormsForCore.Net.Configuration.NetConfiguration`).
+- **Build targets** (`src/webForCore.WebStack.targets`, imported by every app through the `webForCore.Web` package):
+  - The shared framework has facades named `System.Web.dll` and `System.Configuration.dll`, and the host keeps whichever
+    copy has the higher `assemblyVersion` in `deps.json`. The SDK writes none for project references, so the
+    framework's 4.0.0.0 facade won and loading System.Web failed with 0x80131053 ("The requested assembly version
+    conflicts with what is already bound"). A target after `GenerateBuildDependencyFile` writes each app-local
+    assembly's real `assemblyVersion` where a reference pack has one of the same name.
+  - The framework's `System.Web.HttpUtility.dll` (and the `System.Web` facade) are left out of the compiler's references
+    next to webForCore's System.Web (CS0433, CS7069 otherwise). They are matched by the reference pack's name, not by
+    the SDK's `packs` folder: an SDK newer than the target framework takes the pack from the NuGet cache
+    (`microsoft.netcore.app.ref/<version>/`). `tools/ci/package-smoke.sh` builds once that way.
+- **Run-time compilation** adds the targets of a referenced facade's type forwards (CS0012 otherwise), leaving out
+  those whose types System.Web defines itself (`HttpUtility`).
 - **BinaryFormatter port:** surrogates for .NET Framework types .NET no longer serializes (`NameValueCollection`
   and others), so session state and view state round-trip.
 - **Security:** `bin`, `App_Data`, the build output folder and the other hidden segments return 404, as on IIS.

@@ -36,6 +36,13 @@ namespace IISGate
             Assert.Contains("error=", body);
             // Off Windows the emulation names the cause; on Windows, Windows' DPAPI can't decrypt another machine's blob.
             Assert.Contains(OperatingSystem.IsWindows() ? "Failed to decrypt using provider 'DataProtectionConfigurationProvider'" : "Windows DPAPI", body);
+            if (!OperatingSystem.IsWindows())
+            {
+                // The explanation says what to do, and names no file an application's developer doesn't have (it pointed
+                // at the repository's lift log, which #67 removed; the steps are in docs/IIS-COMPATIBILITY.md).
+                Assert.Contains("webforcore-regiis -pef", body);
+                Assert.DoesNotContain(".md", body);
+            }
         }
 
         private static string Repository()
