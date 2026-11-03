@@ -40,10 +40,10 @@ machine's store). To run the suites on Windows: Git for Windows, the SDK in `glo
 SQL Server (Express is enough) at `127.0.0.1,14333` with the `sa` login of `tools/ci/sqlserver.sh`; then the commands
 above in Git Bash.
 
-The default branch, `webforcore-lift`, is protected by the repository ruleset `default-branch` (#76), the same in every
+The default branch, `main`, is protected by the repository ruleset `default-branch` (#76), the same in every
 xforcore repository: changes land only through a pull request (no approvals required), and it merges only once CI's
 `build-and-test` and `build-windows` jobs have passed on it (packing and the package smoke test included, on both) with
-the branch up to date with `webforcore-lift`. If it is behind, `gh pr update-branch <n>` merges the base in and CI runs
+the branch up to date with `main`. If it is behind, `gh pr update-branch <n>` merges the base in and CI runs
 again. A release likewise needs both jobs. Force pushes and deleting the branch are blocked, and nobody can bypass the
 rules, administrators included. Version bumps therefore go through a pull request too, before the `v<Version>` tag is
 pushed on the merged commit; tags aren't covered by the ruleset. GitHub runs CI on a first-time contributor's pull
