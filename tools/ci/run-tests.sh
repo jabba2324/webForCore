@@ -36,7 +36,7 @@ for s in "${SUITES[@]}"; do
   echo "::endgroup::"
 done
 
-python3 tools/lift/trx_summary.py "$OUT"/*.trx > "$OUT/summary.md" || true
+dotnet run tools/ci/trx_summary.cs -- "$OUT"/*.trx > "$OUT/summary.md" || true
 if [ ${#failed[@]} -gt 0 ]; then
   echo "Failed suites: ${failed[*]}"
   exit 1

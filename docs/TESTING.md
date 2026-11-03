@@ -36,7 +36,7 @@ Windows is supported as a development environment (#46). CI's `build-windows` jo
 suite passes. Two IIS gate tests run only off Windows, because on Windows protected configuration uses Windows'
 own key containers and DPAPI, as on .NET Framework: `AppReadsProtectedSections` (the sample's sections are encrypted with
 key files and the DPAPI emulation) and `RegIISProtectExportImportUnprotect` (it would create key containers in the
-machine's store). To run the suites on Windows: Git for Windows, Python 3 (as `python3`), the SDK in `global.json`, and
+machine's store). To run the suites on Windows: Git for Windows, the SDK in `global.json`, and
 SQL Server (Express is enough) at `127.0.0.1,14333` with the `sa` login of `tools/lift/sqlserver.sh`; then the commands
 above in Git Bash.
 
@@ -170,4 +170,5 @@ Branch coverage isn't reported: dotnet-coverage's Cobertura output has no branch
 
 - `tools/lift/test-results/2026-10-30.md`: results of each round, including failures grouped by message.
 - `LIFT.md`: why each test was corrected or skipped.
-- `tools/lift/trx_summary.py` and `trx_failures.py` summarise `.trx` files.
+- `tools/ci/trx_summary.cs` and `trx_failures.cs` summarise `.trx` files (C# file-based apps:
+  `dotnet run tools/ci/trx_summary.cs -- <files>`).
