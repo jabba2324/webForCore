@@ -284,5 +284,37 @@ namespace IISGate
             Assert.Contains("scan failures: 0\n", body);
             Assert.DoesNotContain("failed: ", body);
         }
+
+        // #90: .aspx and .ascx files without a BOM are read in the ANSI code page when <globalization fileEncoding> isn't
+        // set, as .NET Framework's Encoding.Default was (windows-1252 on a Western Windows, and on Linux for an English,
+        // Western European or invariant locale). Umbraco 6's installer (install/steps/theend.ascx, byte 0x92) showed
+        // "You�re done...now what?" because .NET's Encoding.Default is UTF-8.
+        [Fact]
+        public async Task FilesWithoutABomAreReadInTheAnsiCodePage()
+        {
+            var (response, body) = await Get("/regressions/encoding/Ansi.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.DoesNotContain("�", body);
+            if (!body.Contains("fileEncoding: Windows-1252", StringComparison.OrdinalIgnoreCase))
+            {
+                // A machine whose locale has another code page (932 for Japanese, ...) reads the file in that one.
+                Assert.Matches("fileEncoding: (?!utf-8)", body);
+                return;
+            }
+            Assert.Contains("page: You’re done, café", body);
+            Assert.Contains("control: You’re done...now what?", body);
+        }
+
+        // A file with a UTF-8 BOM is UTF-8 whatever fileEncoding is, and an application whose files are UTF-8 without a
+        // BOM sets <globalization fileEncoding="utf-8" />, as it had to on IIS.
+        [Theory]
+        [InlineData("/regressions/encoding/Bom.aspx", "bom: ")]
+        [InlineData("/regressions/encoding/utf8/Utf8.aspx", "utf8: ")]
+        public async Task UnicodeFilesAreReadAsUtf8(string url, string prefix)
+        {
+            var (response, body) = await Get(url);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains(prefix + "You’re done, café", body);
+        }
     }
 }
