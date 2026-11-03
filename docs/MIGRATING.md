@@ -242,7 +242,7 @@ These came up migrating real applications; each names one that needed it.
   <PackageReference Include="Hangfire.Core" Version="1.6.17" GeneratePathProperty="true" ExcludeAssets="compile;runtime" />
   <Reference Include="Hangfire.Core" HintPath="$(PkgHangfire_Core)/lib/net45/Hangfire.Core.dll" />
   ```
-- **Katana packages webForCore doesn't lift** (#14, #18). webForCore provides `Microsoft.Owin`, its hosts, `Security`,
+- **Katana packages webForCore doesn't build** (#14, #18). webForCore provides `Microsoft.Owin`, its hosts, `Security`,
   `Security.Cookies`, `Security.OAuth` and `Cors`. The social logins of the Visual Studio templates
   (`Microsoft.Owin.Security.Facebook`, `.Google`, `.MicrosoftAccount`, `.Twitter`) and `.WsFederation` are not: keep
   the application's package (any version from 2.0). Its Katana dependencies lose to webForCore's `Microsoft.Owin`
@@ -260,11 +260,12 @@ These came up migrating real applications; each names one that needed it.
     `AppDomainSetup.ShadowCopyFiles` (`MissingMethodException`). Remove the packages, the `glimpse` configuration
     section, its module and handler in `<system.web>` and `<system.webServer>`, and the app's `GlimpseSecurityPolicy`
     class (ReaLocate).
-  - **AutoMapper before 12** throws while configuring a map (seen on .NET 11; not yet rechecked on .NET 10) (`The type or method has 3 generic parameter(s),
-    but 1 generic argument(s) were provided`, or `... violates the constraint of type 'T'` from `MaxFloat`/`MaxInteger`):
-    it scans `System.Linq.Enumerable`'s extension methods, non-public ones included. This isn't webForCore's: a .NET 11
-    console app did the same. AutoMapper 12 works; from 4.x the change is mostly `IMapperConfiguration` →
-    `IMapperConfigurationExpression` (ReaLocate). From 3.x's static `Mapper` it is a rewrite of the mapping code.
+  - **AutoMapper before 12** throws while configuring a map (`The type or method has 3 generic parameter(s), but 1
+    generic argument(s) were provided`, or `... violates the constraint of type 'T'` from `MaxFloat`/`MaxInteger`): it
+    scans `System.Linq.Enumerable`'s extension methods, non-public ones included. This isn't webForCore's: a plain
+    .NET 10 console app does the same (AutoMapper 4.2 and 11.0 fail on 10.0.14, as they did on .NET 11). AutoMapper 12
+    works; from 4.x the change is mostly `IMapperConfiguration` → `IMapperConfigurationExpression` (ReaLocate). From
+    3.x's static `Mapper` it is a rewrite of the mapping code.
 
 ## 4. Program.cs
 

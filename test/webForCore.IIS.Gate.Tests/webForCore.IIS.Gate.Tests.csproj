@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!-- The IIS hosting gate: test/webForCore.IIS.Sample on Kestrel with the fork's System.Web. Each <system.webServer>
-       feature the hosting layer implements, checked against IIS 10's documented behaviour, and the PseudoAppDomain's
-       in-process restart. -->
+       feature the hosting layer implements, checked against IIS 10's documented behaviour, and application restarts
+       under webforcore-host. -->
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>

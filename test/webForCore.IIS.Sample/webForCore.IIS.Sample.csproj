@@ -3,7 +3,7 @@
   <!-- The IIS hosting gate: a Web Forms site whose web.config uses the <system.webServer> sections the hosting layer
        implements (request filtering, custom headers, HTTP redirection, URL Rewrite, default documents, the static
        content MIME map and client cache, custom errors, managed modules and handlers, URL authorization, compression)
-       and pages for the PseudoAppDomain (in-process restart). Hosted on Kestrel by the fork's System.Web;
+       and pages for application restarts (webforcore-host's worker processes). Hosted on Kestrel by the fork's System.Web;
        test/webForCore.IIS.Gate.Tests drives it. -->
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>

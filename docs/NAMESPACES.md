@@ -1,9 +1,9 @@
 # Implemented namespaces and their caveats
 
 This page lists, assembly by assembly, the .NET Framework and ASP.NET namespaces webForCore provides on .NET 10, and
-what doesn't work in each. "Lifted" assemblies are Microsoft's open-source code, copied and built for .NET (see
-[MODIFICATIONS.md](MODIFICATIONS.md)). "Ported" assemblies are WebFormsForCore's port of the .NET Framework reference
-source, with webForCore's changes.
+what doesn't work in each. "Upstream" assemblies are Microsoft's open-source code, compiled for .NET from the
+`external/` submodules (see [MODIFICATIONS.md](MODIFICATIONS.md)). "Ported" assemblies are WebFormsForCore's port of
+the .NET Framework reference source, with webForCore's changes.
 
 Each assembly keeps the name, and where Microsoft signed it the public key, of the assembly it replaces. Compiled
 references and `web.config` type names therefore resolve without changes.
@@ -13,10 +13,10 @@ in the code; the rest are from `LIFT.md`.
 
 - [Summary of what doesn't work](#summary-of-what-doesnt-work)
 - [System.Web and its companions (ported)](#systemweb-and-its-companions-ported)
-- [ASP.NET MVC, Web Pages, Razor (lifted)](#aspnet-mvc-web-pages-razor-lifted)
-- [ASP.NET Web API (lifted)](#aspnet-web-api-lifted)
-- [OWIN / Katana (lifted)](#owin--katana-lifted)
-- [SignalR 2 and ASP.NET Identity 2 (lifted)](#signalr-2-and-aspnet-identity-2-lifted)
+- [ASP.NET MVC, Web Pages, Razor (upstream)](#aspnet-mvc-web-pages-razor-upstream)
+- [ASP.NET Web API (upstream)](#aspnet-web-api-upstream)
+- [OWIN / Katana (upstream)](#owin--katana-upstream)
+- [SignalR 2 and ASP.NET Identity 2 (upstream)](#signalr-2-and-aspnet-identity-2-upstream)
 - [System.Drawing (drawingForCore)](#systemdrawing-drawingforcore)
 - [Other assemblies](#other-assemblies)
 
@@ -174,7 +174,7 @@ isn't provided ([MIGRATING.md](MIGRATING.md#3-references)).
 | System.Web.DynamicData | `System.Web.DynamicData` (+ `.ModelProviders`), and `System.ComponentModel.DataAnnotations.ScaffoldTableAttribute`, which .NET dropped | Part of the "Always" set: System.Web loads it for every data control with `ItemType`. The LINQ to SQL and Entity Framework 1–4 model providers aren't built (`RegisterContext` needs a `DataModelProvider`), nor are the EF 5 spatial types (`DbGeography`, `DbGeometry`) as column types. Designers are .NET Framework only |
 | System.Web.Entity | | Not built by the solution |
 
-## ASP.NET MVC, Web Pages, Razor (lifted)
+## ASP.NET MVC, Web Pages, Razor (upstream)
 
 | Assembly (version) | Namespaces | Caveats |
 | --- | --- | --- |
@@ -186,7 +186,7 @@ isn't provided ([MIGRATING.md](MIGRATING.md#3-references)).
 | System.Web.WebPages.Deployment 3.0 | `System.Web.WebPages.Deployment` | Dependency checks use a collectible load context instead of an AppDomain |
 | System.Web.Helpers 3.0 | `System.Web.Helpers` (WebGrid, Chart, WebImage, Crypto, Json) | Chart and WebImage render through the SkiaSharp System.Drawing |
 
-## ASP.NET Web API (lifted)
+## ASP.NET Web API (upstream)
 
 | Assembly (version) | Namespaces | Caveats |
 | --- | --- | --- |
@@ -196,7 +196,7 @@ isn't provided ([MIGRATING.md](MIGRATING.md#3-references)).
 | System.Web.Http.Cors, System.Web.Cors 5.3 | `System.Web.Http.Cors`, `System.Web.Cors` | |
 | System.Net.Http.Formatting 6.0 | `System.Net.Http`, `.Formatting`, `.Handlers`, `.Headers` | `ContentDispositionHeaderValue.FileName` is unquoted by .NET (Web API's providers handle this); indented JSON and XML use `\n` |
 
-## OWIN / Katana (lifted)
+## OWIN / Katana (upstream)
 
 Microsoft.Owin 4.2.3 and companions: `Microsoft.Owin` (+ `.Builder`, `.Extensions`, `.Infrastructure`, `.Logging`,
 `.Mapping`, `.Security`), `Microsoft.Owin.Security` (+ `.Cookies`, `.OAuth`, `.DataHandler`, `.DataProtection`),
@@ -207,7 +207,7 @@ Caveats: `DpapiDataProtectionProvider` uses the DPAPI emulation, so its payloads
 System.Web the machine key protects cookies, as on IIS. The "Domain" hosting starter throws (it needs AppDomains). The
 HttpListener host uses Katana's Mono code paths. `HostString` accepts hosts that mix Unicode and punycode labels.
 
-## SignalR 2 and ASP.NET Identity 2 (lifted)
+## SignalR 2 and ASP.NET Identity 2 (upstream)
 
 | Assembly | Namespaces | Caveats |
 | --- | --- | --- |
@@ -231,8 +231,9 @@ Caveats:
 - **Text:** no font fallback for missing glyphs, no right-to-left or vertical layout. Windows font names map to
   metric-compatible fonts (Liberation, Carlito, Caladea) through fontconfig.
 - Output is close to Windows GDI+ but not pixel-identical.
-- Microsoft's own suite: 3,716 of 3,883 pass on Linux, and 141 of the 151 failures are metafiles (see
-  [TESTING.md](TESTING.md)).
+- Microsoft's own suite: 3,705 of 3,882 pass in drawingForCore's CI on Linux and Windows, and 141 of the 151
+  failures are metafiles (see drawingForCore's
+  [TESTING.md](https://github.com/xforcore/drawingForCore/blob/main/docs/TESTING.md)).
 
 ## Other assemblies
 

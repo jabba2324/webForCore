@@ -56,7 +56,7 @@ run on webForCore), and redirect a Google challenge.
 
 ## The suites
 
-### Lifted from Microsoft and Mono
+### Microsoft's and Mono's suites
 
 | Suite | Upstream | Tests | Passed | Skipped | What it exercises |
 | --- | --- | ---: | ---: | ---: | --- |
@@ -101,11 +101,11 @@ samples and NuGet dependencies excluded):
 
 | | Coverable lines | Covered | Line coverage |
 | --- | ---: | ---: | ---: |
-| Lifted Microsoft code (Web Stack, Katana, SignalR, Identity) | 64,168 | 50,659 | **78.9%** |
+| Microsoft's code from the submodules (Web Stack, Katana, SignalR, Identity) | 64,168 | 50,659 | **78.9%** |
 | WebFormsForCore's port (System.Web and companions) and webForCore's tools | 301,396 | 59,361 | **19.7%** |
 | **All** | **365,564** | **110,020** | **30.1%** |
 
-The lifted libraries come with Microsoft's own suites, so their coverage is close to what Microsoft had: MVC 91%,
+The upstream libraries come with Microsoft's own suites, so their coverage is close to what Microsoft had: MVC 91%,
 Web API 91%, Razor 90%, Formatting 90%. The port is the weak spot:
 - **System.Web (27.8% of 146,216 lines)** is covered by Mono's tests and the gates. The hosting layer webForCore
   added is well covered (the IIS layer 84%, the worker request 69%), but large parts of the Web Forms control set
@@ -120,33 +120,33 @@ Per assembly:
 
 | Assembly | Source | Coverable lines | Covered | Line coverage |
 | --- | --- | ---: | ---: | ---: |
-| Microsoft.AspNet.Identity.Core | lifted | 1,302 | 1,258 | 96.6% |
-| Microsoft.AspNet.Identity.EntityFramework | lifted | 517 | 442 | 85.5% |
-| Microsoft.AspNet.Identity.Owin | lifted | 424 | 225 | 53.1% |
-| Microsoft.AspNet.SignalR.Client | lifted | 3,105 | 1,773 | 57.1% |
-| Microsoft.AspNet.SignalR.Core | lifted | 6,172 | 4,624 | 74.9% |
-| Microsoft.AspNet.SignalR.SystemWeb | lifted | 13 | 0 | 0.0% |
-| Microsoft.Owin | lifted | 1,759 | 1,219 | 69.3% |
-| Microsoft.Owin.Cors | lifted | 74 | 0 | 0.0% |
-| Microsoft.Owin.Host.HttpListener | lifted | 1,812 | 492 | 27.2% |
-| Microsoft.Owin.Host.SystemWeb | lifted | 2,847 | 1,578 | 55.4% |
-| Microsoft.Owin.Hosting | lifted | 853 | 466 | 54.6% |
-| Microsoft.Owin.Security | lifted | 689 | 436 | 63.3% |
-| Microsoft.Owin.Security.Cookies | lifted | 328 | 253 | 77.1% |
-| Microsoft.Owin.Security.OAuth | lifted | 871 | 790 | 90.7% |
-| Microsoft.Web.Mvc | lifted | 2,964 | 1,654 | 55.8% |
-| System.Net.Http.Formatting | lifted | 4,141 | 3,724 | 89.9% |
-| System.Web.Cors | lifted | 216 | 216 | 100.0% |
-| System.Web.Helpers | lifted | 2,146 | 1,696 | 79.0% |
-| System.Web.Http | lifted | 9,552 | 8,657 | 90.6% |
-| System.Web.Http.Cors | lifted | 372 | 362 | 97.3% |
-| System.Web.Http.Owin | lifted | 755 | 548 | 72.6% |
-| System.Web.Http.WebHost | lifted | 1,172 | 877 | 74.8% |
-| System.Web.Mvc | lifted | 11,118 | 10,133 | 91.1% |
-| System.Web.Razor | lifted | 6,368 | 5,704 | 89.6% |
-| System.Web.WebPages | lifted | 3,921 | 3,020 | 77.0% |
-| System.Web.WebPages.Deployment | lifted | 320 | 200 | 62.5% |
-| System.Web.WebPages.Razor | lifted | 357 | 312 | 87.4% |
+| Microsoft.AspNet.Identity.Core | upstream | 1,302 | 1,258 | 96.6% |
+| Microsoft.AspNet.Identity.EntityFramework | upstream | 517 | 442 | 85.5% |
+| Microsoft.AspNet.Identity.Owin | upstream | 424 | 225 | 53.1% |
+| Microsoft.AspNet.SignalR.Client | upstream | 3,105 | 1,773 | 57.1% |
+| Microsoft.AspNet.SignalR.Core | upstream | 6,172 | 4,624 | 74.9% |
+| Microsoft.AspNet.SignalR.SystemWeb | upstream | 13 | 0 | 0.0% |
+| Microsoft.Owin | upstream | 1,759 | 1,219 | 69.3% |
+| Microsoft.Owin.Cors | upstream | 74 | 0 | 0.0% |
+| Microsoft.Owin.Host.HttpListener | upstream | 1,812 | 492 | 27.2% |
+| Microsoft.Owin.Host.SystemWeb | upstream | 2,847 | 1,578 | 55.4% |
+| Microsoft.Owin.Hosting | upstream | 853 | 466 | 54.6% |
+| Microsoft.Owin.Security | upstream | 689 | 436 | 63.3% |
+| Microsoft.Owin.Security.Cookies | upstream | 328 | 253 | 77.1% |
+| Microsoft.Owin.Security.OAuth | upstream | 871 | 790 | 90.7% |
+| Microsoft.Web.Mvc | upstream | 2,964 | 1,654 | 55.8% |
+| System.Net.Http.Formatting | upstream | 4,141 | 3,724 | 89.9% |
+| System.Web.Cors | upstream | 216 | 216 | 100.0% |
+| System.Web.Helpers | upstream | 2,146 | 1,696 | 79.0% |
+| System.Web.Http | upstream | 9,552 | 8,657 | 90.6% |
+| System.Web.Http.Cors | upstream | 372 | 362 | 97.3% |
+| System.Web.Http.Owin | upstream | 755 | 548 | 72.6% |
+| System.Web.Http.WebHost | upstream | 1,172 | 877 | 74.8% |
+| System.Web.Mvc | upstream | 11,118 | 10,133 | 91.1% |
+| System.Web.Razor | upstream | 6,368 | 5,704 | 89.6% |
+| System.Web.WebPages | upstream | 3,921 | 3,020 | 77.0% |
+| System.Web.WebPages.Deployment | upstream | 320 | 200 | 62.5% |
+| System.Web.WebPages.Razor | upstream | 357 | 312 | 87.4% |
 | aspnetcore_compiler | port | 476 | 168 | 35.3% |
 | WebFormsForCore.Compilers | port | 51 | 40 | 78.4% |
 | System.Configuration.ConfigurationManager | port | 14,125 | 5,530 | 39.2% |

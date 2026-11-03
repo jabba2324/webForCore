@@ -27,7 +27,7 @@ legal advice: for a product decision, have counsel review NOTICE and this page.
 | Roslyn compilers (binaries) | `src/WebFormsForCore.Compilers` | MIT (© .NET Foundation) | ✅ Yes |
 | System.Drawing and System.Drawing.Common 6.0 with a GDI+ engine on SkiaSharp: [drawingForCore](https://github.com/xforcore/drawingForCore)'s packages | restored at build time | MIT (© .NET Foundation and drawingForCore's contributors) | ✅ Yes |
 | Dependencies from NuGet: EntityFramework 6, Newtonsoft.Json, CoreWCF, System.Data.SqlClient, ... | restored at build time | MIT or Apache 2.0, each package's own | ✅ Yes |
-| Tests lifted from Microsoft and Mono | `test/webForCore.*` | Apache 2.0 or MIT | ✅ Yes (not shipped in packages) |
+| Tests from Microsoft and Mono (submodules) | `test/webForCore.*` | Apache 2.0 or MIT | ✅ Yes (not shipped in packages) |
 
 ### What the permissive licences ask of you
 
@@ -49,8 +49,9 @@ container (Developer edition, not shipped).
 
 WebFormsForCore's fork base contained material that no open licence covered: binaries from .NET Framework, and code
 decompiled from .NET Framework assemblies and other Microsoft products. webForCore replaced every piece. Where
-Microsoft published the original source under MIT, the decompiled copy was replaced with that original, through a lift
-script that records each change. Where no MIT source exists, webForCore wrote the code from the documented public API.
+Microsoft published the original source under MIT, the decompiled copy was replaced with that original, now compiled
+from a submodule of Microsoft's repository with each change as a commit ([MODIFICATIONS.md](MODIFICATIONS.md)). Where
+no MIT source exists, webForCore wrote the code from the documented public API.
 
 | Was | Now | How |
 | --- | --- | --- |
