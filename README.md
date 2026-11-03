@@ -98,9 +98,7 @@ The full guide is [docs/MIGRATING.md](docs/MIGRATING.md). In outline:
    var builder = WebApplication.CreateBuilder(args);
    builder.Services.AddWebForms();                 // IIS compression, W3C logging
    builder.Services.AddDistributedMemoryCache();   // if the app uses session state
-   builder.Services.AddSession();
    var app = builder.Build();
-   app.UseSession();
    app.UseWebForms(o => o.HandleAllRequestsWithWebForms().UseAspNetCoreSessionProvider());
    app.Run();
    ```
