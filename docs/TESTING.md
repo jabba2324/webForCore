@@ -10,7 +10,7 @@ on Kestrel and check them over HTTP against IIS's documented behaviour.
 skipped with a reason, and none fail.** System.Drawing.Common's own tests run in
 [drawingForCore](https://github.com/xforcore/drawingForCore)'s CI. System.Web.MonoTests skips 11 (6 before 0.7.0): Mono's 5
 `SimpleWorkerRequestTest` tests that create application hosts need an AppDomain per host, and are skipped again now that
-webForCore has no in-process AppDomains (LIFT.md).
+webForCore has no in-process AppDomains (#56).
 
 ## Running the tests
 
@@ -82,15 +82,64 @@ run on webForCore), and redirect a Google challenge.
 Every skip is the upstream project's own (`Skip=` in its source, or a category Microsoft excludes on Linux). None was
 added to hide a failure.
 
+Settings some suites need:
+- **SignalR** runs with `TieredCompilation=false`: two weak-reference tests rely on a local being dead after its last
+  use, which .NET Framework's JIT gave and .NET's tier-0 code doesn't.
+- **Identity** runs one test at a time (`parallelizeTestCollections: false`, as xunit 1.9 ran them; they share one
+  database) and in Pacific time (one test assumes UTC−8).
+- The suites run in **Release**, as Microsoft ships: in Debug, `Debug.Fail` calls in Microsoft's code fire in Mono's
+  tests.
+
+#### System.Web.MonoTests
+
+Mono's System.Web tests (mono/mono `0f53e9e`, MIT) are the only large suite for System.Web itself. Of the 563 files in
+Mono's `System.Web_test.dll.sources`, 188 are built (186 test files and two helpers). Left out: 103 that use Mono's
+in-process web harness (`MonoTests.SystemWeb.Framework`), 11 that use its HTML-comparison harness and 45 of the
+harness itself (`mainsoft/`), 209 Code Access Security tests (.NET doesn't enforce CAS), 4 that test Mono internals or
+inspect an AppDomain's setup, and `RequestValidatorTest`, which needs the harness's fake worker request.
+
+- They run on NUnit 3.14, the last version with NUnit 2's classic `Assert`, with `NUnit2Compat.cs` for
+  `[ExpectedException]` (NUnit 2's exact-type semantics) and Mono's `[MonoTODO]`. `TARGET_DOTNET` and `DOT_NET` are
+  defined, so where Mono wrote a .NET variant of a test, that variant runs.
+- The assembly is named `DotNet4_NUnit_Tests`: the output-cache tests compare bytes against baselines recorded on .NET
+  Framework from an assembly of that name, which the serialized bytes contain.
+- Where a Mono test disagrees with System.Web, Microsoft's reference source (microsoft/referencesource `ec9fa9a`)
+  decides: where the port's code is the reference source's, the test is corrected to .NET Framework 4.5+'s behaviour
+  (Mono's tests follow Mono); where the port differs, the port is fixed.
+
+#### Accepted platform differences
+
+Tests corrected to .NET's behaviour, because the difference comes from .NET's base class library or the platform and
+not from Microsoft's ASP.NET code. Those an application can see are marked \*; the others only change what a test
+asserts.
+
+| Difference | Suites |
+| --- | --- |
+| \* `ArgumentException.Message` is `msg (Parameter 'name')` (.NET Framework: `msg`, a newline, `Parameter name: name`); it shows in model-state errors built from exceptions | Web API, MVC, Web Pages, Identity |
+| \* `ContentDispositionHeaderValue.FileName` is unquoted (.NET Framework kept the quotes). Web API's own multipart providers unquote it themselves, so they behave the same | Formatting |
+| \* `MediaTypeHeaderValue(null)` throws `ArgumentNullException` (.NET Framework: `ArgumentException`, its base class) | Web API |
+| \* Invalid UTF-8 is replaced per Unicode's "maximal subpart" rule (more U+FFFD than .NET Framework) | Formatting |
+| \* Indented JSON and XML, Razor's generated code and select lists use the platform newline | Formatting, Razor, MVC |
+| \* ICU cultures: any well-formed culture name is created (`<PredefinedCulturesOnly>true</PredefinedCulturesOnly>` restores .NET Framework's `CultureNotFoundException`), and culture data differs from Windows NLS (es-MX's time format, ar-DZ's decimal separator, U+202F before AM in en-US) | Web Pages, MVC |
+| \* `HostString` decodes a host that mixes Unicode and punycode labels (.NET Framework threw) | Katana |
+| \* A whitespace-only directory name is valid on Linux | Formatting (the multipart root path is rejected anyway, as on .NET Framework) |
+| The core library is `System.Private.CoreLib`, not `mscorlib`, in assembly-qualified names | Web API, MVC |
+| Reworded BCL messages and stack frames (`List<T>.InsertRange`, `KeyNotFoundException`, `Boolean.Parse`, Activator, async state machines) | Web API, MVC, WebHost |
+| `HttpContent.ReadAsStreamAsync` returns a different stream over its buffer | Formatting |
+| `Thread.Abort` isn't supported: tests throw a `ThreadAbortException` instance, as `Response.End` does | MVC |
+| No AppDomains: tests that need one run in a collectible `AssemblyLoadContext`, or are skipped where that can't stand in | MVC, Web Pages, Mono |
+| No DPAPI or LocalDB off Windows: Katana's security tests use a test data protector, and Identity uses SQL Server in a container | Katana, Identity |
+| Things .NET doesn't have (LINQ to SQL's `Binary`, EF 1's `EntityObject`, legacy CAS, a JScript CodeDom provider, side-by-side Web Pages versions from the GAC, `WindowsIdentity`): compiled out or skipped | MVC, Web Pages, MVC Futures |
+
 ### webForCore's own
 
 | Suite | Tests | What it checks |
 | --- | ---: | --- |
 | IIS.Gate.Tests | 106 | `test/webForCore.IIS.Sample` under `webforcore-host`, compiled from an empty Temporary ASP.NET Files each run: `RegressionTests` (23) for problems real applications hit (`regressions/`, one test per issue, each naming the application); each `<system.webServer>` feature against IIS 10's documented behaviour (request filtering, rewrite rules, redirects, default documents, errors, IP restrictions, directory browsing, compression, logging), the connection details the host forwards (and that clients can't forge them), WebSockets, HTTPS and client certificates, timeouts, SignalR, bundling, protected configuration, integrated-pipeline APIs, precompiled sites (`aspnetcore_compiler`: fixed, updatable, compile errors, usage), ASMX (SOAP 1.1/1.2, faults, HTTP POST, WSDL, help page, JSON), ASP.NET AJAX (ScriptResource.axd, UpdatePanel partial postback, page methods), `System.Web.Mail`, `<system.net>` (mail settings through a PasswordRecovery postback to a fake SMTP server, the default proxy through a fake proxy), `<DbProviderFactories>`, data binding over app types, a Visual Studio typed DataSet with TableAdapters against SQL Server, and restarts (`RecyclingTests`): `UnloadAppDomain` starts the application in a new worker process, every request during a restart under load is answered, Web.config changing while the next worker starts ends in a serving worker (#49), a worker that exits is replaced, `bin` and `App_Code` changes restart the application (#51), and a WebSocket outlasting `shutdownTimeout` is aborted |
-| WebApi.Gate.Tests | 67 | `test/webForCore.WebApi.Sample` (Visual Studio's Web API template and the "Getting Started" tutorial's controllers). Each request runs through System.Web and through OWIN, and is compared with an oracle: the same controllers in Web API's in-memory server, without System.Web. Status, media type, body, Location and Allow must match. Also: a restart, which runs the application in a new worker process |
+| WebApi.Gate.Tests | 67 | `test/webForCore.WebApi.Sample` (Visual Studio's Web API template and the "Getting Started" tutorial's controllers). Each request runs through System.Web and through OWIN, and is compared with an oracle: the same controllers in Web API's in-memory server, without System.Web. Status, media type, body, Location and Allow must match. Every response is written to `gate-responses.json` beside the test assembly, for a diff against IIS (#78). Also: a restart, which runs the application in a new worker process |
 | Mvc.Gate.Tests | 65 | `test/webForCore.Mvc.Sample` and `test/webForCore.WebPages.Sample`: model binding, validation, post-redirect-get with TempData, `Html.Serialize`/`[Deserialize]` state (and tampering), anti-forgery tokens, filters, error pages, layouts, display and editor templates, Razor features, MVC Futures, Web Pages, that source files aren't served, and that a restart runs the application in a new worker process |
 | Host.Tests | 3 | `webforcore-host` itself (`test/webForCore.Host.Sample`): rapid-fail protection stops starting workers that keep crashing, workers stop when the host ends, and an application run without the host stops when it restarts |
-| Serialization.Tests | 10 | `NameValueCollection` and its subclasses through the BinaryFormatter port, in .NET Framework's format |
+| Serialization.Tests | 10 | `NameValueCollection` and its subclasses through the BinaryFormatter port, in .NET Framework's format: round trips and the wire layout (member names and order, `Version=4.0.0.0` assembly names). The port also read and re-wrote 458 of the 589 .NET Framework streams in dotnet/runtime's `BinaryFormatterTestData.cs` (release/8.0), as many as before the surrogates; no `NameValueCollection` stream written by .NET Framework itself has been checked (the layout follows the reference source member for member) |
 
 ## Code coverage
 
@@ -168,6 +217,7 @@ Branch coverage isn't reported: dotnet-coverage's Cobertura output has no branch
 
 ## How results are recorded
 
-- `LIFT.md`: why each test was corrected or skipped.
+- The fork commits in `external/` (`git log` in a submodule): why each test was corrected or skipped, one change per
+  commit. A difference kept on purpose is in the tables above.
 - `tools/ci/trx_summary.cs` and `trx_failures.cs` summarise `.trx` files (C# file-based apps:
   `dotnet run tools/ci/trx_summary.cs -- <files>`).

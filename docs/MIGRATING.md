@@ -179,7 +179,9 @@ webForCore ships only Microsoft assemblies, so two libraries apps commonly have 
 - **AjaxControlToolkit** isn't provided. The original package is built for .NET Framework.
 
 Keep other NuGet packages, preferring versions that target .NET Standard or .NET. The `test/webForCore.*.Sample`
-projects in this repository are working examples for Web Forms, MVC, Web API and Web Pages.
+projects in this repository are working examples for Web Forms, MVC, Web API and Web Pages. A .NET Framework package
+built against MVC 5 runs as it is unless it uses an API .NET lacks: Microsoft's own MVC Futures 5.0.0 binary (built for
+.NET Framework 4.0 against MVC 5.0) ran unmodified on webForCore's MVC 5.3, with .NET binding its 5.0.0.0 reference.
 
 ### Packages that need more than a reference
 
