@@ -668,9 +668,14 @@ namespace System.Web {
                     try {
                         StartManagedDirectoryWatch(dir, watchSubtree, notifyFilter);
                     }
-                    catch (Exception) {
+                    catch (Exception e) {
                         _rootCallback.Free();
-                        throw FileChangesMonitor.CreateFileMonitoringException(HResults.E_FAIL, dir);
+                        StopManagedDirectoryWatch();
+                        // webForCore: with the reason as the inner exception, which the error page and the logs show: off Windows
+                        // usually the user's inotify instances used up (fs.inotify.max_user_instances, #107). DirMonOpen's HRESULT
+                        // chose the message on .NET Framework, and its event log entry gave the reason.
+                        var exception = FileChangesMonitor.CreateFileMonitoringException(HResults.E_FAIL, dir);
+                        throw new HttpException(exception.Message, e) { HResult = exception.HResult };
                     }
 #endif
                     

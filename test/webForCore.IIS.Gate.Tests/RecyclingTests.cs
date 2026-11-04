@@ -26,8 +26,9 @@ namespace IISGate
         {
             var response = await _server.Client.GetAsync("/Domain.aspx");
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var match = Regex.Match(await response.Content.ReadAsStringAsync(), @"domain=([0-9a-f-]+);starts=(\d+);process=(\d+)");
-            Assert.True(match.Success);
+            var body = await response.Content.ReadAsStringAsync();
+            var match = Regex.Match(body, @"domain=([0-9a-f-]+);starts=(\d+);process=(\d+)");
+            Assert.True(match.Success, body);
             return new Start(match.Groups[1].Value, int.Parse(match.Groups[2].Value), int.Parse(match.Groups[3].Value));
         }
 
@@ -144,19 +145,31 @@ namespace IISGate
             }
             var deadline = DateTime.UtcNow.AddSeconds(90);
             Start after = null;
+            string last = null;
             while (DateTime.UtcNow < deadline)
             {
                 var response = await _server.Client.GetAsync("/Domain.aspx");
-                if (response.StatusCode == HttpStatusCode.OK)
+                var body = await response.Content.ReadAsStringAsync();
+                var match = Regex.Match(body, @"domain=([0-9a-f-]+);starts=(\d+);process=(\d+)");
+                last = $"{(int)response.StatusCode} {(body.Length > 500 ? body[..500] : body)}";
+                if (response.StatusCode == HttpStatusCode.OK && match.Success)
                 {
-                    after = await Current();
+                    after = new Start(match.Groups[1].Value, int.Parse(match.Groups[2].Value), int.Parse(match.Groups[3].Value));
                     if (after.Process != before.Process) break;
                 }
                 await Task.Delay(250);
             }
-            Assert.NotNull(after);
-            Assert.NotEqual(before.Process, after.Process);
+            // #107: when no worker serves, what the host and its workers said (on Linux, an application whose file change
+            // monitoring couldn't start because the user's inotify instances were used up answers with its error page).
+            Assert.True(after != null && after.Process != before.Process,
+                $"No new worker served /Domain.aspx within 90 s. Last answer: {last}\nThe host's output:\n{OutputTail()}");
             Assert.Equal(HttpStatusCode.OK, (await _server.Client.GetAsync("/Domain.aspx")).StatusCode);
+        }
+
+        private string OutputTail()
+        {
+            var output = _server.Output;
+            return output.Length > 20000 ? output[^20000..] : output;
         }
 
         // #89: an App_Code change while the old worker still compiles a page (Umbraco 6.2.6's install: its Application_Start

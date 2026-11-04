@@ -135,6 +135,12 @@ namespace Microsoft.AspNetCore.Builder
 			app.RouteClaims = (Func<string, bool>)host[3];
 			logger.LogInformation("Started application {AppId} in process {ProcessId}{Worker}.", AppId, Environment.ProcessId,
 				WorkerProcess.IsWorker ? $" (worker {WorkerProcess.WorkerId} of webforcore-host)" : "");
+			// webForCore: the runtime couldn't start the application (a configuration error, or file change monitoring that
+			// couldn't start: off Windows usually the user's inotify instances used up, #107). As on IIS, each request shows
+			// the error and the application restarts after it; IIS also wrote the error to the event log.
+			if (HttpRuntime.HostingInitFailed && HttpRuntime.InitializationException is Exception error)
+				logger.LogError(error, "Application {AppId} didn't start: {Message} Each request shows this error and restarts the application.",
+					AppId, error.GetBaseException().Message);
 			return app;
 		}
 
