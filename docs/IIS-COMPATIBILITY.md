@@ -93,7 +93,7 @@ IIS hands ASP.NET a worker request (`HttpWorkerRequest`); on Kestrel this is `As
 | --- | --- | --- |
 | App pool worker process | Works | `webforcore-host` (in the application's output, `bin_dotnet/webforcore-host/`) plays WAS's part: it owns the bindings and TLS and runs the application in worker processes, forwarding each request to the current one over a private Unix socket (#56). Run it with `dotnet bin_dotnet/webforcore-host/webforcore-host.dll`; starting the host itself (at boot, again if it ends) is the service manager's or container runtime's job, as it was Windows' for IIS. The client's address and port, the binding's, the scheme, the client certificate and the TLS strength reach `Request.ServerVariables` as on IIS; the Host header and the raw URL are the client's |
 | AppDomain per application | Works | Each worker process runs one start of the application, so static state, `AppDomain.CurrentDomain` data (`DataDirectory`) and events are per start, as they were per AppDomain. The shared framework is the process's, as the GAC's assemblies were the AppDomain's |
-| Restart on web.config, `bin` or `App_Code` change; `HttpRuntime.UnloadAppDomain` | Works | On every platform (`bin` and `App_Code` on Linux since #51). Off Windows each watched directory takes an inotify watch: a site with many folders may need a higher `fs.inotify.max_user_watches`. The worker tells the host, which starts the next worker; requests that arrive meanwhile wait for it, and none fails. The old worker finishes its requests and exits; those still running after `<hostingEnvironment shutdownTimeout>` (30 s) are aborted, as AppDomain.Unload did: long polls and WebSockets reconnect to the new worker. A restart costs a process start (and compiling what isn't precompiled). An application run on its own (`dotnet run`, without the host) stops on a restart, for whatever started it to start it again |
+| Restart on web.config, `bin` or `App_Code` change; `HttpRuntime.UnloadAppDomain` | Works | On every platform (`bin` and `App_Code` on Linux since #51). Off Windows each watched directory takes an inotify watch: a site with many folders may need a higher `fs.inotify.max_user_watches`. The worker tells the host, which starts the next worker; requests that arrive meanwhile wait for it, and none fails. The old worker finishes its requests and exits; those still running after `<hostingEnvironment shutdownTimeout>` (30 s) are aborted, as AppDomain.Unload did: long polls and WebSockets reconnect to the new worker. The workers share the compilation folder, as AppDomains did: the next one empties it when App_Code, `bin` or Web.config changed, but leaves the assemblies a running worker has loaded, marked `.delete` for a later start to remove, as .NET Framework could not delete them either, so the old worker still compiles pages against them (#89). Off Windows that is a lock each worker holds on them; it also makes an assembly a worker replaces itself (a page edited while it runs) count towards `numRecompilesBeforeAppRestart` (15), as on IIS. A restart costs a process start (and compiling what isn't precompiled). An application run on its own (`dotnet run`, without the host) stops on a restart, for whatever started it to start it again |
 | Recycling by time, request count, private memory | Works | `Recycling(...)`, with IIS's defaults: a new worker |
 | Freeing old domains | Works | The old worker process exits: everything it held goes with it |
 | Health monitoring, rapid-fail protection | Works | The host replaces a worker that exits; after 5 failures in 5 minutes it starts no more and answers 503 (IIS stops the application pool). Startup and shutdown time limits (90 s) are IIS's. Settings: `WebForCore:Host` (`StartupTimeLimit`, `ShutdownTimeLimit`, `RapidFailProtection`, `RapidFailProtectionMaxCrashes`, `RapidFailProtectionInterval`, `QueueTimeout`, `RequestIdleTimeout`, `AcceptUntrustedClientCertificates`). |
@@ -173,13 +173,33 @@ Where .NET Framework, IIS and .NET disagree, these choices decide what webForCor
 | **IIS 10**, in **classic pipeline mode**, with the integrated-only APIs provided on the Kestrel worker request ([above](#what-the-worker-request-gives-aspnet)) | Classic mode is how the reference source's `HttpRuntime` runs outside IIS; the integrated-only APIs are what apps call |
 | **`HttpUtility` is Microsoft's** (in System.Web), not .NET's `System.Web.HttpUtility.dll` | It goes through `HttpEncoder.Current`, so `<httpRuntime encoderType>` applies and the encoding is .NET Framework's. The framework's copy is left out of the compiler's references (CS0433 otherwise) |
 | **`System.Data.SqlClient`**, not Microsoft.Data.SqlClient, behind `SqlDataSource` and the SQL providers (membership, roles, profile, session, cache dependency) | The objects apps get and cast are the types they had on .NET Framework |
+| **Session state through `UseAspNetCoreSessionProvider()` is out-of-process state in ASP.NET Core's distributed cache**, keyed by System.Web's session ID, not ASP.NET Core's session ([MIGRATING.md](MIGRATING.md#session-state)) | One session cookie, `<sessionState cookieName>` (`ASP.NET_SessionId`), and `<sessionState timeout>`, as on IIS; ASP.NET Core's session would add its own `.AspNetCore.Session` cookie and timeout (#79) |
 | **Newlines are the platform's** in product output (`\n` on Linux): Razor's generated code, indented JSON and XML, exception messages. Only tests change | Rewriting product output would diverge from Microsoft's code. Tests compare newline-agnostically, or give Windows input where they hard-code positions |
 | **BinaryFormatter output is .NET Framework's**: webForCore's .NET Framework 4.0 assemblies are written as `Version=4.0.0.0`, and .NET Framework types .NET no longer serializes have surrogates ([NAMESPACES.md](NAMESPACES.md#other-assemblies)) | Session state, view state and the output cache keep the format out-of-process stores and other servers expect |
 | **`AssemblyVersion` is 11.0.0.0** for webForCore's assemblies, whatever the .NET version | It is webForCore's own version, and it must outrank the shared framework's 4.0.0.0 facades of the same names (`System.Web.dll`), which the host would load otherwise |
 
-Known differences from IIS these leave: an unmatched route gets ASP.NET's 404 page where IIS serves its native 404
-page (the same status), and the `Server` header is `Kestrel`, not `Microsoft-IIS/10.0`. No run has yet compared the
-gate responses with IIS itself (#78).
+### Compared with IIS 10
+
+CI's `iis-compare` job ([TESTING.md](TESTING.md#compared-with-iis-10), #78) sends the Web API gate's 66 requests
+(`test/webForCore.WebApi.Sample`, through `GlobalConfiguration` and through OWIN under `/owin`) to the same sample built
+for .NET Framework 4.8 with Microsoft's Web API 5.3.0 and Katana 4.2.3 packages, on IIS 10 (Windows Server 2025), and
+compares the responses. In IIS's **integrated** pipeline every status, `Content-Type`, `Location`, `Allow`, body
+(stack traces aside) and other header matches, including `Cache-Control: no-cache`, `Pragma` and `Expires: -1` on Web
+API's own responses and `X-Powered-By`, except these, which `tools/ci/iis-known-differences.json` lists (the job fails on
+any other difference, and on a listed one that stops occurring):
+
+| Difference | Requests | Why |
+| --- | --- | --- |
+| `Server` is `Kestrel`, not `Microsoft-IIS/10.0` | all 66 | webForCore's host is Kestrel |
+| Responses that Katana's System.Web host (`Microsoft.Owin.Host.SystemWeb`) ends have `X-AspNet-Version: 4.0.30319` and `Cache-Control: private`; IIS sends neither | the 31 under `/owin` | In IIS's integrated pipeline, Katana's `OwinHttpModule` ends the request before a managed handler runs, and ASP.NET adds those headers only around a handler. webForCore runs the classic pipeline, where they are added |
+| An unmatched extensionless URL (no route matches) gets ASP.NET's 404 page, with `X-AspNet-Version`; IIS serves its native 404 page ("HTTP Error 404.0 - Not Found", `StaticFile` handler), without it. The status is 404 on both | 2 | In IIS's integrated pipeline a URL that no managed handler claims falls through to IIS's static file handler; webForCore gives every request to ASP.NET |
+
+In IIS's **classic** pipeline, webForCore's reference ([above](#compatibility-decisions)), this sample doesn't run at
+all. Katana's `OwinHttpModule` needs the integrated pipeline, so every request fails with a 500 ("This operation requires
+IIS integrated pipeline mode"); and with the template's `Web.config`, `PUT`, `DELETE` and `OPTIONS` never reach ASP.NET
+(IIS's 404.0), because the classic-mode extensionless handler accepts only `GET`, `HEAD`, `POST` and `DEBUG`. The job
+records that run too, for reference. webForCore runs such an application as IIS's integrated pipeline does, apart from
+the differences above, with the integrated-only APIs Katana uses provided on the Kestrel worker request.
 
 How each part came to be is in git: the fork commits in `external/` and this repository's history
 ([MODIFICATIONS.md](MODIFICATIONS.md)).

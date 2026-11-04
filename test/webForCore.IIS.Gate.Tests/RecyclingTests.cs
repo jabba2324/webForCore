@@ -159,6 +159,21 @@ namespace IISGate
             Assert.Equal(HttpStatusCode.OK, (await _server.Client.GetAsync("/Domain.aspx")).StatusCode);
         }
 
+        // #89: an App_Code change while the old worker still compiles a page (Umbraco 6.2.6's install: its Application_Start
+        // creates ~/App_Code, and the login page that worker was compiling failed with CS0006 because the next worker had
+        // deleted App_global.asax's assembly from the compilation folder they share). As on IIS, the next worker leaves
+        // the assemblies a running worker has loaded, marked .delete, and the old worker's compilation succeeds.
+        [Fact]
+        public async Task AnOldWorkerStillCompilesAfterTheNextOneCleanedTheCompilationFolder()
+        {
+            var before = await Current();
+            var slow = _server.Client.GetStringAsync("/regressions/RecycleCompile.aspx");
+            // The next worker cleans the compilation folder when it starts the application: on its first request.
+            await Next(before, TimeSpan.FromSeconds(30));
+            var body = await slow;
+            Assert.True(body.Contains("page: compiled") && body.Contains("cleaned: marked"), body);
+        }
+
         // A worker that exits by itself (a crash) is replaced, and requests are answered again.
         [Fact]
         public async Task AWorkerThatExitsIsReplaced()

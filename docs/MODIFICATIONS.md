@@ -107,6 +107,9 @@ commit that made it, and its issue, say why.
   Off Windows, when App_Code's new assembly has the path of one already loaded, `CodeDirectoryCompiler` fails at
   once with the reference source's "already loaded" error: it used to force garbage collections for 3 seconds waiting
   for it to unload, which it can't in a worker process (#57).
+  `<system.codedom>` entries naming .NET Framework's `Microsoft.CSharp.CSharpCodeProvider` or
+  `Microsoft.VisualBasic.VBCodeProvider` (System.CodeDom's types on .NET) resolve to System.Web's own C# and VB
+  providers, keeping the entry's options (`CompilerInfo.CodeDomProviderType`, #88).
 - **Additions removed under CONTRIBUTING.md rules 6 and 7 (#57):** the unused `WebFormsTaskScheduler` (a public type
   .NET Framework's System.Web never had, which reflected into `ThreadPoolTaskScheduler` and `Task`), a debug-only
   `#if DebugWF4C` block in `HttpApplication.ExecuteStep`, and the `GCUtil.Alloc`/`Free` wrappers (`GCUtil`,
