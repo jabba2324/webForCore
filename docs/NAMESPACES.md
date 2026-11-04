@@ -63,7 +63,12 @@ in the code; the rest come from the test suites and gates ([TESTING.md](TESTING.
 
 It also carries types .NET removed that System.Web needs: `System.Resources.ResX*` (ResX reading and writing),
 `System.Runtime.Remoting.Messaging.CallContext` (built on `AsyncLocal`), `System.EnterpriseServices.TransactionOption`,
-`System.Drawing.Design.UITypeEditor`.
+`System.Drawing.Design.UITypeEditor`. These serve code compiled against webForCore: the application's own code and
+libraries rebuilt for .NET. A prebuilt .NET Framework library that uses one was compiled against the .NET Framework
+assembly that had it (`mscorlib` for `CallContext`), where .NET has no such type and webForCore can't add a forward,
+so the library fails with `TypeLoadException: Could not load type 'System.Runtime.Remoting.Messaging.CallContext' from
+assembly 'mscorlib'` (Log4Net.Async 2.0.4, which Umbraco 7 configures by default, #95; see
+[MIGRATING.md](MIGRATING.md#3-references), "Libraries that don't run on .NET").
 
 Caveats:
 - **Classic pipeline.** The integrated pipeline itself doesn't run, but its APIs work on Kestrel (notifications,
