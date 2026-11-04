@@ -12,7 +12,7 @@
 // src/webForCore.System.Data.Linq/FrameworkData/System.Data.Linq.json.
 //
 // It reads metadata with System.Reflection.Metadata, and simulates the evaluation stack of each method's body to find
-// the `newobj`'s type and arguments; a body it doesn't understand is reported, and the tool fails.
+// the `newobj`'s type and arguments. A body it doesn't understand (not generated code) is marked "notRead".
 #:property NuGetAudit=false
 #:property PublishAot=false
 using System.Diagnostics;
@@ -39,7 +39,7 @@ using var pe = new PEReader(stream);
 var md = pe.GetMetadataReader();
 var reader = new FrameworkDataReader(pe, md);
 
-var problems = new List<string>();
+var notes = new List<string>();
 var root = new JsonObject
 {
     ["comment"] = "Read from .NET Framework's System.Data.Linq.dll by tools/linq/framework_data.cs (#142): names, messages and exception types only.",
@@ -56,7 +56,7 @@ foreach (var handle in md.TypeDefinitions)
     string name = md.GetString(type.Name);
     if (!type.GetDeclaringType().IsNil || (name != "Error" && name != "Strings" && name != "SR"))
         continue;
-    classes.Add(reader.ReadClass(type, problems));
+    classes.Add(reader.ReadClass(type, notes));
 }
 root["classes"] = classes;
 
@@ -66,11 +66,8 @@ Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
 File.WriteAllText(outputPath, root.ToJsonString(options).Replace("\r\n", "\n") + "\n", new UTF8Encoding(false));
 Console.WriteLine($"{dllPath} ({root["fileVersion"]}): {classes.Count} classes, written to {outputPath}");
 
-// The output is written either way, with each member the tool didn't understand marked "problem".
-foreach (var problem in problems)
-    Console.Error.WriteLine(problem);
-if (problems.Count > 0)
-    return 1;
+foreach (var note in notes)
+    Console.WriteLine(note);
 
 if (args.Length == 3)
 {
@@ -130,7 +127,7 @@ sealed class FrameworkDataReader(PEReader pe, MetadataReader md)
         return result;
     }
 
-    public JsonObject ReadClass(TypeDefinition type, List<string> problems)
+    public JsonObject ReadClass(TypeDefinition type, List<string> notes)
     {
         string ns = md.GetString(type.Namespace);
         string typeName = ns.Length == 0 ? md.GetString(type.Name) : $"{ns}.{md.GetString(type.Name)}";
@@ -154,29 +151,38 @@ sealed class FrameworkDataReader(PEReader pe, MetadataReader md)
 
         var members = new JsonArray();
         var literals = new SortedSet<string>(StringComparer.Ordinal);
+        var integers = new SortedSet<int>();
         foreach (var methodHandle in type.GetMethods())
         {
             var method = md.GetMethodDefinition(methodHandle);
             string name = md.GetString(method.Name);
             if (md.GetString(type.Name) == "SR")
             {
-                // Only the string literals of SR's methods: the resource base name is one of them.
-                foreach (var literal in StringLiterals(method))
-                    literals.Add(literal);
+                // Only the constants in SR's methods: the resource base name is one of its strings, and the integers
+                // (other than 0, 1 and -1) are lengths, such as how much of a long argument a message keeps.
+                foreach (var literal in Literals(method))
+                {
+                    if (literal is string text)
+                        literals.Add(text);
+                    else if (literal is int number and not (0 or 1 or -1))
+                        integers.Add(number);
+                }
                 continue;
             }
             if (name == ".cctor" || name == ".ctor")
                 continue;
-            members.Add(ReadMember(typeName, method, problems));
+            members.Add(ReadMember(typeName, method, notes));
         }
         if (literals.Count > 0)
             result["literals"] = new JsonArray(literals.Select(l => (JsonNode)JsonValue.Create(l)!).ToArray());
+        if (integers.Count > 0)
+            result["integers"] = new JsonArray(integers.Select(i => (JsonNode)JsonValue.Create(i)!).ToArray());
         if (members.Count > 0)
             result["members"] = members;
         return result;
     }
 
-    private JsonObject ReadMember(string typeName, MethodDefinition method, List<string> problems)
+    private JsonObject ReadMember(string typeName, MethodDefinition method, List<string> notes)
     {
         string name = md.GetString(method.Name);
         var signature = method.DecodeSignature(_names, null);
@@ -208,15 +214,17 @@ sealed class FrameworkDataReader(PEReader pe, MetadataReader md)
         var (value, problem) = Evaluate(method, parameterNames);
         if (problem != null)
         {
-            problems.Add($"{typeName}.{name}: {problem}");
-            member["problem"] = problem;
+            // Not generated code, such as SqlClient's Error.ExpressionNotSupportedForSqlServerVersion, which is
+            // referencesource's (SqlClient/Error.cs): the generator checks that referencesource has each of these.
+            notes.Add($"{typeName}.{name}: not read ({problem})");
+            member["notRead"] = problem;
         }
         else
             member["value"] = value;
         return member;
     }
 
-    private IEnumerable<string> StringLiterals(MethodDefinition method)
+    private IEnumerable<object> Literals(MethodDefinition method)
     {
         if (method.RelativeVirtualAddress == 0)
             yield break;
@@ -226,13 +234,17 @@ sealed class FrameworkDataReader(PEReader pe, MetadataReader md)
             var opCode = ReadOpCode(ref il);
             if (opCode == OpCodes.Ldstr)
                 yield return md.GetUserString(MetadataTokens.UserStringHandle(il.ReadInt32()));
+            else if (opCode == OpCodes.Ldc_I4)
+                yield return il.ReadInt32();
+            else if (opCode == OpCodes.Ldc_I4_S)
+                yield return (int)il.ReadSByte();
             else
                 SkipOperand(ref il, opCode);
         }
     }
 
     // What the method returns, from a simulation of its evaluation stack: arguments, string and integer constants,
-    // object arrays, calls and constructors. Anything else (branches, fields) is a problem to report.
+    // object arrays, calls and constructors. Anything else (branches, fields) is returned as the reason it isn't read.
     private (JsonNode? Value, string? Problem) Evaluate(MethodDefinition method, string[] parameterNames)
     {
         var body = pe.GetMethodBody(method.RelativeVirtualAddress);
