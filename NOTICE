@@ -128,6 +128,10 @@ Foundation and Contributors. It is in the external/maintenance-packages submodul
 (https://github.com/xforcore/maintenance-packages, branch webforcore), compiled by src/webForCore.System.Data.SqlClient;
 each file keeps its original header, and every change is a commit on that branch. The assembly carries Microsoft's
 name, version (4.6.1.6) and public key token (b03f5f7f11d50a3a); it is not signed by Microsoft.
+On Windows, System.Data.SqlClient uses the SQL Server Network Interface (sni.dll) from Microsoft's
+runtime.native.System.Data.SqlClient.sni 4.4.0 package, a NuGet dependency that isn't in this repository. It is licensed
+under the Microsoft .NET Library License (dotnet_library_license.txt in the package), not an open-source licence; it
+may be redistributed as part of a program under that licence's distribution terms.
 
 src/WebFormsForCore.Web.DataVisualization/Common/SR.resx comes from Data Visualization for .NET
 (https://github.com/dotnet/winforms-datavisualization, commit 022f396), licensed under the MIT License,

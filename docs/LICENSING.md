@@ -5,6 +5,8 @@ BSD 3-Clause. All three allow commercial use: you may use, modify and ship the c
 products, for free, as long as you keep the copyright and licence notices. The material WebFormsForCore (the project
 webForCore forked) had copied or decompiled from closed Microsoft products has been replaced or removed; see
 [What was replaced](#what-was-replaced).
+One dependency isn't open source: on Windows, SqlClient's `sni.dll` is under Microsoft's .NET Library License, which
+allows redistributing it ([below](#which-parts-have-which-licence)).
 
 This page summarises; [NOTICE](../NOTICE) is the authoritative list of components and copyright holders. It isn't
 legal advice: for a product decision, have counsel review NOTICE and this page.
@@ -28,6 +30,7 @@ legal advice: for a product decision, have counsel review NOTICE and this page.
 | Roslyn compilers (binaries) | `src/WebFormsForCore.Compilers` | MIT (© .NET Foundation) | ✅ Yes |
 | System.Drawing and System.Drawing.Common 6.0 with a GDI+ engine on SkiaSharp: [drawingForCore](https://github.com/xforcore/drawingForCore)'s packages | restored at build time | MIT (© .NET Foundation and drawingForCore's contributors) | ✅ Yes |
 | Dependencies from NuGet: EntityFramework 6, Newtonsoft.Json, CoreWCF, ... | restored at build time | MIT or Apache 2.0, each package's own | ✅ Yes |
+| SQL Server Network Interface (`sni.dll`, Windows only), from the `runtime.native.System.Data.SqlClient.sni` 4.4.0 package that `webForCore.Data.SqlClient` depends on, as Microsoft's System.Data.SqlClient package does | restored at build time; copied to the output on Windows | Microsoft .NET Library License: **not open source**, but it may be redistributed in the object code form as part of your programs, under its distribution terms (`dotnet_library_license.txt` in the package) | ✅ Yes, under those terms. On Linux SqlClient uses its managed network code and `sni.dll` isn't used |
 | Tests from Microsoft and Mono (submodules) | `test/webForCore.*` | Apache 2.0 or MIT | ✅ Yes (not shipped in packages) |
 
 ### What the permissive licences ask of you
