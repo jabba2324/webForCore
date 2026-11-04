@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Core = Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 using System.Linq;
@@ -117,6 +118,7 @@ namespace Microsoft.AspNetCore.Builder
 				app?.Shutdown?.Invoke();
 			});
 			app = StartApplication();
+			WarnOfInvariantCulture();
 			recycleTimer = new Timer(_ => CheckRecycling(), null, Recycling.CheckInterval, Recycling.CheckInterval);
 		}
 
@@ -134,6 +136,29 @@ namespace Microsoft.AspNetCore.Builder
 			logger.LogInformation("Started application {AppId} in process {ProcessId}{Worker}.", AppId, Environment.ProcessId,
 				WorkerProcess.IsWorker ? $" (worker {WorkerProcess.WorkerId} of webforcore-host)" : "");
 			return app;
+		}
+
+		// webForCore: a process without a locale (LANG and LC_ALL unset, or C, POSIX, C.UTF-8) has the invariant culture,
+		// which can't happen on IIS (#97). Only when <globalization> doesn't give requests a culture of their own ("auto"
+		// alone falls back to the process's): with one, only code outside requests runs invariant, as docs/MIGRATING.md says.
+		void WarnOfInvariantCulture()
+		{
+			static bool Sets(string culture) => !string.IsNullOrEmpty(culture) && !culture.Equals("auto", StringComparison.OrdinalIgnoreCase);
+			try
+			{
+				var globalization = System.Web.Configuration.RuntimeConfig.GetAppConfig().Globalization;
+				if (CultureInfo.CurrentCulture.Name.Length == 0 && !Sets(globalization.Culture) ||
+					CultureInfo.CurrentUICulture.Name.Length == 0 && !Sets(globalization.UICulture))
+					logger.LogWarning("Application {AppId} runs with the invariant culture: the process has no locale (LANG and LC_ALL " +
+						"unset, or C, POSIX or C.UTF-8), which can't happen on IIS, so resources chosen by culture name aren't found. " +
+						"Set <globalization culture=\"en-US\" uiCulture=\"en-US\" /> in Web.config, or give the environment a locale " +
+						"(LANG=en_US.UTF-8): https://github.com/xforcore/webForCore/blob/main/docs/MIGRATING.md#6-code-changes", AppId);
+			}
+			catch (Exception e)
+			{
+				// A Web.config error shows on the application's pages.
+				logger.LogDebug(e, "Application {AppId}: couldn't read <globalization>.", AppId);
+			}
 		}
 
 		// The application's hosting environment is shutting down (file change, UnloadAppDomain, recycling, idle).

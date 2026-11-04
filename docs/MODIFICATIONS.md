@@ -95,7 +95,8 @@ commit that made it, and its issue, say why.
   the Kestrel worker request (WebSockets, client certificates, server variables, timeouts, integrated-pipeline APIs).
   See [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md).
 - **Integrated-mode semantics** on the classic pipeline: writable `Response.Headers`, the Content-Type rule, the
-  server name from the Host header.
+  server name from the Host header, `X-AspNet-Version` and the default `Cache-Control: private` only once a managed
+  handler ran, the response was flushed or an error was reported.
 - **Configuration:** protected configuration on Linux (DPAPI emulation, RSA key containers as files), section type
   identity across load contexts, `machine.config` refreshed by content.
 - **Compilation:** the in-process compiler loads into the app's context, and so does `AssemblyBuilder` with every

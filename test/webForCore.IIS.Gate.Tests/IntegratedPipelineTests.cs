@@ -32,6 +32,26 @@ namespace IISGate
         }
 
         [Fact]
+        public async Task HandlerHeadersOnlyAroundAHandler()
+        {
+            // IIS's integrated pipeline adds X-AspNet-Version and Cache-Control: private around a managed handler, or when
+            // the response is flushed; a response a module ends before the handler (Katana's OwinHttpModule) has neither.
+            var ended = await _server.Client.GetAsync("/integrated/EndedByModule");
+            Assert.Equal("ended by module", await ended.Content.ReadAsStringAsync());
+            Assert.False(ended.Headers.Contains("X-AspNet-Version"));
+            Assert.Null(ended.Headers.CacheControl);
+
+            var flushed = await _server.Client.GetAsync("/integrated/EndedByModule?flush=1");
+            Assert.Equal("ended by module", await flushed.Content.ReadAsStringAsync());
+            Assert.Equal("4.0.30319", Assert.Single(flushed.Headers.GetValues("X-AspNet-Version")));
+            Assert.Equal("private", flushed.Headers.CacheControl?.ToString());
+
+            var page = await _server.Client.GetAsync("/integrated/Target.aspx");
+            Assert.Equal("4.0.30319", Assert.Single(page.Headers.GetValues("X-AspNet-Version")));
+            Assert.Equal("private", page.Headers.CacheControl?.ToString());
+        }
+
+        [Fact]
         public async Task TransferRequest()
         {
             var body = await _server.Client.GetStringAsync("/integrated/Transfer.aspx?from=origin");

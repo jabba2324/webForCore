@@ -457,7 +457,9 @@ Fix what the blocker search found (see [NAMESPACES.md](NAMESPACES.md) for replac
   <globalization culture="en-US" uiCulture="en-US" />
   ```
   or give the server's environment a locale (`LANG=en_US.UTF-8`). Code outside requests (background threads,
-  timers) gets only the process's culture, so set `LANG` too where that matters.
+  timers) gets only the process's culture, so set `LANG` too where that matters. The application logs a warning when
+  it starts with the invariant culture and `<globalization>` sets no `culture` or `uiCulture` (`auto` alone counts as
+  none: it falls back to the process's culture): `Application ... runs with the invariant culture`.
 - **Named semaphores and events are Windows-only on .NET** (#94). `new Semaphore(..., name)`,
   `new EventWaitHandle(..., name)` and their `OpenExisting` throw `PlatformNotSupportedException: The named version
   of this synchronization primitive is not supported on this platform.` on Linux; only a named `Mutex` works, and
