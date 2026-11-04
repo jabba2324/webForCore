@@ -119,8 +119,11 @@ commit that made it, and its issue, say why.
   the lookup found nothing on .NET 10, so .NET's SerializationGuard was never on, and isn't now
   (`SerializationGuardTest`). System.Web's C# and VB CodeDom providers (`CSharpCodeProviderBase`, `VBCodeProviderBase`)
   take the generator, the converters and member generation from System.CodeDom's public `CSharpCodeProvider` and
-  `VBCodeProvider` instead of creating its internal types by reflection (`CodeDomTests`). `tools/ci/check_code_rules.cs`
-  keeps new breaks out.
+  `VBCodeProvider` instead of creating its internal types by reflection (`CodeDomTests`). Off Windows the compilation
+  folder's name ends with the user's name from `Environment.UserName` (`Temporary_ASP.NET_Files-www-data`), with any
+  character other than an ASCII letter, a digit, `.`, `_` or `-` replaced by `_`, instead of the user's number from
+  libc's `geteuid()` by P/Invoke (`Temporary_ASP.NET_Files-33`); the public `HttpRuntime.UserId` that .NET Framework
+  never had is gone (`HttpRuntime.CodegenDirNameForCurrentUser`). `tools/ci/check_code_rules.cs` keeps new breaks out.
 - **`<system.net>`:** `<defaultProxy>` applied at application start, and `<mailSettings>` used by System.Web's mail
   senders (`WebFormsForCore.Net.Configuration.NetConfiguration`).
 - **Build targets** (`src/webForCore.WebStack.targets`, imported by every app through the `webForCore.Web` package):
