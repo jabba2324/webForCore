@@ -34,7 +34,7 @@ in the code; the rest come from the test suites and gates ([TESTING.md](TESTING.
 | `System.Runtime.Serialization.NetDataContractSerializer` in app code | Apps that use it directly (MVC Futures' `Html.Serialize` / `[Deserialize]` work: webForCore provides their serializer) | `DataContractSerializer` with a `DataContractResolver` |
 | BinaryFormatter in app code | .NET's `System.Runtime.Serialization.Formatters.Binary.BinaryFormatter` throws (since .NET 9) | `WebFormsForCore.Serialization.Formatters.Binary.BinaryFormatter` (System.Web uses it for session and view state) |
 | Windows-DPAPI-encrypted configuration | Sections encrypted on Windows with `DataProtectionConfigurationProvider` | Decrypt them on Windows; re-encrypt with `webforcore-regiis` or RSA (see [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md#deployment-tools)) |
-| Code Access Security, partial trust | Trust levels, CAS attributes | Ignored: everything runs in full trust |
+| Code Access Security, partial trust | Trust levels, CAS attributes | Ignored: everything runs in full trust. A partial `<trust level>` (Medium, ...) is accepted and runs in full trust; demands of `AspNetHostingPermission` succeed at every level (#87) |
 | Registry, WMI, COM interop, MSMQ, Office | Windows only | Replace |
 
 ## System.Web and its companions (ported)

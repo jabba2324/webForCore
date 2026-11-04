@@ -3328,7 +3328,15 @@ namespace System.Web
             // been set, which is not the case until later in this method.
             string trustLevel = trustSection.Level;
 
+#if NETCOREAPP
+            // webForCore (#87): .NET has no Code Access Security; every application runs in full trust and a partial
+            // trust level is ignored (ApplicationManager.CreateAppDomainWithHostingEnvironment). Its policy file isn't
+            // shipped, and reading it made every request a Configuration Error.
+            trustLevel = "Full";
+            if (trustLevel == "Full") {
+#else
             if (trustSection.Level == "Full") {
+#endif
                 _trustLevel = trustLevel;
                 return;
             }
@@ -3483,7 +3491,12 @@ namespace System.Web
 #pragma warning restore 618
 
         private void SetTrustParameters(TrustSection trustSection, SecurityPolicySection securityPolicySection, PolicyLevel policyLevel) {
+#if NETCOREAPP
+            // webForCore (#87): full trust whatever the level (SetTrustLevel); ApplicationManager passes no PolicyLevel.
+            _trustLevel = "Full";
+#else
             _trustLevel = trustSection.Level;
+#endif
             if (_trustLevel != "Full") {
                 // if we are in partial trust, HostingEnvironment should init HttpRuntime with a non-null PolicyLevel object
                 Debug.Assert(policyLevel != null);
