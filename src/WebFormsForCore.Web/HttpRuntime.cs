@@ -1953,7 +1953,16 @@ namespace System.Web
                                     response.ReportRuntimeError(eReport, false /*canThrow*/, false);
                                 }
 
-                                response.FinalFlushAtTheEndOfRequestProcessing();
+                                try {
+                                    response.FinalFlushAtTheEndOfRequestProcessing();
+                                }
+                                catch (Exception eFlush) when (!(eFlush is ThreadAbortException)) {
+                                    // webForCore: the flush reads <appSettings> (AppSettings.EnsureSessionStateLockedOnFlush), which throws
+                                    // the configuration's error the first time when the application didn't start, and the error page was
+                                    // lost: an empty 200 (#107). AppSettings has its defaults now: report that error and send it.
+                                    response.ReportRuntimeError(eFlush, false /*canThrow*/, false);
+                                    response.FinalFlushAtTheEndOfRequestProcessing();
+                                }
                             }
 							catch (ThreadAbortException ex)
 							{
