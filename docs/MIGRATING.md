@@ -12,7 +12,10 @@ For an AI agent doing the migration, the same procedure is written as instructio
 1. **Check the blockers.** Search the solution for the APIs in the summary table of [NAMESPACES.md](NAMESPACES.md):
    `WindowsIdentity`, `<authentication mode="Windows">`, `System.ServiceModel` hosting (`.svc`), `LinqDataSource`,
    `ObjectContext`/EDMX (EF 1–4), registry and COM use, `App_WebReferences`,
-   EMF/WMF metafiles. Each one needs a code change; plan these first.
+   EMF/WMF metafiles, Windows Identity Foundation (`System.IdentityModel`, `<system.identityModel>`,
+   `WSFederationAuthenticationModule`), Windows Workflow Foundation (`System.Workflow`, `System.Activities`) and WCF
+   Data Services hosting (`System.Data.Services`, `DataService<T>`). Each one needs a code change; plan these first.
+   A **Web Site Project** (no `.csproj`, pages with `CodeFile=`) converts differently: see section 2.
 2. **Inventory the dependencies.** List NuGet packages and referenced DLLs:
    - Microsoft's ASP.NET packages (`Microsoft.AspNet.Mvc`, `.WebApi.*`, `.WebPages`, `.Razor`, `.Cors`,
      `Microsoft.Owin.*`, `.SignalR.*`, `.Identity.*`, `Microsoft.AspNet.Web.Optimization`) are
@@ -24,6 +27,17 @@ For an AI agent doing the migration, the same procedure is written as instructio
      both namespaces gets `CS0104: 'SignInStatus' is an ambiguous reference` (OpenOrderFramework). Keep the
      application's type with an alias in that file:
      `using SignInStatus = OpenOrderFramework.Models.SignInStatus;`.
+     An **MVC 3 or 4** application needs two more changes, as Microsoft's own upgrade to MVC 5 did (#122, MVC Music
+     Store):
+     - `<add key="webpages:Version" value="1.0.0.0"/>` (MVC 4: `2.0.0.0`) makes every request a 500: `Conflicting
+       versions of ASP.NET Web Pages detected: specified version is "1.0.0.0", but the version in bin is "3.0.0.0"`.
+       Set it to `3.0.0.0`, or remove the key. The other old version numbers (`<compilation><assemblies>`,
+       `Views/Web.config`'s Razor section types) need no change: .NET binds them to the newer assemblies.
+     - The templates' `AccountModels.cs` has `using System.ComponentModel.DataAnnotations;` and
+       `using System.Web.Mvc;`, and .NET Framework 4.5 added a `CompareAttribute` to DataAnnotations: `CS0104: 'Compare'
+       is an ambiguous reference between 'System.ComponentModel.DataAnnotations.CompareAttribute' and
+       'System.Web.Mvc.CompareAttribute'`. Keep MVC's, which it compiled to on 4.0 (and which keeps the client
+       validation): `using CompareAttribute = System.Web.Mvc.CompareAttribute;`.
    - Pure managed libraries that target .NET Standard or .NET usually work as they are. Newtonsoft.Json, Autofac,
      EntityFramework 6.4+ and log4net are examples.
    - Libraries built only for .NET Framework that reference System.Web often load, because webForCore's assemblies
@@ -125,7 +139,11 @@ These differences from .NET Framework projects come up when converting:
   `System.Resources.Extensions` package.
 - **The C# version.** .NET Framework projects compiled with the C# of their time: 7.3 by default, or what "latest" meant
   then. On net10.0 the default is the newest, and C# 14's first-class span conversions resolve some calls differently
-  (`CS0029: Cannot implicitly convert type 'System.ReadOnlySpan<char>' to 'string'`, YAF.NET's ServiceStack.Text). Keep
+  (`CS0029: Cannot implicitly convert type 'System.ReadOnlySpan<char>' to 'string'`, YAF.NET's ServiceStack.Text). A
+  project that compiles can still fail at run time: in an expression tree, `ids.Contains(p.Id)` on an array binds to
+  `MemoryExtensions.Contains(ReadOnlySpan<T>, T)` instead of `Enumerable.Contains`, which EF 6 and other `IQueryable`
+  providers can't translate: ``NotSupportedException: LINQ to Entities does not recognize the method 'Boolean
+  Contains[Int32](System.ReadOnlySpan`1[System.Int32], Int32)' method`` (#138, nopCommerce 3.90's product pages). Keep
   the project's: `<LangVersion>7.3</LangVersion>` if it set none, or 13 for "latest". C# 11's ref-safety rules apply on
   .NET 7 and later whatever the version (`CS8347 ... may expose variables referenced by parameter 'index'`): mark such a
   `ref` parameter `scoped` (#43). An application that references CoreWCF itself (a CoreWCF service) gets CoreWCF's source
@@ -150,6 +168,18 @@ These differences from .NET Framework projects come up when converting:
     ambiguous: Umbraco 6's `SqlHelper<P>` has `ExecuteReader(string, params IParameter[])` and
     `ExecuteReader(string, params P[])`, and its subclasses' `ExecuteReader("select ...")` is `CS0121`. Pass the empty
     array of the overload that was meant: `ExecuteReader("select ...", new IParameter[0])`.
+- **Types .NET added that have the name of one of the application's** (#136). .NET Core 2.0 added a non-generic
+  static `System.Collections.Generic.KeyValuePair` (`KeyValuePair.Create`), so an application's own non-generic
+  `KeyValuePair` in a file with `using System.Collections.Generic;` gets `CS0104: 'KeyValuePair' is an ambiguous
+  reference between 'Composite.Core.Types.KeyValuePair' and 'System.Collections.Generic.KeyValuePair'` (C1 CMS). Alias
+  the application's type in that file: `using KeyValuePair = Composite.Core.Types.KeyValuePair;`. An alias has no type
+  parameters, so `KeyValuePair<TKey, TValue>` still binds to .NET's.
+- **Design-time classes don't compile** (#144). .NET has no System.Design, so an application's designer classes
+  (subclasses of `System.Web.UI.Design.ExpressionEditor`, `ControlDesigner`, `DataSourceDesigner`, and System.Design's
+  editors) fail: `CS0234: The type or namespace name 'Design' does not exist in the namespace 'System.Web.UI'` (DNN 9's
+  `LocalizationExpressionBuilderEditor`). Nothing uses them at run time: remove them from the build
+  (`<Compile Remove="...Editor.cs" />`). `[ExpressionEditor("...")]`, `[Designer("...")]` and `[Editor("...", ...)]`
+  that name them by string keep working; one that names them with `typeof` needs the string form.
 - **Project references are transitive.** A project now sees the packages and projects its references use.
   - Packages pinned at different versions in different projects fail with `NU1605: Detected package downgrade`.
     Use the highest version everywhere (#39, FunnelWeb's Iesi.Collections).
@@ -170,6 +200,79 @@ These differences from .NET Framework projects come up when converting:
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   ```
+- **Plug-in libraries built into a folder of their own** (#150). Apps whose plug-ins are class libraries the web
+  project doesn't reference, built to a folder the app loads them from (Orchard's `Modules/<id>/bin/`, nopCommerce's
+  and SmartStoreNET's plug-in folders), relied on .NET Framework projects copying their references there, packages
+  included. An SDK class library doesn't copy its packages' assemblies, so the plug-in fails when it's loaded:
+  `FileNotFoundException: Could not load file or assembly 'Microsoft.Data.Services.Client, Version=5.8.4.0'`. Keep the
+  old `OutputPath` (with `AppendTargetFrameworkToOutputPath` false), and copy only the plug-in's own packages
+  (`CopyLocalLockFileAssemblies` alone copies webForCore's and the framework's too, a couple of hundred assemblies):
+  ```xml
+  <PropertyGroup>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <PluginPackages>;Orchard.NuGet.Core;Microsoft.Data.Services.Client;Microsoft.Data.OData;Microsoft.Data.Edm;System.Spatial;</PluginPackages>
+  </PropertyGroup>
+  <Target Name="KeepOnlyPluginPackages" AfterTargets="ResolveLockFileCopyLocalFiles">
+    <ItemGroup>
+      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' != '' and !$(PluginPackages.Contains(';%(ReferenceCopyLocalPaths.NuGetPackageId);'))" />
+    </ItemGroup>
+  </Target>
+  ```
+  Put `Private="false"` on the plug-in's `ProjectReference`s to the host's own libraries, as the old project had, so
+  they aren't copied either.
+- **VB projects** (#121). A `.vbproj` converts the same way (`Microsoft.NET.Sdk.Web`, or `Microsoft.NET.Sdk` for a
+  library, with the same properties), with these differences:
+  - `<MyType>Windows</MyType>`, the default of Visual Studio's VB class library templates, fails in the `My` code the
+    compiler generates: `BC30002: Type 'Global.Microsoft.VisualBasic.ApplicationServices.ApplicationBase' is not
+    defined` (and `...ApplicationServices.User`, `...Devices.Computer`). On .NET those types are in Windows Desktop's
+    `Microsoft.VisualBasic.Forms`. Use `<MyType>Empty</MyType>`; code that used `My.Computer`, `My.User` or
+    `My.Application` needs a change (`My.Computer.FileSystem` → `System.IO`). (SignalR 2.4.3's sample's VB hub library.)
+  - Keep the project's `<Import Include="System.Web" />` namespace items: VB imports them for every file.
+  - Set `<GenerateAssemblyInfo>false</GenerateAssemblyInfo>` when `My Project/AssemblyInfo.vb` exists.
+  - A VB class library gets the `FrameworkReference` above, as a C# one does.
+
+### A Web Site Project (no `.csproj`)
+
+A Visual Studio Web Site Project has no project file (the solution lists the folder as a web site), its pages and
+controls use `CodeFile=`, its other code is in `App_Code`, and `Bin` holds `*.dll.refresh` files and the assemblies
+other projects copy there (#131, Rock RMS's `RockWeb`). webForCore compiles all of it at run time, as IIS did. Create
+the SDK project in the site's folder, compiling only `Program.cs`: the SDK's glob would compile the `CodeFile=` code
+too, which fails (`CS0103: The name 'lbl' does not exist in the current context`).
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <OutputPath>bin_dotnet</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <GenerateDependencyFile>true</GenerateDependencyFile>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+    <PredefinedCulturesOnly>true</PredefinedCulturesOnly>
+    <EnableDefaultRazorGenerateItems>false</EnableDefaultRazorGenerateItems>
+    <RazorCompileOnBuild>false</RazorCompileOnBuild>
+    <RazorCompileOnPublish>false</RazorCompileOnPublish>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="webForCore" Version="0.8.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- CodeFile= pages and controls, Global.asax and App_Code are compiled at run time, as on IIS. -->
+    <Compile Remove="**\*.cs" />
+    <Compile Include="Program.cs" />
+    <Content Remove="bin_dotnet\**" />
+    <None Remove="bin_dotnet\**" />
+  </ItemGroup>
+</Project>
+```
+
+- The references come from `Bin`: each `*.dll.refresh` names a package's DLL (a `PackageReference`), and the
+  assemblies the solution's other projects copy into `Bin` become `ProjectReference`s. Remove those projects' copy
+  targets (Rock's `CopyToRockWeb`): the assemblies must land in `bin_dotnet/`.
+- Remove the old `Bin` folder's DLLs; the site's `Bin` isn't `bin_dotnet`.
 
 ## 3. References
 
@@ -221,6 +324,21 @@ webForCore ships only Microsoft assemblies. Two libraries apps commonly have:
   [webForCore-thirdparty](https://github.com/xforcore/webForCore-thirdparty) builds it for .NET 10 (it isn't part of
   webForCore).
 
+**WebMatrix.Data and WebMatrix.WebData** (`Database.Open`, `db.Query`; `WebSecurity`, `SimpleMembershipProvider`,
+`SimpleRoleProvider`) aren't built by webForCore (#130). Microsoft's packages run as they are; their dependencies on
+Web Pages and Microsoft.Web.Infrastructure lose to webForCore's, as MVC packages' do:
+
+```xml
+<PackageReference Include="Microsoft.AspNet.WebPages.Data" Version="3.2.9" />
+<PackageReference Include="Microsoft.AspNet.WebPages.WebData" Version="3.2.9" />
+```
+
+Every WebMatrix template site (Starter Site, Bakery, Photo Gallery) and the MVC 4 Internet Application template
+(`InitializeSimpleMembership`) uses them. On WebMatrix sites they came from the GAC, so `bin` has nothing to keep: add
+the packages. `WebSecurity.InitializeDatabaseConnection(..., autoCreateTables: true)`, registering, logging in and out
+and changing the password work on SQL Server (the Starter Site), and WebData's pre-start method (SimpleMembership, forms
+authentication) runs.
+
 Keep other NuGet packages, preferring versions that target .NET Standard or .NET. The `test/webForCore.*.Sample`
 projects in this repository are working examples for Web Forms, MVC, Web API and Web Pages. A .NET Framework package
 built against MVC 5 runs as it is unless it uses an API .NET lacks: Microsoft's own MVC Futures 5.0.0 binary (built for
@@ -267,13 +385,23 @@ These came up migrating real applications; each names one that needed it.
   .NET build: use 6.4 or later (6.5.1 works with `System.Data.SqlClient`). EntityFramework 6.5.1 needs `System.ComponentModel.Annotations` 5.0.0,
   and .NET 10 treats only versions up to 4.3.0 as part of the framework, so a lower reference fails:
   `NU1605: Detected package downgrade: System.ComponentModel.Annotations from 5.0.0 to 4.4.1` (MVCForum). Raise it to
-  5.0.0 in every project that has it, or remove it where the project doesn't use it directly (#62).
+  5.0.0 in every project that has it, or remove it where the project doesn't use it directly (#62). The application's
+  own Roslyn packages (`Microsoft.CodeAnalysis.*`: Umbraco 8's ModelsBuilder, scripting, analyzers referenced as
+  packages) must be 5.9.0, `webForCore.Compilers`' version. Roslyn's packages pin each other exactly, so the error is
+  `NU1107: Version conflict detected for Microsoft.CodeAnalysis.Common`, not `NU1605` (#153, Umbraco 8.18.15's
+  `Microsoft.CodeAnalysis.CSharp` 2.10.0). Roslyn's API is compatible: raise the reference to 5.9.0.
 - **.NET Framework assemblies that are packages on .NET** (#9). The root web.config of .NET Framework referenced its
   framework assemblies for every page, so App_Code and pages used them freely. On .NET some are NuGet packages the
   application must reference, or code compiled at run time fails with `CS1069: The type name 'SyndicationItem' could not
   be found ... forwarded to assembly 'System.ServiceModel.Syndication'` (MiniBlog's feed handler). Among them:
   `System.ServiceModel.Syndication`, `System.Data.SqlClient`, `System.Data.OleDb`, `System.DirectoryServices`,
   `System.Runtime.Caching`, `System.ServiceModel.Http` and the other WCF client packages.
+  `System.Data.Services.Client` (WCF Data Services' client: `DataServiceContext`, `DataServiceQuery<T>`, the proxies
+  "Add Service Reference" generated for an OData v1-v3 feed) has no .NET version: `CS0234: The type or namespace name
+  'Services' does not exist in the namespace 'System.Data'`. Reference **`Microsoft.Data.Services.Client` 5.8.4**, its
+  NuGet successor with a .NET Standard build and the same `System.Data.Services.Client` namespace, so generated code
+  compiles unchanged (#149, Orchard 1.10's gallery proxy), and remove the `<compilation><assemblies>` entry for
+  `System.Data.Services.Client` (section 5). Microsoft.OData.Client 7.x is a different API.
 - **A library's own types named like System.Web.ApplicationServices' become ambiguous** (#29). On .NET Framework a
   library that references only `System.Web` doesn't see the membership types (`MembershipUser`, `MembershipCreateStatus`,
   `MembershipProvider`, `Roles`, ...), which `System.Web` forwards to `System.Web.ApplicationServices`. The `webForCore`
@@ -330,6 +458,25 @@ These came up migrating real applications; each names one that needed it.
       <appender-ref ref="rollingFile" />   <!-- was: AsynchronousLog4NetAppender (Log4Net.Async.ParallelForwardingAppender) -->
     </root>
     ```
+  - **Autofac.Configuration 3.x** (3.3.0, the last for Autofac 3) throws reading a configuration file (#148, Orchard
+    1.10): `MissingMethodException: Method not found: 'System.String System.AppDomainSetup.get_ConfigurationFile()'`
+    in `SectionHandler.NormalizeConfigurationFilePath`. 4.x is a rewrite on Microsoft.Extensions.Configuration and
+    needs Autofac 4. To keep Autofac 3, read the file yourself: `SectionHandler.Deserialize(XmlReader)` takes the
+    same XML, from a `ConfigurationModule` subclass that sets `SectionHandler`.
+  - **Castle.Core 3.x** (DynamicProxy; Autofac's interception) fails creating every proxy: `MissingMethodException:
+    Method not found: 'System.Reflection.Emit.AssemblyBuilder System.AppDomain.DefineDynamicAssembly(...)'` in
+    `Castle.DynamicProxy.ModuleScope.CreateModule`. Use 4.0 to 4.1.1, which have 3.x's API apart from
+    `Castle.Core.Internal`'s `ForEach` extension, now internal. 4.2 added `Trace` members to
+    `Castle.Core.Logging.ILogger`, which an application's own logger then has to implement.
+  - **NHibernate 4.x** (4.1.2.4000, the last) fails creating lazy-loading proxies, with the same
+    `DefineDynamicAssembly` exception (`HibernateException: Creating a proxy instance failed`, then
+    `LazyInitializationException: illegal access to loading collection`), and with `adonet.batch_size` above 0 on SQL
+    Server, `TypeInitializationException` in `NHibernate.AdoNet.SqlClientSqlCommandSet`. Use 5.1 or later, with
+    FluentNHibernate 2.1.2 and Iesi.Collections 4.0.4: it works on webForCore's System.Data.SqlClient, batching
+    included. What changed for Orchard: `IInterceptor.Instantiate(string entityName, object id)` (no `EntityMode`),
+    `DriverBase.InitializeParameter(DbParameter, ...)`, `new EntityKey(id, persister)`,
+    `IClassMetadata.GetPropertyValues(obj)`/`SetPropertyValues(obj, values)`, `ICache`'s new async members, and
+    NHibernate.Caches.SysCache2 5.x.
 
 ## 4. Program.cs
 
@@ -384,7 +531,8 @@ before the upgrade aren't found after it: users start new ones.
 - **Keep `web.config`**, including `<system.webServer>`: webForCore reads its modules, handlers, rewrite rules,
   request filtering, default documents, custom errors and static content settings. See
   [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md) for what's covered.
-- **Remove `<compilation><assemblies>` entries for assemblies .NET doesn't have**, such as System.Design
+- **Remove `<compilation><assemblies>` entries for assemblies .NET doesn't have**, such as System.Design,
+  System.Data.Services.Client or System.IdentityModel
   ([NAMESPACES.md](NAMESPACES.md)). Each one is a Configuration Error on every page ("Could not load
   file or assembly 'System.Design, Version=4.0.0.0'"), even when no page uses it (#37, Subtext and mojoPortal).
   System.Data.Linq's can stay from 0.9.0, at 3.5.0.0 or 4.0.0.0: the `webForCore` package brings it (#142).
@@ -441,11 +589,50 @@ Fix what the blocker search found (see [NAMESPACES.md](NAMESPACES.md) for replac
   `HttpRuntime.AppDomainAppPath`, `HostingEnvironment.ApplicationPhysicalPath` or `Server.MapPath("~/...")` instead
   ([NAMESPACES.md](NAMESPACES.md)). Search for `BaseDirectory` and `ApplicationBase`: eShopLegacyMVC's database seed read
   its SQL scripts that way.
+- **`AppDomain.CurrentDomain.DynamicDirectory` is null** on .NET (#139). On IIS it was the application's code
+  generation folder (`Temporary ASP.NET Files/<app>/<hash>`), where plug-in loaders (nopCommerce, SmartStoreNET, and
+  others descended from Umbraco's) copy plug-in DLLs before `Assembly.Load`ing them and adding them to `BuildManager`.
+  They fail at start: `ArgumentNullException: Value cannot be null. (Parameter 'path') at
+  System.IO.DirectoryInfo..ctor(String path)`. Use `HttpRuntime.CodegenDir`, the same folder, which webForCore's
+  assembly resolver probes: with it nopCommerce 3.90's plug-ins load as on IIS. Likewise `AppDomainSetup.PrivateBinPath`
+  doesn't exist on .NET (`CS1061`): use `HttpRuntime.BinDirectory`. Search for `DynamicDirectory` and `PrivateBinPath`.
+- **`Thread.ResetAbort()` throws** `PlatformNotSupportedException: Thread abort is not supported on this platform.`
+  (#143, DNN 9's URL rewriter and module host). Where it follows `catch (ThreadAbortException)` (after `Response.End`,
+  `Response.Redirect(url, true)` or `Server.Transfer`), remove it: webForCore's `ThreadAbortException` isn't
+  re-raised at the end of the `catch`, so the `catch` already ends it. Search for `ResetAbort`.
+- **The parameterless crypto factories throw** (#151, Kooboo CMS's password hashing): on .NET Framework they returned
+  machine.config's defaults; on .NET they throw `PlatformNotSupportedException: This platform does not allow the
+  automatic selection of an algorithm.` Replace each with the old default, not a stronger algorithm, or stored hashes
+  and encrypted values stop matching. The named overloads (`HashAlgorithm.Create("SHA256")`) still work.
+
+  | Call | .NET Framework 4.8 returned | Use |
+  | --- | --- | --- |
+  | `HashAlgorithm.Create()` | `SHA1CryptoServiceProvider` | `SHA1.Create()` |
+  | `KeyedHashAlgorithm.Create()`, `HMAC.Create()` | `HMACSHA1` | `new HMACSHA1()` |
+  | `SymmetricAlgorithm.Create()` | `RijndaelManaged` | `Aes.Create()` (the same cipher at `RijndaelManaged`'s defaults: 128-bit blocks, 256-bit key, CBC, PKCS7) |
+  | `AsymmetricAlgorithm.Create()` | `RSACryptoServiceProvider` | `RSA.Create(1024)` (its default key size) |
+- **Compiling C# at run time** (#133). .NET's System.CodeDom can't compile: `CodeDomProvider.CreateProvider("c#")`
+  returns .NET's `Microsoft.CSharp.CSharpCodeProvider`, whose `CompileAssemblyFromSource`, `...FromDom` and
+  `...FromFile` throw `PlatformNotSupportedException: Operation is not supported on this platform.`, and it reads no
+  `<system.codedom>` (C1 CMS's data types). Use webForCore's providers, which System.Web compiles pages with
+  (in-process Roslyn, C# and VB). `WebFormsForCore.CodeDom.Compiler.CodeDomProvider.CreateProvider("c#")` reads
+  `<system.codedom>` as .NET Framework's did, and `new WebFormsForCore.CodeDom.Compiler.CSharpCodeProvider()` (or
+  `VBCodeProvider`) creates one directly. They take System.CodeDom's `CompilerParameters` and return its
+  `CompilerResults`, so only the provider's type changes (in a file that names it,
+  `using CodeDomProvider = WebFormsForCore.CodeDom.Compiler.CodeDomProvider;`); they don't derive from
+  System.CodeDom's `CodeDomProvider`, so code that passes one to an API typed with it needs that API changed too. In
+  0.8.0 (#135), set `CompilerOptions` (`""` will do; `null` throws a `NullReferenceException`) and, with
+  `GenerateInMemory`, `IncludeDebugInformation = true` (without it the in-memory load throws an
+  `ArgumentNullException`).
 - **Newlines:** `Environment.NewLine` is `\n`.
 - **Fonts and drawing:** install the fonts the app uses, or fontconfig's metric-compatible substitutes for Windows
   fonts (Liberation, Carlito, Caladea).
 - **Culture data:** ICU's formats differ slightly from Windows NLS (for example some currency and date patterns).
-  Check pages that format numbers and dates.
+  Check pages that format numbers and dates. One changes ordinary pages (#124): ICU gives `en-US` and `en-GB` a
+  `NumberFormatInfo.NumberDecimalDigits` of 3 (Windows has 2; the invariant culture still has 2), so `F` and `N` with
+  no precision print three decimals: `String.Format("{0:F}", 8.99m)` is `8.990`, not `8.99` (MVC Music Store's
+  prices). Give a precision where the page relies on two (`{0:F2}`, `ToString("N2")`), or set `NumberDecimalDigits`
+  on the culture the application uses at start.
 - **Files without a BOM** (#90): `.aspx`, `.ascx`, `.master`, `.cshtml` and the other files ASP.NET compiles are read
   in the ANSI code page when they have no byte order mark and `<globalization fileEncoding>` isn't set, as on .NET
   Framework, whose `Encoding.Default` it was (.NET's is UTF-8). On Windows that is the system's code page; Linux has
@@ -546,6 +733,21 @@ The first request compiles pages, as on IIS. Then compare the responses recorded
 | `PlatformNotSupportedException` | A Windows-only API: see [NAMESPACES.md](NAMESPACES.md) |
 | `PlatformNotSupportedException: The named version of this synchronization primitive is not supported` | A named `Semaphore` or `EventWaitHandle`: see "Named semaphores and events" (step 6) |
 | `CS0121: The call is ambiguous` | The app's own `DistinctBy`/`MaxBy`/`Chunk`, or a `params` call with no arguments (step 2) |
+| `CS0104: 'KeyValuePair' is an ambiguous reference` (or another type .NET added) | Alias the app's own type in that file (step 2) |
+| `CS0104: 'Compare' is an ambiguous reference`; `Conflicting versions of ASP.NET Web Pages detected` | An MVC 3 or 4 app ("Before you start", step 2) |
+| `BC30002: Type 'Global.Microsoft.VisualBasic.ApplicationServices.ApplicationBase' is not defined` | `<MyType>Windows</MyType>` in a VB project: use `Empty` (step 2) |
+| `CS0103` in `CodeFile=` code-behind, in a project with no old `.csproj` | A Web Site Project: compile only `Program.cs` (step 2) |
+| `CS0234: ... 'Design' does not exist in the namespace 'System.Web.UI'` | The app's designer classes: remove them from the build (step 2) |
+| ``LINQ to Entities does not recognize the method 'Boolean Contains[Int32](System.ReadOnlySpan`1[System.Int32], Int32)'`` | C# 14's span conversions: set `<LangVersion>` (step 2) |
+| `NU1107: Version conflict detected for Microsoft.CodeAnalysis.Common` | The app's own Roslyn packages: use 5.9.0 (step 3) |
+| `CS0234: ... 'Services' does not exist in the namespace 'System.Data'` | WCF Data Services' client: `Microsoft.Data.Services.Client` 5.8.4 (step 3) |
+| `FileNotFoundException` for a plug-in's package when the plug-in loads | SDK libraries don't copy packages: "Plug-in libraries" (step 2) |
+| `MissingMethodException: Method not found: '... AppDomainSetup.get_ConfigurationFile()'` or `'... AppDomain.DefineDynamicAssembly(...)'` | Autofac.Configuration 3, Castle.Core 3 or NHibernate 4 (step 3, "Libraries that don't run on .NET") |
+| `ArgumentNullException ... (Parameter 'path')` at `DirectoryInfo..ctor` in a plug-in loader | `AppDomain.CurrentDomain.DynamicDirectory` is null: use `HttpRuntime.CodegenDir` (step 6) |
+| `PlatformNotSupportedException: Thread abort is not supported on this platform` | `Thread.ResetAbort()`: remove it (step 6) |
+| `PlatformNotSupportedException: This platform does not allow the automatic selection of an algorithm` | `HashAlgorithm.Create()` or another parameterless crypto factory (step 6) |
+| `PlatformNotSupportedException` from `CompileAssemblyFromSource`, `...FromDom` or `...FromFile` | System.CodeDom can't compile on .NET: use webForCore's provider (step 6) |
+| `Could not load file or assembly 'System.IdentityModel, Version=4.0.0.0'` | Windows Identity Foundation isn't on .NET ([NAMESPACES.md](NAMESPACES.md#summary-of-what-doesnt-work)) |
 | `Could not load file or assembly '<site>/bin/...'` | A hard-coded `~/bin`: the assemblies are in `bin_dotnet` (step 6) |
 | Language keys (`[login]`) instead of text, or dates as `MM/dd/yyyy` and `¤` currency, on a server or container only | No locale: the invariant culture; set `<globalization culture uiCulture>` or `LANG` (step 6) |
 | An empty log file with log4net | Log4Net.Async's appenders (step 3, "Libraries that don't run on .NET"); turn on `log4net.Internal.Debug` to see why |
