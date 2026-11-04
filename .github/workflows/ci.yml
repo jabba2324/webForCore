@@ -224,7 +224,7 @@ jobs:
         run: dotnet build test/webForCore.WebApi.Sample.Iis/webForCore.WebApi.Sample.Iis.csproj -c Release -nodeReuse:false "-p:IisSiteDirectory=$RUNNER_TEMP/site/"
 
       - name: IIS 10, classic pipeline
-        shell: pwsh
+        shell: powershell
         run: tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\site" -Port 8090
 
       - name: Send the gate's requests to IIS

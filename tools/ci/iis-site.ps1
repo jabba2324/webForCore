@@ -2,6 +2,8 @@
 # application pool in the classic pipeline, .NET CLR v4.0: webForCore's reference (docs/IIS-COMPATIBILITY.md). CI's
 # iis-compare job (#78) serves test/webForCore.WebApi.Sample.Iis's site with it.
 # Usage: tools/ci/iis-site.ps1 -Path <site folder> [-Port 8090]
+# Windows PowerShell (powershell, not pwsh): PowerShell 7 loads WebAdministration through a remoting session, without
+# its IIS: drive.
 param(
     [Parameter(Mandatory = $true)] [string] $Path,
     [int] $Port = 8090
