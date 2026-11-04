@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- webForCore (#156): writes the .NET Framework 4.8 BinaryFormatter streams that Serialization.Tests reads and
+       compares the port's output with (test/webForCore.Serialization.Tests/FrameworkStreams/*.bin), from the graphs in
+       FrameworkStreamCases.cs, with Microsoft's BinaryFormatter on .NET Framework. Run on Windows by CI's
+       serialization-framework-streams job (see Program.cs). Not in WebFormsForCore.slnx: it needs .NET Framework to run.
+       It builds on Linux too (reference assemblies). -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <NuGetAudit>false</NuGetAudit>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\..\test\webForCore.Serialization.Tests\FrameworkStreams\FrameworkStreamCases.cs" Link="FrameworkStreamCases.cs" />
+    <Reference Include="System.Web" />
+  </ItemGroup>
+</Project>
