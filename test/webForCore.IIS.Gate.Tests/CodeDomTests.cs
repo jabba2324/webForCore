@@ -35,5 +35,29 @@ namespace IISGate
             Assert.Contains("vb generator: Microsoft.VisualBasic.VBCodeGenerator, valid identifier: True\n", body);
             Assert.Contains("vb compiler: True\n", body);
         }
+
+        // CodeDom reads its CompilerErrors from the compiler's text output: csc's and vbc's format, written by the
+        // in-process compiler (Roslyn's public API, #57). A missing reference is left to csc, in a process. The
+        // expected lines are what the in-process csc and vbc gave before #57.
+        [Fact]
+        public async Task CompilerErrorsComeFromTheCompilersOutput()
+        {
+            var response = await _server.Client.GetAsync("/CompilerErrors.aspx");
+            string body = await response.Content.ReadAsStringAsync();
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            Assert.Matches(
+                "^cs: exit 1, assembly False\n" +
+                @"cs: error CS0103 Page\.aspx\(7,5\): The name 'Missing' does not exist in the current context\n" +
+                @"cs: warning CS0168 \w+\.0\.cs\(3,9\): The variable 'unused' is declared but never used\n" +
+                "cs ok: exit 0, assembly True\n" +
+                @"cs ok: warning CS0168 \w+\.0\.cs\(3,9\): The variable 'unused' is declared but never used\n" +
+                "cs missing reference: exit 1, assembly False\n" +
+                @"cs missing reference: error CS0006 \(0,0\): Metadata file '/nonexistent/Missing\.dll' could not be found\n" +
+                "vb: exit 1, assembly False\n" +
+                @"vb: error BC30451 Page\.aspx\(7,0\): 'Missing' is not declared\. It may be inaccessible due to its protection level\.\n" +
+                @"vb: warning BC42024 \w+\.0\.vb\(3,0\): Unused local variable: 'unused'\.\n$",
+                body);
+        }
     }
 }

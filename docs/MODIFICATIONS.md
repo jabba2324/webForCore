@@ -98,8 +98,9 @@ commit that made it, and its issue, say why.
   server name from the Host header.
 - **Configuration:** protected configuration on Linux (DPAPI emulation, RSA key containers as files), section type
   identity across load contexts, `machine.config` refreshed by content.
-- **Compilation:** the in-process compiler loads into the app's context, and so does `AssemblyBuilder` with every
-  compiled assembly (never CodeDom's `Assembly.LoadFile`, which loaded App_Code a second time, #56); precompilation for .NET
+- **Compilation:** csc and vbc run in process, through Roslyn's public API (below), and `AssemblyBuilder` loads every
+  compiled assembly into the app's context (never CodeDom's `Assembly.LoadFile`, which loaded App_Code a second time,
+  #56); precompilation for .NET
   (`System.Private.CoreLib` as the core library); typed DataSets in App_Code (the Reference Source's
   `System.Data.TypedDataSetGenerator` and webForCore's TableAdapter generator); `BuildManager.ResolveAssembly` looks the
   fixed names (`App_GlobalResources`, `App_Code`, `__code`) up by simple name too, because .NET passes the display name,
@@ -118,8 +119,17 @@ commit that made it, and its issue, say why.
   the lookup found nothing on .NET 10, so .NET's SerializationGuard was never on, and isn't now
   (`SerializationGuardTest`). System.Web's C# and VB CodeDom providers (`CSharpCodeProviderBase`, `VBCodeProviderBase`)
   take the generator, the converters and member generation from System.CodeDom's public `CSharpCodeProvider` and
-  `VBCodeProvider` instead of creating its internal types by reflection (`CodeDomTests`). `tools/ci/check_code_rules.cs`
-  keeps new breaks out.
+  `VBCodeProvider` instead of creating its internal types by reflection (`CodeDomTests`). The `dotnet csc.dll` and
+  `dotnet vbc.dll` command lines CodeDom gives are compiled in process through Roslyn's public API
+  (`WebFormsForCore.Compilers/Compiler.cs`): Roslyn's command-line parser, `CSharpCompilation`/`VisualBasicCompilation`,
+  `Emit`, and the diagnostics in csc's and vbc's text (vbc's with the source line underlined), which CodeDom parses
+  into `CompilerError`s. It used to call Roslyn's internal `Csc.Run`/`Vbc.Run`, with its internal `BuildPaths` and
+  `AnalyzerAssemblyLoader`, by private reflection. The output, the assembly and the PDB are byte for byte what csc and
+  vbc write (the order of the warnings from methods compiled in parallel varies from run to run, in csc too). A
+  command line that needs something it doesn't do (analyzers, `/doc`, `/errorlog` and the like), or that
+  csc reports an error on before compiling (a source file or a reference that isn't there), runs in a csc
+  or vbc process, given the application's `runtimeconfig.json`: an application's bin has csc.dll and vbc.dll without
+  theirs. The logo line is in English whatever the UI culture. `tools/ci/check_code_rules.cs` keeps new breaks out.
 - **`<system.net>`:** `<defaultProxy>` applied at application start, and `<mailSettings>` used by System.Web's mail
   senders (`WebFormsForCore.Net.Configuration.NetConfiguration`).
 - **Build targets** (`src/webForCore.WebStack.targets`, imported by every app through the `webForCore.Web` package):
