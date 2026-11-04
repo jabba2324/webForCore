@@ -353,5 +353,24 @@ namespace IISGate
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Contains("vb page: Int32 42\n", body);
         }
+
+        // #154: ApplicationSettingsBase (Visual Studio's Settings.settings classes, and the Url of every "Add Web
+        // Reference" SOAP client) reads application-scoped settings from <applicationSettings> in web.config, and its
+        // [DefaultSettingValue] for one that isn't there. Umbraco 7.15's CheckForUpgrade web reference threw
+        // "TypeLoadException: Could not resolve type 'System.Configuration.Internal.ConfigurationManagerInternal' in
+        // assembly 'System.Configuration, Version=4.0.0.0'". ASP.NET's configuration system doesn't support user-scoped
+        // settings, so a class with one throws ConfigurationErrorsException for every setting, as on IIS.
+        [Fact]
+        public async Task SettingsClassesReadApplicationSettingsFromWebConfig()
+        {
+            var (response, body) = await Get("/regressions/ApplicationSettings.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("ServiceUrl: http://our.umbraco.org/umbraco/webservices/api/repository.asmx\n", body);
+            Assert.Contains("Retries: 3\n", body);
+            Assert.Contains("NotInConfig: from the attribute\n", body);
+            const string unsupported = "System.Configuration.ConfigurationErrorsException: The current configuration system does not support user-scoped settings.";
+            Assert.Contains("user AppValue: " + unsupported + "\n", body);
+            Assert.Contains("user UserValue: " + unsupported + "\n", body);
+        }
     }
 }
