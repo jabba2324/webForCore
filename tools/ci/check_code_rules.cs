@@ -43,7 +43,6 @@ string[] microsoftFiles =
 // Known exceptions: (file, rule, issue). Each is listed in #57, or explained here.
 (string File, string Rule, string Why)[] known =
 [
-    ("src/WebFormsForCore.Compilers/Compiler.cs", "non-public reflection", "#57"),
     ("src/WebFormsForCore.Serialization.Formatters/Serialization/Formatters/Binary/FrameworkSurrogates.cs", "non-public reflection", "#57"),
     // Microsoft's own CreateNonPublicInstance, unchanged from the reference source.
     ("src/WebFormsForCore.Web/HttpRuntime.cs", "non-public reflection", "reference source"),

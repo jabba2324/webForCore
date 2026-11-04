@@ -66,6 +66,12 @@ namespace System.CodeDom.Compiler
 					return exitCode;
 				}
 				else {
+					// webForCore: a csc.dll or vbc.dll command line the in-process compiler leaves to csc or vbc (#57).
+					if (file.Equals("dotnet", StringComparison.OrdinalIgnoreCase))
+					{
+						args = WebFormsForCore.Compilers.Compiler.OutOfProcessArguments(args);
+					}
+
 					var psi = new ProcessStartInfo(cmd, args)
 						{
 							WorkingDirectory = currentDir,
