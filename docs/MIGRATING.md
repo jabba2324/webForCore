@@ -128,7 +128,10 @@ These differences from .NET Framework projects come up when converting:
   (`CS0029: Cannot implicitly convert type 'System.ReadOnlySpan<char>' to 'string'`, YAF.NET's ServiceStack.Text). Keep
   the project's: `<LangVersion>7.3</LangVersion>` if it set none, or 13 for "latest". C# 11's ref-safety rules apply on
   .NET 7 and later whatever the version (`CS8347 ... may expose variables referenced by parameter 'index'`): mark such a
-  `ref` parameter `scoped` (#43).
+  `ref` parameter `scoped` (#43). An application that references CoreWCF itself (a CoreWCF service) gets CoreWCF's source
+  generator, which needs C# 11 for every `[ServiceContract]` (`CS8370: Feature 'file types' is not available`): set
+  `<EnableCoreWCFOperationInvokerGenerator>false</EnableCoreWCFOperationInvokerGenerator>` with an older `LangVersion`.
+  webForCore's own CoreWCF dependency doesn't bring it (#134, C1 CMS).
 - **Calls that become ambiguous** (`CS0121: The call is ambiguous between ...`, #93). `<LangVersion>` doesn't help
   with either of these; qualify the call:
   - *The application's own LINQ-style extension methods.* .NET 6 added `DistinctBy`, `MinBy`, `MaxBy`, `Chunk`,

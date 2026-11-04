@@ -42,8 +42,13 @@
         <ProjectReference Include="..\WebFormsForCore.Web.Services\WebFormsForCore.Web.Services.csproj" />
         <ProjectReference Include="..\WebFormsForCore.Web\WebFormsForCore.Web.csproj" Version="11.0.0.0" SpecificVersion="true" />
         <ProjectReference Include="..\WebFormsForCore.Web.ApplicationServices\WebFormsForCore.Web.ApplicationServices.csproj" />
-        <PackageReference Include="CoreWCF.Http" Version="1.9.1" />
-        <PackageReference Include="CoreWCF.Primitives" Version="1.9.1" />
+        <!-- webForCore: CoreWCF's build assets stay out of applications (#134). CoreWCF.Primitives' buildTransitive targets turn
+             its source generator on for net7.0 and later, and it wrote C# 11 code ('file' types, a module initializer) for
+             every [ServiceContract] in an application: with LangVersion 7.3, CS8370 (C1 CMS's log service). The default
+             exclusions (Build, Analyzers) left buildTransitive, which brought the generator with it. An application that
+             references CoreWCF itself gets CoreWCF's assets, as CoreWCF intends. -->
+        <PackageReference Include="CoreWCF.Http" Version="1.9.1" PrivateAssets="analyzers;build;buildTransitive;contentFiles" />
+        <PackageReference Include="CoreWCF.Primitives" Version="1.9.1" PrivateAssets="analyzers;build;buildTransitive;contentFiles" />
     </ItemGroup>
 
     <ItemGroup Condition="$(TargetFramework) == 'net10.0'">

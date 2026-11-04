@@ -60,7 +60,9 @@ run on webForCore), and redirect a Google challenge. It also has Entity Framewor
 webForCore's System.Data.SqlClient, Entity Framework bound to it, and `Assembly.GetTypes()` working on every loaded
 assembly (#41). Web API OData's `ODataConventionModelBuilder.GetEdmModel()` must map LINQ to SQL's `Binary`, with the
 System.Data.Linq the `webForCore` package brings, and the Web Forms app's Web.config lists System.Data.Linq 3.5.0.0 in
-`<compilation><assemblies>`, which `Linq.aspx` compiles against (#142).
+`<compilation><assemblies>`, which `Linq.aspx` compiles against (#142). The Web Forms app is built with
+`<LangVersion>7.3</LangVersion>`, as MIGRATING.md says for a project that set none, and has a WCF `[ServiceContract]`,
+which CoreWCF's source generator turned into C# 11 code (#134).
 
 CI's `linq-framework-data` job (#142) reads .NET Framework 4.8's `System.Data.Linq.dll` on a Windows runner with
 `tools/linq/framework_data.cs` and fails if the names, messages and exception types differ from the committed
