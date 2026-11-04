@@ -5,6 +5,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>System.Net.Http.Formatting</AssemblyName>
+    <!-- webForCore: Microsoft.AspNet.WebApi.Client 6.0.0's version, which Microsoft's build stamped in place of the source's development version (6.0.1.0) (#141). -->
+    <MicrosoftAssemblyVersion>6.0.0.0</MicrosoftAssemblyVersion>
     <RootNamespace>System.Net.Http</RootNamespace>
     <PackageId>webForCore.Net.Http.Formatting</PackageId>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>

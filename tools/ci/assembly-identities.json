@@ -1,0 +1,70 @@
+// The Microsoft assembly each assembly in webForCore's packages replaces, for tools/ci/check_assembly_identities.cs
+// (#141): the NuGet package and version Microsoft shipped it in, and its path there. .NET Framework's own assemblies
+// are read from Microsoft's reference assemblies for .NET Framework 4.8, which have their identities. The latest
+// version of each Microsoft package is the one webForCore replaces (docs/NAMESPACES.md).
+//   "higherVersion": the version must be higher than Microsoft's, for the reason given (the name is also in .NET).
+//   "own": webForCore's own assembly, with no Microsoft counterpart; "dependency": a NuGet dependency shipped as it is.
+{
+  "System.Web": { "package": "Microsoft.NETFramework.ReferenceAssemblies.net48", "version": "1.0.3", "path": "build/.NETFramework/v4.8/System.Web.dll",
+    "higherVersion": "the shared framework has a System.Web.dll facade, 4.0.0.0, and the host loads whichever copy has the higher version (docs/IIS-COMPATIBILITY.md)" },
+  "System.Configuration.ConfigurationManager": { "package": "System.Configuration.ConfigurationManager", "version": "10.0.14", "path": "lib/net10.0/System.Configuration.ConfigurationManager.dll",
+    "higherVersion": ".NET Framework's System.Configuration under the name of .NET's package, which other packages bring in every version: webForCore's must win the SDK's conflict resolution over each of them" },
+  "System.Web.Abstractions": { "package": "Microsoft.NETFramework.ReferenceAssemblies.net48", "version": "1.0.3", "path": "build/.NETFramework/v4.8/System.Web.Abstractions.dll" },
+  "System.Web.ApplicationServices": { "package": "Microsoft.NETFramework.ReferenceAssemblies.net48", "version": "1.0.3", "path": "build/.NETFramework/v4.8/System.Web.ApplicationServices.dll" },
+  "System.Web.DataVisualization": { "package": "Microsoft.NETFramework.ReferenceAssemblies.net48", "version": "1.0.3", "path": "build/.NETFramework/v4.8/System.Web.DataVisualization.dll" },
+  "System.Web.DynamicData": { "package": "Microsoft.NETFramework.ReferenceAssemblies.net48", "version": "1.0.3", "path": "build/.NETFramework/v4.8/System.Web.DynamicData.dll" },
+  "System.Web.Extensions": { "package": "Microsoft.NETFramework.ReferenceAssemblies.net48", "version": "1.0.3", "path": "build/.NETFramework/v4.8/System.Web.Extensions.dll" },
+  "System.Web.Mobile": { "package": "Microsoft.NETFramework.ReferenceAssemblies.net48", "version": "1.0.3", "path": "build/.NETFramework/v4.8/System.Web.Mobile.dll" },
+  "System.Web.RegularExpressions": { "package": "Microsoft.NETFramework.ReferenceAssemblies.net48", "version": "1.0.3", "path": "build/.NETFramework/v4.8/System.Web.RegularExpressions.dll" },
+  "System.Web.Routing": { "package": "Microsoft.NETFramework.ReferenceAssemblies.net48", "version": "1.0.3", "path": "build/.NETFramework/v4.8/System.Web.Routing.dll" },
+  "System.Web.Services": { "package": "Microsoft.NETFramework.ReferenceAssemblies.net48", "version": "1.0.3", "path": "build/.NETFramework/v4.8/System.Web.Services.dll" },
+  "System.Data.Linq": { "package": "Microsoft.NETFramework.ReferenceAssemblies.net48", "version": "1.0.3", "path": "build/.NETFramework/v4.8/System.Data.Linq.dll" },
+  "System.Net.Http.WebRequest": { "package": "Microsoft.NETFramework.ReferenceAssemblies.net48", "version": "1.0.3", "path": "build/.NETFramework/v4.8/System.Net.Http.WebRequest.dll" },
+  "System.Data.SqlClient": { "package": "System.Data.SqlClient", "version": "4.9.1", "path": "runtimes/unix/lib/net8.0/System.Data.SqlClient.dll" },
+
+  "System.Web.Optimization": { "package": "Microsoft.AspNet.Web.Optimization", "version": "1.1.3", "path": "lib/net40/System.Web.Optimization.dll" },
+  "Microsoft.AspNet.Web.Optimization.WebForms": { "package": "Microsoft.AspNet.Web.Optimization.WebForms", "version": "1.1.3", "path": "lib/net45/Microsoft.AspNet.Web.Optimization.WebForms.dll" },
+  "WebGrease": { "package": "WebGrease", "version": "1.6.0", "path": "lib/WebGrease.dll" },
+  "Microsoft.Web.Infrastructure": { "package": "Microsoft.Web.Infrastructure", "version": "2.0.0", "path": "lib/net40/Microsoft.Web.Infrastructure.dll" },
+
+  "System.Web.Mvc": { "package": "Microsoft.AspNet.Mvc", "version": "5.3.0", "path": "lib/net45/System.Web.Mvc.dll" },
+  "Microsoft.Web.Mvc": { "package": "Microsoft.AspNet.Mvc.Futures", "version": "5.0.0", "path": "lib/net40/Microsoft.Web.Mvc.dll" },
+  "System.Web.Razor": { "package": "Microsoft.AspNet.Razor", "version": "3.3.0", "path": "lib/net45/System.Web.Razor.dll" },
+  "System.Web.WebPages": { "package": "Microsoft.AspNet.WebPages", "version": "3.3.0", "path": "lib/net45/System.Web.WebPages.dll" },
+  "System.Web.WebPages.Deployment": { "package": "Microsoft.AspNet.WebPages", "version": "3.3.0", "path": "lib/net45/System.Web.WebPages.Deployment.dll" },
+  "System.Web.WebPages.Razor": { "package": "Microsoft.AspNet.WebPages", "version": "3.3.0", "path": "lib/net45/System.Web.WebPages.Razor.dll" },
+  "System.Web.Helpers": { "package": "Microsoft.AspNet.WebPages", "version": "3.3.0", "path": "lib/net45/System.Web.Helpers.dll" },
+  "System.Web.Http": { "package": "Microsoft.AspNet.WebApi.Core", "version": "5.3.0", "path": "lib/net45/System.Web.Http.dll" },
+  "System.Web.Http.WebHost": { "package": "Microsoft.AspNet.WebApi.WebHost", "version": "5.3.0", "path": "lib/net45/System.Web.Http.WebHost.dll" },
+  "System.Web.Http.Owin": { "package": "Microsoft.AspNet.WebApi.Owin", "version": "5.3.0", "path": "lib/net45/System.Web.Http.Owin.dll" },
+  "System.Web.Http.Cors": { "package": "Microsoft.AspNet.WebApi.Cors", "version": "5.3.0", "path": "lib/net45/System.Web.Http.Cors.dll" },
+  "System.Web.Cors": { "package": "Microsoft.AspNet.Cors", "version": "5.3.0", "path": "lib/net45/System.Web.Cors.dll" },
+  "System.Net.Http.Formatting": { "package": "Microsoft.AspNet.WebApi.Client", "version": "6.0.0", "path": "lib/netstandard2.0/System.Net.Http.Formatting.dll" },
+
+  "Microsoft.Owin": { "package": "Microsoft.Owin", "version": "4.2.3", "path": "lib/net45/Microsoft.Owin.dll" },
+  "Microsoft.Owin.Cors": { "package": "Microsoft.Owin.Cors", "version": "4.2.3", "path": "lib/net45/Microsoft.Owin.Cors.dll" },
+  "Microsoft.Owin.Host.HttpListener": { "package": "Microsoft.Owin.Host.HttpListener", "version": "4.2.3", "path": "lib/net45/Microsoft.Owin.Host.HttpListener.dll" },
+  "Microsoft.Owin.Hosting": { "package": "Microsoft.Owin.Hosting", "version": "4.2.3", "path": "lib/net45/Microsoft.Owin.Hosting.dll" },
+  "Microsoft.Owin.Host.SystemWeb": { "package": "Microsoft.Owin.Host.SystemWeb", "version": "4.2.3", "path": "lib/net45/Microsoft.Owin.Host.SystemWeb.dll" },
+  "Microsoft.Owin.Security": { "package": "Microsoft.Owin.Security", "version": "4.2.3", "path": "lib/net45/Microsoft.Owin.Security.dll" },
+  "Microsoft.Owin.Security.Cookies": { "package": "Microsoft.Owin.Security.Cookies", "version": "4.2.3", "path": "lib/net45/Microsoft.Owin.Security.Cookies.dll" },
+  "Microsoft.Owin.Security.OAuth": { "package": "Microsoft.Owin.Security.OAuth", "version": "4.2.3", "path": "lib/net45/Microsoft.Owin.Security.OAuth.dll" },
+  "Microsoft.Owin.Testing": { "package": "Microsoft.Owin.Testing", "version": "4.2.3", "path": "lib/net45/Microsoft.Owin.Testing.dll" },
+  "Microsoft.AspNet.SignalR.Core": { "package": "Microsoft.AspNet.SignalR.Core", "version": "2.4.3", "path": "lib/net45/Microsoft.AspNet.SignalR.Core.dll" },
+  "Microsoft.AspNet.SignalR.SystemWeb": { "package": "Microsoft.AspNet.SignalR.SystemWeb", "version": "2.4.3", "path": "lib/net45/Microsoft.AspNet.SignalR.SystemWeb.dll" },
+  "Microsoft.AspNet.SignalR.Client": { "package": "Microsoft.AspNet.SignalR.Client", "version": "2.4.3", "path": "lib/netstandard2.0/Microsoft.AspNet.SignalR.Client.dll" },
+  "Microsoft.AspNet.Identity.Core": { "package": "Microsoft.AspNet.Identity.Core", "version": "2.2.4", "path": "lib/net45/Microsoft.AspNet.Identity.Core.dll" },
+  "Microsoft.AspNet.Identity.EntityFramework": { "package": "Microsoft.AspNet.Identity.EntityFramework", "version": "2.2.4", "path": "lib/net45/Microsoft.AspNet.Identity.EntityFramework.dll" },
+  "Microsoft.AspNet.Identity.Owin": { "package": "Microsoft.AspNet.Identity.Owin", "version": "2.2.4", "path": "lib/net45/Microsoft.AspNet.Identity.Owin.dll" },
+
+  "WebFormsForCore.Serialization.Formatters": { "own": "the BinaryFormatter port System.Web uses (docs/NAMESPACES.md)" },
+  "WebFormsForCore.Compilers": { "own": "Roslyn's csc and vbc for run-time compilation" },
+  "aspnetcore_compiler": { "own": "aspnet_compiler for .NET" },
+  "webforcore-host": { "own": "the host that runs applications in worker processes" },
+  "csc": { "dependency": "Microsoft.Net.Compilers.Toolset, in webForCore.Compilers" },
+  "vbc": { "dependency": "Microsoft.Net.Compilers.Toolset, in webForCore.Compilers" },
+  "VBCSCompiler": { "dependency": "Microsoft.Net.Compilers.Toolset, in webForCore.Compilers" },
+  "Microsoft.CodeAnalysis": { "dependency": "Microsoft.Net.Compilers.Toolset's satellite assemblies, in webForCore.Compilers" },
+  "Microsoft.CodeAnalysis.CSharp": { "dependency": "Microsoft.Net.Compilers.Toolset's satellite assemblies, in webForCore.Compilers" },
+  "Microsoft.CodeAnalysis.VisualBasic": { "dependency": "Microsoft.Net.Compilers.Toolset's satellite assemblies, in webForCore.Compilers" }
+}

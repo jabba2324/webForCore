@@ -62,7 +62,12 @@ assembly (#41). Web API OData's `ODataConventionModelBuilder.GetEdmModel()` must
 System.Data.Linq the `webForCore` package brings, and the Web Forms app's Web.config lists System.Data.Linq 3.5.0.0 in
 `<compilation><assemblies>`, which `Linq.aspx` compiles against (#142). The Web Forms app is built with
 `<LangVersion>7.3</LangVersion>`, as MIGRATING.md says for a project that set none, and has a WCF `[ServiceContract]`,
-which CoreWCF's source generator turned into C# 11 code (#134).
+which CoreWCF's source generator turned into C# 11 code (#134). The MVC app has BundleTransformer.Core 1.10, built
+against Microsoft's System.Web.Optimization 1.1.0.0, and `/Bundling` must report Microsoft's identities for
+System.Web.Optimization and WebGrease (#141). Before the smoke test, `tools/ci/check_assembly_identities.cs` checks
+every assembly in the packages against the Microsoft assembly it replaces, read from Microsoft's NuGet package (name,
+version, culture and public key token; `tools/ci/assembly-identities.json` says where each one is, and why System.Web
+and System.Configuration.ConfigurationManager have higher versions), and fails on any difference (#141).
 
 CI's `linq-framework-data` job (#142) reads .NET Framework 4.8's `System.Data.Linq.dll` on a Windows runner with
 `tools/linq/framework_data.cs` and fails if the names, messages and exception types differ from the committed

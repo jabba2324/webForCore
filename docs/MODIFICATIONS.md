@@ -37,7 +37,13 @@ that code and what had to change.
    with Microsoft's public key (`src/SigningKey/35MSSharedLib1024.snk`), so existing references and binding
    information resolve to them. They aren't signed by Microsoft. System.Data.SqlClient carries Microsoft's other public
    key (`b03f5f7f11d50a3a`), as System.Web does, and System.Data.Linq the ECMA key (`b77a5c561934e089`), as on .NET
-   Framework, both set by `FakeStrongName`.
+   Framework, both set by `FakeStrongName`. The port's assemblies (System.Web.Extensions, System.Web.Optimization,
+   WebGrease, ...) have .NET Framework's or Microsoft's package's identity too, their keys set by `FakeStrongName` and
+   their versions by `MicrosoftAssemblyVersion` (`Directory.Build.targets`); System.Web alone keeps 11.0.0.0, above the
+   shared framework's facade. The Web Stack's source has development versions (5.3.1.0, 6.0.1.0), which Microsoft's
+   builds replaced (`BUILD_GENERATED_VERSION`): webForCore defines that switch and stamps the released versions (MVC and
+   Web API 5.3.0.0, System.Net.Http.Formatting 6.0.0.0, MVC Futures 5.0.0.0), without changing the source. CI compares
+   every packaged assembly with Microsoft's (`tools/ci/check_assembly_identities.cs`, #141).
 6. **Project files are webForCore's,** edited by hand: they name the submodule files they compile. Build steps
    Microsoft's build had are in them: SignalR's wrote the version into the hub proxy template (`Scripts/hubs.js`,
    `[!VERSION!]`) with `updateHubsJsVersion.ps1` before embedding it, on Windows only, and

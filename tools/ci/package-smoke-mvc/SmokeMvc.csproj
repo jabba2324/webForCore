@@ -34,6 +34,7 @@
     <PackageReference Include="webForCore.Microsoft.AspNet.SignalR.SystemWeb" Version="$(WebForCoreVersion)" />
     <PackageReference Include="webForCore.Web.DataVisualization" Version="$(WebForCoreVersion)" />
     <PackageReference Include="webForCore.Web.Http.WebHost" Version="$(WebForCoreVersion)" />
+    <PackageReference Include="webForCore.Web.Optimization" Version="$(WebForCoreVersion)" />
   </ItemGroup>
 
   <ItemGroup>
@@ -47,5 +48,7 @@
     <PackageReference Include="EntityFramework" Version="6.5.1" />
     <!-- Built for .NET Framework; its model builder needs System.Data.Linq, which the webForCore package brings (#142). -->
     <PackageReference Include="Microsoft.AspNet.OData" Version="7.5.18" />
+    <!-- Built against Microsoft's System.Web.Optimization 1.1.0.0, as SmartStoreNET has it (#141). -->
+    <PackageReference Include="BundleTransformer.Core" Version="1.10.0" />
   </ItemGroup>
 </Project>

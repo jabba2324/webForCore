@@ -118,9 +118,10 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
         internal static bool IsUnsupportedDeserializationCallback(object obj) =>
             obj is TextInfo || (obj is NameObjectCollectionBase && NameObjectCollectionSurrogate.Handles(obj.GetType()));
 
-        // The .NET Framework 4.x assemblies this repository builds carry upstream's version (11.0.0.0, so they win over
-        // .NET's 4.0.0.0 facades of the same name); on the wire they are written with .NET Framework's version, as
-        // System.Web's types were. Other assemblies (the Web Stack's keep their own versions) are written as they are.
+        // System.Web carries webForCore's version (11.0.0.0, so it wins over .NET's 4.0.0.0 facade of the same name); on
+        // the wire it is written with .NET Framework's version, as System.Web's types were. The other .NET Framework 4.x
+        // assemblies this repository builds have .NET Framework's identity (#141), and the rest (the Web Stack's) are
+        // written as they are.
         private static readonly HashSet<string> s_frameworkAssemblies = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "System.Web", "System.Web.ApplicationServices", "System.Web.DataVisualization", "System.Web.DynamicData",

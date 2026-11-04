@@ -8,6 +8,8 @@
         <SignAssembly>True</SignAssembly>
         <AssemblyOriginatorKeyFile>..\SigningKey\WebFormsForCore.snk</AssemblyOriginatorKeyFile>
         <AssemblyName>System.Web.Extensions</AssemblyName>
+        <!-- webForCore: .NET Framework 4's identity (#141). -->
+        <MicrosoftAssemblyVersion>4.0.0.0</MicrosoftAssemblyVersion>
         <DefineConstants>$(DefineConstants);WEB_EXTENSIONS_CODE;WebFormsForCore</DefineConstants>
 
         <PackageId>webForCore.Web.Extensions</PackageId>

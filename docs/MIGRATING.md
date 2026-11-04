@@ -239,7 +239,7 @@ These came up migrating real applications; each names one that needed it.
   Bonobo Git Server, ApplicantTracking, ReaLocate, Roadkill). An
   application built against webForCore's projects instead (a source build) gets both, so the compiler sees two
   `System.Web.Mvc`s: `CS0433: The type 'Controller' exists in both 'System.Web.Mvc, Version=5.1.0.0' and
-  'System.Web.Mvc, Version=5.3.1.0'`. There, reference each one that `obj/project.assets.json` lists, at the version
+  'System.Web.Mvc, Version=5.3.0.0'`. There, reference each one that `obj/project.assets.json` lists, at the version
   restored, with no assets, so the direct reference wins and contributes nothing (eShopLegacyMVC):
   ```xml
   <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.1.0" ExcludeAssets="all" />
