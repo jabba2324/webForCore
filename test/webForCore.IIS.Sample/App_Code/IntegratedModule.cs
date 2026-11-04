@@ -22,6 +22,15 @@ public class IntegratedModule : IHttpModule
             context.Response.AddOnSendingHeaders(c => c.Response.AppendHeader("X-Sending-Headers", c.CurrentNotification.ToString()));
         };
         app.PostAuthenticateRequest += (s, e) => Note(((HttpApplication)s).Context);
+        // A response the module ends before a handler runs, as Katana's OwinHttpModule does; ?flush=1 flushes it first.
+        app.PostAuthorizeRequest += (s, e) =>
+        {
+            var application = (HttpApplication)s;
+            if (application.Request.Path != "/integrated/EndedByModule") return;
+            application.Response.Write("ended by module");
+            if (application.Request.QueryString["flush"] == "1") application.Response.Flush();
+            application.CompleteRequest();
+        };
         app.MapRequestHandler += (s, e) => Note(((HttpApplication)s).Context);
         app.PostMapRequestHandler += (s, e) => Note(((HttpApplication)s).Context);
         app.LogRequest += (s, e) => Logged.AddOrUpdate("log:" + ((HttpApplication)s).Context.Request.Path, 1, (k, v) => v + 1);

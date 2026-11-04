@@ -145,20 +145,27 @@ namespace WebApiGate
                 Assert.Equal(expectedBody, actualBody);
             }
 
-            // Headers added by System.Web: Web API's WebHost marks responses that set no caching as no-cache, as IIS
-            // does. Under /owin, ASP.NET's default Cache-Control: private and X-AspNet-Version come from webForCore's
-            // classic pipeline; IIS's integrated pipeline sends neither there (docs/IIS-COMPATIBILITY.md, "Compared with
-            // IIS 10", #78).
-            Assert.Contains(actual.Headers.GetValues("X-AspNet-Version"), v => v == "4.0.30319");
+            // Headers added by System.Web, as on IIS's integrated pipeline: Web API's WebHost handler gets X-AspNet-Version,
+            // and responses that set no caching are marked no-cache. Under /owin, Katana's OwinHttpModule ends the request
+            // before a handler runs, so neither X-AspNet-Version nor ASP.NET's default Cache-Control: private is added
+            // (docs/IIS-COMPATIBILITY.md, "Compared with IIS 10", #78), unless the response is flushed: Web API doesn't
+            // buffer content that knows its length (StringContent), so each write flushes, and a flush adds them.
             if (host == "webhost")
             {
+                Assert.Contains(actual.Headers.GetValues("X-AspNet-Version"), v => v == "4.0.30319");
                 Assert.Equal("no-cache", actual.Headers.CacheControl.ToString());
                 Assert.Equal("no-cache", string.Join(",", actual.Headers.Pragma));
                 Assert.Equal("-1", string.Join(",", actual.Content.Headers.GetValues("Expires")));
             }
+            else if (path == "/api/status/text")
+            {
+                Assert.Contains(actual.Headers.GetValues("X-AspNet-Version"), v => v == "4.0.30319");
+                Assert.Equal("private", actual.Headers.CacheControl.ToString());
+            }
             else
             {
-                Assert.Equal("private", actual.Headers.CacheControl.ToString());
+                Assert.False(actual.Headers.Contains("X-AspNet-Version"));
+                Assert.Null(actual.Headers.CacheControl);
             }
         }
 
@@ -171,6 +178,8 @@ namespace WebApiGate
             HttpResponseMessage response = await _server.Client.GetAsync(path);
             Record($"system.web GET {path}", null, response, await response.Content.ReadAsStringAsync());
             Assert.Equal(404, (int)response.StatusCode);
+            // ASP.NET's 404 page: an error ASP.NET reports gets its headers, under /owin too.
+            Assert.Contains(response.Headers.GetValues("X-AspNet-Version"), v => v == "4.0.30319");
         }
 
         private static HttpRequestMessage CreateRequest(Uri uri, string method, string body, string accept, string contentType)
