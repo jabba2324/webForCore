@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- From mono/mono 0f53e9e (mcs/class/System.Data.Linq/Test, MIT) by way of the external/mono submodule (xforcore/mono's
+       webforcore branch, #142). See NOTICE. MONO_STRICT, as Mono's build of them for its System.Data.Linq (which is
+       Microsoft's reference source too) defines it: the tests are of System.Data.Linq, not of DbLinq. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- Shorter than Mono's System.Data.Linq_test: Ctor_FileOrServerOrConnectionIsFilename gives SqlClient the assembly's
+         path as a server name, which SqlClient limits to 128 characters (CI's Linux path would be 128 with Mono's). -->
+    <AssemblyName>Linq_test</AssemblyName>
+    <RootNamespace>MonoTests</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS0168;CS0169;CS0219;CS0414;CS0618;CS0649;CS0659;CS0660;CS0661;CS1591</NoWarn>
+    <DefineConstants>$(DefineConstants);MONO_STRICT</DefineConstants>
+    <MonoLinqTests>../../external/mono/mcs/class/System.Data.Linq/Test/</MonoLinqTests>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(MonoLinqTests)**/*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="NUnit2Compat.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/webForCore.System.Data.Linq/webForCore.System.Data.Linq.csproj" />
+    <PackageReference Include="NUnit" Version="3.14.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+  </ItemGroup>
+</Project>

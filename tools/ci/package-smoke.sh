@@ -53,6 +53,9 @@ curl -s http://127.0.0.1:5199/Encode.aspx | grep -q "<b>&lt;compiled&gt;</b>" ||
 curl -s http://127.0.0.1:5199/Ping.ashx | grep -q "ping Literal" || { echo "Ping.ashx: unexpected response"; fail=1; }
 # A Repeater with ItemType needs System.Web.DynamicData, which the webForCore package brings (issue #8).
 curl -s http://127.0.0.1:5199/Typed.aspx | grep -q "\[typed\]\[repeater\]" || { echo "Typed.aspx: unexpected response"; fail=1; }
+# Web.config's <compilation><assemblies> lists System.Data.Linq 3.5.0.0, which the webForCore package brings, and
+# Linq.aspx compiles against it (issue #142: every page was a Configuration Error, "Could not load file or assembly").
+curl -s http://127.0.0.1:5199/Linq.aspx | grep -q "binary 3 bytes, System.Data.Linq 4.0.0.0" || { echo "Linq.aspx: unexpected response"; curl -s http://127.0.0.1:5199/Linq.aspx | head -5; fail=1; }
 # With relaxedUrlToFileSystemMapping="true" (Web.config), MapPath still maps (issue #27: every MapPath returned
 # NOT_A_VALID_FILESYSTEM_PATH on Linux).
 curl -s http://127.0.0.1:5199/MapPath.aspx | grep -q "mapped: True" || { echo "MapPath.aspx: unexpected response"; curl -s http://127.0.0.1:5199/MapPath.aspx | head -5; fail=1; }
@@ -124,5 +127,9 @@ echo "$home" | grep -q "hello from Unity, rendered by Razor" || { echo "/: unexp
 # every request failed).
 location=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' http://127.0.0.1:5198/challenge)
 case "$location" in "302 https://accounts.google.com/"*) ;; *) echo "/challenge: $location"; fail=1;; esac
+# Web API OData's model builder, built for .NET Framework, maps LINQ to SQL's Binary, from the System.Data.Linq the
+# webForCore package brings (issue #142: without it, GetEdmModel() threw and OData applications failed at start, F68).
+odata=$(curl -s http://127.0.0.1:5198/ODataModel)
+case "$odata" in "Blob: Edm.Binary, Bytes: Edm.Binary, Id: Edm.Int32; System.Data.Linq, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089") ;; *) echo "/ODataModel: $odata" | head -c 400; echo; fail=1;; esac
 if [ $fail -ne 0 ]; then cat server.log; exit 1; fi
 echo "Package smoke test passed ($version)."

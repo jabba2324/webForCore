@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- webForCore's tests of LINQ to SQL (#142), MIT: its errors against .NET Framework's (ErrorTests), the assembly
+       (AssemblyTests), and LINQ to SQL against SQL Server (SqlServerTests, 127.0.0.1,14333 as for Identity.Test, or the
+       connection string in WEBFORCORE_LINQ_SQLSERVER). Mono's tests are test/webForCore.System.Data.Linq.MonoTests. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- System.Data.Linq's Properties/AssemblyInfo.cs gives Microsoft's unit tests, DLinq.Unittests with Microsoft's
+         public key (PublicKeyToken=b03f5f7f11d50a3a, as System.Data.SqlClient has), its internals: the tests call the
+         generated Strings and Error classes directly. Public signed with that public key, which WebForCorePublicKeyFile
+         writes. -->
+    <AssemblyName>DLinq.Unittests</AssemblyName>
+    <RootNamespace>System.Data.Linq.Tests</RootNamespace>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign>true</PublicSign>
+    <AssemblyOriginatorKeyFile>$(MSBuildProjectDirectory)/obj/b03f5f7f11d50a3a.pub</AssemblyOriginatorKeyFile>
+    <MicrosoftPublicKey>002400000480000094000000060200000024000052534131000400000100010007D1FA57C4AED9F0A32E84AA0FAEFD0DE9E8FD6AEC8F87FB03766C834C99921EB23BE79AD9D5DCC1DD9AD236132102900B723CF980957FC4E177108FC607774F29E8320E92EA05ECE4E821C0A5EFE8F1645C4C0C93C1AB99285D622CAA652C1DFAD63D745D6F2DE5F17E5EAF0FC4963D261C8A12436518206DC093344D5AD293</MicrosoftPublicKey>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <NoWarn>$(NoWarn);CS0618</NoWarn>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../src/webForCore.System.Data.Linq/FrameworkData/System.Data.Linq.json" Link="FrameworkData/System.Data.Linq.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/webForCore.System.Data.Linq/webForCore.System.Data.Linq.csproj" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+  </ItemGroup>
+
+  <UsingTask TaskName="WebForCoreWritePublicKey" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)/Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <PublicKey ParameterType="System.String" Required="true" />
+      <OutputFile ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        var bytes = new byte[PublicKey.Length / 2];
+        for (int i = 0; i < bytes.Length; i++)
+            bytes[i] = System.Convert.ToByte(PublicKey.Substring(2 * i, 2), 16);
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(OutputFile));
+        if (!System.IO.File.Exists(OutputFile) || System.Convert.ToBase64String(System.IO.File.ReadAllBytes(OutputFile)) != System.Convert.ToBase64String(bytes))
+            System.IO.File.WriteAllBytes(OutputFile, bytes);
+      ]]></Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="WebForCorePublicKeyFile" BeforeTargets="CoreCompile">
+    <WebForCoreWritePublicKey PublicKey="$(MicrosoftPublicKey)" OutputFile="$(AssemblyOriginatorKeyFile)" />
+  </Target>
+</Project>

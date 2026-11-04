@@ -33,6 +33,7 @@
     <PackageReference Include="webForCore.Microsoft.Owin.Security.Cookies" Version="$(WebForCoreVersion)" />
     <PackageReference Include="webForCore.Microsoft.AspNet.SignalR.SystemWeb" Version="$(WebForCoreVersion)" />
     <PackageReference Include="webForCore.Web.DataVisualization" Version="$(WebForCoreVersion)" />
+    <PackageReference Include="webForCore.Web.Http.WebHost" Version="$(WebForCoreVersion)" />
   </ItemGroup>
 
   <ItemGroup>
@@ -44,5 +45,7 @@
     <PackageReference Include="Microsoft.AspNet.SignalR.SqlServer" Version="2.4.3" />
     <!-- Brings Microsoft's System.Data.SqlClient 4.8.6, which webForCore's replaces (#41). -->
     <PackageReference Include="EntityFramework" Version="6.5.1" />
+    <!-- Built for .NET Framework; its model builder needs System.Data.Linq, which the webForCore package brings (#142). -->
+    <PackageReference Include="Microsoft.AspNet.OData" Version="7.5.18" />
   </ItemGroup>
 </Project>

@@ -14,9 +14,9 @@ that code and what had to change.
   | `external/AspNetKatana` | [xforcore/AspNetKatana `webforcore`](https://github.com/xforcore/AspNetKatana/commits/webforcore) | `096e225` | 10 |
   | `external/SignalR` | [xforcore/SignalR `webforcore`](https://github.com/xforcore/SignalR/commits/webforcore) | `7f53f26` | 3 |
   | `external/AspNetIdentity` | [xforcore/AspNetIdentity `webforcore`](https://github.com/xforcore/AspNetIdentity/commits/webforcore) | `b7fc094` | 5 |
-  | `external/referencesource` | [xforcore/referencesource `webforcore`](https://github.com/xforcore/referencesource/commits/webforcore) | `ec9fa9a` | 41 |
+  | `external/referencesource` | [xforcore/referencesource `webforcore`](https://github.com/xforcore/referencesource/commits/webforcore) | `ec9fa9a` | 44, and System.Data.Linq brought back (#142) |
   | `external/winforms` | [xforcore/winforms `webforcore`](https://github.com/xforcore/winforms/commits/webforcore) | `8266870` | 13 |
-  | `external/mono` | [xforcore/mono `webforcore`](https://github.com/xforcore/mono/commits/webforcore) | `0f53e9e` | 31 |
+  | `external/mono` | [xforcore/mono `webforcore`](https://github.com/xforcore/mono/commits/webforcore) | `0f53e9e` | 32, and System.Data.Linq's tests brought back (#142) |
   | `external/maintenance-packages` | [xforcore/maintenance-packages `webforcore`](https://github.com/xforcore/maintenance-packages/commits/webforcore) | `e699209` | 1 |
 
   Each branch starts at the upstream commit, then one commit keeps only the files webForCore uses (and the licences),
@@ -36,7 +36,8 @@ that code and what had to change.
 5. **Identity is kept.** Assemblies keep Microsoft's names and versions. Those Microsoft strong-named are delay signed
    with Microsoft's public key (`src/SigningKey/35MSSharedLib1024.snk`), so existing references and binding
    information resolve to them. They aren't signed by Microsoft. System.Data.SqlClient carries Microsoft's other public
-   key (`b03f5f7f11d50a3a`), as System.Web does, set by `FakeStrongName`.
+   key (`b03f5f7f11d50a3a`), as System.Web does, and System.Data.Linq the ECMA key (`b77a5c561934e089`), as on .NET
+   Framework, both set by `FakeStrongName`.
 6. **Project files are webForCore's,** edited by hand: they name the submodule files they compile.
 
 ## Components from submodules
@@ -48,11 +49,13 @@ that code and what had to change.
 | ASP.NET SignalR 2.4.3 | [SignalR/SignalR@7f53f26](https://github.com/SignalR/SignalR/tree/7f53f26) | Apache 2.0 | 318 · 152 | 2 · 1 |
 | ASP.NET Identity 2 | [aspnet/AspNetIdentity@b7fc094](https://github.com/aspnet/AspNetIdentity/tree/b7fc094) | MIT | 75 · 26 | 0 · 4 |
 | System.Data.SqlClient 4.9.1 (replacing Microsoft's package, #41) | [dotnet/maintenance-packages@e699209](https://github.com/dotnet/maintenance-packages/tree/e699209) (`src/System.Data.SqlClient`, `src/Common`) | MIT | 270 · 18 | 1 · 0 |
+| LINQ to SQL, System.Data.Linq (#142) | [microsoft/referencesource@ec9fa9a](https://github.com/microsoft/referencesource/tree/ec9fa9ae770d522a5b5f0607898044b7478574a3) (`System.Data.Linq`) | MIT | 98 | 3 |
 | System.Web tests | [mono/mono@0f53e9e](https://github.com/mono/mono/tree/0f53e9e) (`mcs/class/System.Web/Test`) | MIT | 188 | 30 |
+| System.Data.Linq tests | mono/mono@0f53e9e (`mcs/class/System.Data.Linq/Test`) | MIT | 9 | 1 |
 | System.Configuration, System.Web.ApplicationServices, aspnet_compiler, `BindableTypeAttribute` (replacing WebFormsForCore's decompiled copies); System.Data's typed DataSet generator | [microsoft/referencesource@ec9fa9a](https://github.com/microsoft/referencesource/tree/ec9fa9ae770d522a5b5f0607898044b7478574a3) | MIT | 114 | 41 |
 | ResX classes (replacing decompiled copies) | [dotnet/winforms@8266870](https://github.com/dotnet/winforms/tree/8266870) (release/8.0) | MIT | 13 | 13 |
 | StronglyTypedResourceBuilder (replacing an API reconstruction) | mono/mono@0f53e9e (`mcs/class/System.Design`) | MIT | 1 | 1 |
-| **Total** | | | **4,373** | **261** |
+| **Total** | | | **4,480** | **265** |
 
 The fork itself starts from [webformsforcore/WebFormsForCore@52f4172](https://github.com/webformsforcore/WebFormsForCore/tree/52f4172dbc09b3ad0b849c97642720fa7a49aa22),
 whose System.Web, System.Configuration and related assemblies were ported from Microsoft's .NET Framework reference
@@ -64,11 +67,12 @@ webForCore's changes to the port are its git history since the fork: `git diff 5
 
 | Kind | Examples | Where |
 | --- | --- | --- |
-| **APIs .NET doesn't have** | `AppDomain.DefineDynamicAssembly` → `AssemblyBuilder.DefineDynamicAssembly` (SignalR); `AppDomainSetup.PrivateBinPath` → scan the app base (Katana's loader); LINQ to SQL's `Binary` binding compiled out (MVC, Web Pages); `NetDataContractSerializer`, which MVC Futures' `MvcSerializer` uses, is replaced by a `DataContractSerializer` with a type-preserving resolver (`src/webForCore.Microsoft.Web.Mvc`), so `MvcSerializer.cs` itself is unchanged; Code Access Security policy removed | Web Stack, Katana, SignalR |
+| **APIs .NET doesn't have** | `AppDomain.DefineDynamicAssembly` → `AssemblyBuilder.DefineDynamicAssembly` (SignalR); `AppDomainSetup.PrivateBinPath` → scan the app base (Katana's loader); LINQ to SQL's `Binary` binding compiled out (MVC, Web Pages); `NetDataContractSerializer`, which MVC Futures' `MvcSerializer` uses, is replaced by a `DataContractSerializer` with a type-preserving resolver (`src/webForCore.Microsoft.Web.Mvc`), so `MvcSerializer.cs` itself is unchanged; Code Access Security policy removed, and LINQ to SQL's reflection-permission demands are empty; LINQ to SQL's `DBConvert` uses webForCore's BinaryFormatter port, and a debug build of it doesn't capture compiled readers to an assembly file (`AssemblyBuilderAccess.Save`) | Web Stack, Katana, SignalR, System.Data.Linq |
 | **Windows-only APIs** | The CryptoAPI certificate context → `PublicKey.ExportSubjectPublicKeyInfo()` (Katana); `DpapiDataProtector` → webForCore's DPAPI emulation (`LocalDataProtection`); the HttpListener host's private-field access → Katana's Mono path | Katana |
 | **.NET Framework behaviour restored** | Web Pages' `WebMail` takes its defaults from `<system.net><mailSettings>`, which .NET's `SmtpClient` ignores; `float`/`double` route constraints reject overflow; a whitespace multipart root path is rejected; `HttpResponseMessage.Content` is never null on .NET, so `ResponseContent.Get` treats `EmptyContent` as no content (11 call sites in the Web API hosts); a request body copied through the seekable stream; `HostString` keeps the host's case | Web Stack, Katana |
 | **Compiler and language** | A `(string)null` where .NET's `ArraySegment<T>` overloads made `null` ambiguous; `LangVersion` pinned to what Microsoft built with (C# 7.3 for SignalR) | SignalR, Web Stack |
 | **Linux and ICU** | Case-correct paths for files referenced with a different case; newline handling; IDN mapping | Web Stack tests, Katana |
+| **Generated code that isn't published** | LINQ to SQL's `SR`, `Strings` and `Error` classes and string resources (in System.Data.Linq, .Mapping and .SqlClient), which Microsoft's build generated and referencesource doesn't include: `tools/linq/generate.cs` writes them (`src/webForCore.System.Data.Linq/Generated`) from referencesource's `System.Data.Linq.txt` and from data read from .NET Framework 4.8's `System.Data.Linq.dll` by `tools/linq/framework_data.cs` (`FrameworkData/System.Data.Linq.json`): resource names and messages, and each error's name, parameters, exception type and constructor arguments. No IL or code is copied; the two sources must agree where both have a string, and CI's `linq-framework-data` job reads the assembly again on Windows and fails if the data differs (#142) | System.Data.Linq |
 | **Types .NET can't load** | `SqlGuidCaster` overlaid a `byte[]` on `SqlGuid`, whose field is a `Guid?` on .NET, so `Assembly.GetTypes()` threw; its unused `SqlGuidCtor` calls `new SqlGuid(byte[])`, as Microsoft.Data.SqlClient 5.2 does (#41) | System.Data.SqlClient |
 
 ## Test changes, by kind
@@ -85,6 +89,7 @@ fixed, or the BCL difference is documented.
 | **Windows-only test dependencies** | DPAPI in Katana's security tests → `TestDataProtectionProvider` (AES-CBC and HMAC-SHA256); LocalDB → SQL Server in a container (Identity); a test certificate .NET's DER reader rejects outside Windows |
 | **Time zone** | Identity's `LockoutEndToNowPlus5ShouldNotBeLockedOut` assumes Pacific time: the suite runs with `TZ`, and the test takes Pacific time itself, since .NET on Windows ignores `TZ` (#46) |
 | **Mono's System.Web tests** | Corrected to Microsoft's .NET Framework 4.5+ behaviour wherever Mono's own implementation differed (Mono's tests follow Mono); hosting in the test process (.NET has one AppDomain) |
+| **Mono's System.Data.Linq tests** | One test expected the `System.Exception` that Mono's own `Error` class throws where .NET Framework's throws `ArgumentException` (#142) |
 | **Selection** | Microsoft's own categories are used (`category!=failing`). SignalR's IIS Express and Service Bus tests aren't built |
 
 ## webForCore's changes to System.Web and the hosting layer

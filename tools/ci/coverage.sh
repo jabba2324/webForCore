@@ -13,7 +13,7 @@ SUITES=(
   Microsoft.Owin.Tests Microsoft.Owin.Host.SystemWeb.Tests Microsoft.Owin.Security.Tests System.Web.MonoTests
   System.Web.Mvc.Test Microsoft.Web.Mvc.Test System.Web.WebPages.Test System.Web.WebPages.Razor.Test
   System.Web.WebPages.Deployment.Test System.Web.Helpers.Test Microsoft.AspNet.SignalR.Tests Identity.Test
-  System.Data.SqlClient.Tests
+  System.Data.SqlClient.Tests System.Data.Linq.Tests System.Data.Linq.MonoTests
   WebApi.Gate.Tests Mvc.Gate.Tests IIS.Gate.Tests
 )
 for s in "${SUITES[@]}"; do

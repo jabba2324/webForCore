@@ -21,7 +21,7 @@ restore the old behaviour, the difference is documented.
 | --- | --- |
 | Target | .NET 10 LTS (`net10.0`), Linux x64; Windows as a development environment (built and tested in CI) |
 | Status | Pre-release (0.8.0). No production app has been migrated yet. NuGet packages are on a [feed on GitHub Pages](https://xforcore.github.io/webForCore/index.json) (from 0.7.0) and attached to [GitHub releases](https://github.com/xforcore/webForCore/releases), not published on nuget.org |
-| Tests | 23,605 tests in 25 suites, almost all of them Microsoft's and Mono's; all pass ([TESTING.md](docs/TESTING.md)). System.Drawing's own tests are [drawingForCore](https://github.com/xforcore/drawingForCore)'s |
+| Tests | 24,267 tests in 27 suites, almost all of them Microsoft's and Mono's; all pass ([TESTING.md](docs/TESTING.md)). System.Drawing's own tests are [drawingForCore](https://github.com/xforcore/drawingForCore)'s |
 | Licence | MIT, Apache 2.0 and BSD 3-Clause, all of which allow commercial use; see [docs/LICENSING.md](docs/LICENSING.md) |
 
 ## What works
@@ -34,7 +34,7 @@ restore the old behaviour, the difference is documented.
 | OWIN | Microsoft.Owin 4.2.3, Host.SystemWeb, Security (Cookies, OAuth), Hosting, HttpListener, Testing, Cors | |
 | SignalR 2.4.3 | Core, SystemWeb, .NET client | WebSockets, Server-Sent Events, long polling |
 | ASP.NET Identity 2 | Core, EntityFramework (EF 6.5), Owin | |
-| Data | System.Data.SqlClient 4.9.1 | Microsoft's, built from its source with `Assembly.GetTypes()` fixed (#41); replaces the `System.Data.SqlClient` package that Entity Framework 6 brings |
+| Data | System.Data.SqlClient 4.9.1, LINQ to SQL (System.Data.Linq) | Microsoft's, built from its source: SqlClient with `Assembly.GetTypes()` fixed (#41), replacing the `System.Data.SqlClient` package that Entity Framework 6 brings; LINQ to SQL from the .NET Framework 4.8 Reference Source, with .NET Framework's errors (#142) |
 | Configuration | System.Configuration (web.config, machine.config, protected sections) | DPAPI and RSA key containers work on Linux |
 | Drawing | System.Drawing, System.Drawing.Common 6.0 | [drawingForCore](https://github.com/xforcore/drawingForCore)'s packages: Microsoft's managed code over a GDI+ engine written on SkiaSharp; no libgdiplus |
 | Optimization | System.Web.Optimization, WebGrease | |
