@@ -17,7 +17,7 @@ webForCore has no in-process AppDomains (#56).
 ```bash
 dotnet build src/WebFormsForCore.Build/WebFormsForCore.Build.csproj -c Release
 dotnet build WebFormsForCore.slnx -c Release
-tools/ci/sqlserver.sh          # SQL Server in a container for Identity.Test (podman or docker)
+tools/ci/sqlserver.sh          # SQL Server in a container for Identity.Test and System.Data.Linq.Tests (podman or docker)
 tools/ci/run-tests.sh            # every suite; .trx files and summary.md in ./TestResults
 ```
 
@@ -58,7 +58,15 @@ construct a controller through Unity (started from `Application_Start`, since We
 run on webForCore), and redirect a Google challenge. It also has Entity Framework 6.5.1, which brings Microsoft's
 `System.Data.SqlClient` 4.8.6: none of that package may be in the output or `deps.json`, and `/Scan` must find
 webForCore's System.Data.SqlClient, Entity Framework bound to it, and `Assembly.GetTypes()` working on every loaded
-assembly (#41).
+assembly (#41). Web API OData's `ODataConventionModelBuilder.GetEdmModel()` must map LINQ to SQL's `Binary`, with the
+System.Data.Linq the `webForCore` package brings, and the Web Forms app's Web.config lists System.Data.Linq 3.5.0.0 in
+`<compilation><assemblies>`, which `Linq.aspx` compiles against (#142).
+
+CI's `linq-framework-data` job (#142) reads .NET Framework 4.8's `System.Data.Linq.dll` on a Windows runner with
+`tools/linq/framework_data.cs` and fails if the names, messages and exception types differ from the committed
+`src/webForCore.System.Data.Linq/FrameworkData/System.Data.Linq.json`, which LINQ to SQL's generated classes come from;
+`build-and-test` checks that the generated classes are what `tools/linq/generate.cs` writes. It is not a required
+check.
 
 Both jobs then run `tools/ci/testapp-smoke.sh` (#80): `src/WebFormsForCore.TestApp` is rebuilt with its pages newer than
 their designer files, so that this repository's designer-file task runs (upstream's WebFormsForCore.Build package,
@@ -105,6 +113,7 @@ webForCore's build, so it takes a few minutes after `build-and-test`. It is not 
 | Microsoft.Owin.Security.Tests | Katana | 118 | 114 | 4 | Cookie, OAuth and other authentication middleware |
 | Microsoft.AspNet.SignalR.Tests | SignalR 2.4.3 | 489 | 487 | 2 | SignalR server and client |
 | Identity.Test | ASP.NET Identity 2 | 311 | 311 | 0 | Identity on Entity Framework 6 against SQL Server |
+| System.Data.Linq.MonoTests | Mono `mcs/class/System.Data.Linq/Test` | 72 | 72 | 0 | LINQ to SQL without a server: `DataContext`'s constructors and arguments, `EntitySet`, `Table<T>`, `Binary`, and the SQL text of a few queries. Built with `MONO_STRICT`, as Mono built them for its own build of Microsoft's System.Data.Linq; one test corrected to .NET Framework's `ArgumentException` (#142) |
 | System.Data.SqlClient.Tests | dotnet/maintenance-packages (`FunctionalTests`) | 143 | 143 | 0 | System.Data.SqlClient without a server: parameters, `SqlDataRecord`, metadata, bulk copy mappings, errors, statistics, credentials, async provider base classes. Only upstream's tests that need nothing but xunit: the rest need its TDS test server, RemoteExecutor or Arcade's xunit extensions, which aren't on nuget.org. With webForCore's `AssemblyTests` (4): `GetTypes()` works, and Microsoft's identity is kept (#41) |
 
 Every skip is the upstream project's own (`Skip=` in its source, or a category Microsoft excludes on Linux). None was
@@ -167,6 +176,7 @@ asserts.
 | WebApi.Gate.Tests | 67 | `test/webForCore.WebApi.Sample` (Visual Studio's Web API template and the "Getting Started" tutorial's controllers). Each request runs through System.Web and through OWIN, and is compared with an oracle: the same controllers in Web API's in-memory server, without System.Web. Status, media type, body, Location and Allow must match. Every request and response is written to `gate-responses.json` beside the test assembly, and CI sends the same requests to the sample on IIS 10 ([Compared with IIS 10](#compared-with-iis-10), #78). Also: a restart, which runs the application in a new worker process |
 | Mvc.Gate.Tests | 66 | `test/webForCore.Mvc.Sample` and `test/webForCore.WebPages.Sample`: model binding, validation, post-redirect-get with TempData, one session cookie (`<sessionState cookieName>`) with `UseAspNetCoreSessionProvider()`, `Html.Serialize`/`[Deserialize]` state (and tampering), anti-forgery tokens, filters, error pages, layouts, display and editor templates, Razor features, MVC Futures, Web Pages, that source files aren't served, and that a restart runs the application in a new worker process |
 | Host.Tests | 5 | `webforcore-host` itself (`test/webForCore.Host.Sample`): rapid-fail protection stops starting workers that keep crashing, workers stop when the host ends, an application run without the host stops when it restarts, and an application warns at start when the process has no locale (`LC_ALL=C`) and not when it has one (#97) |
+| System.Data.Linq.Tests | 590 | LINQ to SQL (#142). `ErrorTests` (560): each of the 553 members of the generated `Strings` and `Error` classes against `FrameworkData/System.Data.Linq.json`, the data read from .NET Framework 4.8's `System.Data.Linq.dll` (the exception's type, constructor and message, and the string), without the generator; the resources; long arguments cut as .NET Framework cuts them; errors through the public API. `SqlServerTests` (24) against SQL Server (127.0.0.1,14333, or `WEBFORCORE_LINQ_SQLSERVER`), in a database `DataContext.CreateDatabase` creates: inserts with identity and `rowversion` values, LIKE, joins, grouping, paging, deferred and eager loading, updates, a concurrency conflict, deletes, `CompiledQuery`, aggregates, `SqlMethods`, `Binary`, `ExecuteQuery`/`ExecuteCommand`, a stored procedure and a composable function, a `TransactionScope` rollback, `Attach`, `XmlMappingSource`, inheritance, an untranslatable method's `NotSupportedException`, `DBConvert`. `AssemblyTests` (6): .NET Framework's identity, references to 3.5.0.0 and 4.0.0.0 bind to it. The test assembly is `DLinq.Unittests` with Microsoft's public key, to which System.Data.Linq's own `InternalsVisibleTo` gives its internals |
 | Serialization.Tests | 11 | `NameValueCollection` and its subclasses through the BinaryFormatter port, in .NET Framework's format: round trips and the wire layout (member names and order, `Version=4.0.0.0` assembly names). The port also read and re-wrote 458 of the 589 .NET Framework streams in dotnet/runtime's `BinaryFormatterTestData.cs` (release/8.0), as many as before the surrogates; no `NameValueCollection` stream written by .NET Framework itself has been checked (the layout follows the reference source member for member) |
 
 ## Code coverage

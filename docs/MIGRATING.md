@@ -10,7 +10,7 @@ For an AI agent doing the migration, the same procedure is written as instructio
 ## Before you start
 
 1. **Check the blockers.** Search the solution for the APIs in the summary table of [NAMESPACES.md](NAMESPACES.md):
-   `WindowsIdentity`, `<authentication mode="Windows">`, `System.ServiceModel` hosting (`.svc`), `System.Data.Linq`,
+   `WindowsIdentity`, `<authentication mode="Windows">`, `System.ServiceModel` hosting (`.svc`), `LinqDataSource`,
    `ObjectContext`/EDMX (EF 1–4), registry and COM use, `App_WebReferences`,
    EMF/WMF metafiles. Each one needs a code change; plan these first.
 2. **Inventory the dependencies.** List NuGet packages and referenced DLLs:
@@ -189,6 +189,7 @@ packages, so the app's `nuget.config` needs drawingForCore's feed (above). Every
 | BinaryFormatter port (session, view state) | `WebFormsForCore.Serialization.Formatters/...` |
 | Run-time compiler | `WebFormsForCore.Compilers/...` |
 | System.Web.DynamicData (data controls with `ItemType` load it) | `WebFormsForCore.Web.DynamicData/...` |
+| LINQ to SQL (System.Data.Linq, in .NET Framework's GAC) | `webForCore.System.Data.Linq/...` |
 
 | If the app uses | Add |
 | --- | --- |
@@ -380,9 +381,10 @@ before the upgrade aren't found after it: users start new ones.
 - **Keep `web.config`**, including `<system.webServer>`: webForCore reads its modules, handlers, rewrite rules,
   request filtering, default documents, custom errors and static content settings. See
   [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md) for what's covered.
-- **Remove `<compilation><assemblies>` entries for assemblies .NET doesn't have**, such as System.Design and
-  System.Data.Linq ([NAMESPACES.md](NAMESPACES.md)). Each one is a Configuration Error on every page ("Could not load
+- **Remove `<compilation><assemblies>` entries for assemblies .NET doesn't have**, such as System.Design
+  ([NAMESPACES.md](NAMESPACES.md)). Each one is a Configuration Error on every page ("Could not load
   file or assembly 'System.Design, Version=4.0.0.0'"), even when no page uses it (#37, Subtext and mojoPortal).
+  System.Data.Linq's can stay from 0.9.0, at 3.5.0.0 or 4.0.0.0: the `webForCore` package brings it (#142).
 - **Set an explicit `<machineKey>`** (validation and decryption keys). Generated keys change with every process, so
   forms authentication cookies, view state and anti-forgery tokens wouldn't survive a restart or work across servers.
 - **`<trust level="Medium" />`** (or any partial trust level) can stay: it is ignored and the application runs in full
@@ -474,6 +476,14 @@ Fix what the blocker search found (see [NAMESPACES.md](NAMESPACES.md) for replac
   primitives (unnamed) are enough: the old worker still gets `IRegisteredObject.Stop` when the host stops it.
 - **BinaryFormatter:** code that calls `System.Runtime.Serialization.Formatters.Binary.BinaryFormatter` directly
   should use `WebFormsForCore.Serialization.Formatters.Binary.BinaryFormatter`.
+- **LINQ to SQL** (#142) works as it is against SQL Server: `DataContext` classes, attribute mapping (what the `.dbml`
+  designer generates) and `XmlMappingSource` need no changes, and errors have .NET Framework's exception types and
+  messages. The `webForCore` package brings System.Data.Linq; remove a `<Reference>` to a copy of .NET Framework's.
+  Three things need SQL Server and a connection string instead: SQL Server Compact (`.sdf`), and off Windows a `.mdf` path or
+  LocalDB (see [NAMESPACES.md](NAMESPACES.md#summary-of-what-doesnt-work)). Code that compares `DataContext.Log`'s
+  text gets `\n` line endings on Linux. `LinqDataSource` isn't available yet: bind an `ObjectDataSource` or model
+  binding to the `DataContext`'s queries. Web API OData's `ODataConventionModelBuilder` needs System.Data.Linq for
+  its `Binary` mapping, so OData applications, which failed in `Application_Start` before 0.9.0, now start.
 - **Scanning every loaded assembly's types** (#41, fixed). `Assembly.GetTypes()` on Microsoft's System.Data.SqlClient
   packages throws on .NET, on Linux and on Windows: `ReflectionTypeLoadException ... Could not load type
   'SqlGuidCaster' ... contains an object field at offset 0 that is incorrectly aligned or overlapped by a non-object

@@ -6,7 +6,9 @@ products, for free, as long as you keep the copyright and licence notices. The m
 webForCore forked) had copied or decompiled from closed Microsoft products has been replaced or removed; see
 [What was replaced](#what-was-replaced).
 One dependency isn't open source: on Windows, SqlClient's `sni.dll` is under Microsoft's .NET Library License, which
-allows redistributing it ([below](#which-parts-have-which-licence)).
+allows redistributing it ([below](#which-parts-have-which-licence)). And one set of strings doesn't come from an
+open-source source: the messages of LINQ to SQL's errors that referencesource doesn't include, read as data from .NET
+Framework's `System.Data.Linq.dll` ([below](#linq-to-sqls-error-messages)).
 
 This page summarises; [NOTICE](../NOTICE) is the authoritative list of components and copyright holders. It isn't
 legal advice: for a product decision, have counsel review NOTICE and this page.
@@ -21,6 +23,8 @@ legal advice: for a product decision, have counsel review NOTICE and this page.
 | Katana (Microsoft.Owin and friends) | `src/webForCore.Microsoft.Owin*` | Apache 2.0 (© .NET Foundation) | ✅ Yes |
 | SignalR 2 | `src/webForCore.Microsoft.AspNet.SignalR.*` | Apache 2.0 (© .NET Foundation) | ✅ Yes |
 | ASP.NET Identity 2 | `src/webForCore.Microsoft.AspNet.Identity.*` | MIT (© Microsoft) | ✅ Yes |
+| LINQ to SQL, System.Data.Linq (from the Reference Source) | `src/webForCore.System.Data.Linq` (the source comes from the `external/referencesource` submodule) | MIT (© Microsoft) | ✅ Yes |
+| LINQ to SQL's error messages and exception types for System.Data.Linq.Mapping and .SqlClient (210 strings), read from .NET Framework 4.8's `System.Data.Linq.dll` | `src/webForCore.System.Data.Linq/FrameworkData`, and the resources generated from it | Microsoft's text, from a .NET Framework binary: not under an open-source licence | See [below](#linq-to-sqls-error-messages) |
 | System.Data.SqlClient 4.9.1 (from dotnet/maintenance-packages) | `src/webForCore.System.Data.SqlClient` (the source comes from the `external/maintenance-packages` submodule) | MIT (© .NET Foundation) | ✅ Yes |
 | ResX reader and writer (from dotnet/winforms) | `src/WebFormsForCore.Web/WebFormsForCore/System.Resources/winforms` | MIT (© .NET Foundation) | ✅ Yes |
 | StronglyTypedResourceBuilder (from Mono); Mono code in System.Web, WebGrease and the SoapFormatter | `src/WebFormsForCore.Web/WebFormsForCore/mono` and others | MIT (© Novell and others) | ✅ Yes |
@@ -46,8 +50,20 @@ satisfies all three. None of the three requires you to release your own source c
 **Trademarks** aren't licensed: don't present your product as Microsoft's or as "ASP.NET", even though the
 assemblies keep Microsoft's names for compatibility.
 
-The test suites need one thing that isn't in the repository: SQL Server for the Identity tests, which runs as a
-container (Developer edition, not shipped).
+The test suites need one thing that isn't in the repository: SQL Server for the Identity and LINQ to SQL tests, which
+runs as a container (Developer edition, not shipped).
+
+### LINQ to SQL's error messages
+
+LINQ to SQL's code is Microsoft's MIT Reference Source, but the classes Microsoft's build generated for its errors and
+strings aren't in it, and neither are the strings of System.Data.Linq.Mapping and System.Data.Linq.SqlClient (only
+System.Data.Linq's 70, in `System.Data.Linq.txt`). So that applications get .NET Framework's exceptions and messages
+(#142), webForCore read them as data from .NET Framework 4.8's `System.Data.Linq.dll` on a Windows CI runner
+(`tools/linq/framework_data.cs`): the resource names and message texts, and each error's name, parameters and
+exception type. No code or IL was copied; webForCore's generator writes its own classes from the data. The 210
+message texts are Microsoft's, from a product under the .NET Framework's licence rather than an open-source one, and
+they are what an application sees in exception messages, as on .NET Framework. Have counsel review this part before
+relying on it in a product.
 
 ## What was replaced
 

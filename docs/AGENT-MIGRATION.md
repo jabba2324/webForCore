@@ -45,7 +45,8 @@ Do this before changing anything, and present the findings to the user.
    | --- | --- |
    | `mode="Windows"`, `WindowsIdentity`, `WindowsPrincipal`, `<identity impersonate` | Windows authentication and impersonation: not available |
    | `.svc` files, `ServiceHost`, `<system.serviceModel><services>` | WCF hosting: not available (client proxies may work) |
-   | `System.Data.Linq`, `DataContext`, `.dbml`, `LinqDataSource` | LINQ to SQL: not available |
+   | `LinqDataSource`, `LinqBinaryModelBinder`, `MetaModel.RegisterContext` with a `DataContext` | ASP.NET's LINQ to SQL integrations: not available (LINQ to SQL itself, `System.Data.Linq`, `DataContext` and `.dbml`, works) |
+   | `.sdf`, `System.Data.SqlServerCe`; a `.mdf` path or LocalDB in a `DataContext`'s connection | SQL Server Compact: not available; database files and LocalDB: Windows only |
    | `ObjectContext`, `.edmx` with EF < 6, `EntityDataSource` | EF 1–4: not available |
    | `App_WebReferences` | The build provider generates no proxy |
    | `Microsoft.Win32.Registry`, `[ComImport]`, `Marshal.GetActiveObject`, `System.Messaging`, `Microsoft.Office.Interop` | Windows only |
