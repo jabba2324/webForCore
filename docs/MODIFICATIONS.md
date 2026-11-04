@@ -38,7 +38,11 @@ that code and what had to change.
    information resolve to them. They aren't signed by Microsoft. System.Data.SqlClient carries Microsoft's other public
    key (`b03f5f7f11d50a3a`), as System.Web does, and System.Data.Linq the ECMA key (`b77a5c561934e089`), as on .NET
    Framework, both set by `FakeStrongName`.
-6. **Project files are webForCore's,** edited by hand: they name the submodule files they compile.
+6. **Project files are webForCore's,** edited by hand: they name the submodule files they compile. Build steps
+   Microsoft's build had are in them: SignalR's wrote the version into the hub proxy template (`Scripts/hubs.js`,
+   `[!VERSION!]`) with `updateHubsJsVersion.ps1` before embedding it, on Windows only, and
+   `webForCore.Microsoft.AspNet.SignalR.Core.csproj` does the same, so the resource is byte for byte Microsoft's 2.4.3
+   (#118).
 
 ## Components from submodules
 

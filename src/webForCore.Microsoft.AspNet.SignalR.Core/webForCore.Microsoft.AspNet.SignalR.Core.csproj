@@ -268,7 +268,6 @@
     <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Transports/WebSocketTransport.cs" Link="Transports/WebSocketTransport.cs" />
     <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Client/Infrastructure/StreamExtensions.cs" Link="Infrastructure/StreamExtensions.cs" />
     <EmbeddedResource Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Resources.resx" Link="Resources.resx" LogicalName="Microsoft.AspNet.SignalR.Resources.resources" />
-    <EmbeddedResource Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Scripts/hubs.js" Link="Scripts/hubs.js" LogicalName="Microsoft.AspNet.SignalR.Scripts.hubs.js" />
 
 
   </ItemGroup>
@@ -280,4 +279,37 @@
     <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="10.0.14" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.14" />
   </ItemGroup>
+  <!-- webForCore: the hub proxy template (/signalr/hubs) with SignalR's version in its header, as Microsoft's package has it
+       (#118). SignalR's build ran updateHubsJsVersion.ps1, which writes Scripts/hubs.js with [!VERSION!] replaced by the
+       package version, line by line with PowerShell's Windows line endings, and embedded that copy; on other systems its
+       project embedded the template as it is, and so did this one, so the proxy began "ASP.NET SignalR JavaScript Library
+       [!VERSION!]". The copy written here is byte for byte the resource in Microsoft.AspNet.SignalR.Core 2.4.3. -->
+  <PropertyGroup>
+    <HubsJsVersion>2.4.3</HubsJsVersion>
+  </PropertyGroup>
+
+  <UsingTask TaskName="WebForCoreWriteHubsJs" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Template ParameterType="System.String" Required="true" />
+      <Output ParameterType="System.String" Required="true" />
+      <Version ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System.IO" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        string text = File.ReadAllText(Template).Replace("\r\n", "\n").Replace("[!VERSION!]", Version).Replace("\n", "\r\n");
+        if (!text.EndsWith("\r\n")) text += "\r\n";
+        Directory.CreateDirectory(Path.GetDirectoryName(Output));
+        if (!File.Exists(Output) || File.ReadAllText(Output) != text) File.WriteAllText(Output, text);
+      ]]></Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="WebForCoreHubsJs" BeforeTargets="BeforeBuild">
+    <WebForCoreWriteHubsJs Template="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Scripts/hubs.js" Output="$(IntermediateOutputPath)hubs.js" Version="$(HubsJsVersion)" />
+    <ItemGroup>
+      <EmbeddedResource Include="$(IntermediateOutputPath)hubs.js" LogicalName="Microsoft.AspNet.SignalR.Scripts.hubs.js" />
+      <FileWrites Include="$(IntermediateOutputPath)hubs.js" />
+    </ItemGroup>
+  </Target>
 </Project>
