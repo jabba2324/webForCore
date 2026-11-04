@@ -1,3 +1,4 @@
+| webforcore-regsql | aspnet_regsql: the SQL providers' database, session state, SQL cache dependency (#123) |
 # Implemented namespaces and their caveats
 
 This page lists, assembly by assembly, the .NET Framework and ASP.NET namespaces webForCore provides on .NET 10, and
@@ -49,7 +50,7 @@ in the code; the rest come from the test suites and gates ([TESTING.md](TESTING.
 
 | Namespace | Types (approx.) | Notes |
 | --- | ---: | --- |
-| `System.Web` | 107 | `HttpContext`, `HttpRequest`, `HttpResponse`, `HttpApplication`, `HttpUtility` (Microsoft's, with `<httpRuntime encoderType>`), the `*Base`/`*Wrapper` abstractions |
+| `System.Web` | 107 | `HttpContext`, `HttpRequest`, `HttpResponse`, `HttpApplication`, `HttpUtility` (Microsoft's, with `<httpRuntime encoderType>`), the `*Base`/`*Wrapper` abstractions. `Server.MachineName` is `Environment.MachineName`: on Windows the computer name, as on .NET Framework (both read `GetComputerName`; Windows keeps its case); on Linux the host name up to its first dot, not upper-cased or cut to NetBIOS's 15 characters (#128) |
 | `System.Web.UI` | 187 | Pages, controls, master pages, themes, view state |
 | `System.Web.UI.WebControls` | 413 | All the server controls, including GridView, ListView, DetailsView, FormView, Login controls, Menu, TreeView, SqlDataSource (System.Data.SqlClient), ObjectDataSource, XmlDataSource |
 | `System.Web.UI.WebControls.WebParts` | 120 | Web Parts and personalization |
