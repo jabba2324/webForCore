@@ -56,21 +56,7 @@ namespace WebFormsForCore.CodeDom.Compiler
 					{
 						if (type == null)
 						{
-                            //type = Type.GetType(_codeDomProviderTypeName);
-                            var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
-							type = Type.GetType(_codeDomProviderTypeName,
-								assemblyName => {
-									try
-									{
-										return alc.LoadFromAssemblyName(assemblyName);
-									}
-									catch (FileNotFoundException)
-									{
-										return null;
-									}
-								},
-                                (assembly, name, ignoreCase) => assembly?.GetType(name, false, ignoreCase),
-								false);
+							type = ResolveCodeDomProviderType();
 							if (type == null)
 							{
 								if (configFileName == null)
@@ -96,22 +82,45 @@ namespace WebFormsForCore.CodeDom.Compiler
 		{
 			get
 			{
-                //Type type = Type.GetType(_codeDomProviderTypeName);
-                var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
-                type = Type.GetType(_codeDomProviderTypeName,
-                    assemblyName => {
-						try
-						{
-							return alc.LoadFromAssemblyName(assemblyName);
-						} catch (FileNotFoundException)
-						{
-							return null;
-						}
-					},
-                    (assembly, name, ignoreCase) => assembly?.GetType(name, false, ignoreCase),
-                    false);
+				type = ResolveCodeDomProviderType();
 				return (type != null);
 			}
+		}
+
+		// webForCore: Type.GetType(_codeDomProviderTypeName), resolved in this assembly's load context.
+		private Type ResolveCodeDomProviderType()
+		{
+			Type resolved = GetType(_codeDomProviderTypeName);
+
+			// webForCore (#88): <system.codedom> entries written for .NET Framework name its own providers,
+			// Microsoft.CSharp.CSharpCodeProvider and Microsoft.VisualBasic.VBCodeProvider in System (.NET 3.5/4.0's
+			// project templates wrote them, with provider options), and on IIS System.Web compiles with them. On .NET
+			// those names are System.CodeDom's providers, which aren't this CodeDomProvider and can't compile in the
+			// application's context, so they mean System.Web's providers, the defaults, which take the same options.
+			if (resolved == typeof(Microsoft.CSharp.CSharpCodeProvider))
+				resolved = GetType("WebFormsForCore.CodeDom.Compiler.CSharpCodeProvider, " + AssemblyRef.WebFormsForCoreWeb);
+			else if (resolved == typeof(Microsoft.VisualBasic.VBCodeProvider))
+				resolved = GetType("WebFormsForCore.CodeDom.Compiler.VBCodeProvider, " + AssemblyRef.WebFormsForCoreWeb);
+
+			return resolved;
+		}
+
+		private static Type GetType(string typeName)
+		{
+			var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
+			return Type.GetType(typeName,
+				assemblyName => {
+					try
+					{
+						return alc.LoadFromAssemblyName(assemblyName);
+					}
+					catch (FileNotFoundException)
+					{
+						return null;
+					}
+				},
+				(assembly, name, ignoreCase) => assembly?.GetType(name, false, ignoreCase),
+				false);
 		}
 
 		public CodeDomProvider CreateProvider()
