@@ -140,6 +140,8 @@
     <Project Path="test/webForCore.Mvc.Gate.Tests/webForCore.Mvc.Gate.Tests.csproj" />
     <Project Path="test/webForCore.IIS.Gate.Tests/webForCore.IIS.Gate.Tests.csproj" />
     <Project Path="test/webForCore.IIS.Sample/webForCore.IIS.Sample.csproj" />
+    <Project Path="test/webForCore.IIS.Sample.Probed/webForCore.IIS.Sample.Probed.csproj" />
+    <Project Path="test/webForCore.IIS.Sample.Unprobed/webForCore.IIS.Sample.Unprobed.csproj" />
     <Project Path="test/webForCore.Host.Tests/webForCore.Host.Tests.csproj" />
     <Project Path="test/webForCore.Host.Sample/webForCore.Host.Sample.csproj" />
     <Project Path="test/webForCore.Precompiled.Host/webForCore.Precompiled.Host.csproj" />

@@ -51,5 +51,13 @@
     <!-- SignalR 2 on Katana's System.Web host (App_Code/SignalRStartup.cs). -->
     <ProjectReference Include="..\..\src\webForCore.Microsoft.AspNet.SignalR.SystemWeb\webForCore.Microsoft.AspNet.SignalR.SystemWeb.csproj" />
     <ProjectReference Include="..\..\src\webForCore.Microsoft.Owin.Host.SystemWeb\webForCore.Microsoft.Owin.Host.SystemWeb.csproj" />
+    <!-- #147: built, but not referenced (not in deps.json): Web.config's <probing privatePath> names the folders they are
+         in. ProbedLib is copied to bin_dotnet/probed, under the site; UnprobedLib stays in its own project, outside it. -->
+    <ProjectReference Include="..\webForCore.IIS.Sample.Probed\webForCore.IIS.Sample.Probed.csproj" ReferenceOutputAssembly="false" Private="false" />
+    <ProjectReference Include="..\webForCore.IIS.Sample.Unprobed\webForCore.IIS.Sample.Unprobed.csproj" ReferenceOutputAssembly="false" Private="false" />
   </ItemGroup>
+
+  <Target Name="CopyProbedLib" AfterTargets="Build">
+    <Copy SourceFiles="..\webForCore.IIS.Sample.Probed\bin_dotnet\ProbedLib.dll" DestinationFolder="$(OutDir)probed" SkipUnchangedFiles="true" />
+  </Target>
 </Project>

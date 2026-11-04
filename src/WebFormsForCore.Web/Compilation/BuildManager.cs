@@ -1501,7 +1501,7 @@ public sealed class BuildManager
         {
             var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
             type = Type.GetType(typeName,
-                assemblyName => alc.LoadFromAssemblyName(assemblyName),
+                System.Web.Hosting.AssemblyLoaderNetCore.TypeAssemblyResolver(alc, throwOnError),
                 // webForCore: a name without an assembly reaches the resolver with asm == null; like Type.GetType(string), search
                 // the calling assembly and the core library (was asm?.GetType, so "System.Guid" was never found).
                 (asm, typeName, ignoreCase) => asm != null ? asm.GetType(typeName, false, ignoreCase) : Type.GetType(typeName, false, ignoreCase),
@@ -1519,7 +1519,7 @@ public sealed class BuildManager
         {
             var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
             return Type.GetType(typeName,
-                assemblyName => alc.LoadFromAssemblyName(assemblyName),
+                System.Web.Hosting.AssemblyLoaderNetCore.TypeAssemblyResolver(alc, throwOnError),
                 // webForCore: see above.
                 (asm, typeName, ignoreCase) => asm != null ? asm.GetType(typeName, false, ignoreCase) : Type.GetType(typeName, false, ignoreCase),
                 throwOnError, ignoreCase);
