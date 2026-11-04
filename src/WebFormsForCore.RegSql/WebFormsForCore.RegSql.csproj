@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- webforcore-regsql: aspnet_regsql for the fork (#123): the application services' database (-A/-R), session state
+       (-ssadd/-ssremove), exported scripts (-sqlexportonly) and SQL cache dependency (-ed/-et/-lt...), through the fork's
+       System.Web SqlServices and .NET Framework 4.8's scripts, which System.Web carries. A .NET tool:
+       dotnet tool install webForCore.RegSql. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>webforcore-regsql</AssemblyName>
+    <RootNamespace>WebFormsForCore.RegSql</RootNamespace>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>true</IsPackable>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>webforcore-regsql</ToolCommandName>
+    <PackageId>webForCore.RegSql</PackageId>
+    <Description>webforcore-regsql: aspnet_regsql for webForCore. Creates the database of ASP.NET's SQL providers (membership, roles, profile, personalization, web events), SQL Server session state and SQL cache dependency, with .NET Framework 4.8's scripts.</Description>
+    <PackageTags>aspnet;aspnet_regsql;membership;system.web;webforcore</PackageTags>
+  </PropertyGroup>
+
+  <Import Project="..\webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\WebFormsForCore.Configuration\WebFormsForCore.Configuration.csproj" />
+    <ProjectReference Include="..\WebFormsForCore.Web\WebFormsForCore.Web.csproj" />
+  </ItemGroup>
+</Project>
