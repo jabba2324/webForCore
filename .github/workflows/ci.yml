@@ -81,6 +81,11 @@ jobs:
       - name: Code rules
         run: dotnet run tools/ci/check_code_rules.cs
 
+      # LINQ to SQL's SR, Strings and Error classes and string resources (#142) are what tools/linq/generate.cs writes
+      # from System.Data.Linq.txt and the committed data read from .NET Framework's System.Data.Linq.dll.
+      - name: LINQ to SQL's generated code
+        run: dotnet run tools/linq/generate.cs -- --check
+
       # The other projects import lib/WebFormsForCore.Build/*/FakeStrongName.targets, this project's output, so it is
       # built before the solution can even be restored.
       - name: Build the build tasks

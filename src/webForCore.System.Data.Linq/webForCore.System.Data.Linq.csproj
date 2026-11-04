@@ -1,0 +1,119 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- LINQ to SQL (System.Data.Linq 4.0.0.0) from microsoft/referencesource ec9fa9a by way of the external/referencesource
+       submodule (xforcore/referencesource's webforcore branch, #142). MIT licence; see NOTICE at the repo root.
+       Referencesource doesn't publish the classes .NET Framework's build generated from its string resources (SR,
+       Strings and Error, in System.Data.Linq, .Mapping and .SqlClient): Generated/ has webForCore's, written by
+       tools/linq/generate.cs from System.Data.Linq.txt and from the names, messages and exception types read from .NET
+       Framework 4.8's System.Data.Linq.dll (FrameworkData/System.Data.Linq.json, tools/linq/framework_data.cs), so each
+       error is .NET Framework's exception with .NET Framework's message. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>System.Data.Linq</AssemblyName>
+    <RootNamespace>System.Data.Linq</RootNamespace>
+    <PackageId>webForCore.Data.Linq</PackageId>
+    <Description>System.Data.Linq</Description>
+    <PackageDescription>LINQ to SQL (System.Data.Linq 4.0.0.0) for webForCore: Microsoft's .NET Framework 4.8 source (microsoft/referencesource), built for .NET 10 on webForCore's System.Data.SqlClient, with .NET Framework's exceptions and messages.</PackageDescription>
+    <PackageTags>webforms;aspnet;linq-to-sql;datacontext;porting;net10</PackageTags>
+    <!-- Microsoft's code; MIT, as in microsoft/referencesource (Directory.Build.props makes webForCore.* Apache-2.0). -->
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- Microsoft's identity: version 4.0.0.0 and the ECMA key (PublicKeyToken=b77a5c561934e089, FakeStrongName below),
+         as .NET Framework's System.Data.Linq.dll has. -->
+    <AssemblyVersion>4.0.0.0</AssemblyVersion>
+    <!-- Above .NET Framework 4.8's (4.8.9221.0), so that this build wins wherever file versions decide. -->
+    <FileVersion>4.801.0.0</FileVersion>
+    <InformationalVersion>4.8+webForCore</InformationalVersion>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>../SigningKey/WebFormsForCore.snk</AssemblyOriginatorKeyFile>
+    <!-- ILGEN, as Microsoft's build defines it: ObjectMaterializer<T> is public. SYSTEM_DATA_LINQ puts SecurityUtils in
+         System.Data.Linq. -->
+    <DefineConstants>$(DefineConstants);ILGEN;SYSTEM_DATA_LINQ</DefineConstants>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <!-- Warnings in Microsoft's code, and System.Data.SqlClient's [Obsolete] (CS0618). -->
+    <NoWarn>$(NoWarn);CS0168;CS0169;CS0219;CS0414;CS0618;CS0649;CS1591;CS3001;CS3002;CS3003;CS3009;CS3016;CS3021;CS8981;SYSLIB0003;SYSLIB0050;SYSLIB0051;CA1416;CA2022</NoWarn>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <!-- The assembly's title, company, product and copyright are .NET Framework's (below); the package's are webForCore's. -->
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <RsLinq>../../external/referencesource/System.Data.Linq/</RsLinq>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyTitleAttribute"><_Parameter1>System.Data.Linq.dll</_Parameter1></AssemblyAttribute>
+    <AssemblyAttribute Include="System.Reflection.AssemblyDescriptionAttribute"><_Parameter1>System.Data.Linq.dll</_Parameter1></AssemblyAttribute>
+    <AssemblyAttribute Include="System.Reflection.AssemblyDefaultAliasAttribute"><_Parameter1>System.Data.Linq.dll</_Parameter1></AssemblyAttribute>
+    <AssemblyAttribute Include="System.Reflection.AssemblyCompanyAttribute"><_Parameter1>Microsoft Corporation</_Parameter1></AssemblyAttribute>
+    <AssemblyAttribute Include="System.Reflection.AssemblyProductAttribute"><_Parameter1>Microsoft® .NET Framework</_Parameter1></AssemblyAttribute>
+    <AssemblyAttribute Include="System.Reflection.AssemblyCopyrightAttribute"><_Parameter1>© Microsoft Corporation.  All rights reserved.</_Parameter1></AssemblyAttribute>
+    <AssemblyAttribute Include="System.Resources.NeutralResourcesLanguageAttribute"><_Parameter1>en-US</_Parameter1></AssemblyAttribute>
+    <AssemblyAttribute Include="System.Resources.SatelliteContractVersionAttribute"><_Parameter1>4.0.0.0</_Parameter1></AssemblyAttribute>
+    <AssemblyAttribute Include="System.CLSCompliantAttribute">
+      <_Parameter1>true</_Parameter1>
+      <_Parameter1_IsLiteral>true</_Parameter1_IsLiteral>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.InteropServices.ComVisibleAttribute">
+      <_Parameter1>false</_Parameter1>
+      <_Parameter1_IsLiteral>true</_Parameter1_IsLiteral>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <!-- Every file of referencesource's System.Data.Linq, as Mono's System.Data.Linq.dll.sources lists them, and
+       Properties/AssemblyInfo.cs. -->
+  <ItemGroup>
+    <Compile Include="$(RsLinq)**/*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="Generated/*.cs" />
+  </ItemGroup>
+
+  <!-- The string resources, with the names .NET Framework's assembly gives them. -->
+  <ItemGroup>
+    <EmbeddedResource Include="Generated/System.Data.Linq.resx" LogicalName="System.Data.Linq.resources" />
+    <EmbeddedResource Include="Generated/System.Data.Linq.Mapping.resx" LogicalName="System.Data.Linq.Mapping.resources" />
+    <EmbeddedResource Include="Generated/System.Data.Linq.SqlClient.resx" LogicalName="System.Data.Linq.SqlClient.resources" />
+    <None Include="FrameworkData/System.Data.Linq.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../webForCore.System.Data.SqlClient/webForCore.System.Data.SqlClient.csproj" />
+    <ProjectReference Include="../WebFormsForCore.Serialization.Formatters/WebFormsForCore.Serialization.Formatters.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="/" Visible="false" />
+  </ItemGroup>
+
+  <!-- ThisAssembly, which .NET Framework's build generated: SqlProvider writes its InformationalVersion, the file version,
+       in DataContext.Log ("Build: 4.801.0.0"). -->
+  <Target Name="WebForCoreGenerateThisAssembly" BeforeTargets="CoreCompile" DependsOnTargets="PrepareForBuild">
+    <PropertyGroup>
+      <_ThisAssemblyText>// &lt;auto-generated/&gt;
+internal static class ThisAssembly
+{
+    internal const string InformationalVersion = "$(FileVersion)"%3B
+}
+</_ThisAssemblyText>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(IntermediateOutputPath)ThisAssembly.g.cs" Lines="$(_ThisAssemblyText)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+    <ItemGroup>
+      <Compile Include="$(IntermediateOutputPath)ThisAssembly.g.cs" Visible="false" />
+    </ItemGroup>
+  </Target>
+
+  <Import Project="../../lib/WebFormsForCore.Build/netstandard2.0/FakeStrongName.targets" />
+
+  <PropertyGroup>
+    <!-- The ECMA key, which .NET Framework's System.Data.Linq is signed with. -->
+    <StrongNamePublicKey>00000000000000000400000000000000</StrongNamePublicKey>
+    <StrongNamePublicKeyToken>b77a5c561934e089</StrongNamePublicKeyToken>
+  </PropertyGroup>
+</Project>

@@ -38,6 +38,11 @@
     <!-- System.Web loads System.Web.DynamicData for every data control with ItemType (EnableDynamicData), as on .NET
          Framework, where it is in the GAC (#8). -->
     <ProjectReference Include="..\WebFormsForCore.Web.DynamicData\WebFormsForCore.Web.DynamicData.csproj" />
+    <!-- LINQ to SQL (System.Data.Linq, #142), which .NET Framework has in the GAC: System.Web.Extensions' LinqDataSource
+         and Dynamic Data's LINQ to SQL model provider are built on it there, a web.config's <compilation><assemblies>
+         names it, and .NET Framework libraries reference it (Web API OData's model builder, for Binary), as System.Web's
+         System.Data has System.Data.SqlClient, which webForCore.Web brings (#41). -->
+    <ProjectReference Include="..\webForCore.System.Data.Linq\webForCore.System.Data.Linq.csproj" />
     <!-- webforcore-host, which runs the application as IIS did, in worker processes it recycles (#56): its build targets
          put it in the application's output, bin_dotnet/webforcore-host/. A tool, not a library: its package has no lib
          folder. (Not ReferenceOutputAssembly="false": NuGet leaves such references out of the package's dependencies.) -->

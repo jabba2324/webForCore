@@ -15,6 +15,8 @@ string[] ownDirectories =
     "src/WebFormsForCore.Host",
     "src/WebFormsForCore.Compilers",
     "src/WebFormsForCore.Web.Infrastructure",
+    // LINQ to SQL's generated classes (#142); its Microsoft code is in external/referencesource.
+    "src/webForCore.System.Data.Linq",
 ];
 string[] ownFiles =
 [
