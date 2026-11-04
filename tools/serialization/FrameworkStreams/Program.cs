@@ -75,7 +75,11 @@ internal static class Program
         }
         catch (Exception e)
         {
-            return "reading the " + what + " stream: " + e.GetType().FullName + ": " + e.Message;
+            return e.GetType() == streamCase.ReadThrows ? null : "reading the " + what + " stream: " + e.GetType().FullName + ": " + e.Message;
+        }
+        if (streamCase.ReadThrows != null)
+        {
+            return "the " + what + " stream read as " + read + " (expected " + streamCase.ReadThrows.FullName + ")";
         }
         if (!streamCase.PortWrites)
         {

@@ -81,6 +81,23 @@ namespace WebForCore.Serialization.Tests
             Assert.DoesNotContain("System.RuntimeType", text);
         }
 
+        // Each type with the assembly .NET Framework had it in: TypeForwardedFrom (Uri), the .NET Framework facade .NET
+        // forwards it from (Enumerable: System.Core; NameValueCollection: System), this repository's System.Web as 4.0.0.0.
+        [Theory]
+        [InlineData(typeof(Uri), "System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089")]
+        [InlineData(typeof(Enumerable), "System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089")]
+        [InlineData(typeof(System.Collections.Specialized.NameValueCollection), "System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089")]
+        [InlineData(typeof(System.Web.HttpContext), "System.Web, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a")]
+        public void Type_WrittenWithFrameworkAssembly(Type type, string assembly)
+        {
+            byte[] bytes = Serialize(type);
+            string text = Encoding.UTF8.GetString(bytes);
+
+            Assert.Contains(type.FullName!, text);
+            Assert.Contains(assembly, text);
+            Assert.Same(type, Deserialize(bytes));
+        }
+
         [Fact]
         public void Members_WrittenAsMemberInfoSerializationHolder()
         {
@@ -134,8 +151,14 @@ namespace WebForCore.Serialization.Tests
         public void RoundTrips(FrameworkStreamCase streamCase)
         {
             object graph = streamCase.Create();
+            byte[] bytes = Serialize(graph);
 
-            object copy = Deserialize(Serialize(graph));
+            if (streamCase.ReadThrows != null)
+            {
+                Assert.Throws(streamCase.ReadThrows, () => Deserialize(bytes));
+                return;
+            }
+            object copy = Deserialize(bytes);
 
             Assert.True(FrameworkStreamCases.Matches(graph, copy), $"{streamCase.Name}: read {copy}");
         }
@@ -151,6 +174,11 @@ namespace WebForCore.Serialization.Tests
             {
                 // System.Empty: .NET has none.
                 Assert.Throws<SerializationException>(() => Deserialize(bytes));
+                return;
+            }
+            if (streamCase.ReadThrows != null)
+            {
+                Assert.Throws(streamCase.ReadThrows, () => Deserialize(bytes));
                 return;
             }
             object copy = Deserialize(bytes);

@@ -186,12 +186,10 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
                     if (m_signature == null)
                         throw new SerializationException(NullSignature);
 
+                    // A generic method's arguments are holders of the graph too, and may not be complete yet. With
+                    // overloads, MakeGenericMethod below then throws ArgumentNullException, as on .NET Framework
+                    // (FrameworkStreams/method-generic-overload-instance.bin, which .NET Framework 4.8 can't read back).
                     Type[]? genericArguments = GetValueNoThrow(m_info, "GenericArguments") as Type[];
-
-                    // webForCore: the generic arguments are objects of the graph too, and may not be complete yet; null
-                    // tells the ObjectManager to come back later (as below), where MakeGenericMethod would throw.
-                    if (genericArguments != null && System.Array.IndexOf(genericArguments, null) >= 0)
-                        return null;
 
                     MethodInfo[] methods = (MethodInfo[])m_reflectedType.GetMember(m_memberName, MemberTypes.Method, bindingFlags);
 

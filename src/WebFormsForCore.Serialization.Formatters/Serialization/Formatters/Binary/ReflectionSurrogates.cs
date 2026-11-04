@@ -150,35 +150,37 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
             {
                 type = type.GetGenericTypeDefinition();
             }
-            return s_assemblyNames.GetOrAdd(type, static t =>
+            return s_assemblyNames.GetOrAdd(type, static t => Shared(AssemblyNameOf(t)));
+        }
+
+        private static string AssemblyNameOf(Type t)
+        {
+            foreach (Attribute first in t.GetCustomAttributes(typeof(TypeForwardedFromAttribute), false))
             {
-                foreach (Attribute first in t.GetCustomAttributes(typeof(TypeForwardedFromAttribute), false))
-                {
-                    return ((TypeForwardedFromAttribute)first).AssemblyFullName;
-                }
-                Type outer = t;
-                while (outer.DeclaringType != null)
-                {
-                    outer = outer.DeclaringType;
-                }
-                foreach (Attribute first in outer.GetCustomAttributes(typeof(TypeForwardedFromAttribute), false))
-                {
-                    return ((TypeForwardedFromAttribute)first).AssemblyFullName;
-                }
-                string name = FrameworkSurrogates.GetAssemblyName(t.Assembly);
-                if (name != t.Assembly.FullName || t.FullName == null)
-                {
-                    return name;
-                }
-                foreach (string facade in s_frameworkFacades)
-                {
-                    if (ForwardsTo(facade, t))
-                    {
-                        return facade;
-                    }
-                }
+                return ((TypeForwardedFromAttribute)first).AssemblyFullName;
+            }
+            Type outer = t;
+            while (outer.DeclaringType != null)
+            {
+                outer = outer.DeclaringType;
+            }
+            foreach (Attribute first in outer.GetCustomAttributes(typeof(TypeForwardedFromAttribute), false))
+            {
+                return ((TypeForwardedFromAttribute)first).AssemblyFullName;
+            }
+            string name = FrameworkSurrogates.GetAssemblyName(t.Assembly);
+            if (name != t.Assembly.FullName || t.FullName == null)
+            {
                 return name;
-            });
+            }
+            foreach (string facade in s_frameworkFacades)
+            {
+                if (ForwardsTo(facade, t))
+                {
+                    return facade;
+                }
+            }
+            return name;
         }
 
         private static bool ForwardsTo(string facade, Type type)
@@ -193,7 +195,13 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
             }
         }
 
-        internal static string FrameworkAssemblyName(Assembly assembly) => FrameworkSurrogates.GetAssemblyName(assembly);
+        internal static string FrameworkAssemblyName(Assembly assembly) => Shared(FrameworkSurrogates.GetAssemblyName(assembly));
+
+        // One string object for each name, as .NET Framework's are (RuntimeAssembly.FullName and RuntimeType.FullName are
+        // cached): BinaryFormatter writes a string it has written before as a reference to it.
+        private static readonly ConcurrentDictionary<string, string> s_names = new ConcurrentDictionary<string, string>(StringComparer.Ordinal);
+
+        private static string Shared(string name) => s_names.GetOrAdd(name, name);
 
         // Type.FullName as .NET Framework has it: the generic arguments' assemblies are .NET Framework's. Null where
         // FullName is null (a type that contains generic parameters but isn't a generic type definition).
@@ -205,7 +213,7 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
             }
             var builder = new StringBuilder();
             AppendFullName(builder, type);
-            return builder.ToString();
+            return Shared(builder.ToString());
         }
 
         private static void AppendFullName(StringBuilder builder, Type type)
@@ -441,7 +449,11 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
                     }
                     type = type.GetElementType()!;
                 }
-                info.AddValue("ElementTypes", elementTypes.ToArray(), typeof(int[]));
+                // A new array each time, as List<int>.ToArray() was on .NET Framework (.NET's gives one empty array for
+                // all, which BinaryFormatter would write once and then refer to).
+                var array = new int[elementTypes.Count];
+                elementTypes.CopyTo(array);
+                info.AddValue("ElementTypes", array, typeof(int[]));
                 return type;
             }
 

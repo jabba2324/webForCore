@@ -3,6 +3,7 @@
 // BinaryFormatter), which writes FrameworkStreams/<name>.bin. Each graph is made the same way on both runtimes, so
 // what one runtime reads is compared with the graph that runtime makes. Only .NET Framework types are used: a type of
 // this assembly would have another assembly name on each side.
+#nullable disable
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -14,11 +15,12 @@ namespace WebForCore.Serialization.Tests
 {
     public sealed class FrameworkStreamCase
     {
-        public FrameworkStreamCase(string name, Func<object> create, bool portWrites = true)
+        public FrameworkStreamCase(string name, Func<object> create, bool portWrites = true, Type readThrows = null)
         {
             Name = name;
             Create = create;
             PortWrites = portWrites;
+            ReadThrows = readThrows;
         }
 
         // FrameworkStreams/<Name>.bin.
@@ -28,6 +30,9 @@ namespace WebForCore.Serialization.Tests
 
         // False for what .NET can't have (System.Empty): only read.
         public bool PortWrites { get; }
+
+        // The exception reading the stream throws, on .NET Framework and so on the port.
+        public Type ReadThrows { get; }
 
         public override string ToString() => Name;
     }
@@ -75,7 +80,9 @@ namespace WebForCore.Serialization.Tests
             new FrameworkStreamCase("method-generic-definition", () => typeof(Array).GetMethod("AsReadOnly")),
             new FrameworkStreamCase("method-generic-instance", () => typeof(Array).GetMethod("AsReadOnly").MakeGenericMethod(typeof(int))),
             new FrameworkStreamCase("method-generic-overload", () => ArrayIndexOf2()),
-            new FrameworkStreamCase("method-generic-overload-instance", () => ArrayIndexOf2().MakeGenericMethod(typeof(string))),
+            // An instance of an overloaded generic method: .NET Framework's MemberInfoSerializationHolder calls MakeGenericMethod
+            // before the type arguments are read, and throws.
+            new FrameworkStreamCase("method-generic-overload-instance", () => ArrayIndexOf2().MakeGenericMethod(typeof(string)), readThrows: typeof(ArgumentNullException)),
             new FrameworkStreamCase("method-on-generic-type", () => typeof(Dictionary<string, int>).GetMethod("TryGetValue")),
             new FrameworkStreamCase("method-reflected-type", () => typeof(ArgumentNullException).GetMethod("GetType")),
             new FrameworkStreamCase("method-system-web", () => typeof(HttpCookie).GetMethod("ToString")),
