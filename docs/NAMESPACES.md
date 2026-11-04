@@ -53,7 +53,7 @@ in the code; the rest come from the test suites and gates ([TESTING.md](TESTING.
 | `System.Web.Compilation` | 34 | `BuildManager`; run-time compilation with Roslyn (C# and VB) |
 | `System.Web.ModelBinding` | 99 | Web Forms model binding |
 | `System.Web.Security` | 39 | Forms authentication, membership, roles, `MachineKey`, URL authorization |
-| `System.Web.SessionState` | 22 | In-process and ASP.NET Core session providers |
+| `System.Web.SessionState` | 22 | In-process session state, and `AspNetCoreSessionProvider` (`UseAspNetCoreSessionProvider()`: in ASP.NET Core's distributed cache, [MIGRATING.md](MIGRATING.md#session-state)) |
 | `System.Web.Caching` | 25 | Cache, output cache, `SqlCacheDependency` |
 | `System.Web.Routing` | 16 | |
 | `System.Web.Management` | 44 | Health monitoring |

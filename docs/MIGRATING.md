@@ -334,10 +334,8 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddWebForms();                 // IIS compression, W3C logging
         builder.Services.AddDistributedMemoryCache();   // session state (or Redis, SQL Server, ...)
-        builder.Services.AddSession();
 
         var app = builder.Build();
-        app.UseSession();
         app.UseWebForms(o => o
             .HandleAllRequestsWithWebForms()            // routing, extensionless URLs, static files through IIS rules
             .UseAspNetCoreSessionProvider());
@@ -348,6 +346,27 @@ public class Program
 
 Without `HandleAllRequestsWithWebForms()`, only ASP.NET's own extensions (`.aspx`, `.ashx`, `.asmx`, `.axd`, ...)
 reach System.Web, and ASP.NET Core serves everything else.
+
+### Session state
+
+`UseAspNetCoreSessionProvider()` keeps session state in ASP.NET Core's distributed cache (`IDistributedCache`), as
+`<sessionState mode="StateServer">` or `"SQLServer"` kept it out of process on IIS: `AddDistributedMemoryCache()` for
+one server, `AddStackExchangeRedisCache(...)` or `AddDistributedSqlServerCache(...)` to share it between servers. Without
+it, session state is in process (`mode="InProc"`, the default), and is lost when the application restarts. The rest is
+`<sessionState>`'s, as on IIS:
+
+- The session ID and its cookie are System.Web's (`SessionIDManager`): `ASP.NET_SessionId`, or `<sessionState cookieName>`,
+  with `SameSite=Lax` (`<sessionState cookieSameSite>`). It is the only session cookie: ASP.NET Core's
+  session (`AddSession()`, `UseSession()` and its `.AspNetCore.Session` cookie) isn't used, and isn't needed (#79).
+  Leave them in only if ASP.NET Core code of the application uses `HttpContext.Session` itself.
+- A session ends `Session.Timeout` minutes (`<sessionState timeout>`, 20 by default) after its last request; ASP.NET
+  Core's `SessionOptions.IdleTimeout` doesn't apply. `Session_End` isn't raised, as with IIS's out-of-process modes.
+- Several applications sharing one cache need an instance name each (Redis's `InstanceName`, a table each for SQL
+  Server): the cache keys are `WebFormsForCore.SessionState.` and the session ID.
+
+Up to 0.7.0, the provider kept session state inside ASP.NET Core's session, which set a second cookie
+(`.AspNetCore.Session`), needed `UseSession()`, and ended sessions after `SessionOptions.IdleTimeout`. Sessions stored
+before the upgrade aren't found after it: users start new ones.
 
 ## 5. Configuration
 

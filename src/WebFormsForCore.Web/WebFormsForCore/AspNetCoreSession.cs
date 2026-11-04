@@ -1,21 +1,27 @@
 using System.IO;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace System.Web.SessionState;
 
 /// <summary>
-/// Bridges classic <see cref="SessionStateStoreProviderBase"/> session state to the
-/// ASP.NET Core session (<see cref="Microsoft.AspNetCore.Http.ISession"/>) of the current request,
-/// so WebForms session state is backed by whatever session store the host app configured
-/// (in-memory, distributed cache, etc.) via services.AddSession()/app.UseSession().
+/// Out-of-process session state in ASP.NET Core's distributed cache (<see cref="IDistributedCache"/>: in memory, Redis,
+/// SQL Server, ...), registered by services.AddDistributedMemoryCache() (or AddStackExchangeRedisCache, ...). It works
+/// like IIS's out-of-process modes (StateServer, SQLServer): one entry per System.Web session ID, which ends
+/// <c>Session.Timeout</c> minutes after it was last used. The session ID is System.Web's (SessionIDManager), so the only
+/// cookie is <c>&lt;sessionState cookieName&gt;</c> (ASP.NET_SessionId by default).
+/// ASP.NET Core's own session (ISession, AddSession()/UseSession() and its .AspNetCore.Session cookie) isn't used (#79).
 /// </summary>
 public class AspNetCoreSessionProvider : SessionStateStoreProviderBase
 {
     private const string SessionStateKeyPrefix = "WebFormsForCore.SessionState.";
 
-    // Keyed by the WebForms session id (rather than a single fixed key) so that a WebForms-side
-    // id rotation (e.g. session-fixation mitigation, RegenerateExpiredSessionId) starts from an
-    // empty item instead of silently inheriting whatever was stored under the previous id.
     private static string GetSessionStateKey(string id) => SessionStateKeyPrefix + id;
+
+    private static IDistributedCache Cache(HttpContext context) =>
+        context.CoreContext.RequestServices.GetService<IDistributedCache>()
+            ?? throw new InvalidOperationException("Session state through UseAspNetCoreSessionProvider() needs ASP.NET Core's distributed cache: " +
+                "add services.AddDistributedMemoryCache() (or AddStackExchangeRedisCache, AddDistributedSqlServerCache, ...) to Program.cs.");
 
     public override void Dispose()
     {
@@ -23,7 +29,7 @@ public class AspNetCoreSessionProvider : SessionStateStoreProviderBase
 
     public override bool SetItemExpireCallback(SessionStateItemExpireCallback expireCallback)
     {
-        // ASP.NET Core session has no expiry notification mechanism to hook Session_End into.
+        // As in IIS's out-of-process modes, there is no Session_End: the cache doesn't say when an entry expires.
         return false;
     }
 
@@ -52,7 +58,9 @@ public class AspNetCoreSessionProvider : SessionStateStoreProviderBase
         lockId = null;
         actions = SessionStateActions.None;
 
-        if (!context.CoreContext.Session.TryGetValue(GetSessionStateKey(id), out byte[] buffer))
+        // Reading the entry restarts its sliding expiration.
+        byte[] buffer = Cache(context).Get(GetSessionStateKey(id));
+        if (buffer == null)
         {
             return null;
         }
@@ -76,18 +84,20 @@ public class AspNetCoreSessionProvider : SessionStateStoreProviderBase
             Array.Copy(buffer, bytes, length);
         }
 
-        context.CoreContext.Session.Set(GetSessionStateKey(id), bytes);
+        // Session.Timeout (<sessionState timeout>, 20 minutes by default, or what the application set) is how long the
+        // session lasts unused.
+        Cache(context).Set(GetSessionStateKey(id), bytes,
+            new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromMinutes(item.Timeout) });
     }
 
     public override void RemoveItem(HttpContext context, string id, object lockId, SessionStateStoreData item)
     {
-        context.CoreContext.Session.Remove(GetSessionStateKey(id));
+        Cache(context).Remove(GetSessionStateKey(id));
     }
 
     public override void ResetItemTimeout(HttpContext context, string id)
     {
-        // ASP.NET Core session expiry is governed globally by SessionOptions.IdleTimeout;
-        // there is no per-item timeout to reset.
+        Cache(context).Refresh(GetSessionStateKey(id));
     }
 
     public override SessionStateStoreData CreateNewStoreData(HttpContext context, int timeout)
