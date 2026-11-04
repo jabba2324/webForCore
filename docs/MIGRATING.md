@@ -129,6 +129,24 @@ These differences from .NET Framework projects come up when converting:
   the project's: `<LangVersion>7.3</LangVersion>` if it set none, or 13 for "latest". C# 11's ref-safety rules apply on
   .NET 7 and later whatever the version (`CS8347 ... may expose variables referenced by parameter 'index'`): mark such a
   `ref` parameter `scoped` (#43).
+- **Calls that become ambiguous** (`CS0121: The call is ambiguous between ...`, #93). `<LangVersion>` doesn't help
+  with either of these; qualify the call:
+  - *The application's own LINQ-style extension methods.* .NET 6 added `DistinctBy`, `MinBy`, `MaxBy`, `Chunk`,
+    `ExceptBy`, `IntersectBy`, `UnionBy` and others to `System.Linq.Enumerable`. An application (or MoreLINQ) that has
+    its own gets `CS0121 ... 'System.Linq.Enumerable.DistinctBy<TSource, TKey>(...)' and
+    'Umbraco.Core.EnumerableExtensions.DistinctBy<T, TKey>(...)'` in every file that imports both namespaces (Umbraco
+    6.2.6 and 7.15.11); code in the extension class's own namespace still binds to the application's. Call the
+    application's method statically, around the whole chain before it (or remove the application's copy where it
+    behaves the same):
+    ```csharp
+    // was: var propertyTypes = types.ToArray().SelectMany(x => x.PropertyTypes).DistinctBy(c => c.Alias);
+    var propertyTypes = Umbraco.Core.EnumerableExtensions.DistinctBy(
+        types.ToArray().SelectMany(x => x.PropertyTypes), c => c.Alias);
+    ```
+  - *A `params` call with no arguments.* Visual Studio 2013's and earlier compilers chose an overload that Roslyn finds
+    ambiguous: Umbraco 6's `SqlHelper<P>` has `ExecuteReader(string, params IParameter[])` and
+    `ExecuteReader(string, params P[])`, and its subclasses' `ExecuteReader("select ...")` is `CS0121`. Pass the empty
+    array of the overload that was meant: `ExecuteReader("select ...", new IParameter[0])`.
 - **Project references are transitive.** A project now sees the packages and projects its references use.
   - Packages pinned at different versions in different projects fail with `NU1605: Detected package downgrade`.
     Use the highest version everywhere (#39, FunnelWeb's Iesi.Collections).
@@ -291,6 +309,20 @@ These came up migrating real applications; each names one that needed it.
     .NET 10 console app does the same (AutoMapper 4.2 and 11.0 fail on 10.0.14, as they did on .NET 11). AutoMapper 12
     works; from 4.x the change is mostly `IMapperConfiguration` → `IMapperConfigurationExpression` (ReaLocate). From
     3.x's static `Mapper` it is a rewrite of the mapping code.
+  - **Log4Net.Async** 2.0.4 (`ParallelForwardingAppender`, `AsyncForwardingAppender`; net40 only, the last release)
+    logs nothing (#95). Each event fails with `TypeLoadException: Could not load type
+    'System.Runtime.Remoting.Messaging.CallContext' from assembly 'mscorlib'`: .NET's `mscorlib` has no `CallContext`,
+    and webForCore's (in `System.Web`) serves only code compiled against webForCore ([NAMESPACES.md](NAMESPACES.md)).
+    log4net swallows the error, so the only sign is an empty log file (the exception shows with
+    `<add key="log4net.Internal.Debug" value="true" />` in `<appSettings>`). Point the logger at the appender the
+    async one forwards to, so it logs synchronously. Umbraco 7.15.11's `config/log4net.config` has the async appender
+    by default:
+    ```xml
+    <root>
+      <priority value="Info"/>
+      <appender-ref ref="rollingFile" />   <!-- was: AsynchronousLog4NetAppender (Log4Net.Async.ParallelForwardingAppender) -->
+    </root>
+    ```
 
 ## 4. Program.cs
 
@@ -306,10 +338,8 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddWebForms();                 // IIS compression, W3C logging
         builder.Services.AddDistributedMemoryCache();   // session state (or Redis, SQL Server, ...)
-        builder.Services.AddSession();
 
         var app = builder.Build();
-        app.UseSession();
         app.UseWebForms(o => o
             .HandleAllRequestsWithWebForms()            // routing, extensionless URLs, static files through IIS rules
             .UseAspNetCoreSessionProvider());
@@ -320,6 +350,27 @@ public class Program
 
 Without `HandleAllRequestsWithWebForms()`, only ASP.NET's own extensions (`.aspx`, `.ashx`, `.asmx`, `.axd`, ...)
 reach System.Web, and ASP.NET Core serves everything else.
+
+### Session state
+
+`UseAspNetCoreSessionProvider()` keeps session state in ASP.NET Core's distributed cache (`IDistributedCache`), as
+`<sessionState mode="StateServer">` or `"SQLServer"` kept it out of process on IIS: `AddDistributedMemoryCache()` for
+one server, `AddStackExchangeRedisCache(...)` or `AddDistributedSqlServerCache(...)` to share it between servers. Without
+it, session state is in process (`mode="InProc"`, the default), and is lost when the application restarts. The rest is
+`<sessionState>`'s, as on IIS:
+
+- The session ID and its cookie are System.Web's (`SessionIDManager`): `ASP.NET_SessionId`, or `<sessionState cookieName>`,
+  with `SameSite=Lax` (`<sessionState cookieSameSite>`). It is the only session cookie: ASP.NET Core's
+  session (`AddSession()`, `UseSession()` and its `.AspNetCore.Session` cookie) isn't used, and isn't needed (#79).
+  Leave them in only if ASP.NET Core code of the application uses `HttpContext.Session` itself.
+- A session ends `Session.Timeout` minutes (`<sessionState timeout>`, 20 by default) after its last request; ASP.NET
+  Core's `SessionOptions.IdleTimeout` doesn't apply. `Session_End` isn't raised, as with IIS's out-of-process modes.
+- Several applications sharing one cache need an instance name each (Redis's `InstanceName`, a table each for SQL
+  Server): the cache keys are `WebFormsForCore.SessionState.` and the session ID.
+
+Up to 0.7.0, the provider kept session state inside ASP.NET Core's session, which set a second cookie
+(`.AspNetCore.Session`), needed `UseSession()`, and ended sessions after `SessionOptions.IdleTimeout`. Sessions stored
+before the upgrade aren't found after it: users start new ones.
 
 ## 5. Configuration
 
@@ -356,6 +407,25 @@ Fix what the blocker search found (see [NAMESPACES.md](NAMESPACES.md) for replac
 - **File paths:** Linux paths are case-sensitive and use `/`. Fix string-built paths (`"~\\Images\\Logo.PNG"`,
   `Path.Combine` with `\`) and file names whose case differs from the references to them. `Server.MapPath` and
   virtual paths work as before.
+- **Telling URLs and paths apart** (#92). Two .NET behaviours on Linux (Unix, not webForCore) break code that checks
+  whether a string is a local URL or a physical path:
+  - `Uri.TryCreate("/umbraco/Default.aspx", UriKind.Absolute, out uri)` succeeds: a path that starts with `/` is an
+    implicit `file:` URI (`IsFile` true, `Host` `""`). On Windows and .NET Framework it isn't absolute. Umbraco 6.2.6's
+    log-in checks its `redir` this way, finds the host `""` isn't the request's, and throws "There was attempt to
+    redirect to '/umbraco/Default.aspx' which is another domain", so every visit to `/umbraco/` is a 500. Search for
+    `UriKind.Absolute` (open-redirect checks, link rewriters, proxy allow lists) and treat a string that starts with
+    `/` as local before calling it, or check `uri.IsFile`. `UriKind.RelativeOrAbsolute` gives a relative URI for
+    `/path` on Linux too.
+  - `Path.VolumeSeparatorChar` is `/` (`:` on Windows). Umbraco 6.2.6's `IOHelper.MapPath` took
+    `path[1] == Path.VolumeSeparatorChar` to mean "already a physical path", so `~/...` came back unmapped: its
+    language files weren't found and files were written under a folder named `~` in the site. Search for
+    `VolumeSeparatorChar`, and use `Path.IsPathRooted` or `Path.IsPathFullyQualified` instead.
+- **The build output is `bin_dotnet/`** (#91). Code or configuration that builds `~/bin/...` paths to load or scan the
+  application's assemblies (plug-in folders, `Assembly.LoadFrom`, type scans) finds nothing there:
+  `FileNotFoundException: Could not load file or assembly '<site>/bin/umbraco.dll'` when Umbraco 6.2.6 creates a
+  document type (it loads its dialogs' tasks from `~/bin` + the assembly in `config/create/UI.xml`). Use
+  `HttpRuntime.BinDirectory`, which is `<site>/bin_dotnet/` on webForCore, or point the setting at `~/bin_dotnet`
+  (Umbraco has one: `<add key="umbracoBinDirectory" value="~/bin_dotnet" />`). Search for `~/bin` and `bin\`.
 - **The site's folder:** `AppDomain.CurrentDomain.BaseDirectory` (and `AppContext.BaseDirectory`) is the build output,
   `bin_dotnet/`, not the site root as in IIS's per-application AppDomain. Find the site's files with
   `HttpRuntime.AppDomainAppPath`, `HostingEnvironment.ApplicationPhysicalPath` or `Server.MapPath("~/...")` instead
@@ -366,6 +436,26 @@ Fix what the blocker search found (see [NAMESPACES.md](NAMESPACES.md) for replac
   fonts (Liberation, Carlito, Caladea).
 - **Culture data:** ICU's formats differ slightly from Windows NLS (for example some currency and date patterns).
   Check pages that format numbers and dates.
+- **A server with no locale runs with the invariant culture** (#97). With `LANG` and `LC_ALL` unset, or `C`, `POSIX`
+  or `C.UTF-8` (GitHub's Ubuntu runners, most container images), .NET's `CurrentCulture` and `CurrentUICulture` are
+  `CultureInfo.InvariantCulture` (name `""`), which can't happen on IIS. Resources and language files chosen by culture
+  name aren't found (Umbraco 6.2.6's log-in page shows `[login]`, `[username]`, `[password]` and can't log in or
+  install), a `ResourceManager` falls back to the neutral resources, and dates and numbers are formatted
+  `11/03/2026` and `¤1,234.50`. Set the culture in `web.config`, which applies to every request as on IIS:
+  ```xml
+  <globalization culture="en-US" uiCulture="en-US" />
+  ```
+  or give the server's environment a locale (`LANG=en_US.UTF-8`). Code outside requests (background threads,
+  timers) gets only the process's culture, so set `LANG` too where that matters.
+- **Named semaphores and events are Windows-only on .NET** (#94). `new Semaphore(..., name)`,
+  `new EventWaitHandle(..., name)` and their `OpenExisting` throw `PlatformNotSupportedException: The named version
+  of this synchronization primitive is not supported on this platform.` on Linux; only a named `Mutex` works, and
+  across processes. Umbraco 7.15.11's `MainDom` creates both in `ApplicationContext.Init`, so it fails in
+  `Application_Start`. Such code coordinated an application's old and new AppDomain during a recycle; under
+  `webforcore-host` a recycle is a new worker process (section 8), so the replacement still has to work across
+  processes: a named `Mutex` (it must be released by the thread that acquired it, so it isn't a drop-in for a
+  semaphore released elsewhere) or a file lock. Where the old instance only needs to let go when it stops, process-local
+  primitives (unnamed) are enough: the old worker still gets `IRegisteredObject.Stop` when the host stops it.
 - **BinaryFormatter:** code that calls `System.Runtime.Serialization.Formatters.Binary.BinaryFormatter` directly
   should use `WebFormsForCore.Serialization.Formatters.Binary.BinaryFormatter`.
 - **Scanning every loaded assembly's types** (#41, fixed). `Assembly.GetTypes()` on Microsoft's System.Data.SqlClient
@@ -424,5 +514,10 @@ The first request compiles pages, as on IIS. Then compare the responses recorded
 | 404 for files that exist | Case mismatch in the path, or a request filtering rule (`<hiddenSegments>`, `<fileExtensions>`) |
 | Logins lost after a restart | No explicit `<machineKey>` |
 | `PlatformNotSupportedException` | A Windows-only API: see [NAMESPACES.md](NAMESPACES.md) |
+| `PlatformNotSupportedException: The named version of this synchronization primitive is not supported` | A named `Semaphore` or `EventWaitHandle`: see "Named semaphores and events" (step 6) |
+| `CS0121: The call is ambiguous` | The app's own `DistinctBy`/`MaxBy`/`Chunk`, or a `params` call with no arguments (step 2) |
+| `Could not load file or assembly '<site>/bin/...'` | A hard-coded `~/bin`: the assemblies are in `bin_dotnet` (step 6) |
+| Language keys (`[login]`) instead of text, or dates as `MM/dd/yyyy` and `¤` currency, on a server or container only | No locale: the invariant culture; set `<globalization culture uiCulture>` or `LANG` (step 6) |
+| An empty log file with log4net | Log4Net.Async's appenders (step 3, "Libraries that don't run on .NET"); turn on `log4net.Internal.Debug` to see why |
 | 503 right after a deploy | Another process is compiling the same site folder |
 | `ReflectionTypeLoadException`: `Could not load type 'SqlGuidCaster'` | Microsoft's `System.Data.SqlClient` is in the application, not webForCore's (an earlier webForCore, or a build without `webForCore.Web.targets`): see "Scanning every loaded assembly's types" (step 6) |

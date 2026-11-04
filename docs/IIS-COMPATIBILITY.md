@@ -173,13 +173,33 @@ Where .NET Framework, IIS and .NET disagree, these choices decide what webForCor
 | **IIS 10**, in **classic pipeline mode**, with the integrated-only APIs provided on the Kestrel worker request ([above](#what-the-worker-request-gives-aspnet)) | Classic mode is how the reference source's `HttpRuntime` runs outside IIS; the integrated-only APIs are what apps call |
 | **`HttpUtility` is Microsoft's** (in System.Web), not .NET's `System.Web.HttpUtility.dll` | It goes through `HttpEncoder.Current`, so `<httpRuntime encoderType>` applies and the encoding is .NET Framework's. The framework's copy is left out of the compiler's references (CS0433 otherwise) |
 | **`System.Data.SqlClient`**, not Microsoft.Data.SqlClient, behind `SqlDataSource` and the SQL providers (membership, roles, profile, session, cache dependency) | The objects apps get and cast are the types they had on .NET Framework |
+| **Session state through `UseAspNetCoreSessionProvider()` is out-of-process state in ASP.NET Core's distributed cache**, keyed by System.Web's session ID, not ASP.NET Core's session ([MIGRATING.md](MIGRATING.md#session-state)) | One session cookie, `<sessionState cookieName>` (`ASP.NET_SessionId`), and `<sessionState timeout>`, as on IIS; ASP.NET Core's session would add its own `.AspNetCore.Session` cookie and timeout (#79) |
 | **Newlines are the platform's** in product output (`\n` on Linux): Razor's generated code, indented JSON and XML, exception messages. Only tests change | Rewriting product output would diverge from Microsoft's code. Tests compare newline-agnostically, or give Windows input where they hard-code positions |
 | **BinaryFormatter output is .NET Framework's**: webForCore's .NET Framework 4.0 assemblies are written as `Version=4.0.0.0`, and .NET Framework types .NET no longer serializes have surrogates ([NAMESPACES.md](NAMESPACES.md#other-assemblies)) | Session state, view state and the output cache keep the format out-of-process stores and other servers expect |
 | **`AssemblyVersion` is 11.0.0.0** for webForCore's assemblies, whatever the .NET version | It is webForCore's own version, and it must outrank the shared framework's 4.0.0.0 facades of the same names (`System.Web.dll`), which the host would load otherwise |
 
-Known differences from IIS these leave: an unmatched route gets ASP.NET's 404 page where IIS serves its native 404
-page (the same status), and the `Server` header is `Kestrel`, not `Microsoft-IIS/10.0`. No run has yet compared the
-gate responses with IIS itself (#78).
+### Compared with IIS 10
+
+CI's `iis-compare` job ([TESTING.md](TESTING.md#compared-with-iis-10), #78) sends the Web API gate's 66 requests
+(`test/webForCore.WebApi.Sample`, through `GlobalConfiguration` and through OWIN under `/owin`) to the same sample built
+for .NET Framework 4.8 with Microsoft's Web API 5.3.0 and Katana 4.2.3 packages, on IIS 10 (Windows Server 2025), and
+compares the responses. In IIS's **integrated** pipeline every status, `Content-Type`, `Location`, `Allow`, body
+(stack traces aside) and other header matches, including `Cache-Control: no-cache`, `Pragma` and `Expires: -1` on Web
+API's own responses and `X-Powered-By`, except these, which `tools/ci/iis-known-differences.json` lists (the job fails on
+any other difference, and on a listed one that stops occurring):
+
+| Difference | Requests | Why |
+| --- | --- | --- |
+| `Server` is `Kestrel`, not `Microsoft-IIS/10.0` | all 66 | webForCore's host is Kestrel |
+| Responses that Katana's System.Web host (`Microsoft.Owin.Host.SystemWeb`) ends have `X-AspNet-Version: 4.0.30319` and `Cache-Control: private`; IIS sends neither | the 31 under `/owin` | In IIS's integrated pipeline, Katana's `OwinHttpModule` ends the request before a managed handler runs, and ASP.NET adds those headers only around a handler. webForCore runs the classic pipeline, where they are added |
+| An unmatched extensionless URL (no route matches) gets ASP.NET's 404 page, with `X-AspNet-Version`; IIS serves its native 404 page ("HTTP Error 404.0 - Not Found", `StaticFile` handler), without it. The status is 404 on both | 2 | In IIS's integrated pipeline a URL that no managed handler claims falls through to IIS's static file handler; webForCore gives every request to ASP.NET |
+
+In IIS's **classic** pipeline, webForCore's reference ([above](#compatibility-decisions)), this sample doesn't run at
+all. Katana's `OwinHttpModule` needs the integrated pipeline, so every request fails with a 500 ("This operation requires
+IIS integrated pipeline mode"); and with the template's `Web.config`, `PUT`, `DELETE` and `OPTIONS` never reach ASP.NET
+(IIS's 404.0), because the classic-mode extensionless handler accepts only `GET`, `HEAD`, `POST` and `DEBUG`. The job
+records that run too, for reference. webForCore runs such an application as IIS's integrated pipeline does, apart from
+the differences above, with the integrated-only APIs Katana uses provided on the Kestrel worker request.
 
 How each part came to be is in git: the fork commits in `external/` and this repository's history
 ([MODIFICATIONS.md](MODIFICATIONS.md)).

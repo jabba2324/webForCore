@@ -119,11 +119,26 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
    `Microsoft.Extensions.*` references fail with `NU1605`. Remove the references `NU1510` then reports.
 6. Add `Program.cs` from `docs/MIGRATING.md` section 4. Include session state only if the app uses `Session`. Use
    `HandleAllRequestsWithWebForms()` unless the app serves only `.aspx`/`.asmx`/`.ashx`.
+7. Search the code for what behaves differently on Linux (`docs/MIGRATING.md` section 6), and fix each hit minimally:
+   - `"~/bin` or `\bin` used to load or scan assemblies: they are in `bin_dotnet/`; use `HttpRuntime.BinDirectory` or
+     the app's own setting (Umbraco: `umbracoBinDirectory` = `~/bin_dotnet`).
+   - `UriKind.Absolute` used to tell local URLs from others: `/path` is an absolute `file:` URI on Linux.
+   - `VolumeSeparatorChar`: it is `/` on Linux; use `Path.IsPathRooted`.
+   - `new Semaphore(`, `new EventWaitHandle(`, `OpenExisting(` with a name: Windows-only. Ask the user before
+     replacing them (a named `Mutex` or a file lock keeps cross-process hand-over).
+   - A `<globalization>` element without `culture`/`uiCulture`, in an app that depends on the server's culture: a
+     server with no locale runs with the invariant culture. Ask the user which culture IIS used and set it.
+   - `Log4Net.Async` in the log4net configuration: it logs nothing on .NET; point the logger at the appender it
+     forwards to.
 
 **Check:** `dotnet build -c Release` succeeds. Fix compile errors one at a time:
 - A missing type that `docs/NAMESPACES.md` lists as unavailable is a blocker: stop and ask.
 - A missing type from a .NET Framework-only library is a dependency problem: report it.
 - Platform-only issues (for example `#if` symbols or ambiguous references) can be fixed in place.
+- `CS0121: The call is ambiguous` between `System.Linq.Enumerable.DistinctBy` (or `MaxBy`, `MinBy`, `Chunk`, ...) and
+  the app's own extension method: call the app's method statically around the whole chain
+  (`EnumerableExtensions.DistinctBy(source.SelectMany(...), x => x.Key)`). Between two `params` overloads called with
+  no arguments: pass the intended overload's empty array (`new IParameter[0]`). `<LangVersion>` doesn't help.
 
 ## Phase 3: Run
 
@@ -140,6 +155,12 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
    | `FileNotFoundException`, or 404 for an existing file | Path case or `\` separators: fix the reference in code or markup, never rename to hide it |
    | `CultureNotFoundException` | Expected .NET Framework behaviour; check the culture name |
    | `PlatformNotSupportedException` | A Windows-only API: find it in `docs/NAMESPACES.md`; ask before replacing it |
+   | `PlatformNotSupportedException: The named version of this synchronization primitive is not supported` | A named `Semaphore`/`EventWaitHandle` (Phase 2 step 7); ask before replacing it |
+   | `Could not load file or assembly '<site>/bin/...'` | A hard-coded `~/bin`: use `HttpRuntime.BinDirectory` or `~/bin_dotnet` |
+   | A redirect or "another domain" error for a local URL such as `/admin/` | `Uri.TryCreate(url, UriKind.Absolute, ...)` accepts `/path` on Linux (Phase 2 step 7) |
+   | `~/...` paths not mapped, or a folder named `~` appears in the site | A `Path.VolumeSeparatorChar` check (Phase 2 step 7) |
+   | Language keys (`[login]`) or invariant formats (`¤`, `MM/dd/yyyy`) only on some servers or in containers | No locale: the invariant culture. Set `<globalization culture uiCulture>` (ask the user which) or `LANG` |
+   | log4net writes nothing | Log4Net.Async (Phase 2 step 7); `log4net.Internal.Debug` shows the `TypeLoadException` |
    | Lost logins or view state errors after a restart | Add an explicit `<machineKey>` (ask the user for keys, or generate new ones and say so) |
    | "No parameterless constructor defined" for a controller, or a DI container (Unity, Ninject, StructureMap) that was never set up | WebActivatorEx's start methods don't run on webForCore: call them from `Application_Start` (`docs/MIGRATING.md` section 3) |
    | "The SMTP host was not specified" from the app's own mail code | .NET's `SmtpClient` ignores `<mailSettings>`: replace `new SmtpClient()` with `WebFormsForCore.Net.Configuration.NetConfiguration.CreateSmtpClient()` |

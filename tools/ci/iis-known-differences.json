@@ -1,0 +1,27 @@
+[
+  {
+    "requests": ".*",
+    "field": "header Server",
+    "reason": "IIS sends Server: Microsoft-IIS/10.0; webForCore's host is Kestrel."
+  },
+  {
+    "requests": "^owin ",
+    "field": "header X-AspNet-Version",
+    "reason": "On IIS (integrated pipeline) Katana's OwinHttpModule ends the request before a managed handler runs, so ASP.NET adds no X-AspNet-Version; webForCore runs the classic pipeline, where it does."
+  },
+  {
+    "requests": "^owin ",
+    "field": "header Cache-Control",
+    "reason": "On IIS (integrated pipeline) responses Katana ends in its module get no Cache-Control: private; in webForCore's classic pipeline they do."
+  },
+  {
+    "requests": "^system\\.web GET ",
+    "field": "body",
+    "reason": "An unmatched extensionless URL gets IIS's native 404 page (StaticFile handler); webForCore serves ASP.NET's 404 page. Same status."
+  },
+  {
+    "requests": "^system\\.web GET ",
+    "field": "header X-AspNet-Version",
+    "reason": "IIS's native 404 page is not ASP.NET's, so it has no X-AspNet-Version."
+  }
+]
