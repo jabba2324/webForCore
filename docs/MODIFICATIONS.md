@@ -10,7 +10,7 @@ that code and what had to change.
 
   | Submodule | Fork branch | Upstream commit | Changes |
   | --- | --- | --- | --- |
-  | `external/AspNetWebStack` | [xforcore/AspNetWebStack `webforcore`](https://github.com/xforcore/AspNetWebStack/commits/webforcore) | `2106565` | 149, a casing fix, and upstream's `.gitattributes` kept (Windows line endings for the tests) |
+  | `external/AspNetWebStack` | [xforcore/AspNetWebStack `webforcore`](https://github.com/xforcore/AspNetWebStack/commits/webforcore) | `2106565` | 162, a casing fix, and upstream's `.gitattributes` kept (Windows line endings for the tests) |
   | `external/AspNetKatana` | [xforcore/AspNetKatana `webforcore`](https://github.com/xforcore/AspNetKatana/commits/webforcore) | `096e225` | 10 |
   | `external/SignalR` | [xforcore/SignalR `webforcore`](https://github.com/xforcore/SignalR/commits/webforcore) | `7f53f26` | 3 |
   | `external/AspNetIdentity` | [xforcore/AspNetIdentity `webforcore`](https://github.com/xforcore/AspNetIdentity/commits/webforcore) | `b7fc094` | 5 |
@@ -43,7 +43,7 @@ that code and what had to change.
 
 | Component | Upstream (pinned commit) | Licence | Files used | Files changed |
 | --- | --- | --- | ---: | ---: |
-| ASP.NET Web API 2, Razor 3, Web Pages 3, MVC 5, MVC Futures, Helpers, CORS | [aspnet/AspNetWebStack@2106565](https://github.com/aspnet/AspNetWebStack/tree/2106565) | Apache 2.0 | 1,553 libraries · 1,266 tests | 26 · 121 |
+| ASP.NET Web API 2, Razor 3, Web Pages 3, MVC 5, MVC Futures, Helpers, CORS | [aspnet/AspNetWebStack@2106565](https://github.com/aspnet/AspNetWebStack/tree/2106565) | Apache 2.0 | 1,553 libraries · 1,266 tests | 26 · 131 |
 | Katana (Microsoft.Owin 4.2.3) | [aspnet/AspNetKatana@096e225](https://github.com/aspnet/AspNetKatana/tree/096e225) | Apache 2.0 | 324 · 55 | 8 · 3 |
 | ASP.NET SignalR 2.4.3 | [SignalR/SignalR@7f53f26](https://github.com/SignalR/SignalR/tree/7f53f26) | Apache 2.0 | 318 · 152 | 2 · 1 |
 | ASP.NET Identity 2 | [aspnet/AspNetIdentity@b7fc094](https://github.com/aspnet/AspNetIdentity/tree/b7fc094) | MIT | 75 · 26 | 0 · 4 |
@@ -52,7 +52,7 @@ that code and what had to change.
 | System.Configuration, System.Web.ApplicationServices, aspnet_compiler, `BindableTypeAttribute` (replacing WebFormsForCore's decompiled copies); System.Data's typed DataSet generator | [microsoft/referencesource@ec9fa9a](https://github.com/microsoft/referencesource/tree/ec9fa9ae770d522a5b5f0607898044b7478574a3) | MIT | 114 | 41 |
 | ResX classes (replacing decompiled copies) | [dotnet/winforms@8266870](https://github.com/dotnet/winforms/tree/8266870) (release/8.0) | MIT | 13 | 13 |
 | StronglyTypedResourceBuilder (replacing an API reconstruction) | mono/mono@0f53e9e (`mcs/class/System.Design`) | MIT | 1 | 1 |
-| **Total** | | | **4,373** | **251** |
+| **Total** | | | **4,373** | **261** |
 
 The fork itself starts from [webformsforcore/WebFormsForCore@52f4172](https://github.com/webformsforcore/WebFormsForCore/tree/52f4172dbc09b3ad0b849c97642720fa7a49aa22),
 whose System.Web, System.Configuration and related assemblies were ported from Microsoft's .NET Framework reference
@@ -81,6 +81,7 @@ fixed, or the BCL difference is documented.
 | **BCL message and type differences** | `ArgumentException.Message` ends with `(Parameter 'name')`; `MediaTypeHeaderValue(null)` throws `ArgumentNullException`; `System.Private.CoreLib` instead of `mscorlib` in assembly-qualified names; the UTF-8 decoder's replacement characters; stack frames: a test asserts on MVC's own frame, not on .NET's Activator frames, which the JIT may inline (#74) |
 | **Platform newline and paths** | Razor's generated code and error messages use `\n` on Linux; tests that built Windows paths build them with `Path.Combine`, which gives each platform's separator (#46) |
 | **Test infrastructure** | `RunInSeparateAppDomain` and `AppDomainUtils` on collectible `AssemblyLoadContext`s (`test/webForCore.Microsoft.TestCommon`); xunit 1.9 → 2 (`Assert.ThrowsDelegate`, `Xunit.Extensions`); `PersistedAssemblyBuilder` for `AssemblyBuilderAccess.Save` |
+| **Shared static state** | xUnit runs test classes in parallel. Classes that use the static `ScopeStorage` (`HtmlHelper.ValidationInputCssClassName`, `Html5DateRenderingMode`, client validation settings, or a transient scope opened by `ControllerBase.Execute` or `WebPage.ExecutePageHierarchy`) join upstream's `Uses ScopeStorage or ViewEngines.Engines` collection, which runs them one at a time, and so do the classes that assert the defaults of `ModelValidatorProviders.Providers` and `ValueProviderFactories.Factories`, which classes in that collection clear (#113, #114) |
 | **Windows-only test dependencies** | DPAPI in Katana's security tests → `TestDataProtectionProvider` (AES-CBC and HMAC-SHA256); LocalDB → SQL Server in a container (Identity); a test certificate .NET's DER reader rejects outside Windows |
 | **Time zone** | Identity's `LockoutEndToNowPlus5ShouldNotBeLockedOut` assumes Pacific time: the suite runs with `TZ`, and the test takes Pacific time itself, since .NET on Windows ignores `TZ` (#46) |
 | **Mono's System.Web tests** | Corrected to Microsoft's .NET Framework 4.5+ behaviour wherever Mono's own implementation differed (Mono's tests follow Mono); hosting in the test process (.NET has one AppDomain) |
