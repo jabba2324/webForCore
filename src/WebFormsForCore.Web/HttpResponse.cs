@@ -340,9 +340,10 @@ namespace System.Web {
         {
             if ( !(_wr is IIS7WorkerRequest) ) {
                 // webForCore: on the Kestrel host, record that a managed handler ran, for IIS integrated mode's
-                // Content-Type rule in GenerateResponseHeaders.
+                // Content-Type, X-AspNet-Version and Cache-Control: private rules in GenerateResponseHeaders.
                 if (_wr is IAspNetCoreWorkerRequest) {
                     _contentTypeSetByManagedHandler = true;
+                    _handlerHeadersGenerated = true;
                 }
                 return;
             }
@@ -395,10 +396,15 @@ namespace System.Web {
 
         internal ArrayList GenerateResponseHeaders(bool forCache) {
             ArrayList   headers = new ArrayList();
-            bool sendCacheControlHeader = HttpRuntimeSection.DefaultSendCacheControlHeader;
+
+            // webForCore: on the Kestrel host, IIS integrated mode's rule (GenerateResponseHeadersForHandler): X-AspNet-Version
+            // and the default Cache-Control: private only once a managed handler ran, the response was flushed or an error
+            // was reported. A request a module ends before the handler (Katana's OwinHttpModule) gets neither on IIS.
+            bool handlerHeaders = !(_wr is IAspNetCoreWorkerRequest) || _handlerHeadersGenerated;
+            bool sendCacheControlHeader = handlerHeaders && HttpRuntimeSection.DefaultSendCacheControlHeader;
 
             // ASP.NET version header
-            if (!forCache ) {
+            if (!forCache && handlerHeaders) {
 
                 if (!_versionHeaderSent) {
                     String versionHeader = null;
@@ -628,6 +634,12 @@ namespace System.Web {
                 }
 
                 long bufferedLength = 0;
+
+                // webForCore: on the Kestrel host, a flush before the end of the request counts as the handler's, as
+                // integrated mode's flush (above) generates the handler's headers.
+                if (!finalFlush && _wr is IAspNetCoreWorkerRequest) {
+                    GenerateResponseHeadersForHandler();
+                }
 
                 //
                 // Headers
@@ -1202,6 +1214,12 @@ namespace System.Web {
             SetResponseBuffers(rawResponse.Buffers);
   
             _suppressContent = !sendBody;         
+
+            // webForCore: on the Kestrel host, a cached response is a handler's: integrated mode's snapshot keeps its
+            // X-AspNet-Version (GenerateResponseHeadersIntegrated), the classic one has it generated again.
+            if (_wr is IAspNetCoreWorkerRequest) {
+                _handlerHeadersGenerated = true;
+            }
         }
 
         // set the response content bufffers

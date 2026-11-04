@@ -95,7 +95,8 @@ commit that made it, and its issue, say why.
   the Kestrel worker request (WebSockets, client certificates, server variables, timeouts, integrated-pipeline APIs).
   See [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md).
 - **Integrated-mode semantics** on the classic pipeline: writable `Response.Headers`, the Content-Type rule, the
-  server name from the Host header.
+  server name from the Host header, `X-AspNet-Version` and the default `Cache-Control: private` only once a managed
+  handler ran, the response was flushed or an error was reported.
 - **Configuration:** protected configuration on Linux (DPAPI emulation, RSA key containers as files), section type
   identity across load contexts, `machine.config` refreshed by content.
 - **Compilation:** csc and vbc run in process, through Roslyn's public API (below), and `AssemblyBuilder` loads every
@@ -129,7 +130,11 @@ commit that made it, and its issue, say why.
   command line that needs something it doesn't do (analyzers, `/doc`, `/errorlog` and the like), or that
   csc reports an error on before compiling (a source file or a reference that isn't there), runs in a csc
   or vbc process, given the application's `runtimeconfig.json`: an application's bin has csc.dll and vbc.dll without
-  theirs. The logo line is in English whatever the UI culture. `tools/ci/check_code_rules.cs` keeps new breaks out.
+  theirs. The logo line is in English whatever the UI culture. Off Windows the compilation folder's name ends with the
+  user's name from `Environment.UserName` (`Temporary_ASP.NET_Files-www-data`), with any character other than an ASCII
+  letter, a digit, `.`, `_` or `-` replaced by `_`, instead of the user's number from libc's `geteuid()` by P/Invoke
+  (`Temporary_ASP.NET_Files-33`); the public `HttpRuntime.UserId` that .NET Framework never had is gone
+  (`HttpRuntime.CodegenDirNameForCurrentUser`). `tools/ci/check_code_rules.cs` keeps new breaks out.
 - **`<system.net>`:** `<defaultProxy>` applied at application start, and `<mailSettings>` used by System.Web's mail
   senders (`WebFormsForCore.Net.Configuration.NetConfiguration`).
 - **Build targets** (`src/webForCore.WebStack.targets`, imported by every app through the `webForCore.Web` package):

@@ -925,9 +925,26 @@ namespace System.Web
             }
         }
 
-        [DllImport("libc")]
-        static extern uint geteuid();
-        public static string UserId => OSInfo.IsWindows ? Environment.UserName : geteuid().ToString();
+        // webForCore: the name of the codegen directory under Path.GetTempPath(). On Windows it is .NET Framework's name,
+        // since the user's %TEMP% is already their own. Off Windows the temp path is usually /tmp, which every user
+        // shares, so the name ends with the user's name: otherwise the first user to compile owns the directory and the
+        // other users' applications can't compile. Characters other than ASCII letters, digits, '.', '_' and '-' (as in
+        // a directory-service name, DOMAIN\user or user@domain) become '_', so the name stays one path segment.
+        // Environment.UserName replaces the numeric ID from libc's geteuid(), which needed a P/Invoke (CONTRIBUTING.md
+        // rule 7, #57). A user without a name gets the plain name.
+        internal static string CodegenDirNameForCurrentUser {
+            get {
+                if (OSInfo.IsWindows) return codegenDirName;
+                string userName = Environment.UserName;
+                if (String.IsNullOrEmpty(userName)) return codegenDirName;
+                var name = new StringBuilder(codegenDirName.Length + 1 + userName.Length);
+                name.Append(codegenDirName).Append('-');
+                foreach (char c in userName) {
+                    name.Append(c is (>= 'a' and <= 'z') or (>= 'A' and <= 'Z') or (>= '0' and <= '9') or '.' or '_' or '-' ? c : '_');
+                }
+                return name.ToString();
+            }
+        }
 
         // Set up the codegen directory for the app
         [SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands", Justification = "This call site is trusted.")]
@@ -1049,8 +1066,7 @@ namespace System.Web
 
                 tempDirectory = Path.GetTempPath();
                 Debug.Assert(System.Web.UI.Util.HasWriteAccessToDirectory(tempDirectory));
-                if (OSInfo.IsWindows) tempDirectory = Path.Combine(tempDirectory, codegenDirName);
-                else tempDirectory = Path.Combine(tempDirectory, $"{codegenDirName}-{UserId}");
+                tempDirectory = Path.Combine(tempDirectory, CodegenDirNameForCurrentUser);
             }
   
             _tempDir = tempDirectory;

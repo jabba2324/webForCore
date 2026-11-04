@@ -1645,8 +1645,7 @@ setup,
                 }
             }
             else {
-                if (OSInfo.IsWindows) tempDirectory = Path.Combine(RuntimeEnvironment.GetRuntimeDirectory(), HttpRuntime.codegenDirName);
-				else tempDirectory = Path.Combine(RuntimeEnvironment.GetRuntimeDirectory(), $"{HttpRuntime.codegenDirName}-{HttpRuntime.UserId}");
+                tempDirectory = Path.Combine(RuntimeEnvironment.GetRuntimeDirectory(), HttpRuntime.CodegenDirNameForCurrentUser);
 			}
 			// If we don't have write access to the codegen dir, use the TEMP dir instead.
 			// This will allow non-admin users to work in hosting scenarios (e.g. Venus, aspnet_compiler)
@@ -1659,8 +1658,7 @@ setup,
                 }
                 tempDirectory = Path.GetTempPath();
                 Debug.Assert(System.Web.UI.Util.HasWriteAccessToDirectory(tempDirectory));
-                if (OSInfo.IsWindows) tempDirectory = Path.Combine(tempDirectory, HttpRuntime.codegenDirName);
-                else tempDirectory = Path.Combine(tempDirectory, $"{HttpRuntime.codegenDirName}-{HttpRuntime.UserId}");
+                tempDirectory = Path.Combine(tempDirectory, HttpRuntime.CodegenDirNameForCurrentUser);
             }
             String simpleAppName = System.Web.Hosting.AppManagerAppDomainFactory.ConstructSimpleAppName(
                 VirtualPath.GetVirtualPathStringNoTrailingSlash(virtualPath), isDevEnvironment);

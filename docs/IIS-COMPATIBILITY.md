@@ -85,7 +85,7 @@ IIS hands ASP.NET a worker request (`HttpWorkerRequest`); on Kestrel this is `As
 | Bufferless input (`GetBufferlessInputStream`) | Works | |
 | `executionTimeout` | Partial | .NET can't abort a thread. The client gets ASP.NET's 500 "Request timed out." on time, `Request.TimedOutToken` is cancelled, and the request ends at its next pipeline step; the page's code runs to the end, and its output is dropped |
 | Integrated-pipeline APIs | Works | The fork runs the classic pipeline, but the APIs that need integrated mode work: `CurrentNotification`/`IsPostNotification`, `MapRequestHandler`/`LogRequest`/`PostLogRequest` events, writable `Request.Headers` and `ServerVariables`, `Response.Headers`, `AddOnSendingHeaders`, `InsertEntityBody`, `Request.Abort`, `Response.SubStatusCode`, `Server.TransferRequest` (a new request through the whole pipeline on the same connection; a chain deeper than 16 transfers fails, a guard against loops) |
-| Response semantics | Works | Integrated mode's Content-Type rule, server name from the Host header, reason phrases, `X-AspNet-Version`, `Cache-Control: private` |
+| Response semantics | Works | Integrated mode's Content-Type rule, server name from the Host header, reason phrases, `X-AspNet-Version` and `Cache-Control: private` as integrated mode adds them (around a managed handler, on a flush and on an error; not on a response a module ends before the handler, as Katana's `OwinHttpModule` does) |
 
 ## Process model
 
@@ -96,6 +96,7 @@ IIS hands ASP.NET a worker request (`HttpWorkerRequest`); on Kestrel this is `As
 | Restart on web.config, `bin` or `App_Code` change; `HttpRuntime.UnloadAppDomain` | Works | On every platform (`bin` and `App_Code` on Linux since #51). Off Windows each watched directory takes an inotify watch: a site with many folders may need a higher `fs.inotify.max_user_watches`. The worker tells the host, which starts the next worker; requests that arrive meanwhile wait for it, and none fails. The old worker finishes its requests and exits; those still running after `<hostingEnvironment shutdownTimeout>` (30 s) are aborted, as AppDomain.Unload did: long polls and WebSockets reconnect to the new worker. The workers share the compilation folder, as AppDomains did: the next one empties it when App_Code, `bin` or Web.config changed, but leaves the assemblies a running worker has loaded, marked `.delete` for a later start to remove, as .NET Framework could not delete them either, so the old worker still compiles pages against them (#89). Off Windows that is a lock each worker holds on them; it also makes an assembly a worker replaces itself (a page edited while it runs) count towards `numRecompilesBeforeAppRestart` (15), as on IIS. A restart costs a process start (and compiling what isn't precompiled). An application run on its own (`dotnet run`, without the host) stops on a restart, for whatever started it to start it again |
 | Recycling by time, request count, private memory | Works | `Recycling(...)`, with IIS's defaults: a new worker |
 | Freeing old domains | Works | The old worker process exits: everything it held goes with it |
+| Compilation folder (Temporary ASP.NET Files) | Works | `<compilation tempDirectory>` when it is set, as on IIS. Otherwise `Temporary_ASP.NET_Files` in the temp folder (`Path.GetTempPath()`: `%TEMP%` on Windows, `$TMPDIR` or `/tmp` elsewhere), the folder .NET Framework fell back to when it couldn't write to its own (`%WINDIR%\Microsoft.NET\Framework64\v4.0.30319\Temporary ASP.NET Files`), which .NET doesn't have. Off Windows `/tmp` is shared by every user, so the name ends with the user's name, `Temporary_ASP.NET_Files-www-data`, with characters other than ASCII letters, digits, `.`, `_` and `-` replaced by `_` (#57). Up to 0.7.0 it ended with the user's number (`-33`): the first start after the upgrade compiles the application again, and the old folder can be deleted |
 | Health monitoring, rapid-fail protection | Works | The host replaces a worker that exits; after 5 failures in 5 minutes it starts no more and answers 503 (IIS stops the application pool). Startup and shutdown time limits (90 s) are IIS's. Settings: `WebForCore:Host` (`StartupTimeLimit`, `ShutdownTimeLimit`, `RapidFailProtection`, `RapidFailProtectionMaxCrashes`, `RapidFailProtectionInterval`, `QueueTimeout`, `RequestIdleTimeout`, `AcceptUntrustedClientCertificates`). |
 | Request queue, 503 on overflow | Partial | `appConcurrentRequestLimit` (503.2); no HTTP.sys queue |
 | Idle timeout, AlwaysRunning, preload | Not built | The app starts on its first request |
@@ -186,14 +187,19 @@ CI's `iis-compare` job ([TESTING.md](TESTING.md#compared-with-iis-10), #78) send
 for .NET Framework 4.8 with Microsoft's Web API 5.3.0 and Katana 4.2.3 packages, on IIS 10 (Windows Server 2025), and
 compares the responses. In IIS's **integrated** pipeline every status, `Content-Type`, `Location`, `Allow`, body
 (stack traces aside) and other header matches, including `Cache-Control: no-cache`, `Pragma` and `Expires: -1` on Web
-API's own responses and `X-Powered-By`, except these, which `tools/ci/iis-known-differences.json` lists (the job fails on
-any other difference, and on a listed one that stops occurring):
+API's own responses, `X-Powered-By`, `X-AspNet-Version` and `Cache-Control: private`, except these, which
+`tools/ci/iis-known-differences.json` lists (the job fails on any other difference, and on a listed one that stops
+occurring):
 
 | Difference | Requests | Why |
 | --- | --- | --- |
 | `Server` is `Kestrel`, not `Microsoft-IIS/10.0` | all 66 | webForCore's host is Kestrel |
-| Responses that Katana's System.Web host (`Microsoft.Owin.Host.SystemWeb`) ends have `X-AspNet-Version: 4.0.30319` and `Cache-Control: private`; IIS sends neither | the 31 under `/owin` | In IIS's integrated pipeline, Katana's `OwinHttpModule` ends the request before a managed handler runs, and ASP.NET adds those headers only around a handler. webForCore runs the classic pipeline, where they are added |
 | An unmatched extensionless URL (no route matches) gets ASP.NET's 404 page, with `X-AspNet-Version`; IIS serves its native 404 page ("HTTP Error 404.0 - Not Found", `StaticFile` handler), without it. The status is 404 on both | 2 | In IIS's integrated pipeline a URL that no managed handler claims falls through to IIS's static file handler; webForCore gives every request to ASP.NET |
+
+ASP.NET adds `X-AspNet-Version` and the default `Cache-Control: private` around a managed handler, when the response is
+flushed and when it reports an error. The responses Katana's `OwinHttpModule` ends under `/owin`, before a handler
+runs, have neither, on IIS and on webForCore, apart from the one that is flushed (`/api/status/text`: Web API doesn't
+buffer content that knows its length, so each write flushes).
 
 In IIS's **classic** pipeline, webForCore's reference ([above](#compatibility-decisions)), this sample doesn't run at
 all. Katana's `OwinHttpModule` needs the integrated pipeline, so every request fails with a 500 ("This operation requires
