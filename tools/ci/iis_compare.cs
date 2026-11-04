@@ -106,7 +106,7 @@ int Diff(string kestrelPath, string iisPath, string knownPath)
     var used = new HashSet<Known>();
 
     var unexpected = new List<string>();
-    var expected = new List<string>();
+    var expected = new Dictionary<Known, (int Count, string Example)>();
     int same = 0;
     foreach (var (key, k) in kestrel)
     {
@@ -124,7 +124,7 @@ int Diff(string kestrelPath, string iisPath, string knownPath)
             if (rule != null)
             {
                 used.Add(rule);
-                expected.Add(row + $" {rule.Reason} |");
+                expected[rule] = expected.TryGetValue(rule, out var e) ? (e.Count + 1, e.Example) : (1, row);
             }
             else unexpected.Add(row + " |");
         }
@@ -135,14 +135,15 @@ int Diff(string kestrelPath, string iisPath, string knownPath)
 
     var report = new StringBuilder();
     report.Append($"## Web API gate: webForCore (Kestrel) and IIS 10\n\n{kestrel.Count} requests: {same} with the same response, " +
-        $"{unexpected.Count} unexpected differences, {expected.Count} known differences, {stale.Count} known differences that no longer occur.\n\n");
+        $"{unexpected.Count} unexpected differences, {expected.Values.Sum(e => e.Count)} known differences, {stale.Count} known differences that no longer occur.\n\n");
     if (unexpected.Count > 0)
         report.Append("### Unexpected differences\n\n| Request | Field | webForCore | IIS 10 |\n| --- | --- | --- | --- |\n").AppendJoin("\n", unexpected).Append("\n\n");
     if (stale.Count > 0)
         report.Append("### Known differences that no longer occur\n\nRemove them from tools/ci/iis-known-differences.json and docs/IIS-COMPATIBILITY.md:\n\n")
             .AppendJoin("\n", stale.Select(r => $"- `{r.Requests}` {r.Field}: {r.Reason}")).Append("\n\n");
     if (expected.Count > 0)
-        report.Append("### Known differences (docs/IIS-COMPATIBILITY.md)\n\n| Request | Field | webForCore | IIS 10 | Why |\n| --- | --- | --- | --- | --- |\n").AppendJoin("\n", expected).Append("\n\n");
+        report.Append("### Known differences (docs/IIS-COMPATIBILITY.md)\n\n| Why | Occurrences | For example (request, field, webForCore, IIS 10) |\n| --- | ---: | --- |\n")
+            .AppendJoin("\n", expected.Select(e => $"| {e.Key.Reason} | {e.Value.Count} | {e.Value.Example.Trim('|', ' ').Replace(" | ", ", ")} |")).Append("\n\n");
     Console.Write(report);
     return unexpected.Count == 0 && stale.Count == 0 ? 0 : 1;
 }

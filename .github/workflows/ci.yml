@@ -195,7 +195,7 @@ jobs:
         run: tools/ci/package-smoke.sh "$RUNNER_TEMP/packages" 0.0.0-windows.${{ github.run_number }}
 
   # The Web API gate on IIS 10 (#78): the same sample built for .NET Framework 4.8 against Microsoft's packages, served by
-  # IIS in a classic-pipeline application pool, gets the requests WebApi.Gate.Tests sent to it on Kestrel (Linux), and
+  # IIS (integrated pipeline; the classic one is recorded too), gets the requests WebApi.Gate.Tests sent to it on Kestrel (Linux), and
   # tools/ci/iis_compare.cs diffs the responses. A difference that tools/ci/iis-known-differences.json doesn't list (and
   # docs/IIS-COMPATIBILITY.md doesn't record), or a listed one that no longer occurs, fails the job. It needs nothing of
   # webForCore's build, so it takes a few minutes once build-and-test is done. Not a required check (docs/TESTING.md).
@@ -223,17 +223,25 @@ jobs:
       - name: Build the sample for .NET Framework 4.8
         run: dotnet build test/webForCore.WebApi.Sample.Iis/webForCore.WebApi.Sample.Iis.csproj -c Release -nodeReuse:false "-p:IisSiteDirectory=$RUNNER_TEMP/site/"
 
-      - name: IIS 10, classic pipeline
+      # The sample is Visual Studio's Web API template with Katana's System.Web host, written for the integrated
+      # pipeline, as IIS's default application pool runs it: in the classic pipeline, Katana's OwinHttpModule fails every
+      # request (500, "This operation requires IIS integrated pipeline mode"). So the comparison is with the integrated
+      # pipeline; the classic one is recorded too (docs/IIS-COMPATIBILITY.md, "Compared with IIS 10").
+      - name: IIS 10
         shell: powershell
-        run: tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\site" -Port 8090
+        run: |
+          tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\site" -Name gate-integrated -Port 8090 -Pipeline Integrated
+          tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\site" -Name gate-classic -Port 8091 -Pipeline Classic
 
       - name: Send the gate's requests to IIS
-        run: dotnet run tools/ci/iis_compare.cs -- replay "$RUNNER_TEMP/gate/gate-responses.json" http://localhost:8090/ "$RUNNER_TEMP/gate/iis-responses.json"
+        run: |
+          dotnet run tools/ci/iis_compare.cs -- replay "$RUNNER_TEMP/gate/gate-responses.json" http://localhost:8090/ "$RUNNER_TEMP/gate/iis-integrated-responses.json"
+          dotnet run tools/ci/iis_compare.cs -- replay "$RUNNER_TEMP/gate/gate-responses.json" http://localhost:8091/ "$RUNNER_TEMP/gate/iis-classic-responses.json"
 
       - name: Compare
         run: |
           set -o pipefail
-          dotnet run tools/ci/iis_compare.cs -- diff "$RUNNER_TEMP/gate/gate-responses.json" "$RUNNER_TEMP/gate/iis-responses.json" | tee -a "$GITHUB_STEP_SUMMARY"
+          dotnet run tools/ci/iis_compare.cs -- diff "$RUNNER_TEMP/gate/gate-responses.json" "$RUNNER_TEMP/gate/iis-integrated-responses.json" | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Upload the responses
         if: always()

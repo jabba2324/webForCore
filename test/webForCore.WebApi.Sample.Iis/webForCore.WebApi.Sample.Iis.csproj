@@ -2,7 +2,7 @@
 
   <!-- test/webForCore.WebApi.Sample for IIS 10 and .NET Framework 4.8 (#78): the same source files, Global.asax and
        Web.config, built against Microsoft's NuGet packages of Web API 2 and Katana instead of webForCore's. CI's
-       iis-compare job (windows-2025) serves it from IIS in a classic-pipeline application pool and sends it the
+       iis-compare job (windows-2025) serves it from IIS (integrated and classic pipeline) and sends it the
        requests that WebApi.Gate.Tests recorded on Kestrel (gate-responses.json); tools/ci/iis_compare.cs diffs the two.
        Not in WebFormsForCore.slnx: only that job builds it. It builds on Linux too (reference assemblies).
 
