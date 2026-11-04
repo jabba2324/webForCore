@@ -241,14 +241,21 @@ jobs:
       - name: Compare
         run: |
           set -o pipefail
-          dotnet run tools/ci/iis_compare.cs -- diff "$RUNNER_TEMP/gate/gate-responses.json" "$RUNNER_TEMP/gate/iis-integrated-responses.json" | tee -a "$GITHUB_STEP_SUMMARY"
+          dotnet run tools/ci/iis_compare.cs -- diff "$RUNNER_TEMP/gate/gate-responses.json" "$RUNNER_TEMP/gate/iis-integrated-responses.json" \
+            "--title=IIS 10 (integrated pipeline)" | tee -a "$GITHUB_STEP_SUMMARY"
+          # The classic pipeline: for the record only, the sample doesn't run there on IIS.
+          dotnet run tools/ci/iis_compare.cs -- diff "$RUNNER_TEMP/gate/gate-responses.json" "$RUNNER_TEMP/gate/iis-classic-responses.json" \
+            "--title=IIS 10 (classic pipeline, for the record)" --informational > "$RUNNER_TEMP/gate/iis-classic.md"
+          head -3 "$RUNNER_TEMP/gate/iis-classic.md" | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Upload the responses
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: iis-responses
-          path: ${{ runner.temp }}/gate/*.json
+          path: |
+            ${{ runner.temp }}/gate/*.json
+            ${{ runner.temp }}/gate/*.md
           if-no-files-found: warn
 
   # A version tag: the tested packages become a GitHub release (not published to nuget.org), and the feed is rebuilt.

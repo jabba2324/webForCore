@@ -145,8 +145,10 @@ namespace WebApiGate
                 Assert.Equal(expectedBody, actualBody);
             }
 
-            // Headers added by System.Web (as on IIS): Web API's WebHost marks responses that set no caching as
-            // no-cache; elsewhere ASP.NET's default is Cache-Control: private.
+            // Headers added by System.Web: Web API's WebHost marks responses that set no caching as no-cache, as IIS
+            // does. Under /owin, ASP.NET's default Cache-Control: private and X-AspNet-Version come from webForCore's
+            // classic pipeline; IIS's integrated pipeline sends neither there (docs/IIS-COMPATIBILITY.md, "Compared with
+            // IIS 10", #78).
             Assert.Contains(actual.Headers.GetValues("X-AspNet-Version"), v => v == "4.0.30319");
             if (host == "webhost")
             {
