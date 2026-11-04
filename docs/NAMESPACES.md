@@ -109,7 +109,8 @@ Caveats:
   auto-detection or scripts (WPAD, PAC).
 - **What .NET Framework's machine had:** .NET Framework has every Windows code page and registers SqlClient, OleDb and
   ODBC in machine.config; .NET has neither. System.Web registers `CodePagesEncodingProvider` (so
-  `requestEncoding="windows-1252"` works) and, by type name and only when not already registered, the
+  `requestEncoding="windows-1252"` works), reads files without a BOM in the ANSI code page when `fileEncoding` isn't
+  set, as .NET Framework's `Encoding.Default` did (#90, [MIGRATING.md](MIGRATING.md#6-code-changes)), and, by type name and only when not already registered, the
   `System.Data.SqlClient`, `Microsoft.Data.SqlClient`, `System.Data.OleDb` and `System.Data.Odbc` factories, when it
   loads (`WebFormsForCore/FrameworkDefaults.cs`). The provider's own package must still be deployed.
 - `<system.data><DbProviderFactories>` in the app's configuration (`<add>`, `<remove>`, `<clear>`) registers ADO.NET

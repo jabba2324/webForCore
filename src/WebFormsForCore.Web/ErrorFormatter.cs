@@ -1013,7 +1013,7 @@ namespace System.Web {
                     return msg;
                 }
 
-                return FormatterWithFileInfo.GetSourceFileLines(_physicalPath, Encoding.Default, null, _line);
+                return FormatterWithFileInfo.GetSourceFileLines(_physicalPath, FrameworkDefaults.AnsiEncoding /* webForCore (#90): .NET Framework's Encoding.Default */, null, _line);
             }
         }
 
@@ -1590,7 +1590,7 @@ namespace System.Web {
         }
 
         protected virtual Encoding SourceFileEncoding {
-            get { return Encoding.Default; }
+            get { return FrameworkDefaults.AnsiEncoding /* webForCore (#90) */; }
         }
 
         protected override string ColoredSquareContent {
@@ -1703,7 +1703,7 @@ namespace System.Web {
                         sb.Append("               <tr>\r\n");
                         sb.Append("                  <td>\r\n");
                         sb.Append("                      <code><pre>\r\n\r\n");
-                        sb.Append(FormatterWithFileInfo.GetSourceFileLines(e.FileName, Encoding.Default, _excep.SourceCodeWithoutDemand, e.Line));
+                        sb.Append(FormatterWithFileInfo.GetSourceFileLines(e.FileName, FrameworkDefaults.AnsiEncoding /* webForCore (#90) */, _excep.SourceCodeWithoutDemand, e.Line));
                         sb.Append("</pre></code>\r\n\r\n");
                         sb.Append("                  </td>\r\n");
                         sb.Append("               </tr>\r\n");
@@ -1760,7 +1760,7 @@ namespace System.Web {
                             sb.Append("               <tr>\r\n");
                             sb.Append("                  <td>\r\n");
                             sb.Append("                      <code><pre>\r\n\r\n");
-                            sb.Append(FormatterWithFileInfo.GetSourceFileLines(e.FileName, Encoding.Default, _excep.SourceCodeWithoutDemand, e.Line));
+                            sb.Append(FormatterWithFileInfo.GetSourceFileLines(e.FileName, FrameworkDefaults.AnsiEncoding /* webForCore (#90) */, _excep.SourceCodeWithoutDemand, e.Line));
                             sb.Append("</pre></code>\r\n\r\n");
                             sb.Append("                  </td>\r\n");
                             sb.Append("               </tr>\r\n");

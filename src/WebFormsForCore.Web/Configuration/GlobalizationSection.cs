@@ -152,7 +152,7 @@ namespace System.Web.Configuration {
         public Encoding FileEncoding {
             get {
                 if (fileEncodingCache == null) {
-                    fileEncodingCache = Encoding.Default;
+                    fileEncodingCache = FrameworkDefaults.AnsiEncoding; // webForCore (#90): .NET Framework's Encoding.Default, the ANSI code page, not UTF-8
                 }
                 return fileEncodingCache;
             }
@@ -163,7 +163,7 @@ namespace System.Web.Configuration {
                 }
                 else {
                     base[_propFileEncoding] = value;
-                    fileEncodingCache = Encoding.Default;
+                    fileEncodingCache = FrameworkDefaults.AnsiEncoding; // webForCore (#90)
                 }
             }
         }

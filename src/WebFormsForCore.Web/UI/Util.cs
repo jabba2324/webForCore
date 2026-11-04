@@ -199,7 +199,7 @@ namespace System.Web.UI
 
 			// If not, use the default encoding
 			if (fileEncoding == null)
-				fileEncoding = Encoding.Default;
+				fileEncoding = FrameworkDefaults.AnsiEncoding; // webForCore (#90): .NET Framework's Encoding.Default, the ANSI code page
 
 			return fileEncoding;
 		}
@@ -214,7 +214,7 @@ namespace System.Web.UI
 			StreamReader reader;
 
 			// Check if a file encoding is specified in the config
-			Encoding fileEncoding = Encoding.Default;
+			Encoding fileEncoding = FrameworkDefaults.AnsiEncoding; // webForCore (#90)
 			if (configPath != null) fileEncoding = GetEncodingFromConfigPath(configPath);
 
 			try
@@ -421,7 +421,7 @@ namespace System.Web.UI
 		 */
 		internal /*public*/ static String StringFromFile(string path)
 		{
-			Encoding encoding = Encoding.Default;
+			Encoding encoding = FrameworkDefaults.AnsiEncoding; // webForCore (#90)
 			return StringFromFile(path, ref encoding);
 		}
 

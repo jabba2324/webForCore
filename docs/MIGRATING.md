@@ -438,6 +438,15 @@ Fix what the blocker search found (see [NAMESPACES.md](NAMESPACES.md) for replac
   fonts (Liberation, Carlito, Caladea).
 - **Culture data:** ICU's formats differ slightly from Windows NLS (for example some currency and date patterns).
   Check pages that format numbers and dates.
+- **Files without a BOM** (#90): `.aspx`, `.ascx`, `.master`, `.cshtml` and the other files ASP.NET compiles are read
+  in the ANSI code page when they have no byte order mark and `<globalization fileEncoding>` isn't set, as on .NET
+  Framework, whose `Encoding.Default` it was (.NET's is UTF-8). On Windows that is the system's code page; Linux has
+  none, so it is the one Windows has for the locale (`LANG`): windows-1252 for English, Western European and the
+  invariant culture (`LANG=C`), 932 for Japanese, 1251 for Russian, and so on. Files saved in that code page on the old
+  server (Umbraco 6's installer has `’` as byte `0x92`) show as they did there. If the server you're moving from had
+  another code page, set it: `<globalization fileEncoding="windows-1251" />`. Files with a BOM are read in its
+  encoding; files that are UTF-8 without one (saved by an editor other than Visual Studio) need
+  `<globalization fileEncoding="utf-8" />`, as they did on IIS, or `’` shows as `â€™`.
 - **A server with no locale runs with the invariant culture** (#97). With `LANG` and `LC_ALL` unset, or `C`, `POSIX`
   or `C.UTF-8` (GitHub's Ubuntu runners, most container images), .NET's `CurrentCulture` and `CurrentUICulture` are
   `CultureInfo.InvariantCulture` (name `""`), which can't happen on IIS. Resources and language files chosen by culture
