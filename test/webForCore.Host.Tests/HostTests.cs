@@ -157,5 +157,35 @@ namespace HostTests
             Assert.True(app.Process.WaitForExit(60000), "the application was still running 60 s after it restarted");
             Assert.Contains("restarted outside webforcore-host: stopping the process", app.Output);
         }
+
+        // A process without a locale has the invariant culture, which IIS never has: the application warns when it starts,
+        // unless <globalization> gives requests a culture (the sample's Web.config doesn't) (#97).
+        [Theory]
+        [InlineData("C", true)]
+        [InlineData("en_US.UTF-8", false)]
+        public async Task AnApplicationWithoutALocaleWarnsOfTheInvariantCulture(string locale, bool warns)
+        {
+            var address = new Uri($"http://127.0.0.1:{FreePort()}");
+            var start = new ProcessStartInfo("dotnet")
+            {
+                WorkingDirectory = SampleDirectory,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+            };
+            start.ArgumentList.Add($"bin_dotnet/{Sample}.dll");
+            start.ArgumentList.Add("--urls");
+            start.ArgumentList.Add(address.ToString());
+            start.Environment["LC_ALL"] = locale;
+            using var app = new Running(start, address);
+            Assert.Equal(HttpStatusCode.OK, (await app.GetAsync("/Default.aspx")).StatusCode);
+            const string warning = "runs with the invariant culture";
+            if (warns) await app.WaitForOutput(warning, TimeSpan.FromSeconds(30));
+            else
+            {
+                await app.WaitForOutput("Started application", TimeSpan.FromSeconds(30));
+                await Task.Delay(1000);
+                Assert.DoesNotContain(warning, app.Output);
+            }
+        }
     }
 }
