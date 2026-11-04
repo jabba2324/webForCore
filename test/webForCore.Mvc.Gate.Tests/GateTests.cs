@@ -125,6 +125,27 @@ namespace MvcGate
         }
 
         [Fact]
+        public async Task OneSessionCookie()
+        {
+            // #79: session state through UseAspNetCoreSessionProvider() (every application the smoke test migrates with
+            // session state, MVCForum's TempData among them) set ASP.NET Core's .AspNetCore.Session cookie as well as
+            // ASP.NET_SessionId. As on IIS, the only cookie is System.Web's, named by <sessionState cookieName>, even
+            // with AddSession() and UseSession() in Program.cs, as the sample has.
+            HttpResponseMessage post = await _server.Client.PostAsync("/Products/Create", Form(("Name", "Gadget"), ("Price", "7")));
+            Assert.Equal(302, (int)post.StatusCode);
+            string[] cookies = post.Headers.TryGetValues("Set-Cookie", out var values) ? values.ToArray() : Array.Empty<string>();
+            string cookie = Assert.Single(cookies);
+            Assert.Matches("^MvcSample_SessionId=[a-z0-5]{24}; path=/; HttpOnly; SameSite=Lax$", cookie);
+
+            // The session is found by that cookie alone, and isn't sent again.
+            var get = new HttpRequestMessage(HttpMethod.Get, "/Products/Details/2");
+            get.Headers.Add("Cookie", cookie.Substring(0, cookie.IndexOf(';')));
+            HttpResponseMessage details = await _server.Client.SendAsync(get);
+            Assert.Contains("<p id=\"saved\">Saved Gadget</p>", await details.Content.ReadAsStringAsync());
+            Assert.False(details.Headers.Contains("Set-Cookie"));
+        }
+
+        [Fact]
         public async Task AntiForgeryTokens()
         {
             using var client = CookieClient();

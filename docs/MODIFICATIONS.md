@@ -107,6 +107,9 @@ commit that made it, and its issue, say why.
   Off Windows, when App_Code's new assembly has the path of one already loaded, `CodeDirectoryCompiler` fails at
   once with the reference source's "already loaded" error: it used to force garbage collections for 3 seconds waiting
   for it to unload, which it can't in a worker process (#57).
+  `<system.codedom>` entries naming .NET Framework's `Microsoft.CSharp.CSharpCodeProvider` or
+  `Microsoft.VisualBasic.VBCodeProvider` (System.CodeDom's types on .NET) resolve to System.Web's own C# and VB
+  providers, keeping the entry's options (`CompilerInfo.CodeDomProviderType`, #88).
 - **Additions removed under CONTRIBUTING.md rules 6 and 7 (#57):** the unused `WebFormsTaskScheduler` (a public type
   .NET Framework's System.Web never had, which reflected into `ThreadPoolTaskScheduler` and `Task`), a debug-only
   `#if DebugWF4C` block in `HttpApplication.ExecuteStep`, and the `GCUtil.Alloc`/`Free` wrappers (`GCUtil`,
@@ -134,6 +137,11 @@ commit that made it, and its issue, say why.
 - **BinaryFormatter port:** surrogates for .NET Framework types .NET no longer serializes (`NameValueCollection`
   and others), so session state and view state round-trip.
 - **Security:** `bin`, `App_Data`, the build output folder and the other hidden segments return 404, as on IIS.
+- **Full trust only** (`Hosting/ApplicationManager.Core.cs`, `HttpRuntime.cs`): .NET has no Code Access Security, so
+  a partial `<trust level>` (Medium, High, ...) is accepted and the application runs in full trust, as with
+  `level="Full"`: `HttpRuntime`'s trust level is "Full" and there is no named permission set. ASP.NET read the level's
+  policy file (`web_mediumtrust.config`), which webForCore doesn't ship, and every request was a Configuration Error
+  (#87, Umbraco 6).
 - **File change notifications off Windows** (`FileChangesMonitor.cs`, `Util/FileUtil.cs`): `FindFileData` names a
   file as `FindFirstFile` does (its name, or its path relative to the monitored root, without the Windows-only parent
   walk), and the `FileSystemWatcher` that replaces `ReadDirectoryChangesW` reports names relative to the watched

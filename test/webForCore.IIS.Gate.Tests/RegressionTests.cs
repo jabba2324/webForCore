@@ -252,6 +252,20 @@ namespace IISGate
             Assert.Contains("is App_Data: True", body);
         }
 
+        // #87: a partial trust level is accepted and ignored: the application runs in full trust. The sample's Web.config
+        // has <trust level="Medium" originUrl=".*" />, as Umbraco 6's development web.config does; every request of the
+        // application was a Configuration Error ("Unable to read the security policy file for trust level 'Medium'").
+        [Fact]
+        public async Task PartialTrustLevelRunsInFullTrust()
+        {
+            var (response, body) = await Get("/regressions/TrustLevel.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("configured: Medium\n", body);
+            Assert.Contains("runtime: Full\n", body);
+            Assert.Contains("permission set: (none: full trust)\n", body);
+            Assert.Contains("demand: Unrestricted\n", body);
+        }
+
         // #33: Assembly.Load("App_GlobalResources"), as Visual Studio's designer classes for global resources do, resolves
         // to the compiled App_GlobalResources.xxxxxxxx assembly, as on IIS (and "App_Code" and "__code" to App_Code).
         // mojoPortal's Application_Start and every page failed with "Could not load file or assembly 'App_GlobalResources,
@@ -315,6 +329,29 @@ namespace IISGate
             var (response, body) = await Get(url);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Contains(prefix + "You’re done, café", body);
+        }
+
+        // #88: <system.codedom> entries naming .NET Framework's Microsoft.CSharp.CSharpCodeProvider and
+        // Microsoft.VisualBasic.VBCodeProvider (System, Version=2.0.0.0), as .NET 3.5/4.0 project templates wrote them,
+        // compile pages with System.Web's providers and the entries' options, as on IIS. Umbraco 6.2.6's every page
+        // failed with "Unable to cast object of type 'Microsoft.CSharp.CSharpCodeProvider' to type
+        // 'WebFormsForCore.CodeDom.Compiler.CodeDomProvider'". The sample's Web.config has the entries, so every page
+        // of the gate compiles through them.
+        [Fact]
+        public async Task FrameworkCodeDomProvidersInConfigCompilePages()
+        {
+            var (response, body) = await Get("/regressions/FrameworkCodeDomProviders.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("c# provider: WebFormsForCore.CodeDom.Compiler.CSharpCodeProvider\n", body);
+            Assert.Contains("c# created: WebFormsForCore.CodeDom.Compiler.CSharpCodeProvider\n", body);
+            Assert.Contains("c# warning level: 4\n", body);
+            Assert.Contains("vb provider: WebFormsForCore.CodeDom.Compiler.VBCodeProvider\n", body);
+            Assert.Contains("vb created: WebFormsForCore.CodeDom.Compiler.VBCodeProvider\n", body);
+
+            // A VB page, with the entry's OptionInfer="true" (Dim without As infers Int32).
+            (response, body) = await Get("/regressions/FrameworkVBCodeProvider.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("vb page: Int32 42\n", body);
         }
     }
 }

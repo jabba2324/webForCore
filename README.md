@@ -21,7 +21,7 @@ restore the old behaviour, the difference is documented.
 | --- | --- |
 | Target | .NET 10 LTS (`net10.0`), Linux x64; Windows as a development environment (built and tested in CI) |
 | Status | Pre-release (0.7.0). No production app has been migrated yet. NuGet packages are on a [feed on GitHub Pages](https://xforcore.github.io/webForCore/index.json) (from 0.7.0) and attached to [GitHub releases](https://github.com/xforcore/webForCore/releases), not published on nuget.org |
-| Tests | 23,592 tests in 25 suites, almost all of them Microsoft's and Mono's; all pass ([TESTING.md](docs/TESTING.md)). System.Drawing's own tests are [drawingForCore](https://github.com/xforcore/drawingForCore)'s |
+| Tests | 23,601 tests in 25 suites, almost all of them Microsoft's and Mono's; all pass ([TESTING.md](docs/TESTING.md)). System.Drawing's own tests are [drawingForCore](https://github.com/xforcore/drawingForCore)'s |
 | Licence | MIT, Apache 2.0 and BSD 3-Clause, all of which allow commercial use; see [docs/LICENSING.md](docs/LICENSING.md) |
 
 ## What works
@@ -98,9 +98,7 @@ The full guide is [docs/MIGRATING.md](docs/MIGRATING.md). In outline:
    var builder = WebApplication.CreateBuilder(args);
    builder.Services.AddWebForms();                 // IIS compression, W3C logging
    builder.Services.AddDistributedMemoryCache();   // if the app uses session state
-   builder.Services.AddSession();
    var app = builder.Build();
-   app.UseSession();
    app.UseWebForms(o => o.HandleAllRequestsWithWebForms().UseAspNetCoreSessionProvider());
    app.Run();
    ```
