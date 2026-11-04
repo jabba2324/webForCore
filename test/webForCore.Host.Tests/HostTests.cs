@@ -160,7 +160,7 @@ namespace HostTests
 
         // A process without a locale has the invariant culture, which IIS never has: the application warns when it starts,
         // unless <globalization> gives requests a culture (the sample's Web.config doesn't) (#97).
-        [Theory]
+        [NotOnWindowsTheory("the culture comes from the user's locale, not LC_ALL")]
         [InlineData("C", true)]
         [InlineData("en_US.UTF-8", false)]
         public async Task AnApplicationWithoutALocaleWarnsOfTheInvariantCulture(string locale, bool warns)
@@ -186,6 +186,15 @@ namespace HostTests
                 await Task.Delay(1000);
                 Assert.DoesNotContain(warning, app.Output);
             }
+        }
+    }
+
+    // A theory that is skipped on Windows, with the reason, where the code under test takes Windows' own path.
+    public sealed class NotOnWindowsTheoryAttribute : TheoryAttribute
+    {
+        public NotOnWindowsTheoryAttribute(string reason)
+        {
+            if (OperatingSystem.IsWindows()) Skip = "Windows: " + reason;
         }
     }
 }
