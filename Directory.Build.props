@@ -4,7 +4,7 @@
         <netlatest>net10.0</netlatest>
 
         <LangVersion>14</LangVersion>
-        <Version>0.7.0</Version>
+        <Version>0.8.0</Version>
         <AssemblyVersion>11.0.0.0</AssemblyVersion>
         <AssemblyFileVersion>11.0.0.0</AssemblyFileVersion>
         <FileVersion>11.0.0.0</FileVersion>
@@ -21,7 +21,7 @@
         <!-- System.Drawing and System.Drawing.Common: drawingForCore's packages (https://github.com/xforcore/drawingForCore,
              feed in nuget.config). -p:DrawingForCoreSource=<checkout> builds a local checkout's projects instead
              (Directory.Build.targets). -->
-        <DrawingForCoreVersion>0.2.0</DrawingForCoreVersion>
+        <DrawingForCoreVersion>0.3.0</DrawingForCoreVersion>
     </PropertyGroup>
 
     <!-- webForCore: a package's licence follows its code's origin (NOTICE). Lifted ASP.NET Web Stack, Katana and SignalR
