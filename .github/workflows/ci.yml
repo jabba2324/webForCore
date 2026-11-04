@@ -258,6 +258,42 @@ jobs:
             ${{ runner.temp }}/gate/*.md
           if-no-files-found: warn
 
+  # LINQ to SQL's errors and messages (#142): webForCore generates System.Data.Linq's Error and Strings classes, which
+  # referencesource doesn't publish, from src/webForCore.System.Data.Linq/FrameworkData/System.Data.Linq.json, data
+  # read from .NET Framework 4.8's System.Data.Linq.dll (names, messages and exception types). This job reads that
+  # assembly on Windows again and fails if the committed data differs. It needs nothing of webForCore's build. Not a
+  # required check (docs/TESTING.md).
+  linq-framework-data:
+    runs-on: windows-2025
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET (global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Read .NET Framework's System.Data.Linq.dll
+        run: |
+          gac='C:\Windows\Microsoft.NET\assembly\GAC_MSIL\System.Data.Linq\v4.0_4.0.0.0__b77a5c561934e089\System.Data.Linq.dll'
+          ls -l "$(cygpath -u "$gac")" /c/Windows/Microsoft.NET/Framework64/v4.0.30319/System.Data.Linq.dll || true
+          committed=src/webForCore.System.Data.Linq/FrameworkData/System.Data.Linq.json
+          dotnet run tools/linq/framework_data.cs -- "$gac" "$RUNNER_TEMP/linq/System.Data.Linq.json" \
+            $( [ -f "$committed" ] && echo "$committed" )
+
+      - name: Upload the data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: linq-framework-data
+          path: ${{ runner.temp }}/linq/
+          if-no-files-found: warn
+
   # A version tag: the tested packages become a GitHub release (not published to nuget.org), and the feed is rebuilt.
   release:
     # Both platforms must pass: Windows is the development environment (#46).
