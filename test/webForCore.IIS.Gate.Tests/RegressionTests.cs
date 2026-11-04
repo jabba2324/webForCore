@@ -284,5 +284,28 @@ namespace IISGate
             Assert.Contains("scan failures: 0\n", body);
             Assert.DoesNotContain("failed: ", body);
         }
+
+        // #88: <system.codedom> entries naming .NET Framework's Microsoft.CSharp.CSharpCodeProvider and
+        // Microsoft.VisualBasic.VBCodeProvider (System, Version=2.0.0.0), as .NET 3.5/4.0 project templates wrote them,
+        // compile pages with System.Web's providers and the entries' options, as on IIS. Umbraco 6.2.6's every page
+        // failed with "Unable to cast object of type 'Microsoft.CSharp.CSharpCodeProvider' to type
+        // 'WebFormsForCore.CodeDom.Compiler.CodeDomProvider'". The sample's Web.config has the entries, so every page
+        // of the gate compiles through them.
+        [Fact]
+        public async Task FrameworkCodeDomProvidersInConfigCompilePages()
+        {
+            var (response, body) = await Get("/regressions/FrameworkCodeDomProviders.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("c# provider: WebFormsForCore.CodeDom.Compiler.CSharpCodeProvider\n", body);
+            Assert.Contains("c# created: WebFormsForCore.CodeDom.Compiler.CSharpCodeProvider\n", body);
+            Assert.Contains("c# warning level: 4\n", body);
+            Assert.Contains("vb provider: WebFormsForCore.CodeDom.Compiler.VBCodeProvider\n", body);
+            Assert.Contains("vb created: WebFormsForCore.CodeDom.Compiler.VBCodeProvider\n", body);
+
+            // A VB page, with the entry's OptionInfer="true" (Dim without As infers Int32).
+            (response, body) = await Get("/regressions/FrameworkVBCodeProvider.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("vb page: Int32 42\n", body);
+        }
     }
 }

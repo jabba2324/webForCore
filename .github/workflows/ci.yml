@@ -96,6 +96,10 @@ jobs:
         if: always()
         run: cat "$RUNNER_TEMP/TestResults/summary.md" >> "$GITHUB_STEP_SUMMARY" || true
 
+      # src/WebFormsForCore.TestApp rebuilt with its pages newer than their designer files, then started (#80).
+      - name: TestApp smoke test
+        run: tools/ci/testapp-smoke.sh
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
@@ -103,6 +107,14 @@ jobs:
           name: test-results
           path: ${{ runner.temp }}/TestResults/*.trx
           if-no-files-found: warn
+
+      # Every request WebApi.Gate.Tests sent to the Web API sample on Kestrel, with the response, for iis-compare (#78).
+      - name: Upload the Web API gate's responses
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate-responses
+          path: test/webForCore.WebApi.Gate.Tests/bin/Release/net10.0/gate-responses.json
+          if-no-files-found: error
 
       - name: Pack
         run: tools/ci/pack.sh ${{ steps.version.outputs.version }} "$RUNNER_TEMP/packages"
@@ -164,6 +176,10 @@ jobs:
         if: always()
         run: cat "$RUNNER_TEMP/TestResults/summary.md" >> "$GITHUB_STEP_SUMMARY" || true
 
+      # src/WebFormsForCore.TestApp rebuilt with its pages newer than their designer files, then started (#80).
+      - name: TestApp smoke test
+        run: tools/ci/testapp-smoke.sh
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
@@ -177,6 +193,70 @@ jobs:
 
       - name: Package smoke test
         run: tools/ci/package-smoke.sh "$RUNNER_TEMP/packages" 0.0.0-windows.${{ github.run_number }}
+
+  # The Web API gate on IIS 10 (#78): the same sample built for .NET Framework 4.8 against Microsoft's packages, served by
+  # IIS (integrated pipeline; the classic one is recorded too), gets the requests WebApi.Gate.Tests sent to it on Kestrel (Linux), and
+  # tools/ci/iis_compare.cs diffs the responses. A difference that tools/ci/iis-known-differences.json doesn't list (and
+  # docs/IIS-COMPATIBILITY.md doesn't record), or a listed one that no longer occurs, fails the job. It needs nothing of
+  # webForCore's build, so it takes a few minutes once build-and-test is done. Not a required check (docs/TESTING.md).
+  iis-compare:
+    needs: build-and-test
+    runs-on: windows-2025
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET (global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: gate-responses
+          path: ${{ runner.temp }}/gate
+
+      - name: Build the sample for .NET Framework 4.8
+        run: dotnet build test/webForCore.WebApi.Sample.Iis/webForCore.WebApi.Sample.Iis.csproj -c Release -nodeReuse:false "-p:IisSiteDirectory=$RUNNER_TEMP/site/"
+
+      # The sample is Visual Studio's Web API template with Katana's System.Web host, written for the integrated
+      # pipeline, as IIS's default application pool runs it: in the classic pipeline, Katana's OwinHttpModule fails every
+      # request (500, "This operation requires IIS integrated pipeline mode"). So the comparison is with the integrated
+      # pipeline; the classic one is recorded too (docs/IIS-COMPATIBILITY.md, "Compared with IIS 10").
+      - name: IIS 10
+        shell: powershell
+        run: |
+          tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\site" -Name gate-integrated -Port 8090 -Pipeline Integrated
+          tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\site" -Name gate-classic -Port 8091 -Pipeline Classic
+
+      - name: Send the gate's requests to IIS
+        run: |
+          dotnet run tools/ci/iis_compare.cs -- replay "$RUNNER_TEMP/gate/gate-responses.json" http://localhost:8090/ "$RUNNER_TEMP/gate/iis-integrated-responses.json"
+          dotnet run tools/ci/iis_compare.cs -- replay "$RUNNER_TEMP/gate/gate-responses.json" http://localhost:8091/ "$RUNNER_TEMP/gate/iis-classic-responses.json"
+
+      - name: Compare
+        run: |
+          set -o pipefail
+          dotnet run tools/ci/iis_compare.cs -- diff "$RUNNER_TEMP/gate/gate-responses.json" "$RUNNER_TEMP/gate/iis-integrated-responses.json" \
+            "--title=IIS 10 (integrated pipeline)" | tee -a "$GITHUB_STEP_SUMMARY"
+          # The classic pipeline: for the record only, the sample doesn't run there on IIS.
+          dotnet run tools/ci/iis_compare.cs -- diff "$RUNNER_TEMP/gate/gate-responses.json" "$RUNNER_TEMP/gate/iis-classic-responses.json" \
+            "--title=IIS 10 (classic pipeline, for the record)" --informational > "$RUNNER_TEMP/gate/iis-classic.md"
+          head -3 "$RUNNER_TEMP/gate/iis-classic.md" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload the responses
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: iis-responses
+          path: |
+            ${{ runner.temp }}/gate/*.json
+            ${{ runner.temp }}/gate/*.md
+          if-no-files-found: warn
 
   # A version tag: the tested packages become a GitHub release (not published to nuget.org), and the feed is rebuilt.
   release:
