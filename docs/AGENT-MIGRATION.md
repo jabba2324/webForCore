@@ -52,7 +52,11 @@ Do this before changing anything, and present the findings to the user.
    | `Microsoft.Win32.Registry`, `[ComImport]`, `Marshal.GetActiveObject`, `System.Messaging`, `Microsoft.Office.Interop` | Windows only |
    | `Metafile`, `.emf`, `.wmf` | System.Drawing metafiles: not implemented |
    | `NetDataContractSerializer` (outside MVC Futures) | Not on .NET (`Html.Serialize`/`[Deserialize]` work) |
-   | `AppDomain.CreateDomain`, `Thread.Abort`, `Thread.ResetAbort` | Different on .NET |
+   | `AppDomain.CreateDomain`, `Thread.Abort` | Different on .NET |
+   | `System.IdentityModel`, `<system.identityModel`, `WSFederationAuthenticationModule`, `SessionAuthenticationModule`, `FederatedAuthentication`; IdentityServer3, Thinktecture.IdentityModel | Windows Identity Foundation: not available (`System.Security.Claims` works). WS-Federation sign-in: Katana's `Microsoft.Owin.Security.WsFederation`; tokens: `System.IdentityModel.Tokens.Jwt` |
+   | `System.Workflow`, `.xoml`, `System.Activities`, `WorkflowServiceHost` | Windows Workflow Foundation: not available. WF4 code can move to CoreWF; WF3 needs a rewrite (to WF4 for CoreWF, or plain code) |
+   | `System.Data.Services` (not `.Client`), `DataService<`, `.svc` with `DataServiceHostFactory` | WCF Data Services hosting: not available (the client: `Microsoft.Data.Services.Client` 5.8.4, Phase 2 step 5) |
+   | No `.csproj` for the web site (a solution `Project("{E24C65DC-...}")` web site), `CodeFile=` in `.aspx`/`.ascx`, `Bin/*.dll.refresh` | A Web Site Project: not a blocker, but Phase 2 differs (step 3) |
    | `Transaction=` in `@Page`, `System.EnterpriseServices` | COM+: not available |
    | `DataProtectionConfigurationProvider` in a `configProtectedData` section | Must be decrypted on Windows first |
 3. List NuGet packages and DLL references in three groups:
@@ -100,9 +104,24 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
    - for MVC/Web Pages, the three Razor SDK properties false;
    - `<Import Project="<webForCore>/src/webForCore.WebStack.targets" />` (project references only);
    - `App_Code` and `bin_dotnet` removed from `Compile`.
+   - `<LangVersion>`: the project's (7.3 if it set none, 13 for "latest"). C# 14's span conversions can break the
+     build (`CS0029` on `ReadOnlySpan<char>`) or, in a project that builds, LINQ providers at run time (EF 6's
+     `does not recognize the method ... Contains[Int32](System.ReadOnlySpan...)`, #138).
+   - A `.vbproj`: `<MyType>Empty</MyType>` instead of `Windows` (`BC30002` on
+     `Microsoft.VisualBasic.ApplicationServices.ApplicationBase` otherwise; `My.Computer`, `My.User` and
+     `My.Application` code needs a change), the old `<Import Include>` namespaces kept as items, and
+     `GenerateAssemblyInfo` false when `My Project/AssemblyInfo.vb` exists (#121).
 3. Keep every `.cs` file the old project compiled (code-behind with `CodeBehind=`, controllers, models, `Global.asax.cs`).
    Use the old project's `<Compile Include>` list as the source of truth: an SDK project globs all `*.cs`, so remove
    any file the old project didn't compile.
+   A **Web Site Project** has no old project: create one in the site folder with `<Compile Remove="**\*.cs" />` and
+   `<Compile Include="Program.cs" />` (the template in `docs/MIGRATING.md` section 2, "A Web Site Project"), so
+   `CodeFile=` code, `Global.asax` and `App_Code` stay run-time compiled. Turn `Bin/*.dll.refresh` files into
+   `PackageReference`s and the projects that copy into `Bin` into `ProjectReference`s (remove their copy targets), and
+   remove the DLLs in `Bin`.
+   Remove design-time classes (subclasses of `System.Web.UI.Design.*`: `ExpressionEditor`, `ControlDesigner`,
+   `DataSourceDesigner`) from the build: .NET has no System.Design, and attributes that name them by string keep
+   working (#144).
 4. Keep `Content` files as they are. Remove `packages.config`, `Properties/PublishProfiles` references to IIS, and
    the `system.codedom` compiler entries for `Microsoft.CodeDom.Providers.DotNetCompilerPlatform` in `web.config`
    (webForCore supplies the compiler). Entries naming `Microsoft.CSharp.CSharpCodeProvider` or
@@ -118,6 +137,12 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
    class library that references webForCore gets `<FrameworkReference Include="Microsoft.AspNetCore.App" />`
    (`docs/MIGRATING.md` section 2, "Class libraries that reference webForCore"); without it, its
    `Microsoft.Extensions.*` references fail with `NU1605`. Remove the references `NU1510` then reports.
+   Also in that section: an app's own `Microsoft.CodeAnalysis.*` must be 5.9.0 (`NU1107`, #153);
+   `System.Data.Services.Client` becomes `Microsoft.Data.Services.Client` 5.8.4 (#149); `WebMatrix.Data`/`WebMatrix.WebData`
+   (`Database.Open`, `WebSecurity`) are Microsoft's `Microsoft.AspNet.WebPages.Data`/`.WebData` 3.2.9 packages (#130);
+   Autofac.Configuration 3, Castle.Core 3 and NHibernate 4 need newer versions (#148). An MVC 3 or 4 app needs
+   `webpages:Version` `3.0.0.0` and `using CompareAttribute = System.Web.Mvc.CompareAttribute;` where `[Compare]` is
+   `CS0104` (#122). Plug-in libraries built into their own folder need their packages copied there (#150).
 6. Add `Program.cs` from `docs/MIGRATING.md` section 4. Include session state only if the app uses `Session`. Use
    `HandleAllRequestsWithWebForms()` unless the app serves only `.aspx`/`.asmx`/`.ashx`.
 7. Search the code for what behaves differently on Linux (`docs/MIGRATING.md` section 6), and fix each hit minimally:
@@ -131,6 +156,17 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
      server with no locale runs with the invariant culture. Ask the user which culture IIS used and set it.
    - `Log4Net.Async` in the log4net configuration: it logs nothing on .NET; point the logger at the appender it
      forwards to.
+   - `DynamicDirectory` (null on .NET): use `HttpRuntime.CodegenDir`; `PrivateBinPath`: use `HttpRuntime.BinDirectory`
+     (#139).
+   - `ResetAbort`: `Thread.ResetAbort()` throws on .NET. After `catch (ThreadAbortException)`, remove it (#143).
+   - `HashAlgorithm.Create()`, `KeyedHashAlgorithm.Create()`, `HMAC.Create()`, `SymmetricAlgorithm.Create()`,
+     `AsymmetricAlgorithm.Create()` with no argument: they throw on .NET. Replace each with .NET Framework's default
+     (`SHA1`, `HMACSHA1`, `Aes`, `RSA` 1024), never a stronger algorithm, or stored hashes stop matching (#151).
+   - `CodeDomProvider.CreateProvider`, `new CSharpCodeProvider()`, `CompileAssemblyFrom`: .NET's System.CodeDom can't
+     compile. Use `WebFormsForCore.CodeDom.Compiler.CodeDomProvider`/`CSharpCodeProvider` (`docs/MIGRATING.md` section
+     6, #133).
+   - `{0:F}`, `{0:N}`, `ToString("F")`/`("N")` with no precision, where the page relies on two decimals: ICU's
+     `en-US`/`en-GB` give three (`8.990`). Tell the user; add the precision (`F2`) if they agree (#124).
 
 **Check:** `dotnet build -c Release` succeeds. Fix compile errors one at a time:
 - A missing type that `docs/NAMESPACES.md` lists as unavailable is a blocker: stop and ask.
@@ -140,6 +176,8 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
   the app's own extension method: call the app's method statically around the whole chain
   (`EnumerableExtensions.DistinctBy(source.SelectMany(...), x => x.Key)`). Between two `params` overloads called with
   no arguments: pass the intended overload's empty array (`new IParameter[0]`). `<LangVersion>` doesn't help.
+- `CS0104: 'KeyValuePair' is an ambiguous reference` (a type .NET added, here `System.Collections.Generic.KeyValuePair`,
+  with the name of one of the app's): alias the app's in that file (`using KeyValuePair = App.Types.KeyValuePair;`, #136).
 
 ## Phase 3: Run
 
@@ -165,6 +203,16 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
    | Lost logins or view state errors after a restart | Add an explicit `<machineKey>` (ask the user for keys, or generate new ones and say so) |
    | "No parameterless constructor defined" for a controller, or a DI container (Unity, Ninject, StructureMap) that was never set up | Before 0.7.0, WebActivatorEx's start methods didn't run (upgrade to 0.7.0 or later). From 0.7.0 they run when they are in a `bin` assembly; a pre-start method in `App_Code` doesn't run, as on IIS: move it to a `bin` assembly, or call it from `Application_Start` (`docs/MIGRATING.md` section 3) |
    | "The SMTP host was not specified" from the app's own mail code | .NET's `SmtpClient` ignores `<mailSettings>`: replace `new SmtpClient()` with `WebFormsForCore.Net.Configuration.NetConfiguration.CreateSmtpClient()` |
+   | `Conflicting versions of ASP.NET Web Pages detected: specified version is "1.0.0.0"` | An MVC 3/4 `webpages:Version`: set `3.0.0.0` (Phase 2 step 5) |
+   | ``LINQ to Entities does not recognize the method '... Contains[Int32](System.ReadOnlySpan`1[...], Int32)'`` | No `<LangVersion>`: set the project's (Phase 2 step 2) |
+   | `ArgumentNullException ... (Parameter 'path')` at `DirectoryInfo..ctor` in a plug-in loader | `DynamicDirectory` is null: `HttpRuntime.CodegenDir` (Phase 2 step 7) |
+   | `PlatformNotSupportedException: Thread abort is not supported on this platform` | Remove `Thread.ResetAbort()` (Phase 2 step 7) |
+   | `PlatformNotSupportedException: This platform does not allow the automatic selection of an algorithm` | A parameterless crypto factory (Phase 2 step 7) |
+   | `PlatformNotSupportedException: Operation is not supported on this platform` from `CompileAssemblyFrom...` | System.CodeDom compilation: webForCore's provider (Phase 2 step 7) |
+   | `Could not load file or assembly 'System.IdentityModel, Version=4.0.0.0'` | Windows Identity Foundation, a blocker (Phase 0): stop and ask |
+   | `FileNotFoundException` for a package of a plug-in built into its own folder | Copy the plug-in's packages there (`docs/MIGRATING.md` section 2, "Plug-in libraries") |
+   | `MissingMethodException: ... AppDomainSetup.get_ConfigurationFile()` or `... AppDomain.DefineDynamicAssembly(...)` | Autofac.Configuration 3, Castle.Core 3 or NHibernate 4: newer versions (Phase 2 step 5) |
+   | Prices shown with three decimals (`8.990`) | ICU's `en-US`/`en-GB` `NumberDecimalDigits` (Phase 2 step 7) |
 
 **Check:** every page type renders without errors.
 

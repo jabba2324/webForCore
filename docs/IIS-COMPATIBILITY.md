@@ -115,6 +115,7 @@ IIS hands ASP.NET a worker request (`HttpWorkerRequest`); on Kestrel this is `As
 | Windows (Negotiate, Kerberos, NTLM) | Not built | Kestrel's Negotiate handler exists but isn't connected to System.Web's `User` |
 | Basic, Digest | Not built | There are no Windows accounts to check against |
 | Impersonation | Not possible | There's no Windows identity to impersonate |
+| WS-Federation through Windows Identity Foundation (`WSFederationAuthenticationModule`, `SessionAuthenticationModule`, `<system.identityModel>`) | Not available | .NET has no `System.IdentityModel` (WIF), #119. Katana's `Microsoft.Owin.Security.WsFederation` signs in with WS-Federation on OWIN ([NAMESPACES.md](NAMESPACES.md#summary-of-what-doesnt-work)) |
 
 ## Deployment tools
 
