@@ -43,10 +43,25 @@ namespace HostTests
                     </configuration>
                     """);
                 System.IO.Directory.CreateDirectory(Path.Combine(Directory, "App_Data", "unwatched"));
-                // The folders exist before the application starts, as a site's modules do. On Windows, 200 folders made at
-                // once while it ran restarted the application with fcnMode="Single" (BinDirChangeOrDirectoryRename: most
-                // likely an overwhelming change reported by its 8 KB watcher of the whole folder, which IIS restarts on too).
+                // The folders exist before the application starts, as a site's modules do.
                 for (int i = 0; i < 200; i++) System.IO.Directory.CreateDirectory(Path.Combine(Directory, "App_Data", "folders", "f" + i));
+                WaitUntilQuiet(Directory);
+            }
+
+            // On Windows, NTFS reports the new copy's directories as changed for a while after it is made (seen in
+            // build-windows: "bin_dotnet\cs", "bin_dotnet\runtimes\...", without anything writing to them). With
+            // fcnMode="Single", a change below bin_dotnet restarts the application, as it does on IIS, so the application
+            // starts once the folder is quiet, as a deployed site is.
+            static void WaitUntilQuiet(string directory)
+            {
+                using var watcher = new FileSystemWatcher(directory) { IncludeSubdirectories = true, InternalBufferSize = 65536 };
+                var last = DateTime.UtcNow;
+                FileSystemEventHandler changed = (s, e) => last = DateTime.UtcNow;
+                watcher.Changed += changed;
+                watcher.Created += changed;
+                watcher.EnableRaisingEvents = true;
+                var deadline = DateTime.UtcNow.AddSeconds(30);
+                while (DateTime.UtcNow - last < TimeSpan.FromSeconds(2) && DateTime.UtcNow < deadline) Thread.Sleep(200);
             }
 
             static void CopyDirectory(string from, string to)
@@ -56,17 +71,8 @@ namespace HostTests
                 foreach (var dir in System.IO.Directory.GetDirectories(from)) CopyDirectory(dir, Path.Combine(to, Path.GetFileName(dir)));
             }
 
-            public static readonly List<string> Changes = new List<string>();
-
             public Running Start()
             {
-                // DIAG (temporary): what changes in the site while it runs.
-                var recorder = new FileSystemWatcher(Directory) { IncludeSubdirectories = true, InternalBufferSize = 65536 };
-                recorder.Created += (s, e) => { lock (Changes) Changes.Add("created " + e.Name); };
-                recorder.Changed += (s, e) => { lock (Changes) Changes.Add("changed " + e.Name); };
-                recorder.Deleted += (s, e) => { lock (Changes) Changes.Add("deleted " + e.Name); };
-                recorder.Renamed += (s, e) => { lock (Changes) Changes.Add("renamed " + e.OldName + " " + e.Name); };
-                recorder.EnableRaisingEvents = true;
                 var address = new Uri($"http://127.0.0.1:{FreePort()}");
                 var start = new ProcessStartInfo("dotnet")
                 {
@@ -102,7 +108,7 @@ namespace HostTests
         {
             HttpResponseMessage response;
             try { response = await app.GetAsync("/Monitor.aspx?" + query); }
-            catch (HttpRequestException e) { throw new Xunit.Sdk.XunitException($"{e.Message}\n{app.Output}\nDIAG changes: {string.Join("\n", Site.Changes)}"); }
+            catch (HttpRequestException e) { throw new Xunit.Sdk.XunitException($"{e.Message}\n{app.Output}"); }
             var answer = await response.Content.ReadAsStringAsync();
             Assert.True(response.StatusCode == HttpStatusCode.OK, $"{(int)response.StatusCode}: {answer}\n{app.Output}");
             Assert.DoesNotContain("failed at folder", answer);
