@@ -53,6 +53,17 @@ namespace IISGate
             var script = await _server.Client.GetStringAsync("/signalr/hubs");
             Assert.Contains("proxies['gateHub']", script);
         }
+
+        // The proxy's header names SignalR's version, as Microsoft's 2.4.3 serves it: SignalR's build writes the version
+        // into the template's [!VERSION!] (and its lines with Windows line endings) before embedding it, and webForCore's
+        // build of the fork embedded the template as it is (#118, signalr-samples).
+        [Fact]
+        public async Task HubsProxyScriptHeaderHasSignalRVersion()
+        {
+            var script = await _server.Client.GetStringAsync("/signalr/hubs");
+            Assert.StartsWith("/*!\r\n * ASP.NET SignalR JavaScript Library 2.4.3\r\n * http://signalr.net/\r\n", script);
+            Assert.DoesNotContain("[!VERSION!]", script);
+        }
     }
 }
 

@@ -109,7 +109,7 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
             {
                 return s_collection;
             }
-            return null;
+            return ReflectionSurrogates.GetSurrogate(type); // #156
         }
 
         // .NET's NameObjectCollectionBase.OnDeserialization and TextInfo's IDeserializationCallback throw
@@ -118,9 +118,12 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
         internal static bool IsUnsupportedDeserializationCallback(object obj) =>
             obj is TextInfo || (obj is NameObjectCollectionBase && NameObjectCollectionSurrogate.Handles(obj.GetType()));
 
-        // The .NET Framework 4.x assemblies this repository builds carry upstream's version (11.0.0.0, so they win over
-        // .NET's 4.0.0.0 facades of the same name); on the wire they are written with .NET Framework's version, as
-        // System.Web's types were. Other assemblies (the Web Stack's keep their own versions) are written as they are.
+        // System.Web carries webForCore's version (11.0.0.0, so it wins over .NET's 4.0.0.0 facade of the same name); on
+        // the wire it is written with .NET Framework's version, as System.Web's types were. The other .NET Framework 4.x
+        // assemblies this repository builds have .NET Framework's identity (#141), and the rest (the Web Stack's) are
+        // written as they are.
+        // The core library is mscorlib, as on .NET Framework, for its types that have no TypeForwardedFrom (System.Type[]
+        // in a MemberInfoSerializationHolder, #156).
         private static readonly HashSet<string> s_frameworkAssemblies = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "System.Web", "System.Web.ApplicationServices", "System.Web.DataVisualization", "System.Web.DynamicData",
@@ -131,6 +134,10 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
 
         internal static string GetAssemblyName(Assembly assembly) => s_assemblyNames.GetOrAdd(assembly, static a =>
         {
+            if (a == typeof(object).Assembly)
+            {
+                return Mscorlib;
+            }
             AssemblyName name = a.GetName();
             byte[]? token = name.GetPublicKeyToken();
             if (name.Name != null && s_frameworkAssemblies.Contains(name.Name) && name.Version?.Major > 4 && token is { Length: 8 })

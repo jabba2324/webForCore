@@ -28,4 +28,24 @@
       <ReferencePath Remove="@(ReferencePath)" Condition="'%(FileName)' == 'System.Web.HttpUtility' AND $([System.Text.RegularExpressions.Regex]::IsMatch(%(FullPath),'(?i)[\\/]Microsoft\.(NETCore|AspNetCore)\.App\.Ref[\\/]'))" />
     </ItemGroup>
   </Target>
+  <!-- webForCore: Microsoft's assembly identity (#141). A project that replaces a Microsoft assembly whose version isn't
+       webForCore's 11.0.0.0 sets MicrosoftAssemblyVersion to Microsoft's: the version libraries built against Microsoft's
+       assembly reference (BundleTransformer: System.Web.Optimization 1.1.0.0, CS0012 against 11.0.0.0). It takes the place
+       of src/VersionInfo.cs, and of the Web Stack's development versions in CommonAssemblyInfo.cs, which Microsoft's own
+       builds replaced with the released version (BUILD_GENERATED_VERSION). tools/ci/check_assembly_identities.cs checks
+       every packaged assembly against Microsoft's. -->
+  <PropertyGroup Condition="'$(MicrosoftAssemblyVersion)' != ''">
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <AssemblyVersion>$(MicrosoftAssemblyVersion)</AssemblyVersion>
+    <FileVersion>$(MicrosoftAssemblyVersion)</FileVersion>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
+    <DefineConstants>$(DefineConstants);BUILD_GENERATED_VERSION</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(MicrosoftAssemblyVersion)' != ''">
+    <Compile Remove="$(MSBuildThisFileDirectory)src/VersionInfo.cs" />
+  </ItemGroup>
 </Project>

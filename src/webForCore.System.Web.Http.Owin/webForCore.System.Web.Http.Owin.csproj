@@ -5,6 +5,8 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>System.Web.Http.Owin</AssemblyName>
+    <!-- webForCore: the released 5.3.0's version, which Microsoft's build stamped in place of the source's development version (5.3.1.0) (#141). -->
+    <MicrosoftAssemblyVersion>5.3.0.0</MicrosoftAssemblyVersion>
     <RootNamespace>System.Web.Http.Owin</RootNamespace>
     <PackageId>webForCore.Web.Http.Owin</PackageId>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
