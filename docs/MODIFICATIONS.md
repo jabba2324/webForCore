@@ -111,6 +111,9 @@ commit that made it, and its issue, say why.
 - **Hosting:** webforcore-host and its worker processes (process recycling, #56), IIS's `<system.webServer>` modules,
   the Kestrel worker request (WebSockets, client certificates, server variables, timeouts, integrated-pipeline APIs).
   See [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md).
+  `AspNetCoreWorkerRequest.ParseHeaders` stores the request's unknown headers whatever the path: the cookieless
+  session check it took from IIS's filter returned before storing them when a path had a `(` and no `/(...)/`
+  (#170, OData's `/People(1)` lost `Prefer`).
 - **Integrated-mode semantics** on the classic pipeline: writable `Response.Headers`, the Content-Type rule, the
   server name from the Host header, `X-AspNet-Version` and the default `Cache-Control: private` only once a managed
   handler ran, the response was flushed or an error was reported.
@@ -218,7 +221,9 @@ commit that made it, and its issue, say why.
   `HttpStaticObjectsCollection`, `HostingEnvironment`, `ApplicationManager`) return null, as on .NET Framework (#137,
   DNN and ClientDependency). `HttpRuntime.InitFusion` reads `<runtime><assemblyBinding><probing privatePath>` from the
   application's web.config, and the load context's resolver searches those folders after the build output, in fusion's
-  order (#147, Orchard; [NAMESPACES.md](NAMESPACES.md)).
+  order (#147, Orchard; [NAMESPACES.md](NAMESPACES.md)). As fusion does, it checks the version only of a strong-named
+  reference: for one without a public key token, the assembly of that name it finds is the one, whatever its version
+  (#171, JabbR deploys Nancy 0.20.0 and a library built against 0.21.1).
 - **System.Web.DynamicData** (`src/WebFormsForCore.Web.DynamicData`, now built and in the "Always" set): the Entity
   Framework 1–4 and LINQ to SQL model providers, `LinqDataSource`/`EntityDataSource` hookups and EF 5 spatial column
   types are compiled out (`#if NETFRAMEWORK`); `AssemblyRef.cs` and `ScaffoldTableAttribute` (which .NET dropped) are
