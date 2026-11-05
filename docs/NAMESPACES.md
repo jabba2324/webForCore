@@ -29,7 +29,7 @@ in the code; the rest come from the test suites and gates ([TESTING.md](TESTING.
 | Windows authentication | `<authentication mode="Windows">`, `WindowsIdentity`, impersonation, file ACL authorization | Forms, cookie or OpenID Connect authentication |
 | WCF | Hosting `.svc` services; `ApplicationServicesHostFactory` | CoreWCF, or ASMX (`.asmx` works) |
 | WCF Data Services | Hosting OData v1-v3 services (`System.Data.Services`, `DataService<T>`, `DataServiceHostFactory`). The client, `System.Data.Services.Client`, isn't on .NET either | The client: `Microsoft.Data.Services.Client` 5.8.4, same namespace ([MIGRATING.md](MIGRATING.md#3-references), #149). Hosting: Web API OData (`Microsoft.AspNet.OData`, which runs on webForCore) |
-| Windows Identity Foundation | `System.IdentityModel` and `System.IdentityModel.Services` 4.0.0.0: `<system.identityModel>`, `<system.identityModel.services>`, `WSFederationAuthenticationModule`, `SessionAuthenticationModule`, `FederatedAuthentication`, `ClaimsAuthorizationManager`, WIF's security tokens and `System.IdentityModel.Protocols.WSTrust`, and libraries built on them (IdentityServer3: `Could not load file or assembly 'System.IdentityModel, Version=4.0.0.0'`, #119; Thinktecture.IdentityModel). `System.Security.Claims` (`ClaimsPrincipal`, `ClaimsIdentity`) is on .NET | WS-Federation sign-in: Katana's `Microsoft.Owin.Security.WsFederation` ([MIGRATING.md](MIGRATING.md#packages-that-need-more-than-a-reference)); tokens: `Microsoft.IdentityModel.Tokens`, `System.IdentityModel.Tokens.Jwt` |
+| Windows Identity Foundation | `System.IdentityModel` and `System.IdentityModel.Services` 4.0.0.0: `<system.identityModel>`, `<system.identityModel.services>`, `WSFederationAuthenticationModule`, `SessionAuthenticationModule`, `FederatedAuthentication`, `ClaimsAuthorizationManager`, WIF's security tokens and `System.IdentityModel.Protocols.WSTrust`, and libraries built on them (IdentityServer3: `Could not load file or assembly 'System.IdentityModel, Version=4.0.0.0'`, #119; Thinktecture.IdentityModel; IdentityServer3.AccessTokenValidation 2.x, whose `System.IdentityModel.Tokens.Jwt` 4.x is built on WIF. IdentityServer3.Contrib.AccessTokenValidation 4.x, on IdentityModel 5, runs as it is: the OpenID Connect gate tests 4.1.16). `System.Security.Claims` (`ClaimsPrincipal`, `ClaimsIdentity`) is on .NET | WS-Federation sign-in: Katana's `Microsoft.Owin.Security.WsFederation` ([MIGRATING.md](MIGRATING.md#packages-that-need-more-than-a-reference)); tokens: `Microsoft.IdentityModel.Tokens`, `System.IdentityModel.Tokens.Jwt` |
 | Windows Workflow Foundation | WF3 (`System.Workflow.Runtime`, `.ComponentModel`, `.Activities`, XOML) and WF4 (`System.Activities`, `WorkflowServiceHost`): only in .NET Framework's GAC, with no .NET port from Microsoft (C1 CMS, #132) | WF4: [CoreWF](https://github.com/UiPath/CoreWF), the community port of `System.Activities`. WF3: a rewrite of the workflows, to WF4 (then CoreWF) or to plain code; CoreWF doesn't run WF3 |
 | Run-time compilation through System.CodeDom | .NET's `CodeDomProvider.CreateProvider("c#")`, `Microsoft.CSharp.CSharpCodeProvider` and `CompileAssemblyFrom*` throw `PlatformNotSupportedException`, and read no `<system.codedom>` (#133) | webForCore's `WebFormsForCore.CodeDom.Compiler.CodeDomProvider.CreateProvider("c#")` or `CSharpCodeProvider`/`VBCodeProvider` ([MIGRATING.md](MIGRATING.md#6-code-changes)) |
 | Design-time support | System.Design: `System.Web.UI.Design` (`ControlDesigner`, `ExpressionEditor`, `DataSourceDesigner`) and its editors, for an app's own designer classes (#144) | Remove them from the build; attributes that name them by string still work ([MIGRATING.md](MIGRATING.md#2-convert-the-project)) |
@@ -249,12 +249,24 @@ isn't provided ([MIGRATING.md](MIGRATING.md#3-references)).
 
 Microsoft.Owin 4.2.3 and companions: `Microsoft.Owin` (+ `.Builder`, `.Extensions`, `.Infrastructure`, `.Logging`,
 `.Mapping`, `.Security`), `Microsoft.Owin.Security` (+ `.Cookies`, `.OAuth`, `.DataHandler`, `.DataProtection`),
-`Microsoft.Owin.Host.SystemWeb`, `Microsoft.Owin.Hosting`, `Microsoft.Owin.Host.HttpListener`,
-`Microsoft.Owin.Testing`, `Microsoft.Owin.Cors`. `Owin.dll` (`IAppBuilder`) is the `Owin` 1.0 package.
+`Microsoft.Owin.Security.OpenIdConnect`, `.Jwt`, `.WsFederation`, `.ActiveDirectory` (Entra ID / Azure AD and ADFS
+bearer tokens), `.Google`, `.Facebook`, `.MicrosoftAccount` and `.Twitter`, `Microsoft.Owin.Host.SystemWeb`,
+`Microsoft.Owin.Hosting`, `Microsoft.Owin.Host.HttpListener`, `Microsoft.Owin.Testing`, `Microsoft.Owin.Cors`.
+`Owin.dll` (`IAppBuilder`) is the `Owin` 1.0 package. Each is the `webForCore.<assembly>` package.
 
 Caveats: `DpapiDataProtectionProvider` uses the DPAPI emulation, so its payloads can't be exchanged with Windows. On
 System.Web the machine key protects cookies, as on IIS. The "Domain" hosting starter throws (it needs AppDomains). The
 HttpListener host uses Katana's Mono code paths. `HostString` accepts hosts that mix Unicode and punycode labels.
+
+OpenID Connect, JWT, WS-Federation and Active Directory are built against IdentityModel 8 (`Microsoft.IdentityModel.*`
+and `System.IdentityModel.Tokens.Jwt` 8.19.1), the version CoreWCF brings to every webForCore application, where
+Microsoft's packages use 5.3; the source is unchanged ([MODIFICATIONS.md](MODIFICATIONS.md#library-changes-by-kind)
+lists the APIs it uses). An application's own IdentityModel code compiles against 8.x too. What differs from IIS:
+the authorize and end-session redirects carry IdentityModel's telemetry for 8.x (`x-client-SKU=ID_NET10_0`,
+`x-client-ver=8.19.1.0`), and IdentityModel's exception messages are worded as in 8.x; the exception types an
+`AuthenticationFailed` notification sees are the same. The OpenID Connect gate (`test/webForCore.Oidc.Gate.Tests`)
+signs in to an application configured as for Entra ID, and CI compares it with IIS 10
+([IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md#openid-connect)).
 
 ## SignalR 2 and ASP.NET Identity 2 (upstream)
 
