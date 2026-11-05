@@ -240,6 +240,18 @@ namespace IISGate
             Assert.Equal("Deep\n", deepBody);
         }
 
+        // A 304 Not Modified has no Content-Length, as on IIS 10, which sends none for it; ASP.NET's own Content-Length: 0
+        // isn't sent. A customer application's CacheCow.Server.WebApi answers If-None-Match with 304s (Packages.Gate.Tests,
+        // compared with IIS 10 by iis-compare); here a page does.
+        [Fact]
+        public async Task A304HasNoContentLength()
+        {
+            var (response, body) = await Get("/status/NotModified.aspx");
+            Assert.Equal(HttpStatusCode.NotModified, response.StatusCode);
+            Assert.Equal("", body);
+            Assert.False(response.Content.Headers.Contains("Content-Length"));
+        }
+
         // #129 (a WebMatrix Starter Site: WebSecurity.RequireAuthenticatedUser() answered an empty 401 instead of the
         // redirect to the log-in page): after Response.End() the response is still buffered when EndRequest runs, so
         // FormsAuthenticationModule turns the 401 into its redirect, and every module's EndRequest can change it.

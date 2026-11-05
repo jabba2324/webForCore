@@ -1,0 +1,1 @@
+<%@ Page Language="C#" %><%-- A 304 from a page, as an application answers a conditional GET itself, with the Content-Length: 0 Web API's OWIN adapter sets for an empty response. --%><% Response.StatusCode = 304; Response.AppendHeader("Content-Length", "0"); Response.End(); %>

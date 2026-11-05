@@ -240,6 +240,27 @@ in place of the cache headers an application added. In IIS's integrated pipeline
 and the policy replaces only the headers it writes; webForCore now does the same for headers set through
 `Response.Headers` (Oidc.Gate.Tests' `CookieMiddlewareResponsesKeepExpires`).
 
+#### Third-party packages
+
+The job also compares `test/webForCore.Packages.Sample`, with third-party net4x packages a customer application keeps
+as they are (Ninject.Web.Common.WebHost, .OwinHost and Ninject.Web.WebApi.OwinHost; WebActivatorEx; Swashbuckle.Core
+5.6.0; CacheCow.Server.WebApi 2.5.0), built for .NET Framework 4.8 with the same packages and Microsoft's Web API 5.3.0
+and Katana 4.2.3, on IIS's **integrated** pipeline (Katana's System.Web host needs it there). It gets the requests
+Packages.Gate.Tests sent on webForCore, in the same order: Ninject's request scopes through System.Web, an OWIN
+middleware and Web API; Swashbuckle's document, its UI and every file the UI loads; and CacheCow's ETags, 304s and the
+new ETags after a `PUT` and a `POST`. Every status, body and header matches, `X-AspNet-Version` and
+`Cache-Control: private` on Swashbuckle's UI files (Web API streams them, so they are flushed) included, except the one
+`tools/ci/iis-known-differences-packages.json` lists:
+
+| Difference | Requests | Why |
+| --- | --- | --- |
+| `Server` is `Kestrel`, not `Microsoft-IIS/10.0` | all 39 | webForCore's host is Kestrel |
+
+The first run found one more: CacheCow's 304s had `Content-Length: 0` on webForCore (Web API's OWIN adapter sets it
+for an empty response) and none on IIS, which sends no `Content-Length` with a 304. webForCore now leaves it out of a
+304 too, whether ASP.NET or the application set it (IIS.Gate.Tests' `A304HasNoContentLength`, compared with IIS's
+classic pipeline as part of request handling).
+
 #### Request handling
 
 The job also compares request handling (#126, #127, #129, #140): `test/webForCore.Requests.Sample`, a Web Forms site of

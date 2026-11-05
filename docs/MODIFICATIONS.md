@@ -256,6 +256,9 @@ commit that made it, and its issue, say why.
   `HttpResponse` writes `Transfer-Encoding: chunked` and the chunks of an unbuffered response itself, and Kestrel
   passes them through. When the last chunk never went out (sending failed, and so did writing the error), the request
   ended and Kestrel kept the connection: the client waited for ever. The worker aborts the connection then (#184).
+- **No `Content-Length` with a 304** (`AspNetCoreWorkerRequest.SendCalculatedContentLength`, `SendUnknownResponseHeader`):
+  IIS sends none with a 304 Not Modified, whoever set it; Kestrel sends what it is given. The worker request leaves it
+  out (a customer application's CacheCow.Server.WebApi 304s, through Web API's OWIN adapter).
 - **URLs find files in any case off Windows** (`Configuration/UserMapPath.cs`): `ResolveIgnoreCase`, which already
   found configuration paths, is internal so that the worker request (`Request.PhysicalPath`) and the IIS modules map a
   request's path with it too (#140).

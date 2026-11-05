@@ -120,6 +120,7 @@ namespace PackagesGate
             var notModified = _gate.Response("GET /api/products/1 If-None-Match (current)");
             Assert.Equal(304, (int)notModified["status"]);
             Assert.Equal("", (string)notModified["body"]);
+            Assert.Null(PackagesGate.Header(notModified, "Content-Length"));
 
             Assert.Equal("{\"Id\":1,\"Name\":\"Tomato Soup\",\"Price\":1.25}", (string)Ok("PUT /api/products/1")["body"]);
             var changed = Ok("GET /api/products/1 If-None-Match (before the PUT)");
