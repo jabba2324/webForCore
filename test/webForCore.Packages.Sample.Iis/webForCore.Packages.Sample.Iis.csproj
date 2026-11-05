@@ -1,0 +1,87 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- test/webForCore.Packages.Sample for IIS 10 and .NET Framework 4.8: the same source files, handlers, Global.asax and
+       Web.config, built against Microsoft's NuGet packages of Web API 5.3.0 and Katana 4.2.3 (the System.Web host) and the
+       same third-party packages (Ninject's web integration, WebActivatorEx, Swashbuckle.Core, CacheCow.Server.WebApi), as
+       a customer application has them on IIS. CI's iis-compare job serves it from IIS, sends it the requests
+       Packages.Gate.Tests sent to the sample on Kestrel (packages-responses.json) and tools/ci/iis_compare.cs diffs the
+       responses. Not in WebFormsForCore.slnx: only that job builds it. It builds on Linux too.
+
+       The site is written to $(IisSiteDirectory) (obj/site by default): the handlers, Global.asax, the sample's Web.config
+       with the binding redirects the packages need, and bin. -->
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <OutputType>Library</OutputType>
+    <AssemblyName>webForCore.Packages.Sample</AssemblyName>
+    <RootNamespace>PackagesSample</RootNamespace>
+    <LangVersion>7.3</LangVersion>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <NoWarn>$(NoWarn);NU1902;NU1903</NoWarn>
+    <IisSiteDirectory Condition="'$(IisSiteDirectory)' == ''">$(MSBuildProjectDirectory)\obj\site\</IisSiteDirectory>
+    <Sample>$(MSBuildProjectDirectory)\..\webForCore.Packages.Sample\</Sample>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Program.cs is the Kestrel entry point; IIS starts the application from Global.asax. -->
+    <Compile Include="$(Sample)**\*.cs" Exclude="$(Sample)Program.cs;$(Sample)bin_dotnet\**;$(Sample)obj\**;$(Sample)bin\**" />
+    <_IisPage Include="$(Sample)**\*.ashx;$(Sample)Global.asax" Exclude="$(Sample)bin_dotnet\**;$(Sample)obj\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Net.Http" />
+    <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.2.3" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Owin" Version="5.3.0" />
+    <PackageReference Include="Ninject" Version="3.3.6" />
+    <PackageReference Include="Ninject.Web.Common" Version="3.3.2" />
+    <PackageReference Include="Ninject.Web.Common.WebHost" Version="3.3.2" />
+    <PackageReference Include="Ninject.Web.Common.OwinHost" Version="3.3.1" />
+    <PackageReference Include="Ninject.Web.WebApi" Version="3.3.0" />
+    <PackageReference Include="Ninject.Web.WebApi.OwinHost" Version="3.3.0" />
+    <PackageReference Include="WebActivatorEx" Version="2.2.0" />
+    <PackageReference Include="Swashbuckle.Core" Version="5.6.0" />
+    <PackageReference Include="CacheCow.Server.WebApi" Version="2.5.0" />
+    <!-- App_Start/NinjectWebCommon.cs is the sample's; the package's copy of it isn't added again. -->
+    <PackageReference Update="Ninject.Web.Common.WebHost" ExcludeAssets="contentFiles" />
+  </ItemGroup>
+
+  <UsingTask TaskName="WebForCoreIisWebConfig" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <WebConfig ParameterType="System.String" Required="true" />
+      <AssemblyConfig ParameterType="System.String" Required="true" />
+      <Output ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Linq" />
+      <Using Namespace="System.Xml.Linq" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        // The sample's Web.config plus the <runtime> (assembly binding redirects) the build generated for the packages.
+        XDocument config = XDocument.Load(WebConfig);
+        config.Root.Elements("runtime").Remove();
+        if (File.Exists(AssemblyConfig))
+        {
+            XElement runtime = XDocument.Load(AssemblyConfig).Root.Element("runtime");
+            if (runtime != null) config.Root.Add(runtime);
+        }
+        Directory.CreateDirectory(Path.GetDirectoryName(Output));
+        config.Save(Output);
+      ]]></Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="WriteIisSite" AfterTargets="Build">
+    <ItemGroup>
+      <_IisBin Include="$(OutDir)*.dll;$(OutDir)*.pdb;$(OutDir)*.xml" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_IisBin)" DestinationFolder="$(IisSiteDirectory)bin" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(_IisPage)" DestinationFiles="@(_IisPage->'$(IisSiteDirectory)%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <WebForCoreIisWebConfig WebConfig="$(Sample)Web.config" AssemblyConfig="$(TargetPath).config" Output="$(IisSiteDirectory)Web.config" />
+    <Message Importance="high" Text="IIS site: $(IisSiteDirectory)" />
+  </Target>
+</Project>
