@@ -82,6 +82,9 @@ namespace System.Web {
         // webForCore: the cache headers (Cache-Control, Expires, Last-Modified, ETag, Vary) the application set through
         // Response.Headers, the emulated integrated-pipeline API (AppendHeaderThroughHeaders).
         private ArrayList   _integratedCacheHeaders;
+        // webForCore: Content-Length set through Response.Headers (Web API's OWIN adapter sets 0 for an empty response).
+        // IIS's integrated pipeline sends none with a 304; its classic pipeline sends one AppendHeader set.
+        private bool        _integratedContentLength;
         private bool        _suppressHeaders;
         private bool        _suppressContentSet;
         private bool        _suppressContent;
@@ -599,6 +602,12 @@ namespace System.Web {
             for (int i = 0; i < n; i++)
             {
                 header = headers[i] as HttpResponseHeader;
+                // webForCore: no Content-Length set through Response.Headers on a 304, as in IIS's integrated pipeline
+                // (a customer application's CacheCow.Server.WebApi 304s through Katana, compared with IIS 10).
+                if (_integratedContentLength && StatusCode == 304
+                    && StringUtil.EqualsIgnoreCase(header.Name, "Content-Length")) {
+                    continue;
+                }
                 header.Send(_wr);
             }
         }
@@ -2175,6 +2184,9 @@ namespace System.Web {
         internal void AppendHeaderThroughHeaders(String name, String value) {
             AppendHeader(name, value);
             switch (HttpWorkerRequest.GetKnownResponseHeaderIndex(name)) {
+                case HttpWorkerRequest.HeaderContentLength:
+                    _integratedContentLength = true;
+                    break;
                 case HttpWorkerRequest.HeaderCacheControl:
                 case HttpWorkerRequest.HeaderExpires:
                 case HttpWorkerRequest.HeaderLastModified:
@@ -2204,6 +2216,7 @@ namespace System.Web {
             switch (HttpWorkerRequest.GetKnownResponseHeaderIndex(name)) {
                 case HttpWorkerRequest.HeaderContentLength:
                     _contentLengthSet = false;
+                    _integratedContentLength = false;
                     break;
                 case HttpWorkerRequest.HeaderTransferEncoding:
                     _transferEncodingSet = false;
@@ -2272,6 +2285,7 @@ namespace System.Web {
             _charSet = null;
             _customCharSet = false;
             _contentLengthSet = false;
+            _integratedContentLength = false;
 
             _redirectLocation = null;
             _redirectLocationSet = false;

@@ -240,16 +240,18 @@ namespace IISGate
             Assert.Equal("Deep\n", deepBody);
         }
 
-        // A 304 Not Modified has no Content-Length, as on IIS 10, which sends none for it; ASP.NET's own Content-Length: 0
-        // isn't sent. A customer application's CacheCow.Server.WebApi answers If-None-Match with 304s (Packages.Gate.Tests,
-        // compared with IIS 10 by iis-compare); here a page does.
+        // A 304 Not Modified: ASP.NET calculates no Content-Length for it, and one the page appends (AppendHeader) is sent,
+        // as in IIS 10's classic pipeline. One set through Response.Headers isn't, as in the integrated pipeline: a
+        // customer application's CacheCow.Server.WebApi 304s through Katana (Packages.Gate.Tests' CacheCowValidatesWithETags,
+        // compared with IIS's integrated pipeline).
         [Fact]
-        public async Task A304HasNoContentLength()
+        public async Task A304KeepsTheContentLengthAPageAppends()
         {
             var (response, body) = await Get("/status/NotModified.aspx");
             Assert.Equal(HttpStatusCode.NotModified, response.StatusCode);
             Assert.Equal("", body);
-            Assert.False(response.Content.Headers.Contains("Content-Length"));
+            Assert.True(response.Content.Headers.TryGetValues("Content-Length", out var length));
+            Assert.Equal("0", Assert.Single(length));
         }
 
         // #129 (a WebMatrix Starter Site: WebSecurity.RequireAuthenticatedUser() answered an empty 401 instead of the

@@ -657,17 +657,10 @@ namespace System.Web.Hosting
 			return bytesRead;
 		}
 
-		// webForCore: IIS 10 sends no Content-Length with a 304 Not Modified, whoever set it (ASP.NET's calculated one, or
-		// the application's through Response.Headers, as Web API's OWIN adapter does for an empty response). Kestrel would
-		// send it. A customer application's CacheCow.Server.WebApi 304s had Content-Length: 0 (Packages.Gate.Tests,
-		// iis-compare).
-		bool IsNotModifiedContentLength(string name) =>
-			Context.Response.StatusCode == 304 && string.Equals(name, "Content-Length", StringComparison.OrdinalIgnoreCase);
-
 		public override void SendCalculatedContentLength(int contentLength)
 		{
 			if (SuppressOutput) return;
-			if (!headersSent && !IsNotModifiedContentLength("Content-Length"))
+			if (!headersSent)
 			{
 				Context.Response.ContentLength = contentLength;
 			}
@@ -815,7 +808,7 @@ namespace System.Web.Hosting
 
 		public override void SendUnknownResponseHeader(string name, string value)
 		{
-			if (headersSent || SuppressOutput || IsNotModifiedContentLength(name))
+			if (headersSent || SuppressOutput)
 				return;
 
 			if (Context.Response.Headers.ContainsKey(name)) {

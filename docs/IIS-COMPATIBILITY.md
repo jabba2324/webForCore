@@ -257,9 +257,10 @@ new ETags after a `PUT` and a `POST`. Every status, body and header matches, `X-
 | `Server` is `Kestrel`, not `Microsoft-IIS/10.0` | all 39 | webForCore's host is Kestrel |
 
 The first run found one more: CacheCow's 304s had `Content-Length: 0` on webForCore (Web API's OWIN adapter sets it
-for an empty response) and none on IIS, which sends no `Content-Length` with a 304. webForCore now leaves it out of a
-304 too, whether ASP.NET or the application set it (IIS.Gate.Tests' `A304HasNoContentLength`, compared with IIS's
-classic pipeline as part of request handling).
+through `Response.Headers` for an empty response) and none on IIS. IIS's integrated pipeline sends no `Content-Length`
+with a 304; its classic pipeline sends one a page appends with `AppendHeader` (request handling's
+`/status/NotModified.aspx`, `A304KeepsTheContentLengthAPageAppends`). webForCore now does both: a `Content-Length` set
+through the emulated integrated `Response.Headers` is left out of a 304, and one appended is sent.
 
 #### Request handling
 
