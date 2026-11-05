@@ -43,6 +43,10 @@ namespace HostTests
                     </configuration>
                     """);
                 System.IO.Directory.CreateDirectory(Path.Combine(Directory, "App_Data", "unwatched"));
+                // The folders exist before the application starts, as a site's modules do. On Windows, 200 folders made at
+                // once while it ran restarted the application with fcnMode="Single" (BinDirChangeOrDirectoryRename: most
+                // likely an overwhelming change reported by its 8 KB watcher of the whole folder, which IIS restarts on too).
+                for (int i = 0; i < 200; i++) System.IO.Directory.CreateDirectory(Path.Combine(Directory, "App_Data", "folders", "f" + i));
             }
 
             static void CopyDirectory(string from, string to)
