@@ -10,7 +10,7 @@ that code and what had to change.
 
   | Submodule | Fork branch | Upstream commit | Changes |
   | --- | --- | --- | --- |
-  | `external/AspNetWebStack` | [xforcore/AspNetWebStack `webforcore`](https://github.com/xforcore/AspNetWebStack/commits/webforcore) | `2106565` | 162, a casing fix, and upstream's `.gitattributes` kept (Windows line endings for the tests) |
+  | `external/AspNetWebStack` | [xforcore/AspNetWebStack `webforcore`](https://github.com/xforcore/AspNetWebStack/commits/webforcore) | `2106565` | 163, a casing fix, and upstream's `.gitattributes` kept (Windows line endings for the tests) |
   | `external/AspNetKatana` | [xforcore/AspNetKatana `webforcore`](https://github.com/xforcore/AspNetKatana/commits/webforcore) | `096e225` | 10 |
   | `external/SignalR` | [xforcore/SignalR `webforcore`](https://github.com/xforcore/SignalR/commits/webforcore) | `7f53f26` | 3 |
   | `external/AspNetIdentity` | [xforcore/AspNetIdentity `webforcore`](https://github.com/xforcore/AspNetIdentity/commits/webforcore) | `b7fc094` | 5 |
@@ -100,6 +100,7 @@ fixed, or the BCL difference is documented.
 | **Time zone** | Identity's `LockoutEndToNowPlus5ShouldNotBeLockedOut` assumes Pacific time: the suite runs with `TZ`, and the test takes Pacific time itself, since .NET on Windows ignores `TZ` (#46) |
 | **Mono's System.Web tests** | Corrected to Microsoft's .NET Framework 4.5+ behaviour wherever Mono's own implementation differed (Mono's tests follow Mono); hosting in the test process (.NET has one AppDomain) |
 | **Mono's System.Data.Linq tests** | One test expected the `System.Exception` that Mono's own `Error` class throws where .NET Framework's throws `ArgumentException` (#142) |
+| **webForCore's identities** | MVC Futures' `VersionTest` expects System.Web.Mvc 5.3.0.0, the released version webForCore's has, not the source's development version 5.3.1.0 (#141) |
 | **Selection** | Microsoft's own categories are used (`category!=failing`). SignalR's IIS Express and Service Bus tests aren't built |
 
 ## webForCore's changes to System.Web and the hosting layer
