@@ -116,7 +116,9 @@ commit that made it, and its issue, say why.
   (#170, OData's `/People(1)` lost `Prefer`).
 - **Integrated-mode semantics** on the classic pipeline: writable `Response.Headers`, the Content-Type rule, the
   server name from the Host header, `X-AspNet-Version` and the default `Cache-Control: private` only once a managed
-  handler ran, the response was flushed or an error was reported.
+  handler ran, the response was flushed or an error was reported; a cache header (`Expires`, `Cache-Control`, ...) set
+  through `Response.Headers` stays when the cache policy writes its own, which then replaces only the same names, as
+  in IIS's header block (Katana's cookie middleware's `Expires: -1`, found by the OpenID Connect comparison with IIS 10).
 - **Configuration:** protected configuration on Linux (DPAPI emulation, RSA key containers as files), section type
   identity across load contexts, `machine.config` refreshed by content.
 - **Compilation:** csc and vbc run in process, through Roslyn's public API (below), and `AssemblyBuilder` loads every

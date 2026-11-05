@@ -267,6 +267,24 @@ namespace OidcGate
             Assert.Contains(signedIn.Headers.GetValues("Set-Cookie"), c => c.StartsWith(".AspNet.Cookies=wfc1.", StringComparison.Ordinal));
         }
 
+        // Katana's cookie middleware sets Cache-Control: no-cache, Pragma: no-cache and Expires: -1 through
+        // Response.Headers when it signs in or out, and the response sets a cookie. On IIS (integrated pipeline, the only
+        // one Katana runs in) those headers go to IIS directly, and ASP.NET's cache policy then replaces Cache-Control
+        // with "private" but leaves Expires. webForCore, whose Response.Headers emulates the integrated API on the classic
+        // pipeline, dropped Expires: the classic pipeline writes the cache policy instead of the cache headers an
+        // application added once a cookie has modified it (found by CI's iis-compare job).
+        [Theory]
+        [InlineData("oidc signin 2 form_post")]
+        [InlineData("oidc signin-manual 2 form_post")]
+        [InlineData("oidc signin 5 sign-out")]
+        [InlineData("oidc default ticket format 1 sign-in")]
+        public void CookieMiddlewareResponsesKeepExpires(string key)
+        {
+            Assert.Equal("-1", Header(key, "Expires"));
+            Assert.Equal("no-cache", Header(key, "Pragma"));
+            Assert.Equal("private", Header(key, "Cache-Control"));
+        }
+
         // Katana's default TicketDataFormat on System.Web (the machine key's data protection): a cookie it wrote reads back.
         [Fact]
         public void DefaultTicketFormatRoundTrips()

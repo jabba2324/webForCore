@@ -79,6 +79,9 @@ namespace System.Web {
         private bool        _cacheControlHeaderAdded;
         private HttpCachePolicy _cachePolicy;
         private ArrayList   _cacheHeaders;
+        // webForCore: the cache headers (Cache-Control, Expires, Last-Modified, ETag, Vary) the application set through
+        // Response.Headers, the emulated integrated-pipeline API (AppendHeaderThroughHeaders).
+        private ArrayList   _integratedCacheHeaders;
         private bool        _suppressHeaders;
         private bool        _suppressContentSet;
         private bool        _suppressContent;
@@ -458,7 +461,23 @@ namespace System.Web {
 
                 // cache policy
                 if (_cachePolicy != null && _cachePolicy.IsModified()) {
+                    int policyStart = headers.Count;
                     _cachePolicy.GetHeaders(headers, this);
+                    // webForCore: in IIS's integrated pipeline, a header set through Response.Headers is in IIS's header
+                    // block already, and the cache policy replaces only the headers it writes (UpdateNativeResponse): Katana's
+                    // cookie middleware's Expires: -1 stays when the cookie it sets has modified the policy. The classic
+                    // pipeline writes the policy instead of the cache headers AppendHeader kept, as before.
+                    if (_integratedCacheHeaders != null) {
+                        foreach (HttpResponseHeader h in _integratedCacheHeaders) {
+                            bool replaced = false;
+                            for (int i = policyStart; i < headers.Count && !replaced; i++) {
+                                replaced = StringUtil.EqualsIgnoreCase(((HttpResponseHeader)headers[i]).Name, h.Name);
+                            }
+                            if (!replaced) {
+                                headers.Add(h);
+                            }
+                        }
+                    }
                 }
                 else {
                     if (_cacheHeaders != null) {
@@ -2150,10 +2169,29 @@ namespace System.Web {
             }
         }
 
+        // webForCore: AppendHeader for Response.Headers.Add and Set, the emulated integrated-pipeline API. A cache header
+        // is also kept as one IIS would have in its header block, which the cache policy replaces only by name
+        // (GenerateResponseHeaders).
+        internal void AppendHeaderThroughHeaders(String name, String value) {
+            AppendHeader(name, value);
+            switch (HttpWorkerRequest.GetKnownResponseHeaderIndex(name)) {
+                case HttpWorkerRequest.HeaderCacheControl:
+                case HttpWorkerRequest.HeaderExpires:
+                case HttpWorkerRequest.HeaderLastModified:
+                case HttpWorkerRequest.HeaderEtag:
+                case HttpWorkerRequest.HeaderVary:
+                    if (_integratedCacheHeaders == null) {
+                        _integratedCacheHeaders = new ArrayList();
+                    }
+                    _integratedCacheHeaders.Add(new HttpResponseHeader(HttpWorkerRequest.GetKnownResponseHeaderIndex(name), value));
+                    break;
+            }
+        }
+
         // webForCore: removes a header from this response's own store, for Response.Headers.Set and Remove in the
         // emulated integrated pipeline (IIS removes it from the native header block).
         internal void RemoveManagedHeader(String name) {
-            foreach (ArrayList list in new[] { _customHeaders, _cacheHeaders }) {
+            foreach (ArrayList list in new[] { _customHeaders, _cacheHeaders, _integratedCacheHeaders }) {
                 if (list != null) {
                     for (int i = list.Count - 1; i >= 0; i--) {
                         if (StringUtil.EqualsIgnoreCase(((HttpResponseHeader)list[i]).Name, name)) {
@@ -2259,6 +2297,7 @@ namespace System.Web {
 
             _cacheControlHeaderAdded = false;
             _cacheHeaders = null;
+            _integratedCacheHeaders = null;
 
             _suppressHeaders = false;
             _suppressContent = false;
