@@ -352,6 +352,8 @@ jobs:
         if: ${{ !cancelled() }}
         shell: powershell
         run: |
+          # The WebSocket Protocol role service, for the integrated site's WebSocket.
+          Install-WindowsFeature -Name Web-WebSockets | Out-Null
           tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\drain-Classic" -Name drain-classic -Port 8097 -Pipeline Classic
           tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\drain-Integrated" -Name drain-integrated -Port 8098 -Pipeline Integrated
 

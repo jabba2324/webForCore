@@ -4,13 +4,13 @@
 //
 //   dotnet run tools/ci/iis_drain.cs -- site <folder>
 //     writes a site: Web.config with <httpRuntime shutdownTimeout="10"> and <hostingEnvironment shutdownTimeout="5">,
-//     Default.aspx (the application's domain id), Stream.aspx (the domain id, then a line flushed every second for
-//     ?seconds=, then "done") and bin.
+//     Default.aspx (the application's domain id), Echo.ashx (a WebSocket echo), Stream.aspx (the domain id, then a
+//     line flushed every second for ?seconds=, then "done") and bin.
 //   dotnet run tools/ci/iis_drain.cs -- check <folder> <URL> <pipeline> <report.md>
 //     for each length, requests Stream.aspx, writes a new file in bin 2 s later (the application restarts), asks for
 //     Default.aspx every half second while the stream runs (does a new domain serve?), and records how many lines
-//     arrived and how the stream ended. Appends a Markdown report; the exit code is 1 if IIS decided otherwise than
-//     webForCore.
+//     arrived and how the stream ended; in the integrated pipeline, how long a WebSocket open across the change is
+//     served. Appends a Markdown report; the exit code is 1 if IIS decided otherwise than webForCore.
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 
@@ -29,6 +29,42 @@ if (args.Length >= 2 && args[0] == "site")
         </configuration>
         """);
     File.WriteAllText(Path.Combine(dir, "Default.aspx"), "<%@ Page Language=\"C#\" %>domain=<%= System.Web.HttpRuntime.AppDomainId %>;");
+    File.WriteAllText(Path.Combine(dir, "Echo.ashx"), """
+        <%@ WebHandler Language="C#" Class="EchoHandler" %>
+        using System;
+        using System.Net.WebSockets;
+        using System.Threading;
+        using System.Threading.Tasks;
+        using System.Web;
+        using System.Web.WebSockets;
+
+        public class EchoHandler : IHttpHandler
+        {
+            public bool IsReusable { get { return false; } }
+
+            public void ProcessRequest(HttpContext context)
+            {
+                if (context.IsWebSocketRequest) context.AcceptWebSocketRequest(Echo);
+                else context.Response.Write("not a websocket request");
+            }
+
+            static async Task Echo(AspNetWebSocketContext context)
+            {
+                var socket = context.WebSocket;
+                var buffer = new byte[4096];
+                while (socket.State == WebSocketState.Open)
+                {
+                    var result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                    if (result.MessageType == WebSocketMessageType.Close)
+                    {
+                        await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "bye", CancellationToken.None);
+                        break;
+                    }
+                    await socket.SendAsync(new ArraySegment<byte>(buffer, 0, result.Count), WebSocketMessageType.Text, true, CancellationToken.None);
+                }
+            }
+        }
+        """);
     File.WriteAllText(Path.Combine(dir, "Stream.aspx"), """
         <%@ Page Language="C#" %>
         <%
@@ -133,10 +169,58 @@ async Task Check(int seconds, bool? expected)
     if (expected != null && (complete != expected.Value || !newDomain)) failed = true;
 }
 
+// A WebSocket open when bin changes (the integrated pipeline only: the classic one has none): how long it is served.
+async Task CheckWebSocket()
+{
+    await Domain();
+    await Task.Delay(3000);
+    using var socket = new System.Net.WebSockets.ClientWebSocket();
+    var uri = new UriBuilder(baseUrl + "/Echo.ashx") { Scheme = "ws" }.Uri;
+    try { await socket.ConnectAsync(uri, CancellationToken.None); }
+    catch (Exception e)
+    {
+        report.Add($"| a WebSocket | | not opened ({e.GetBaseException().Message}) | | |");
+        return;
+    }
+    await Task.Delay(2000);
+    File.WriteAllText(Path.Combine(site, "bin", "drain-websocket.txt"), DateTime.UtcNow.ToString("O"));
+    var changed = Stopwatch.StartNew();
+    var buffer = new byte[256];
+    string ending;
+    while (true)
+    {
+        try
+        {
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            await socket.SendAsync("ping"u8.ToArray(), System.Net.WebSockets.WebSocketMessageType.Text, true, timeout.Token);
+            var result = await socket.ReceiveAsync(buffer, timeout.Token);
+            if (result.MessageType == System.Net.WebSockets.WebSocketMessageType.Close)
+            {
+                ending = $"closed ({result.CloseStatus})";
+                break;
+            }
+        }
+        catch (Exception e)
+        {
+            ending = $"aborted ({e.GetBaseException().Message})";
+            break;
+        }
+        if (changed.Elapsed > TimeSpan.FromSeconds(60))
+        {
+            ending = "still open";
+            break;
+        }
+        await Task.Delay(500);
+    }
+    report.Add($"| a WebSocket | | {ending}, {changed.Elapsed.TotalSeconds:0.0} s after the change | | (recorded only) |");
+    Console.WriteLine($"{pipeline} WebSocket: {ending}, {changed.Elapsed.TotalSeconds:0.0} s after the change");
+}
+
 // Longer than <hostingEnvironment shutdownTimeout>, shorter than <httpRuntime shutdownTimeout>: webForCore runs it to its end.
 await Check(8, true);
 // Longer than <httpRuntime shutdownTimeout> and the sixth of it HttpRuntime.Dispose waits again.
 await Check(30, null);
+if (pipeline == "Integrated") await CheckWebSocket();
 
 report.Add("");
 File.AppendAllLines(args[4], report);
