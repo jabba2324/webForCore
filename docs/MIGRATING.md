@@ -467,10 +467,10 @@ These came up migrating real applications; each names one that needed it.
   - **Other prebuilt .NET Framework libraries that use `CallContext`** fail the same way, with `TypeLoadException: Could
     not load type 'System.Runtime.Remoting.Messaging.CallContext' from assembly 'mscorlib, Version=4.0.0.0'` (#178).
     Look for a version with a .NET Standard or .NET build, which NuGet then picks. BlogEngine.NET's SimpleInjector
-    3.1.0: `.Integration.WebApi`'s `BeginScope` uses `SimpleInjector.Extensions.ExecutionContextScoping` 3.1.0 (net45
-    only), so every Web API controller failed with "Make sure that the controller has a parameterless public
-    constructor", the `TypeLoadException` inside. SimpleInjector, `.Extensions.ExecutionContextScoping` and
-    `.Integration.WebApi` 3.3.2 work: that ExecutionContextScoping has a .NET Standard 1.3 build (on `AsyncLocal`).
+    3.1.0: `.Integration.WebApi`'s `BeginScope` uses `SimpleInjector.Extensions.ExecutionContextScoping` 3.1.0 (both
+    its builds use `CallContext`), so every Web API controller failed with "Make sure that the controller has a
+    parameterless public constructor", the `TypeLoadException` inside. SimpleInjector, `.Extensions.ExecutionContextScoping`
+    and `.Integration.WebApi` 3.3.2 work: that ExecutionContextScoping has a .NET Standard 1.3 build (on `AsyncLocal`).
   - **Autofac.Configuration 3.x** (3.3.0, the last for Autofac 3) throws reading a configuration file (#148, Orchard
     1.10): `MissingMethodException: Method not found: 'System.String System.AppDomainSetup.get_ConfigurationFile()'`
     in `SectionHandler.NormalizeConfigurationFilePath`. 4.x is a rewrite on Microsoft.Extensions.Configuration and
