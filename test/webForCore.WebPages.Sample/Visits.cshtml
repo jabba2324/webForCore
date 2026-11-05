@@ -1,0 +1,16 @@
+@{
+    // Session state through UseAspNetCoreSessionProvider(): serialized into ASP.NET Core's distributed cache (#180).
+    Layout = null;
+    var visits = (Session["visits"] as int? ?? 0) + 1;
+    Session["visits"] = visits;
+    if (Request["keep"] == "unserializable") {
+        Session["message"] = new Message { Text = "kept" };
+    }
+}
+visits=@visits
+@functions {
+    // Not [Serializable], as MVCForum's GenericMessageViewModel.
+    public class Message {
+        public string Text { get; set; }
+    }
+}
