@@ -7,8 +7,9 @@
 //     Views, bin_dotnet). Builds an image from <base image> with both (tools/ci/windows-container/Dockerfile), runs it
 //     with the container's port 8080 published on <port>, and checks: the application serves its Razor views, JSON and
 //     a POST's redirect; Web.config changed inside the container restarts the application in a new worker process of
-//     webforcore-host (the old one is recycled and exits with 0) and the new worker serves the same responses. Appends
-//     a Markdown report; the exit code is 1 if a check failed. The container is removed in every case.
+//     webforcore-host (the old one is recycled and exits with 0) and the new worker serves the same responses; docker stop
+//     ends the host and its worker cleanly. Appends a Markdown report; the exit code is 1 if a check failed. The
+//     container is removed in every case.
 using System.Diagnostics;
 using System.Net;
 using System.Text;
@@ -106,6 +107,15 @@ try
     var serving = Regex.Matches(Logs(), @"Worker (\d+) \(process (\d+)\) is serving");
     Check("the new worker is another process", serving.Count >= 2 && serving[^1].Groups[2].Value != serving[0].Groups[2].Value,
         string.Join(", ", serving.Select(m => m.Value)));
+
+    // docker stop: the container's shutdown event stops the host, which stops its worker (as WAS stopped w3wp).
+    var watch = Stopwatch.StartNew();
+    var stop = Docker("stop", "-t", "60", Container);
+    watch.Stop();
+    var exitCode = Docker("inspect", "-f", "{{.State.ExitCode}}", Container).Output.Trim();
+    Check("docker stop ends the host", stop.Exit == 0 && exitCode == "0", $"exit code {exitCode} after {watch.Elapsed.TotalSeconds:0.0} s");
+    if (serving.Count >= 2)
+        Check("the serving worker exits with 0 when the container stops", Logs().Contains($"(process {serving[^1].Groups[2].Value}) exited (0)."));
 }
 catch (Exception e)
 {
