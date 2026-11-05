@@ -61,7 +61,7 @@ in the code; the rest come from the test suites and gates ([TESTING.md](TESTING.
 | `System.Web.Compilation` | 34 | `BuildManager`; run-time compilation with Roslyn (C# and VB) |
 | `System.Web.ModelBinding` | 99 | Web Forms model binding |
 | `System.Web.Security` | 39 | Forms authentication, membership, roles, `MachineKey`, URL authorization |
-| `System.Web.SessionState` | 22 | In-process session state (the default, as `mode="InProc"` on IIS), and `AspNetCoreSessionProvider` (`UseAspNetCoreSessionProvider()`: out of process, in ASP.NET Core's distributed cache, for applications that used StateServer or SQLServer or scale out; values must be serializable, [MIGRATING.md](MIGRATING.md#session-state)) |
+| `System.Web.SessionState` | 22 | In-process session state (the default, as `mode="InProc"` on IIS), `mode="SQLServer"` (`SqlSessionStateStore`), custom providers and module swaps (Microsoft's Redis and async SQL providers run unchanged: [MIGRATING.md](MIGRATING.md#session-state)), and `AspNetCoreSessionProvider` (`UseAspNetCoreSessionProvider()`: out of process, in ASP.NET Core's distributed cache, for applications that used StateServer or SQLServer or scale out; values must be serializable, [MIGRATING.md](MIGRATING.md#session-state)) |
 | `System.Web.Caching` | 25 | Cache, output cache, `SqlCacheDependency` |
 | `System.Web.Routing` | 16 | |
 | `System.Web.Management` | 44 | Health monitoring |
@@ -124,12 +124,20 @@ Caveats:
   separated by `;` and relative to the site's folder, are searched after the build output, in fusion's order
   (`name.dll`, then `name/name.dll`, in a culture's subfolder for a satellite assembly, in every folder, then the same
   with `.exe`). As in fusion, only an `<assemblyBinding>` in the `urn:schemas-microsoft-com:asm.v1` namespace counts,
-  and a folder that is rooted or leads out of the site's folder is skipped. `<dependentAssembly><bindingRedirect>`
-  isn't needed for the redirects NuGet writes: .NET binds a request for a version at or below the deployed one to the
-  deployed one. A reference without a public key token binds to the deployed assembly of that name whatever its
-  version, higher or lower, as fusion doesn't check the version of an assembly without a strong name (#171). For a
-  strong-named reference, a redirect *down* to a lower version than the one requested, and `<codeBase>`, aren't
-  applied (#158).
+  and a folder that is rooted or leads out of the site's folder is skipped. A reference without a public key token binds
+  to the deployed assembly of that name whatever its version, higher or lower, as fusion doesn't check the version of
+  an assembly without a strong name (#171). `<dependentAssembly>` is applied as fusion applies it (#158): the first one
+  for the assembly's name, public key token and culture (no `culture` is neutral) counts. A `<bindingRedirect>`
+  applies to a strong-named reference whose version is in its `oldVersion` (one version or a range), the first that
+  matches, in any direction; the new version is then loaded as any reference is. A `<codeBase>` for that version is
+  the only place looked in for it: a relative `href` is relative to the site's folder, a `file:` URL is a path, and an
+  assembly without a strong name has one code base, whatever its version, which must be in the site's folder (it is
+  skipped otherwise). An `<assemblyBinding>` whose `appliesTo` names a runtime before v4 doesn't apply. Differences
+  that remain: .NET binds a reference to a version at or below the one in the application's `deps.json` to that one
+  before any redirect is asked for, so a redirect *up* to a version that isn't deployed,
+  which fails on .NET Framework, loads the deployed one; a reference to a version above the deployed one that no
+  redirect covers fails with `FileNotFoundException` where fusion threw `FileLoadException`; and an `http:` code base,
+  which fusion downloaded, isn't loaded.
   `<publisherPolicy>` and `<qualifyAssembly>` are moot on .NET (no GAC publisher policy; partial names load by simple
   name). The rest of `<runtime>` isn't read: .NET takes runtime settings from `runtimeconfig.json`.
 - **What .NET Framework's machine had:** .NET Framework has every Windows code page and registers SqlClient, OleDb and

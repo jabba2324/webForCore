@@ -59,10 +59,18 @@
          2.0.0.0, is copied to bin_dotnet without it. Neither has a strong name. -->
     <ProjectReference Include="..\webForCore.IIS.Sample.SimpleLib\webForCore.IIS.Sample.SimpleLib.csproj" />
     <ProjectReference Include="..\webForCore.IIS.Sample.SimpleUser\webForCore.IIS.Sample.SimpleUser.csproj" ReferenceOutputAssembly="false" Private="false" />
+    <!-- #158: StrongLib 1.0.0.0 is deployed; StrongUser, built against StrongLib 2.0.0.0, is copied to bin_dotnet without it,
+         and Web.config redirects 2.0.0.0 to 1.0.0.0. CodeBaseLib is copied to bin_dotnet/codebase, which Web.config names
+         in a <codeBase>. StrongLib and CodeBaseLib are strong-named. -->
+    <ProjectReference Include="..\webForCore.IIS.Sample.StrongLib\webForCore.IIS.Sample.StrongLib.csproj" />
+    <ProjectReference Include="..\webForCore.IIS.Sample.StrongUser\webForCore.IIS.Sample.StrongUser.csproj" ReferenceOutputAssembly="false" Private="false" />
+    <ProjectReference Include="..\webForCore.IIS.Sample.CodeBaseLib\webForCore.IIS.Sample.CodeBaseLib.csproj" ReferenceOutputAssembly="false" Private="false" />
   </ItemGroup>
 
   <Target Name="CopyProbedLib" AfterTargets="Build">
     <Copy SourceFiles="..\webForCore.IIS.Sample.Probed\bin_dotnet\ProbedLib.dll" DestinationFolder="$(OutDir)probed" SkipUnchangedFiles="true" />
     <Copy SourceFiles="..\webForCore.IIS.Sample.SimpleUser\bin_dotnet\SimpleUser.dll" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="..\webForCore.IIS.Sample.StrongUser\bin_dotnet\StrongUser.dll" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="..\webForCore.IIS.Sample.CodeBaseLib\bin_dotnet\CodeBaseLib.dll" DestinationFolder="$(OutDir)codebase" SkipUnchangedFiles="true" />
   </Target>
 </Project>

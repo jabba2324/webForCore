@@ -1,0 +1,7 @@
+[
+  {
+    "requests": ".*",
+    "field": "header Server",
+    "reason": "IIS sends Server: Microsoft-IIS/10.0; webForCore's host is Kestrel."
+  }
+]
