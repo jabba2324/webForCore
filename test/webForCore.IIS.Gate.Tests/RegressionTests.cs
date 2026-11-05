@@ -1,3 +1,4 @@
+using System.Text;
 using System.Net;
 using Xunit;
 
@@ -429,6 +430,158 @@ namespace IISGate
             const string unsupported = "System.Configuration.ConfigurationErrorsException: The current configuration system does not support user-scoped settings.";
             Assert.Contains("user AppValue: " + unsupported + "\n", body);
             Assert.Contains("user UserValue: " + unsupported + "\n", body);
+        }
+
+        // #184: Response.Write(string) with BufferOutput = false threw "The buffer is not associated with this pool" in
+        // HttpResponseBufferElement.Recycle (the byte[] FlushCharBuffer allocates was returned to ArrayPool.Shared), and
+        // the client then waited for ever. Bonobo Git Server: GET /<repo>.git/info/refs?service=git-upload-pack, the
+        // first request of every clone, fetch and push, never completed.
+        private async Task<(HttpResponseMessage Response, string Body)> GetWithin(string url, int seconds = 20)
+        {
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(seconds));
+            var response = await _server.Client.GetAsync(url, timeout.Token);
+            return (response, await response.Content.ReadAsStringAsync(timeout.Token));
+        }
+
+        [Fact]
+        public async Task UnbufferedWriteOfAStringAnswers()
+        {
+            var (response, body) = await GetWithin("/regressions/unbuffered/Write.ashx?mode=write");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("hello world", body);
+        }
+
+        [Fact]
+        public async Task UnbufferedWriteThenOutputStreamCopiesAnswer()
+        {
+            var (response, body) = await GetWithin("/regressions/unbuffered/Write.ashx?mode=git");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var pack = new StringBuilder();
+            for (int i = 0; i < 100000; i++) pack.Append((char)('a' + i % 26));
+            Assert.Equal("001e# service=git-upload-pack\n0000" + pack + pack.ToString(0, 10) + "|end", body);
+        }
+
+        // Strings of 1,024 and 4,096 bytes, and ones whose encoded buffer (Encoding.GetMaxByteCount) is exactly one of
+        // ArrayPool's sizes (511 characters in UTF-16 and 1,023 in UTF-32: 1,024 and 4,096 bytes), which the pool took
+        // back and handed out again; many at once, each must get only its own bytes.
+        [Fact]
+        public async Task UnbufferedWritesOfPoolSizedStringsDontMix()
+        {
+            var cases = new List<(string Url, char C, int N, Encoding Encoding)>();
+            for (int i = 0; i < 48; i++)
+            {
+                char c = (char)('A' + i % 26);
+                c = i >= 26 ? char.ToLowerInvariant(c) : c;
+                var (n, encoding) = (i % 4) switch
+                {
+                    0 => (1024, Encoding.UTF8),
+                    1 => (4096, Encoding.UTF8),
+                    2 => (511, (Encoding)Encoding.Unicode),
+                    _ => (1023, (Encoding)new UTF32Encoding(false, false)),
+                };
+                cases.Add(($"/regressions/unbuffered/Write.ashx?mode=fill&c={c}&n={n}&encoding={encoding.WebName}", c, n, encoding));
+            }
+            var results = await Task.WhenAll(cases.Select(async test =>
+            {
+                using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+                var response = await _server.Client.GetAsync(test.Url, timeout.Token);
+                return (test, response.StatusCode, Bytes: await response.Content.ReadAsByteArrayAsync(timeout.Token));
+            }));
+            foreach (var (test, status, bytes) in results)
+            {
+                Assert.True(status == HttpStatusCode.OK, test.Url + ": " + status);
+                Assert.Equal(new string(test.C, 2 * test.N), test.Encoding.GetString(bytes));
+            }
+        }
+
+        // Output caching keeps the response's buffers: a nearly full one as it is (30,000 characters), one with more
+        // free space as a copy (100). Every hit answers the first response's bytes, while other requests rent buffers:
+        // also when the response is flushed after the snapshot was taken (Global.asax's EndRequest, ?flush=1), and when
+        // the application's own provider keeps it (Global.asax's GetOutputCacheProviderName, ?provider=1).
+        [Theory]
+        [InlineData(30000, "")]
+        [InlineData(100, "")]
+        [InlineData(30000, "&flush=1")]
+        [InlineData(100, "&flush=1")]
+        [InlineData(30000, "&provider=1")]
+        [InlineData(100, "&provider=1")]
+        public async Task OutputCachedResponseKeepsItsBytes(int n, string options)
+        {
+            string url = $"/regressions/unbuffered/Cached.aspx?c=q&n={n}{options}";
+            var (first, firstBody) = await GetWithin(url);
+            Assert.Equal(HttpStatusCode.OK, first.StatusCode);
+            Assert.StartsWith(new string('q', n) + "|", firstBody);
+            for (int round = 0; round < 3; round++)
+            {
+                var others = Enumerable.Range(0, 16).Select(i => i % 2 == 0
+                    ? GetWithin($"/regressions/unbuffered/Cached.aspx?c=z&n={30000 + i}&round={round}{n}{options}")
+                    : GetWithin($"/regressions/unbuffered/Write.ashx?mode=fill&c=y&n=1023&encoding=utf-32"));
+                var hits = Enumerable.Range(0, 4).Select(_ => GetWithin(url));
+                var all = await Task.WhenAll(others.Concat(hits));
+                foreach (var (response, body) in all.Skip(16))
+                {
+                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                    Assert.Equal(firstBody, body);
+                }
+            }
+        }
+
+        // Substitution: the cached part stays, the callback runs on each hit.
+        [Fact]
+        public async Task OutputCacheSubstitutionRunsOnEachHit()
+        {
+            string url = "/regressions/unbuffered/Substitution.aspx?c=s&n=2000";
+            var (first, firstBody) = await GetWithin(url);
+            Assert.Equal(HttpStatusCode.OK, first.StatusCode);
+            var parts = firstBody.Split('|');
+            Assert.Equal(3, parts.Length);
+            Assert.StartsWith("subst:s:", parts[1]);
+            Assert.Equal(new string('s', 2000), parts[2]);
+            for (int i = 0; i < 4; i++)
+            {
+                var (response, body) = await GetWithin(url);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                var hit = body.Split('|');
+                Assert.Equal(parts[0], hit[0]);
+                Assert.StartsWith("subst:s:", hit[1]);
+                Assert.NotEqual(parts[1], hit[1]);
+                Assert.Equal(parts[2], hit[2]);
+            }
+        }
+
+        // Something fails while the response is being sent, after its first chunk. A response filter's exception is
+        // written into the response, which ends. An encoding that fails from then on can't write the error
+        // either: the connection is aborted. Either way the client isn't left waiting (it waited for ever).
+        [Theory]
+        [InlineData("filter")]
+        [InlineData("encoding")]
+        public async Task FailureWhileSendingEndsOrAbortsTheResponse(string mode)
+        {
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+            string body = null;
+            try
+            {
+                var response = await _server.Client.GetAsync("/regressions/unbuffered/Throws.ashx?mode=" + mode, timeout.Token);
+                body = await response.Content.ReadAsStringAsync(timeout.Token);
+            }
+            catch (Exception e) when (!timeout.IsCancellationRequested && (e is HttpRequestException || e is IOException))
+            {
+                // aborted
+            }
+            Assert.False(timeout.IsCancellationRequested, "the response neither ended nor was aborted within 20 s");
+            if (mode == "filter")
+            {
+                Assert.NotNull(body);
+                Assert.StartsWith("first chunk", body);
+                Assert.Contains("the filter failed", body);
+            }
+            else
+            {
+                Assert.Null(body);
+            }
+            // and the server still answers
+            var (_, after) = await GetWithin("/regressions/unbuffered/Write.ashx?mode=write");
+            Assert.Equal("hello world", after);
         }
 
         // #171: fusion doesn't check the version of a reference to an assembly without a strong name; it binds to the
