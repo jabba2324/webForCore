@@ -1,4 +1,4 @@
-#if !NETFRAMEWORK
+﻿#if !NETFRAMEWORK
 using Microsoft.AspNetCore.Routing.Constraints;
 using System;
 using System.Collections.Generic;
