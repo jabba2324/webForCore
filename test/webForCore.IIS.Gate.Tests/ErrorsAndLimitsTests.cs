@@ -213,6 +213,36 @@ namespace IISGate
             Assert.StartsWith("files: 1, file upload.bin ", withinBody);
         }
 
+        // Over maxRequestLength, ASP.NET answers 500 and closes the connection without reading the body (its Content-Length
+        // is over the limit). Each client gets the error page, as from IIS. The worker closed its connection to the host after
+        // a response that didn't say so, and the host's pool sometimes sent the next request on it: that request's client
+        // was reset (LimitStatusIsIISs failed now and then on build-windows; about one request in a hundred here).
+        [Fact]
+        public async Task MaxRequestLengthAnswersEveryTime()
+        {
+            var failures = new List<string>();
+            for (int i = 0; i < 100; i++)
+            {
+                foreach (var (kind, length) in new[] { ("multipart", 8193), ("form", 16384), ("multipart", 16384) })
+                {
+                    const string head = "--b\r\nContent-Disposition: form-data; name=\"file\"; filename=\"upload.bin\"\r\n\r\n", tail = "\r\n--b--\r\n";
+                    string body = kind == "form" ? "a=" + new string('x', length - 2) : head + new string('x', length - head.Length - tail.Length) + tail;
+                    var content = new ByteArrayContent(Encoding.UTF8.GetBytes(body));
+                    content.Headers.ContentType = MediaTypeHeaderValue.Parse(kind == "form" ? "application/x-www-form-urlencoded" : "multipart/form-data; boundary=b");
+                    try
+                    {
+                        using var response = await _server.Client.PostAsync(kind == "form" ? "/limits/app/Form.ashx" : "/limits/app/Files.ashx", content);
+                        if (response.StatusCode != HttpStatusCode.InternalServerError) failures.Add($"{i} {kind} {length}: {(int)response.StatusCode}");
+                    }
+                    catch (HttpRequestException e)
+                    {
+                        failures.Add($"{i} {kind} {length}: {e.GetBaseException().Message}");
+                    }
+                }
+            }
+            Assert.True(failures.Count == 0, $"{failures.Count} of 300 requests:\n{string.Join("\n", failures)}");
+        }
+
         // Over maxAllowedContentLength, request filtering's 413.1 "Request Entity Too Large", before the application runs:
         // IIS 10's answer (IIS 7 to 8.5 answered 404.13, as webForCore did before #192).
         [Fact]
