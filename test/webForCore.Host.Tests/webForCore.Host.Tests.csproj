@@ -17,5 +17,8 @@
     <ProjectReference Include="..\webForCore.Host.Sample\webForCore.Host.Sample.csproj" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\..\src\WebFormsForCore.Host\WebFormsForCore.Host.csproj" ReferenceOutputAssembly="false" />
     <Compile Include="..\Shared\WebForCoreHost.cs" Link="WebForCoreHost.cs" />
+    <!-- #158: AssemblyBindingTests copies their assemblies outside the site and names them in <codeBase> file: URLs. -->
+    <ProjectReference Include="..\webForCore.IIS.Sample.CodeBaseLib\webForCore.IIS.Sample.CodeBaseLib.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\webForCore.IIS.Sample.Unprobed\webForCore.IIS.Sample.Unprobed.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
 </Project>

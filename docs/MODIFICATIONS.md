@@ -247,7 +247,11 @@ commit that made it, and its issue, say why.
   application's web.config, and the load context's resolver searches those folders after the build output, in fusion's
   order (#147, Orchard; [NAMESPACES.md](NAMESPACES.md)). As fusion does, it checks the version only of a strong-named
   reference: for one without a public key token, the assembly of that name it finds is the one, whatever its version
-  (#171, JabbR deploys Nancy 0.20.0 and a library built against 0.21.1).
+  (#171, JabbR deploys Nancy 0.20.0 and a library built against 0.21.1). It reads `<dependentAssembly>` too and applies
+  `<bindingRedirect>` and `<codeBase>` as fusion does (#158; a customer application has about 60 redirects, many to a
+  version lower than or equal to the one its references were built against): a redirected reference loads the new
+  version through the load context, and a code base is the only place a version is looked for. The call in
+  `HttpRuntime.InitFusion` is webForCore's own (`AssemblyLoaderNetCore.ReadAssemblyBinding`).
 - **System.Web.DynamicData** (`src/WebFormsForCore.Web.DynamicData`, now built and in the "Always" set): the Entity
   Framework 1–4 and LINQ to SQL model providers, `LinqDataSource`/`EntityDataSource` hookups and EF 5 spatial column
   types are compiled out (`#if NETFRAMEWORK`); `AssemblyRef.cs` and `ScaffoldTableAttribute` (which .NET dropped) are

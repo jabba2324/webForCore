@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- #158: an assembly built against StrongLib 2.0.0.0, which calls it. The IIS sample's build copies StrongUser.dll,
+       without StrongLib 2.0.0.0, to its bin_dotnet, where StrongLib is 1.0.0.0 and Web.config redirects 2.0.0.0 to it. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>StrongUser</AssemblyName>
+    <RootNamespace>StrongUser</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <OutputPath>bin_dotnet</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\webForCore.IIS.Sample.StrongLib2\webForCore.IIS.Sample.StrongLib2.csproj" />
+  </ItemGroup>
+</Project>
