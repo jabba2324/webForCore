@@ -419,13 +419,33 @@ jobs:
         shell: powershell
         run: tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\oidc-site" -Name oidc-integrated -Port 8100 -Pipeline Integrated
 
+      # The provider must answer before the scenarios' first request starts the site (#208): IdentityServer3's access
+      # token validation reads the discovery document in the application's Startup, and Katana keeps a Startup that
+      # failed, so every request of the run answered the SocketException's error page. The provider must also still
+      # answer when the scenarios end; its output is shown when either isn't so.
       - name: Run the OpenID Connect scenarios on IIS
         if: ${{ !cancelled() }}
         run: |
           provider=test/webForCore.Oidc.Provider/bin/Release/net10.0/webForCore.Oidc.Provider.dll
-          dotnet $provider serve http://127.0.0.1:8101 > "$RUNNER_TEMP/gate/oidc-provider.log" 2>&1 &
+          discovery=http://127.0.0.1:8101/.well-known/openid-configuration
+          log="$RUNNER_TEMP/gate/oidc-provider.log"
+          dotnet $provider serve http://127.0.0.1:8101 > "$log" 2>&1 &
           pid=$!
-          dotnet $provider scenarios http://127.0.0.1:8100/ http://127.0.0.1:8101 "$RUNNER_TEMP/gate/iis-oidc-responses.json"
+          fail() { echo "::error::$1"; echo "The provider's output:"; cat "$log"; kill $pid 2>/dev/null || true; exit 1; }
+          for i in $(seq 1 120); do
+            curl -sf -o /dev/null "$discovery" && break
+            kill -0 $pid 2>/dev/null || fail "The OpenID Connect test provider exited before it served."
+            [ $i -eq 120 ] && fail "The OpenID Connect test provider didn't serve its discovery document within 60 s."
+            sleep 0.5
+          done
+          # Another process on the port (a provider left running) would answer too: this one must still be running.
+          kill -0 $pid 2>/dev/null || fail "The OpenID Connect test provider exited: is port 8101 in use?"
+          echo "The provider serves its discovery document."
+          status=0
+          dotnet $provider scenarios http://127.0.0.1:8100/ http://127.0.0.1:8101 "$RUNNER_TEMP/gate/iis-oidc-responses.json" || status=$?
+          kill -0 $pid 2>/dev/null || fail "The OpenID Connect test provider exited during the scenarios."
+          curl -sf -o /dev/null "$discovery" || fail "The OpenID Connect test provider stopped answering during the scenarios."
+          [ $status -eq 0 ] || fail "The scenarios failed ($status)."
           kill $pid || true
 
       - name: Compare OpenID Connect
