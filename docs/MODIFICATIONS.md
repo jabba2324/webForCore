@@ -168,6 +168,12 @@ commit that made it, and its issue, say why.
   walk), and the `FileSystemWatcher` that replaces `ReadDirectoryChangesW` reports names relative to the watched
   directory, as `ReadDirectoryChangesW` does (#2). `bin` and the critical directories (`App_Code`, ...) are watched
   on every platform, as in the reference source; WebFormsForCore watched them only on Windows (`HttpRuntime.cs`, #51).
+  On Linux the directories inside the application's folder share a recursive `FileSystemWatcher` of the folder per
+  notify filter (`WebFormsForCore/SharedDirectoryWatcher.cs`, called from `DirMonCompletion`), which passes each change
+  to the directories that would have seen it with a watcher of their own: on .NET 10 each `FileSystemWatcher` is an
+  inotify instance, of which a user has 128 (#145, #152). `HttpRuntime.HostingInit` creates the `FileChangesMonitor`
+  again with `HostingEnvironment.FcnMode`: `HttpRuntime`'s static constructor runs before the hosting environment has
+  the application's `<httpRuntime fcnMode>`, which was ignored (#146).
 - **No ASP.NET telemetry** (`TelemetryLogger.cs`): .NET Framework wrote handler, provider and target-framework events
   to Windows' telemetry (`TelemetryEventSource`, in a provider group Windows' telemetry service enables). webForCore
   writes none; on Windows, TraceLogging's per-thread type cache also kept an application's domain alive (#46).

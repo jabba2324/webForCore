@@ -407,7 +407,11 @@ namespace System.Web {
     // can start monitoring while the old _rootCallback has not been
     // disposed.
     //
-    sealed class DirMonCompletion : IDisposable {
+    sealed class DirMonCompletion : IDisposable
+#if !NETFRAMEWORK
+        , IDirectoryWatchTarget
+#endif
+    {
         static int _activeDirMonCompletions = 0;            // private counter used via reflection by FCN check-in suite
 
         DirectoryMonitor    _dirMon;                        // directory monitor
@@ -419,6 +423,7 @@ namespace System.Web {
 
 #if !NETFRAMEWORK
         FileSystemWatcher   _managedWatcher;
+        IDisposable         _sharedWatch;                   // webForCore: SharedDirectoryWatcher (#145)
         int                 _internalBufferSize;
         NotifyFilters       _managedNotifyFilters;
         bool                _managedWatchSubtree;
@@ -496,6 +501,13 @@ namespace System.Web {
             _managedNotifyFilters = MapRdcwFilterToNotifyFilters(notifyFilter);
             _managedWatchSubtree = watchSubtree;
             _internalBufferSize = 8192;
+            // webForCore: on Linux a directory in the application's folder shares a watcher of the whole folder, rather than
+            // taking an inotify instance of its own (fs.inotify.max_user_instances, #145, #152).
+            _sharedWatch = SharedDirectoryWatcher.TryWatch(dir, watchSubtree, _managedNotifyFilters, _internalBufferSize, this);
+            if (_sharedWatch != null) {
+                return;
+            }
+
             _managedWatcher = new FileSystemWatcher(dir) {
                 IncludeSubdirectories = watchSubtree,
                 NotifyFilter = _managedNotifyFilters,
@@ -510,6 +522,11 @@ namespace System.Web {
         }
 
         void StopManagedDirectoryWatch() {
+            if (_sharedWatch != null) {
+                _sharedWatch.Dispose();
+                _sharedWatch = null;
+            }
+
             if (_managedWatcher == null) {
                 return;
             }
@@ -518,6 +535,12 @@ namespace System.Web {
             DetachManagedWatcherHandlers();
             _managedWatcher.Dispose();
             _managedWatcher = null;
+        }
+
+        bool IsManagedWatchStopped() {
+            lock (_ndirMonCompletionHandleLock) {
+                return _disposed != 0 || (_managedWatcher == null && _sharedWatch == null);
+            }
         }
 
         // webForCore: names are relative to the watched directory (FileSystemEventArgs.Name), as ReadDirectoryChangesW
@@ -529,66 +552,63 @@ namespace System.Web {
         }
 
         void OnManagedFileSystemCreated(object sender, FileSystemEventArgs e) {
-            lock (_ndirMonCompletionHandleLock) {
-                if (_disposed != 0 || _managedWatcher == null) {
-                    return;
-                }
-            }
-
-            if (!String.IsNullOrEmpty(e.Name)) {
-                ForwardManagedNotification(FileAction.Added, e.Name);
-            }
+            ((IDirectoryWatchTarget)this).OnCreated(e.Name);
         }
 
         void OnManagedFileSystemDeleted(object sender, FileSystemEventArgs e) {
-            lock (_ndirMonCompletionHandleLock) {
-                if (_disposed != 0 || _managedWatcher == null) {
-                    return;
-                }
-            }
-
-            if (!String.IsNullOrEmpty(e.Name)) {
-                ForwardManagedNotification(FileAction.Removed, e.Name);
-            }
+            ((IDirectoryWatchTarget)this).OnDeleted(e.Name);
         }
 
         void OnManagedFileSystemChanged(object sender, FileSystemEventArgs e) {
-            lock (_ndirMonCompletionHandleLock) {
-                if (_disposed != 0 || _managedWatcher == null) {
-                    return;
-                }
-            }
-
-            if (!String.IsNullOrEmpty(e.Name)) {
-                ForwardManagedNotification(FileAction.Modified, e.Name);
-            }
+            ((IDirectoryWatchTarget)this).OnChanged(e.Name);
         }
 
         void OnManagedFileSystemRenamed(object sender, RenamedEventArgs e) {
-            lock (_ndirMonCompletionHandleLock) {
-                if (_disposed != 0 || _managedWatcher == null) {
-                    return;
-                }
-            }
-
-            long ticks = DateTime.UtcNow.ToFileTimeUtc();
-            if (!String.IsNullOrEmpty(e.OldName)) {
-                OnFileChange(FileAction.RenamedOldName, e.OldName, ticks);
-            }
-
-            if (!String.IsNullOrEmpty(e.Name)) {
-                OnFileChange(FileAction.RenamedNewName, e.Name, ticks);
-            }
+            ((IDirectoryWatchTarget)this).OnRenamed(e.OldName, e.Name);
         }
 
         void OnManagedFileSystemError(object sender, ErrorEventArgs e) {
-            lock (_ndirMonCompletionHandleLock) {
-                if (_disposed != 0 || _managedWatcher == null) {
-                    return;
-                }
+            ((IDirectoryWatchTarget)this).OnError(e.GetException());
+        }
+
+        void IDirectoryWatchTarget.OnCreated(string name) {
+            if (!IsManagedWatchStopped() && !String.IsNullOrEmpty(name)) {
+                ForwardManagedNotification(FileAction.Added, name);
+            }
+        }
+
+        void IDirectoryWatchTarget.OnDeleted(string name) {
+            if (!IsManagedWatchStopped() && !String.IsNullOrEmpty(name)) {
+                ForwardManagedNotification(FileAction.Removed, name);
+            }
+        }
+
+        void IDirectoryWatchTarget.OnChanged(string name) {
+            if (!IsManagedWatchStopped() && !String.IsNullOrEmpty(name)) {
+                ForwardManagedNotification(FileAction.Modified, name);
+            }
+        }
+
+        void IDirectoryWatchTarget.OnRenamed(string oldName, string newName) {
+            if (IsManagedWatchStopped()) {
+                return;
             }
 
-            Exception ex = e.GetException();
+            long ticks = DateTime.UtcNow.ToFileTimeUtc();
+            if (!String.IsNullOrEmpty(oldName)) {
+                OnFileChange(FileAction.RenamedOldName, oldName, ticks);
+            }
+
+            if (!String.IsNullOrEmpty(newName)) {
+                OnFileChange(FileAction.RenamedNewName, newName, ticks);
+            }
+        }
+
+        void IDirectoryWatchTarget.OnError(Exception ex) {
+            if (IsManagedWatchStopped()) {
+                return;
+            }
+
             FileAction action = FileAction.Error;
             if (ex is InternalBufferOverflowException) {
                 action = FileAction.Overwhelming;
@@ -600,7 +620,7 @@ namespace System.Web {
 
         internal void TryGrowManagedNotificationBuffer() {
             lock (_ndirMonCompletionHandleLock) {
-                if (_disposed != 0 || _managedWatcher == null) {
+                if (_disposed != 0 || (_managedWatcher == null && _sharedWatch == null)) {
                     return;
                 }
 
@@ -610,6 +630,11 @@ namespace System.Web {
                 }
 
                 _internalBufferSize = newSize;
+                if (_sharedWatch != null) {
+                    ((IGrowableWatch)_sharedWatch).Grow(newSize);
+                    return;
+                }
+
                 string dir = _dirMon.Directory;
                 DetachManagedWatcherHandlers();
                 _managedWatcher.Dispose();
