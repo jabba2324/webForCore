@@ -833,6 +833,14 @@ The first request compiles pages, as on IIS. Then compare the responses recorded
   endpoints the app's `Program.cs` sets up itself (`ConfigureKestrel(k => k.Listen(...))`) would conflict: move them to
   configuration. The host's own settings (startup and shutdown time limits, rapid-fail protection) are in the
   `WebForCore:Host` section ([IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md#process-model)).
+- **In a container:** Microsoft's ASP.NET Core runtime image is enough (no SDK: pages and views compile with
+  webForCore's own compilers). On Windows, the Nano Server image runs it
+  (`mcr.microsoft.com/dotnet/aspnet:10.0-nanoserver-ltsc2025`; with process isolation, the tag of the host's Windows
+  version); Server Core isn't needed. Copy the site folder in, set the binding
+  (`Kestrel__Endpoints__Http__Url=http://+:8080`) and start the host from the site folder:
+  `ENTRYPOINT ["dotnet", "bin_dotnet\\webforcore-host\\webforcore-host.dll"]`. A `web.config` change inside the
+  container recycles the worker as on IIS, and `docker stop` stops the host and its worker. CI's `windows-container`
+  job checks this ([TESTING.md](TESTING.md#in-a-windows-container)).
 - **In front:** a reverse proxy (nginx, Apache, a load balancer) for TLS and the public port, or the host's own HTTPS.
 - **Recycling:** a `web.config`, `bin` or `App_Code` change restarts the app in a new worker process, as IIS did; no
   request fails (the old worker finishes against the assemblies it compiled, #89), and those that arrive meanwhile

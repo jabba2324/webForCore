@@ -145,6 +145,21 @@ ports, nonces, codes, tokens and protected values). `iis_compare.cs diff` compar
 (the `oidc-responses` artifact) against `tools/ci/iis-known-differences-oidc.json`
 ([IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md#openid-connect)).
 
+### In a Windows container
+
+CI's `windows-container` job runs webforcore-host and `test/webForCore.Mvc.Sample` in a Windows container: Microsoft's
+ASP.NET Core runtime image for Nano Server, `mcr.microsoft.com/dotnet/aspnet:10.0-nanoserver-ltsc2025`, which has no
+SDK, so the sample's views compile with webForCore's own compilers. On `windows-2025` the Docker engine runs Windows
+containers with process isolation, so the image's Windows build must be the runner's (ltsc2025); the engine is an
+automatic service that can still be starting when the job begins, and the job waits for it. Nano Server is enough:
+Server Core isn't needed. The job builds the host and the sample, copies them into an image
+(`tools/ci/windows-container/Dockerfile`), runs it with the container's port published, and
+`tools/ci/windows_container.cs` probes it from the runner: Razor views (`/Home/About`, `/Products/Details/2`), JSON
+(`/Products`) and a POST's redirect (`/Products/Create`, 302). Then it changes `Web.config` inside the container, and the
+host must recycle the worker (`Recycling worker 1`, which then exits with 0), and a new worker, another process, must
+serve the same responses. Last, `docker stop` must end the host with exit code 0 and its worker with 0. The checks are
+in the job's summary. It is not a required check.
+
 ## The suites
 
 ### Microsoft's and Mono's suites
