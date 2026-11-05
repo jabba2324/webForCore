@@ -1,0 +1,81 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- test/webForCore.Oidc.Sample for IIS 10 and .NET Framework 4.8: the same source files, pages and Web.config, built
+       against Microsoft's NuGet packages of Katana 4.2.3 (Microsoft.Owin.Security.OpenIdConnect, .Jwt, .Cookies, the
+       System.Web host), Web API 5.3.0 and IdentityServer3.Contrib.AccessTokenValidation 4.1.16, as a customer
+       application has them on IIS. CI's iis-compare job serves it from IIS, runs the OpenID Connect gate's scenarios
+       against it with test/webForCore.Oidc.Provider, and tools/ci/iis_compare.cs diffs the responses with webForCore's
+       (oidc-responses.json). Not in WebFormsForCore.slnx: only that job builds it. It builds on Linux too.
+
+       The site is written to $(IisSiteDirectory) (obj/site by default): the pages, the sample's Web.config with the
+       binding redirects the packages need, and bin. Its ida:* settings are the sample's: the provider at
+       http://127.0.0.1:8099 and the site at http://127.0.0.1:8098, the ports the job uses. -->
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <OutputType>Library</OutputType>
+    <AssemblyName>webForCore.Oidc.Sample</AssemblyName>
+    <RootNamespace>OidcSample</RootNamespace>
+    <LangVersion>7.3</LangVersion>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <NoWarn>$(NoWarn);NU1902;NU1903</NoWarn>
+    <IisSiteDirectory Condition="'$(IisSiteDirectory)' == ''">$(MSBuildProjectDirectory)\obj\site\</IisSiteDirectory>
+    <Sample>$(MSBuildProjectDirectory)\..\webForCore.Oidc.Sample\</Sample>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Program.cs is the Kestrel entry point; IIS starts the application from Global.asax. -->
+    <Compile Include="$(Sample)**\*.cs" Exclude="$(Sample)Program.cs;$(Sample)bin_dotnet\**;$(Sample)obj\**;$(Sample)bin\**" />
+    <_IisPage Include="$(Sample)**\*.aspx;$(Sample)Global.asax" Exclude="$(Sample)bin_dotnet\**;$(Sample)obj\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Net.Http" />
+    <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.2.3" />
+    <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.2.3" />
+    <PackageReference Include="Microsoft.Owin.Security.OpenIdConnect" Version="4.2.3" />
+    <PackageReference Include="Microsoft.Owin.Security.Jwt" Version="4.2.3" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Owin" Version="5.3.0" />
+    <PackageReference Include="IdentityServer3.Contrib.AccessTokenValidation" Version="4.1.16" />
+  </ItemGroup>
+
+  <UsingTask TaskName="WebForCoreIisWebConfig" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <WebConfig ParameterType="System.String" Required="true" />
+      <AssemblyConfig ParameterType="System.String" Required="true" />
+      <Output ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Linq" />
+      <Using Namespace="System.Xml.Linq" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        // The sample's Web.config plus the <runtime> (assembly binding redirects) the build generated for the packages.
+        XDocument config = XDocument.Load(WebConfig);
+        config.Root.Elements("runtime").Remove();
+        if (File.Exists(AssemblyConfig))
+        {
+            XElement runtime = XDocument.Load(AssemblyConfig).Root.Element("runtime");
+            if (runtime != null) config.Root.Add(runtime);
+        }
+        Directory.CreateDirectory(Path.GetDirectoryName(Output));
+        config.Save(Output);
+      ]]></Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="WriteIisSite" AfterTargets="Build">
+    <ItemGroup>
+      <_IisBin Include="$(OutDir)*.dll;$(OutDir)*.pdb;$(OutDir)*.xml" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_IisBin)" DestinationFolder="$(IisSiteDirectory)bin" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(_IisPage)" DestinationFiles="@(_IisPage->'$(IisSiteDirectory)%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <WebForCoreIisWebConfig WebConfig="$(Sample)Web.config" AssemblyConfig="$(TargetPath).config" Output="$(IisSiteDirectory)Web.config" />
+    <Message Importance="high" Text="IIS site: $(IisSiteDirectory)" />
+  </Target>
+</Project>

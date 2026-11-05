@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The OpenID Connect gate: test/webForCore.Oidc.Sample under webforcore-host, signing in through
+       test/webForCore.Oidc.Provider (in this process) as a browser would, failing to, signing out, and calling its Web API
+       with bearer tokens. Every response is written to oidc-responses.json, which CI's iis-compare job compares with the
+       same scenarios on IIS 10 (test/webForCore.Oidc.Sample.Iis, Microsoft's packages). -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <ProjectReference Include="..\webForCore.Oidc.Provider\webForCore.Oidc.Provider.csproj" />
+    <!-- Built and run, not referenced. -->
+    <ProjectReference Include="..\webForCore.Oidc.Sample\webForCore.Oidc.Sample.csproj" ReferenceOutputAssembly="false" />
+    <!-- The samples run under webforcore-host (#56), from its build here. -->
+    <ProjectReference Include="..\..\src\WebFormsForCore.Host\WebFormsForCore.Host.csproj" ReferenceOutputAssembly="false" />
+    <Compile Include="..\Shared\WebForCoreHost.cs" Link="WebForCoreHost.cs" />
+  </ItemGroup>
+</Project>
