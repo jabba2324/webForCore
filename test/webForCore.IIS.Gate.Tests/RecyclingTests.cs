@@ -135,9 +135,10 @@ namespace IISGate
 
         // #181: a request still running when the application restarts runs to its end in the old worker, while new
         // requests go to the new one, as on .NET Framework, where HttpRuntime.Dispose waits for the old domain's requests
-        // for <httpRuntime shutdownTimeout>. <hostingEnvironment shutdownTimeout> (5 s in the sample) is the wait for
-        // registered objects, not for requests. DNN's installer streams its progress with Response.Flush and changes
-        // bin; it was cut about 5 s after the restart.
+        // for <httpRuntime shutdownTimeout> (5 s in the sample), and in the classic pipeline for those still running after
+        // that too (IIS 10 in both pipelines: tools/ci/iis_drain.cs). <hostingEnvironment shutdownTimeout> (5 s in the
+        // sample) is the wait for registered objects, not for requests. DNN's installer streams its progress with
+        // Response.Flush and changes bin; it was cut about 5 s after the restart.
         [Fact]
         public async Task ARequestRunningAcrossARestartRunsToItsEnd()
         {

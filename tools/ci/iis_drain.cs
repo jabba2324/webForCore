@@ -218,8 +218,9 @@ async Task CheckWebSocket()
 
 // Longer than <hostingEnvironment shutdownTimeout>, shorter than <httpRuntime shutdownTimeout>: webForCore runs it to its end.
 await Check(8, true);
-// Longer than <httpRuntime shutdownTimeout> and the sixth of it HttpRuntime.Dispose waits again.
-await Check(30, null);
+// Longer than <httpRuntime shutdownTimeout> and the sixth of it HttpRuntime.Dispose waits again: then the classic
+// pipeline waits for the requests still running (on IIS in both pipelines), and webForCore runs it to its end too.
+await Check(30, true);
 if (pipeline == "Integrated") await CheckWebSocket();
 
 report.Add("");

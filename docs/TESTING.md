@@ -130,8 +130,9 @@ Then a request running when the application restarts (#181): `tools/ci/iis_drain
 integrated application pool, and for an 8 s and a 30 s request to a page that flushes a line every second it writes a
 file in `bin` 2 s in, asks for another page every half second while the request runs, and records how many lines
 arrived, how the request ended and whether a new domain served meanwhile; in the integrated pipeline, how long a
-WebSocket open across the change is served. The job fails if the 8 s request doesn't run to its end while a new domain
-serves, as IIS.Gate.Tests' `ARequestRunningAcrossARestartRunsToItsEnd` asserts of webForCore; the rest is recorded.
+WebSocket open across the change is served. The job fails if either request doesn't run to its end while a new domain
+serves, as IIS.Gate.Tests' `ARequestRunningAcrossARestartRunsToItsEnd` asserts of webForCore (a 12 s request with
+`shutdownTimeout="5"`); the WebSocket is recorded (IIS aborts it at once, as `RestartAbortsAWebSocket` asserts).
 
 ## The suites
 
