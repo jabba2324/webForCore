@@ -145,6 +145,7 @@
     <Project Path="test/webForCore.WebApi.Sample/webForCore.WebApi.Sample.csproj" />
     <Project Path="test/webForCore.WebApi.Gate.Tests/webForCore.WebApi.Gate.Tests.csproj" />
     <Project Path="test/webForCore.Oidc.Provider/webForCore.Oidc.Provider.csproj" />
+    <Project Path="test/webForCore.MachineKey.Sample/webForCore.MachineKey.Sample.csproj" />
     <Project Path="test/webForCore.Oidc.Sample/webForCore.Oidc.Sample.csproj" />
     <Project Path="test/webForCore.Oidc.Gate.Tests/webForCore.Oidc.Gate.Tests.csproj" />
     <Project Path="test/webForCore.System.Web.Mvc.Test/webForCore.System.Web.Mvc.Test.csproj" />

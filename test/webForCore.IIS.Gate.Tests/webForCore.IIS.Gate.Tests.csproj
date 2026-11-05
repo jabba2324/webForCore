@@ -20,12 +20,17 @@
     <ProjectReference Include="..\webForCore.IIS.Sample\webForCore.IIS.Sample.csproj" ReferenceOutputAssembly="false" />
     <!-- RequestHandlingTests: a site that IIS serves as it is (CI's iis-compare job). -->
     <ProjectReference Include="..\webForCore.Requests.Sample\webForCore.Requests.Sample.csproj" ReferenceOutputAssembly="false" />
+    <!-- MachineKeyInteropTests (#191): the <machineKey> interop sample, run once for each configuration of its
+         Interop/MachineKeyConfigs.cs, which is compiled in here too. -->
+    <ProjectReference Include="..\webForCore.MachineKey.Sample\webForCore.MachineKey.Sample.csproj" ReferenceOutputAssembly="false" />
+    <Compile Include="..\webForCore.MachineKey.Sample\Interop\MachineKeyConfigs.cs" Link="MachineKeyConfigs.cs" />
     <!-- The samples run under webforcore-host (#56), from its build here. -->
     <ProjectReference Include="..\..\src\WebFormsForCore.Host\WebFormsForCore.Host.csproj" ReferenceOutputAssembly="false" />
     <Compile Include="..\Shared\WebForCoreHost.cs" Link="WebForCoreHost.cs" />
     <!-- webforcore-regiis, run by ProtectedConfigurationTests. -->
     <ProjectReference Include="..\..\src\WebFormsForCore.RegIIS\WebFormsForCore.RegIIS.csproj" ReferenceOutputAssembly="false" />
-    <!-- What .NET Framework 4.8 gave: aspnet_regsql -sqlexportonly (SqlServicesTests, #123), CodeDom (CodeDomTests, #135). -->
+    <!-- What .NET Framework 4.8 gave: aspnet_regsql -sqlexportonly (SqlServicesTests, #123), CodeDom (CodeDomTests, #135),
+         <machineKey> output (MachineKeyInteropTests, #191). -->
     <None Include="FrameworkData\*" CopyToOutputDirectory="PreserveNewest" />
     <!-- webforcore-regsql, run by SqlServicesTests. -->
     <ProjectReference Include="..\..\src\WebFormsForCore.RegSql\WebFormsForCore.RegSql.csproj" ReferenceOutputAssembly="false" />
