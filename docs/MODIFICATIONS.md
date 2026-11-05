@@ -228,6 +228,20 @@ commit that made it, and its issue, say why.
   code that catches the exception without rethrowing it. WebFormsForCore flushed the response first, so `EndRequest`'s
   modules could no longer change it, and forms authentication sent the 401 itself instead of its redirect to the
   log-in page (#129). `Redirect(url, true)` and `Server.Transfer` end through it.
+- **Response buffers from `ArrayPool`** (`HttpWriter.cs`, `HttpResponseBufferElement`): .NET has no unmanaged buffer
+  pool, so where .NET Framework's writer took `HttpResponseUnmanagedBufferElement`s (aspnet_isapi's or IIS's buffer
+  pool), webForCore's takes managed buffers rented from `ArrayPool<byte>.Shared` (`CreateNewMemoryBufferElement`).
+  A rented buffer behaves as the unmanaged one did: it goes back to the pool when the writer recycles it, unless the
+  output cache keeps it (`DisableRecycling`), and `GetBytes` copies its content. The arrays the element only wraps
+  (an unbuffered `Response.Write`'s, a clone's, a substitution's, the output cache's) are the GC's, as on .NET
+  Framework. Every array used to go back to the pool: an unbuffered `Response.Write(string)` threw "The buffer is not
+  associated with this pool" and the response never ended (Bonobo Git Server's smart HTTP), a cached response's
+  buffer could be handed to another response, and a provider of the application's own cached the whole pool buffer, so
+  hits sent the page followed by another response's bytes (#184).
+- **A response ASP.NET chunked itself ends or is aborted** (`AspNetCoreWorkerRequest.EndOfRequest`): classic mode's
+  `HttpResponse` writes `Transfer-Encoding: chunked` and the chunks of an unbuffered response itself, and Kestrel
+  passes them through. When the last chunk never went out (sending failed, and so did writing the error), the request
+  ended and Kestrel kept the connection: the client waited for ever. The worker aborts the connection then (#184).
 - **URLs find files in any case off Windows** (`Configuration/UserMapPath.cs`): `ResolveIgnoreCase`, which already
   found configuration paths, is internal so that the worker request (`Request.PhysicalPath`) and the IIS modules map a
   request's path with it too (#140).
