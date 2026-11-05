@@ -368,14 +368,16 @@ namespace IISGate
                 ["SCALEOUT_CONNECTION"] = connection,
                 ["SCALEOUT_KEY"] = key,
             };
-            A = new ScaleoutInstance("A", settings);
+            // xunit doesn't dispose a fixture whose constructor throws: what was started is stopped here.
             try
             {
+                A = new ScaleoutInstance("A", settings);
                 B = new ScaleoutInstance("B", settings);
             }
             catch
             {
-                A.Dispose();
+                A?.Dispose();
+                DropDatabase();
                 throw;
             }
         }
@@ -396,6 +398,11 @@ namespace IISGate
         {
             A.Dispose();
             B.Dispose();
+            DropDatabase();
+        }
+
+        private void DropDatabase()
+        {
             if (_database != null)
             {
                 SqlConnection.ClearAllPools();
@@ -465,7 +472,9 @@ namespace IISGate
                 }
                 Thread.Sleep(250);
             }
-            throw new InvalidOperationException($"instance {_name} didn't start ({status}):\n{Output}");
+            string output = Output;
+            Stop();
+            throw new InvalidOperationException($"instance {_name} didn't start ({status}):\n{output}");
         }
 
         // The server restarts: its process tree ends, and a new one starts on the same address.
@@ -477,12 +486,14 @@ namespace IISGate
 
         private void Stop()
         {
+            if (_process == null) return;
             if (!_process.HasExited)
             {
                 _process.Kill(entireProcessTree: true);
                 _process.WaitForExit(10000);
             }
             _process.Dispose();
+            _process = null;
             WebForCoreHost.DeleteTempDirectory(_tempDirectory);
         }
 
