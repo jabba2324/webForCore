@@ -61,6 +61,7 @@
   "WebFormsForCore.Compilers": { "own": "Roslyn's csc and vbc for run-time compilation" },
   "aspnetcore_compiler": { "own": "aspnet_compiler for .NET" },
   "webforcore-host": { "own": "the host that runs applications in worker processes" },
+  "webforcore-regsql": { "own": "aspnet_regsql for .NET, the webForCore.RegSql tool" },
   "csc": { "dependency": "Microsoft.Net.Compilers.Toolset, in webForCore.Compilers" },
   "vbc": { "dependency": "Microsoft.Net.Compilers.Toolset, in webForCore.Compilers" },
   "VBCSCompiler": { "dependency": "Microsoft.Net.Compilers.Toolset, in webForCore.Compilers" },
