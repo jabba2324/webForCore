@@ -325,7 +325,10 @@ webForCore ships only Microsoft assemblies. Two libraries apps commonly have:
   application is in the default context, so `LoadFrom` on a `bin` assembly returns the copy the application has.
   Checked on 0.7.0 with the original WebActivatorEx 2.2.0 and WebActivator 1.5.0 packages (WebActivator 1.x is what MVC
   3 era packages such as Ninject.MVC3 bring; #38, Subtext). As on IIS, a pre-start method in `App_Code` doesn't run:
-  `App_Code` is compiled after the pre-start phase.
+  `App_Code` is compiled after the pre-start phase. Its shutdown methods (`ApplicationShutdownMethod`) run when the
+  application restarts, in the worker that stops, as in the AppDomain that unloaded on IIS: the third-party packages
+  gate (`test/webForCore.Packages.Sample`) checks Ninject.Web.Common.WebHost's `NinjectWebCommon.Start` and `Stop`
+  across a restart.
 - **AjaxControlToolkit** isn't provided: the original package is built for .NET Framework.
   [webForCore-thirdparty](https://github.com/xforcore/webForCore-thirdparty) builds it for .NET 10 (it isn't part of
   webForCore).
@@ -349,6 +352,26 @@ Keep other NuGet packages, preferring versions that target .NET Standard or .NET
 projects in this repository are working examples for Web Forms, MVC, Web API and Web Pages. A .NET Framework package
 built against MVC 5 runs as it is unless it uses an API .NET lacks: Microsoft's own MVC Futures 5.0.0 binary (built for
 .NET Framework 4.0 against MVC 5.0) ran unmodified on webForCore's MVC 5.3, with .NET binding its 5.0.0.0 reference.
+
+The same goes for Web API and OWIN. These net4x packages a customer application has run as they are, checked by the
+third-party packages gate (`test/webForCore.Packages.Sample`, Packages.Gate.Tests) on Linux and Windows, and compared
+with the same application on IIS 10 by CI's `iis-compare` job:
+
+- **Ninject's web integration** (Ninject 3.3.6, Ninject.Web.Common 3.3.2): Ninject.Web.Common.WebHost 3.3.2, started by
+  WebActivatorEx from the `App_Start/NinjectWebCommon.cs` the package wrote, with its `OnePerRequestHttpModule` and
+  `NinjectHttpModule` (`InRequestScope` keyed on `HttpContext.Current`: one object per request, disposed at
+  `EndRequest`); Ninject.Web.Common.OwinHost 3.3.1's `UseNinjectMiddleware` (an OWIN middleware resolving in the request
+  scope it puts in the OWIN environment); and Ninject.Web.WebApi.OwinHost 3.3.0's `UseNinjectWebApi` (controllers
+  constructed by Ninject). Two things Ninject does on IIS too: Ninject.Web.WebApi.OwinHost 3.3.0 needs Ninject.Web.WebApi
+  3.3.0, not 3.3.1, which removed the `IWebApiRequestScopeProvider` it uses (`TypeLoadException`); and its request scope
+  in Web API is a named scope that reaches a controller's dependencies' dependencies only with
+  Ninject.Extensions.ContextPreservation. And `UseNinjectMiddleware` replaces the kernel `Bootstrapper` holds, so with
+  NinjectWebCommon too, keep the kernel each creates where the code that resolves from it can find it.
+- **Swashbuckle.Core 5.6.0** (net40): `config.EnableSwagger(...).EnableSwaggerUi()`, the document
+  (`/swagger/docs/v1`) and the UI with the files embedded in Swashbuckle.Core.dll (`/swagger/ui/index`).
+- **CacheCow.Server.WebApi 2.5.0** (net452): `[HttpCache]`'s ETags, 304 for `If-None-Match`, and a new ETag once a
+  `PUT` or `POST` has changed the resource. It needs the `net452` builds of CacheCow.Server and CacheCow.Common, as
+  below.
 
 ### Packages that need more than a reference
 
@@ -463,11 +486,21 @@ These came up migrating real applications; each names one that needed it.
 - **A package's .NET Standard build can have less than its `net45` build** (#31). NuGet picks the .NET Standard build
   for .NET 10, and some packages built it with a smaller API. WindowsAzure.Storage 9.x has no synchronous blob methods
   there (`Exists`, `OpenRead`, ...: aspnet-mvc5-starter). Hangfire 1.6's has no OWIN extensions (`app.UseHangfireServer`),
-  and its SqlServer storage can't look a connection string name up in web.config (MVCForum). Use the version's `net45`
-  build, in every project that gets the package, the web project included:
+  and its SqlServer storage can't look a connection string name up in web.config (MVCForum). Some have another API
+  altogether: CacheCow.Server and CacheCow.Common 2.x's .NET Standard builds are CacheCow for ASP.NET Core, so
+  CacheCow.Server.WebApi, which has only a `net452` build, fails every `[HttpCache]` action with `MissingMethodException:
+  Method not found: 'Boolean CacheCow.Server.ICacheabilityValidator.IsCacheable(System.Net.Http.HttpRequestMessage)'`
+  (a customer application). Use the version's `net45` (or `net452`) build, in every project that gets the package, the
+  web project included:
   ```xml
   <PackageReference Include="Hangfire.Core" Version="1.6.17" GeneratePathProperty="true" ExcludeAssets="compile;runtime" />
   <Reference Include="Hangfire.Core" HintPath="$(PkgHangfire_Core)/lib/net45/Hangfire.Core.dll" />
+
+  <PackageReference Include="CacheCow.Server.WebApi" Version="2.5.0" />
+  <PackageReference Include="CacheCow.Server" Version="2.5.0" GeneratePathProperty="true" ExcludeAssets="compile;runtime" />
+  <PackageReference Include="CacheCow.Common" Version="2.5.0" GeneratePathProperty="true" ExcludeAssets="compile;runtime" />
+  <Reference Include="CacheCow.Server" HintPath="$(PkgCacheCow_Server)/lib/net452/CacheCow.Server.dll" />
+  <Reference Include="CacheCow.Common" HintPath="$(PkgCacheCow_Common)/lib/net452/CacheCow.Common.dll" />
   ```
 - **Katana's sign-in and token middleware** (#14, #18). webForCore builds all of Katana 4.2.3's security packages:
   `Microsoft.Owin.Security.OpenIdConnect`, `.Jwt`, `.WsFederation`, `.ActiveDirectory` and the social logins of the

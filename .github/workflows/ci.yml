@@ -138,6 +138,14 @@ jobs:
           path: test/webForCore.Oidc.Gate.Tests/bin/Release/net10.0/oidc-responses.json
           if-no-files-found: error
 
+      # ... and every request Packages.Gate.Tests sent to the third-party packages sample (Ninject, Swashbuckle, CacheCow).
+      - name: Upload the third-party packages gate's responses
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages-responses
+          path: test/webForCore.Packages.Gate.Tests/bin/Release/net10.0/packages-responses.json
+          if-no-files-found: error
+
       - name: Pack
         run: tools/ci/pack.sh ${{ steps.version.outputs.version }} "$RUNNER_TEMP/packages"
 
@@ -433,6 +441,34 @@ jobs:
           set -o pipefail
           dotnet run tools/ci/iis_compare.cs -- diff "$RUNNER_TEMP/gate/oidc-responses.json" "$RUNNER_TEMP/gate/iis-oidc-responses.json" \
             tools/ci/iis-known-differences-oidc.json "--gate=OpenID Connect" "--title=IIS 10 (integrated pipeline)" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      # Third-party net45 packages a customer application keeps as they are: test/webForCore.Packages.Sample built for
+      # .NET Framework 4.8 with Microsoft's Web API 5.3.0 and Katana 4.2.3 and the same Ninject (WebHost, OwinHost,
+      # WebApi.OwinHost), WebActivatorEx, Swashbuckle.Core and CacheCow.Server.WebApi packages, served by IIS (integrated
+      # pipeline: Katana's System.Web host needs it on IIS). Packages.Gate.Tests' requests are sent again in their order
+      # and the responses compared (tools/ci/iis-known-differences-packages.json).
+      - uses: actions/download-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: packages-responses
+          path: ${{ runner.temp }}/gate
+
+      - name: Build the third-party packages sample for .NET Framework 4.8
+        if: ${{ !cancelled() }}
+        run: dotnet build test/webForCore.Packages.Sample.Iis/webForCore.Packages.Sample.Iis.csproj -c Release -nodeReuse:false "-p:IisSiteDirectory=$RUNNER_TEMP/packages-site/"
+
+      - name: Third-party packages sample on IIS 10
+        if: ${{ !cancelled() }}
+        shell: powershell
+        run: tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\packages-site" -Name packages-integrated -Port 8102 -Pipeline Integrated
+
+      - name: Compare the third-party packages
+        if: ${{ !cancelled() }}
+        run: |
+          set -o pipefail
+          dotnet run tools/ci/iis_compare.cs -- replay "$RUNNER_TEMP/gate/packages-responses.json" http://localhost:8102/ "$RUNNER_TEMP/gate/iis-packages-responses.json"
+          dotnet run tools/ci/iis_compare.cs -- diff "$RUNNER_TEMP/gate/packages-responses.json" "$RUNNER_TEMP/gate/iis-packages-responses.json" \
+            tools/ci/iis-known-differences-packages.json "--gate=Third-party packages" "--title=IIS 10 (integrated pipeline)" | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Upload the responses
         if: always()
