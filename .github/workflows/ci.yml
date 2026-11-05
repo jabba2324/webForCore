@@ -121,6 +121,15 @@ jobs:
           path: test/webForCore.WebApi.Gate.Tests/bin/Release/net10.0/gate-responses.json
           if-no-files-found: error
 
+      # ... and every request IIS.Gate.Tests' RequestHandlingTests sent to test/webForCore.Requests.Sample (#126, #127,
+      # #129, #140).
+      - name: Upload the request handling responses
+        uses: actions/upload-artifact@v4
+        with:
+          name: requests-responses
+          path: test/webForCore.IIS.Gate.Tests/bin/Release/net10.0/requests-responses.json
+          if-no-files-found: error
+
       - name: Pack
         run: tools/ci/pack.sh ${{ steps.version.outputs.version }} "$RUNNER_TEMP/packages"
 
@@ -204,6 +213,9 @@ jobs:
   # tools/ci/iis_compare.cs diffs the responses. A difference that tools/ci/iis-known-differences.json doesn't list (and
   # docs/IIS-COMPATIBILITY.md doesn't record), or a listed one that no longer occurs, fails the job. It needs nothing of
   # webForCore's build, so it takes a few minutes once build-and-test is done. Not a required check (docs/TESTING.md).
+  # Then the same for request handling (#126, #127, #129, #140): test/webForCore.Requests.Sample, served by IIS as it is,
+  # gets the requests IIS.Gate.Tests' RequestHandlingTests sent to it, compared with the classic pipeline
+  # (tools/ci/iis-known-differences-requests.json).
   iis-compare:
     needs: build-and-test
     runs-on: windows-2025
@@ -252,6 +264,40 @@ jobs:
           dotnet run tools/ci/iis_compare.cs -- diff "$RUNNER_TEMP/gate/gate-responses.json" "$RUNNER_TEMP/gate/iis-classic-responses.json" \
             "--title=IIS 10 (classic pipeline, for the record)" --informational > "$RUNNER_TEMP/gate/iis-classic.md"
           head -3 "$RUNNER_TEMP/gate/iis-classic.md" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      # Request handling (#126, #127, #129, #140): test/webForCore.Requests.Sample is pages, App_Code and static files
+      # only, so IIS serves the folder as it is (webForCore's build output and Program.cs aside). The comparison is with
+      # the classic pipeline, webForCore's; the integrated one is recorded too.
+      - uses: actions/download-artifact@v4
+        with:
+          name: requests-responses
+          path: ${{ runner.temp }}/gate
+
+      - name: The request handling sample's site
+        run: |
+          cp -r test/webForCore.Requests.Sample "$RUNNER_TEMP/requests-site"
+          rm -rf "$RUNNER_TEMP/requests-site/bin_dotnet" "$RUNNER_TEMP/requests-site/obj"
+
+      - name: Request handling sample on IIS 10
+        shell: powershell
+        run: |
+          tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\requests-site" -Name requests-classic -Port 8092 -Pipeline Classic
+          tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\requests-site" -Name requests-integrated -Port 8093 -Pipeline Integrated
+
+      - name: Send the request handling requests to IIS
+        run: |
+          dotnet run tools/ci/iis_compare.cs -- replay "$RUNNER_TEMP/gate/requests-responses.json" http://localhost:8092/ "$RUNNER_TEMP/gate/iis-requests-classic-responses.json"
+          dotnet run tools/ci/iis_compare.cs -- replay "$RUNNER_TEMP/gate/requests-responses.json" http://localhost:8093/ "$RUNNER_TEMP/gate/iis-requests-integrated-responses.json"
+
+      - name: Compare request handling
+        run: |
+          set -o pipefail
+          dotnet run tools/ci/iis_compare.cs -- diff "$RUNNER_TEMP/gate/requests-responses.json" "$RUNNER_TEMP/gate/iis-requests-classic-responses.json" \
+            tools/ci/iis-known-differences-requests.json "--gate=Request handling" "--title=IIS 10 (classic pipeline)" | tee -a "$GITHUB_STEP_SUMMARY"
+          # The integrated pipeline: for the record (it adds HTTP_URL, UNENCODED_URL and CACHE_URL, ServerVariables.aspx).
+          dotnet run tools/ci/iis_compare.cs -- diff "$RUNNER_TEMP/gate/requests-responses.json" "$RUNNER_TEMP/gate/iis-requests-integrated-responses.json" \
+            tools/ci/iis-known-differences-requests.json "--gate=Request handling" "--title=IIS 10 (integrated pipeline, for the record)" --informational > "$RUNNER_TEMP/gate/iis-requests-integrated.md"
+          head -3 "$RUNNER_TEMP/gate/iis-requests-integrated.md" | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Upload the responses
         if: always()

@@ -1,0 +1,62 @@
+[
+  {
+    "requests": ".*",
+    "field": "header Server",
+    "reason": "IIS sends Server: Microsoft-IIS/10.0; webForCore's host is Kestrel."
+  },
+  {
+    "requests": "(?i)^GET /content/.*\\.(txt|htm)$",
+    "field": "header Accept-Ranges",
+    "reason": "A static file is served by ASP.NET's static file handler (IIS: its static file module), which sends no Accept-Ranges: bytes."
+  },
+  {
+    "requests": "(?i)^GET /content/.*\\.(txt|htm)$",
+    "field": "header Cache-Control",
+    "reason": "A static file is served by ASP.NET's static file handler (IIS: its static file module), which sends Cache-Control: public."
+  },
+  {
+    "requests": "(?i)^GET /content/.*\\.(txt|htm)$",
+    "field": "header ETag",
+    "reason": "A static file is served by ASP.NET's static file handler (IIS: its static file module), whose ETag has another form."
+  },
+  {
+    "requests": "(?i)^GET /content/.*\\.(txt|htm)$",
+    "field": "header Last-Modified",
+    "reason": "A static file is served by ASP.NET's static file handler (IIS: its static file module), whose Last-Modified the worker request leaves out (as Cassini, which it comes from, did)."
+  },
+  {
+    "requests": "(?i)^GET /(content/.*\\.(txt|htm)|About%20x)$",
+    "field": "header X-AspNet-Version",
+    "reason": "A static file, or a 404 for one, is ASP.NET's (IIS: its static file module's), so it has X-AspNet-Version."
+  },
+  {
+    "requests": "(?i)^GET /(content/(missing%20file|nothere)\\.txt|About%20x)$",
+    "field": "body",
+    "reason": "A file that doesn't exist gets ASP.NET's 404 page; IIS serves its native 404.0 page (StaticFile handler). The status is 404 on both."
+  },
+  {
+    "requests": "^GET /Echo\\.aspx/a(%2525|\\+|%2B)b$",
+    "field": "body",
+    "reason": "Request filtering's 404.11 (a double escape, or '+') is webForCore's short IIS error page; IIS sends its detailed error page. Same status and substatus."
+  },
+  {
+    "requests": "^GET /Echo\\.aspx/a(%2525|\\+|%2B)b$",
+    "field": "header Content-Type",
+    "reason": "Request filtering's 404.11 is webForCore's short IIS error page (text/html); IIS's detailed error page is text/html; charset=utf-8."
+  },
+  {
+    "requests": "^GET /Echo\\.aspx/a(%2525|\\+|%2B)b$",
+    "field": "header Cache-Control",
+    "reason": "IIS's detailed error page for request filtering's 404.11 has Cache-Control: private; webForCore's has none."
+  },
+  {
+    "requests": "^GET /Echo\\.aspx/a(%2525|\\+|%2B)b$",
+    "field": "header Connection",
+    "reason": "IIS closes the connection after request filtering's 404.11; webForCore keeps it open."
+  },
+  {
+    "requests": "^GET /Echo\\.aspx/a(%25|%26|%3F|%3A|:|%3C|\\*)b$",
+    "field": "body",
+    "reason": "ASP.NET's 400 for a character of requestPathInvalidCharacters is the same error page, with webForCore's source file, line, stack frames (from its PDBs) and version information instead of .NET Framework's."
+  }
+]
