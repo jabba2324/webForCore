@@ -10,7 +10,9 @@
 //     1 if there is any other difference, or a known one that no longer occurs, so the list and the documentation stay
 //     true.
 //
-// --title=<text> names the IIS side in the report; --informational prints the report and exits with 0.
+// --title=<text> names the IIS side in the report, --gate=<text> the requests (default "Web API gate"); --informational
+// prints the report and exits with 0. The request handling sample (test/webForCore.Requests.Sample, RequestHandlingTests
+// writes requests-responses.json) is compared the same way, with tools/ci/iis-known-differences-requests.json.
 //
 // Both sides are normalised before the comparison: each side's own base address (http://127.0.0.1:<port>) becomes
 // {base} wherever it appears (Location headers, bodies); stack traces are removed from Web API's JSON errors, as
@@ -32,11 +34,12 @@ var positional = args.Where(a => !a.StartsWith("--")).ToArray();
 if (positional.Length >= 3 && positional[0] == "diff")
 {
     string title = options.FirstOrDefault(o => o.StartsWith("--title="))?["--title=".Length..] ?? "IIS 10";
-    int result = Diff(positional[1], positional[2], positional.Length > 3 ? positional[3] : Path.Combine(AppContext.GetData("EntryPointFileDirectoryPath") as string ?? "tools/ci", "iis-known-differences.json"), title);
+    string gate = options.FirstOrDefault(o => o.StartsWith("--gate="))?["--gate=".Length..] ?? "Web API gate";
+    int result = Diff(positional[1], positional[2], positional.Length > 3 ? positional[3] : Path.Combine(AppContext.GetData("EntryPointFileDirectoryPath") as string ?? "tools/ci", "iis-known-differences.json"), title, gate);
     // --informational: the report only, exit code 0.
     return options.Contains("--informational") ? 0 : result;
 }
-Console.Error.WriteLine("Usage: iis_compare.cs replay <gate-responses.json> <base URL> <out.json>\n       iis_compare.cs diff <gate-responses.json> <iis-responses.json> [<known differences.json>] [--title=<IIS side>] [--informational]");
+Console.Error.WriteLine("Usage: iis_compare.cs replay <gate-responses.json> <base URL> <out.json>\n       iis_compare.cs diff <gate-responses.json> <iis-responses.json> [<known differences.json>] [--title=<IIS side>] [--gate=<requests>] [--informational]");
 return 2;
 
 async Task<int> Replay(string recordedPath, Uri baseAddress, string outPath)
@@ -72,7 +75,8 @@ async Task<int> Replay(string recordedPath, Uri baseAddress, string outPath)
             return 1;
         }
         var url = new Uri((string)request["url"]!);
-        var message = new HttpRequestMessage(new HttpMethod((string)request["method"]!), new Uri(baseAddress, url.PathAndQuery));
+        // The recorded path and query as they were sent (a path that starts with "//" is a path here, not a host).
+        var message = new HttpRequestMessage(new HttpMethod((string)request["method"]!), new Uri(baseAddress.GetLeftPart(UriPartial.Authority) + url.PathAndQuery));
         if ((string?)request["accept"] is string accept) message.Headers.TryAddWithoutValidation("Accept", accept);
         if ((string?)request["body"] is string body)
         {
@@ -106,7 +110,7 @@ async Task<int> Replay(string recordedPath, Uri baseAddress, string outPath)
     return 0;
 }
 
-int Diff(string kestrelPath, string iisPath, string knownPath, string title)
+int Diff(string kestrelPath, string iisPath, string knownPath, string title, string gate)
 {
     var kestrel = JsonNode.Parse(File.ReadAllText(kestrelPath))!.AsObject();
     var iis = JsonNode.Parse(File.ReadAllText(iisPath))!.AsObject();
@@ -144,7 +148,7 @@ int Diff(string kestrelPath, string iisPath, string knownPath, string title)
     var stale = known.Where(r => !used.Contains(r)).ToList();
 
     var report = new StringBuilder();
-    report.Append($"## Web API gate: webForCore (Kestrel) and {title}\n\n{kestrel.Count} requests: {same} with the same response apart from known differences, " +
+    report.Append($"## {gate}: webForCore (Kestrel) and {title}\n\n{kestrel.Count} requests: {same} with the same response apart from known differences, " +
         $"{unexpected.Count} unexpected differences, {expected.Values.Sum(e => e.Count)} known differences, {stale.Count} known differences that no longer occur.\n\n");
     if (unexpected.Count > 0)
         report.Append("### Unexpected differences\n\n| Request | Field | webForCore | IIS 10 |\n| --- | --- | --- | --- |\n").AppendJoin("\n", unexpected).Append("\n\n");

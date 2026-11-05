@@ -141,7 +141,7 @@ namespace IISGate
         {
             var (response, _) = await Get(url);
             Assert.Equal(HttpStatusCode.MovedPermanently, response.StatusCode);
-            Assert.Equal(url + "/", response.Headers.Location?.OriginalString);
+            Assert.Equal(new Uri(_server.BaseAddress, url + "/").AbsoluteUri, response.Headers.Location?.OriginalString); // absolute, as IIS sends it (#127)
         }
 
         // #15: W3C logs (client addresses, every URL with its query string) were written in the site and served: every
@@ -216,7 +216,8 @@ namespace IISGate
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Contains("HttpContextBase: True", body);
             Assert.Contains("RouteTable: True", body);
-            Assert.Contains("path: ~/regressions/facades/Default.aspx", body);
+            // The default document as applicationHost.config lists it, as IIS rewrites to it (#127).
+            Assert.Contains("path: ~/regressions/facades/default.aspx", body);
         }
 
         // #26: a configSource file in a subfolder, written with '\' as web.configs have it. MVCForum's ImageProcessor

@@ -200,7 +200,8 @@ namespace IISGate
         {
             var (response, _) = await Get("/docs?a=b");
             Assert.Equal(HttpStatusCode.MovedPermanently, response.StatusCode);
-            Assert.Equal("/docs/?a=b", response.Headers.Location.OriginalString);
+            // An absolute URL, as IIS sends it (#127).
+            Assert.Equal(new Uri(_server.BaseAddress, "/docs/?a=b").AbsoluteUri, response.Headers.Location.OriginalString);
         }
 
         [Fact]

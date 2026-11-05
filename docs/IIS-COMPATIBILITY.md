@@ -52,7 +52,7 @@ There's no `applicationHost.config`, so locking sections (`overrideMode`, `allow
 | URL Rewrite: rules that set server variables (`<serverVariables>`) | Not built | The rule's other actions apply; the variables aren't set |
 | **IP and domain restrictions** (`<ipSecurity>`) | Works | First matching `<add>` decides (address with mask or prefix, or `domainName` with `enableReverseDns`), else `allowUnlisted`; `enableProxyMode` checks `X-Forwarded-For`; deny actions Forbidden (403.6, 403.8), Unauthorized, NotFound, AbortRequest |
 | **Dynamic IP restrictions** (`<dynamicIpSecurity>`) | Works | `denyByConcurrentRequests` (403.501), `denyByRequestRate` (403.502), logging-only mode, proxy mode |
-| **Default documents** (`<defaultDocument>`) | Works | IIS's list or yours, case-insensitive; 301 to add a missing trailing slash, unless one of the application's routes takes the URL (`RouteExistingFiles`), as `UrlRoutingModule` does on IIS. The routes are known once the application has started (`Application_Start` runs with its first request) |
+| **Default documents** (`<defaultDocument>`) | Works | IIS's list or yours. The document is found in any case, and the request is rewritten to its name as the list has it (`/` is `/default.aspx` with IIS's list), while `Request.RawUrl` stays the URL asked for (`/`), as on IIS (#127); 301 to the absolute URL with a missing trailing slash added, unless one of the application's routes takes the URL (`RouteExistingFiles`), as `UrlRoutingModule` does on IIS. The routes are known once the application has started (`Application_Start` runs with its first request) |
 | **Directory browsing** (`<directoryBrowse>`) | Works | IIS's listing format and `showFlags`; hidden segments, the output folder and dot files are left out |
 | Directory without a default document, browsing off | Partial | The request goes on to the application, as an extensionless URL does in integrated mode; IIS answers 403.14 |
 | **Static content** (`<staticContent>`) | Works | `<mimeMap>` over IIS's default map, 404.3 for an unmapped file, `<clientCache>` (max-age, expires, no-cache, custom `Cache-Control`) |
@@ -86,6 +86,9 @@ IIS hands ASP.NET a worker request (`HttpWorkerRequest`); on Kestrel this is `As
 | `executionTimeout` | Partial | .NET can't abort a thread. The client gets ASP.NET's 500 "Request timed out." on time, `Request.TimedOutToken` is cancelled, and the request ends at its next pipeline step; the page's code runs to the end, and its output is dropped |
 | Integrated-pipeline APIs | Works | The fork runs the classic pipeline, but the APIs that need integrated mode work: `CurrentNotification`/`IsPostNotification`, `MapRequestHandler`/`LogRequest`/`PostLogRequest` events, writable `Request.Headers` and `ServerVariables`, `Response.Headers`, `AddOnSendingHeaders`, `InsertEntityBody`, `Request.Abort`, `Response.SubStatusCode`, `Server.TransferRequest` (a new request through the whole pipeline on the same connection; a chain deeper than 16 transfers fails, a guard against loops) |
 | Response semantics | Works | Integrated mode's Content-Type rule, server name from the Host header, reason phrases, `X-AspNet-Version` and `Cache-Control: private` as integrated mode adds them (around a managed handler, on a flush and on an error; not on a response a module ends before the handler, as Katana's `OwinHttpModule` does) |
+| Request URLs | Works | As IIS gives them to ASP.NET (#126): `Request.Path`, `FilePath`, `PathInfo` and `PATH_INFO` decoded (`/Product/Convertible Car`), with an escaped `/` and a `\` made `/` and repeated slashes merged, as http.sys does; `PathInfo` after the first segment with a managed handler's extension (`/Page.aspx/a.b/c`); `RawUrl` the URL asked for, decoded the same way, with the query string as sent, before any rewrite or default document (#127). `requestPathInvalidCharacters` gets ASP.NET's 400 and double escapes request filtering's 404.11. `HTTP_URL`, `UNENCODED_URL` and `CACHE_URL` are the integrated pipeline's and aren't set, as in IIS's classic pipeline |
+| File names in URLs | Works | Case-insensitive on every platform, as on IIS's file system: a static file, page, handler or directory asked for in another case is found, the first time (#140). `Request.PhysicalPath` is the file's path as it is on disk |
+| `Response.End`, `Redirect(url, true)`, `Server.Transfer`, `CompleteRequest` | Works | The handler stops and the pipeline goes on to `EndRequest` with the response still buffered, as after .NET Framework's thread abort, so `EndRequest`'s modules can change it: forms authentication turns a 401 ended with `Response.End()` (`WebSecurity.RequireAuthenticatedUser`) into its redirect to the log-in page (#129). Code that catches the `ThreadAbortException` and doesn't rethrow it runs on, as .NET can't rethrow it ([NAMESPACES.md](NAMESPACES.md)) |
 
 ## Process model
 
@@ -209,6 +212,25 @@ IIS integrated pipeline mode"); and with the template's `Web.config`, `PUT`, `DE
 (IIS's 404.0), because the classic-mode extensionless handler accepts only `GET`, `HEAD`, `POST` and `DEBUG`. The job
 records that run too, for reference. webForCore runs such an application as IIS's integrated pipeline does, apart from
 the differences above, with the integrated-only APIs Katana uses provided on the Kestrel worker request.
+
+#### Request handling
+
+The job also compares request handling (#126, #127, #129, #140): `test/webForCore.Requests.Sample`, a Web Forms site of
+pages, `App_Code` and static files that IIS serves as it is, gets the requests IIS.Gate.Tests' `RequestHandlingTests`
+sent to it on Kestrel (escaped and invalid characters, path info, default documents, files in another case,
+`Response.End`, `Redirect`, `Server.Transfer` and `CompleteRequest` before forms authentication's `EndRequest`). The
+reference is IIS's **classic** pipeline, webForCore's; every status, `Location`, body and other header matches, except
+these, which `tools/ci/iis-known-differences-requests.json` lists:
+
+| Difference | Why |
+| --- | --- |
+| `Server` is `Kestrel`, not `Microsoft-IIS/10.0` | webForCore's host is Kestrel |
+| A static file has `Cache-Control: public`, another `ETag`, `X-AspNet-Version`, and no `Accept-Ranges` or `Last-Modified` | ASP.NET's static file handler serves it (the worker request leaves out its `Last-Modified`, as Cassini, which it comes from, did); IIS's static file module serves it on IIS |
+| A file that doesn't exist gets ASP.NET's 404 page, with `X-AspNet-Version`; IIS serves its native 404.0 page. Same status | As above |
+| Request filtering's 404.11 is webForCore's short error page (`text/html`), without IIS's `Cache-Control: private` and `Connection: close`. Same status and substatus | IIS's detailed error pages aren't reproduced |
+| ASP.NET's 400 page for a character of `requestPathInvalidCharacters` shows webForCore's source lines, stack frames and version information | The error and its message are the same; the details are the platform's |
+
+The integrated pipeline is recorded too: it also sets `HTTP_URL`, `UNENCODED_URL` and `CACHE_URL` (`ServerVariables.aspx`).
 
 How each part came to be is in git: the fork commits in `external/` and this repository's history
 ([MODIFICATIONS.md](MODIFICATIONS.md)).

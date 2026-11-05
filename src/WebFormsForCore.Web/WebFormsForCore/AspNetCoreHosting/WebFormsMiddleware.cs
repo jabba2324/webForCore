@@ -221,8 +221,12 @@ namespace Microsoft.AspNetCore.Builder
 			}
 		}
 
-		public Task Invoke(Core.HttpContext context) =>
-			iisModules != null ? iisModules.Invoke(context, InvokeApplication) : InvokeApplication(context);
+		public Task Invoke(Core.HttpContext context)
+		{
+			// webForCore: the request's path as IIS gives it, and its URL before any rewrite, for Request.RawUrl (#126, #127).
+			AspNetCoreWorkerRequest.BeginRequest(context);
+			return iisModules != null ? iisModules.Invoke(context, InvokeApplication) : InvokeApplication(context);
+		}
 
 		async Task InvokeApplication(Core.HttpContext context)
 		{
