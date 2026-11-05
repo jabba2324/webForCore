@@ -264,21 +264,69 @@ namespace IISGate
             }
         }
 
+        // #170 (the smoke test's odata-samples-compositekey: a PATCH to /People(FirstName='Kate',LastName='Jones') with
+        // Prefer: return=representation answered 204 instead of OData's 200 with the entity): a request whose path has
+        // a '(' but isn't a cookieless one lost every header IIS has no index for (Prefer, X-Requested-With, X-...), in
+        // Request.Headers and in ALL_RAW. IIS keeps them whatever the path.
+        private static readonly Dictionary<string, string> UnknownHeaders = new Dictionary<string, string>
+        {
+            ["X-Custom"] = "one",
+            ["Prefer"] = "return=representation",
+            ["X-Requested-With"] = "XMLHttpRequest",
+        };
+
+        [Theory]
+        [InlineData("/Headers.aspx")]
+        [InlineData("/Headers.aspx/People(1)")]
+        [InlineData("/Headers.aspx/People(FirstName='Kate',LastName='Jones')")]
+        [InlineData("/Headers.aspx/a(1)/b")]
+        [InlineData("/Headers.aspx/a)")]
+        public async Task UnknownHeadersReachTheApplicationWhateverThePath(string path)
+        {
+            var (response, body) = await Get(path, requestHeaders: UnknownHeaders);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            foreach (var (name, value) in UnknownHeaders)
+            {
+                Assert.Contains($"{name}: [{value}]\n", body);
+                Assert.Contains($"{name} in ALL_RAW: True\n", body);
+            }
+            Assert.Contains("AspFilterSessionId: (null)\n", body);
+        }
+
+        // #170: a cookieless path still gives its session id to the application, as AspFilterSessionId, and the page is
+        // the one without it; the request's other headers are kept with it.
+        [Fact]
+        public async Task ACookielessPathKeepsItsSessionIdAndTheHeaders()
+        {
+            var (response, body) = await Get("/(S(abc))/Headers.aspx", requestHeaders: UnknownHeaders);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("Path: [/Headers.aspx]\n", body);
+            Assert.Contains("AspFilterSessionId: [S(abc)]\n", body);
+            foreach (var (name, value) in UnknownHeaders)
+                Assert.Contains($"{name}: [{value}]\n", body);
+        }
+
         private static string Header(HttpResponseMessage response, string name) =>
             response.Headers.TryGetValues(name, out var values) ? string.Join(", ", values) : null;
 
-        private async Task<(HttpResponseMessage Response, string Body)> Get(string path, bool record = true)
+        private async Task<(HttpResponseMessage Response, string Body)> Get(string path, bool record = true, IDictionary<string, string> requestHeaders = null)
         {
             // The path as it is written, not as a relative URI ("//Echo.aspx" is a path here).
             var request = new HttpRequestMessage(HttpMethod.Get, new Uri(_server.BaseAddress.GetLeftPart(UriPartial.Authority) + path));
+            if (requestHeaders != null)
+            {
+                foreach (var (name, value) in requestHeaders) request.Headers.TryAddWithoutValidation(name, value);
+            }
             var response = await _server.Client.SendAsync(request);
             var body = await response.Content.ReadAsStringAsync();
-            if (record) Record("GET " + path, response, body);
+            // A request with headers of its own is another request for the comparison with IIS.
+            if (record) Record("GET " + path + (requestHeaders != null ? " (with headers)" : ""), response, body, requestHeaders);
             return (response, body);
         }
 
-        // As WebApi.Gate.Tests records its requests for the comparison with IIS (#78).
-        private static void Record(string key, HttpResponseMessage response, string body)
+        // As WebApi.Gate.Tests records its requests for the comparison with IIS (#78); the request's own headers, if it
+        // has any, are sent again on IIS (#170).
+        private static void Record(string key, HttpResponseMessage response, string body, IDictionary<string, string> requestHeaders = null)
         {
             HttpRequestMessage sent = response.RequestMessage;
             var request = new
@@ -288,6 +336,7 @@ namespace IISGate
                 accept = (string)null,
                 contentType = (string)null,
                 body = (string)null,
+                headers = requestHeaders == null ? null : new SortedDictionary<string, string>(requestHeaders, StringComparer.OrdinalIgnoreCase),
             };
             var headers = new SortedDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (var h in response.Headers.Concat(response.Content.Headers))

@@ -78,6 +78,9 @@ async Task<int> Replay(string recordedPath, Uri baseAddress, string outPath)
         // The recorded path and query as they were sent (a path that starts with "//" is a path here, not a host).
         var message = new HttpRequestMessage(new HttpMethod((string)request["method"]!), new Uri(baseAddress.GetLeftPart(UriPartial.Authority) + url.PathAndQuery));
         if ((string?)request["accept"] is string accept) message.Headers.TryAddWithoutValidation("Accept", accept);
+        // The request's own headers, if it was recorded with any (RequestHandlingTests, #170).
+        if (request["headers"] is JsonObject requestHeaders)
+            foreach (var (name, value) in requestHeaders) message.Headers.TryAddWithoutValidation(name, (string?)value);
         if ((string?)request["body"] is string body)
         {
             message.Content = new ByteArrayContent(Encoding.UTF8.GetBytes(body));
@@ -97,6 +100,7 @@ async Task<int> Replay(string recordedPath, Uri baseAddress, string outPath)
                 ["accept"] = (string?)request["accept"],
                 ["contentType"] = (string?)request["contentType"],
                 ["body"] = (string?)request["body"],
+                ["headers"] = request["headers"]?.DeepClone(),
             },
             ["status"] = (int)response.StatusCode,
             ["headers"] = headers,
