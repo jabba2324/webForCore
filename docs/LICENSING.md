@@ -65,6 +65,18 @@ message texts are Microsoft's, from a product under the .NET Framework's licence
 they are what an application sees in exception messages, as on .NET Framework. Have counsel review this part before
 relying on it in a product.
 
+### aspnet_regsql's SQL scripts
+
+The SQL scripts that create the database of ASP.NET's SQL providers and SQL Server session state
+(18 files: `InstallCommon.sql`, `InstallMembership.sql`, `InstallSqlState.sql` and the other `Install` and `Uninstall`
+scripts) ship with .NET Framework in its folder (`%WINDIR%\Microsoft.NET\Framework64\v4.0.30319`) and aren't in the Reference
+Source. So that `SqlServices` and `webforcore-regsql` create the same database as on IIS (#123), System.Web carries
+.NET Framework 4.8's files unchanged, read as data on a Windows CI runner (`src/WebFormsForCore.Web/FrameworkData/Sql`),
+and the gate tests compare with two scripts .NET Framework's `aspnet_regsql.exe` exported
+(`test/webForCore.IIS.Gate.Tests/FrameworkData`); CI's `regsql-framework-data` job reads them again. They are
+Microsoft's, under the .NET Framework's licence rather than an open-source one (each one's header says "Copyright Microsoft,
+Inc." and "All Rights Reserved."). Have counsel review this part before relying on it in a product.
+
 ## What was replaced
 
 WebFormsForCore's fork base contained material that no open licence covered: binaries from .NET Framework, and code

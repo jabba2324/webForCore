@@ -126,6 +126,7 @@ IIS hands ASP.NET a worker request (`HttpWorkerRequest`); on Kestrel this is `As
 | --- | --- |
 | `aspnet_compiler` | `aspnetcore_compiler` (`src/WebFormsForCore.AspNetCompiler`), with aspnet_compiler's switches. See [Precompiled sites](#precompiled-sites) |
 | `aspnet_regiis -pe/-pd/-pc/-px/-pi` | `webforcore-regiis` (`src/WebFormsForCore.RegIIS`). See [Protected configuration](#protected-configuration) |
+| `aspnet_regsql` | `webforcore-regsql` (`src/WebFormsForCore.RegSql`, the .NET tool `webForCore.RegSql`), with aspnet_regsql's switches: `-A`/`-R` (membership, roles, profile, personalization, web events; `-Q`), `-ssadd`/`-ssremove` (`-sstype t`, `p` or `c`), `-sqlexportonly`, and `-ed`/`-dd`/`-et`/`-dt`/`-lt` (SQL cache dependency), on `-S`/`-U`/`-P`/`-E` or `-C`. The scripts are .NET Framework 4.8's, which System.Web carries for `SqlServices` too, and `-sqlexportonly` writes what aspnet_regsql writes, byte for byte (#123). Not the wizard (`-W`) |
 | `appcmd`, IIS Manager | None. Edit `web.config`, and the service manager's configuration |
 
 ### Precompiled sites
