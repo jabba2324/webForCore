@@ -7,16 +7,41 @@
   {
     "requests": "^GET /(Probe\\.aspx|other|appx/Probe\\.aspx)$",
     "field": "body",
-    "reason": "A URL outside the application is IIS's site's: its native 404.0 page (the site's root is empty). On webForCore it goes on to the rest of the ASP.NET Core pipeline, which ends with an empty 404. Same status."
+    "reason": "A URL outside the application is the IIS site's root application's: ASP.NET's 404 page there (the root is empty). On webForCore it isn't the application's and goes on to the rest of the ASP.NET Core pipeline, which ends with an empty 404. Same status."
   },
   {
     "requests": "^GET /(Probe\\.aspx|other|appx/Probe\\.aspx)$",
     "field": "header Content-Type",
-    "reason": "IIS's native 404.0 page for a URL outside the application is text/html; ASP.NET Core's empty 404 has no Content-Type."
+    "reason": "The site's root application's 404 page is text/html; ASP.NET Core's empty 404 has no Content-Type."
   },
   {
     "requests": "^GET /(Probe\\.aspx|other|appx/Probe\\.aspx)$",
     "field": "header X-Powered-By",
-    "reason": "IIS's site adds X-Powered-By: ASP.NET (applicationHost.config) to its 404 for a URL outside the application; the application's <customHeaders> don't apply there, and webForCore's empty 404 has none."
+    "reason": "IIS adds X-Powered-By: ASP.NET (applicationHost.config) to the site's root application's 404; webForCore's empty 404 is outside the application and has none."
+  },
+  {
+    "requests": "^GET /(Probe\\.aspx|other|appx/Probe\\.aspx)$",
+    "field": "header Cache-Control",
+    "reason": "The site's root application's 404 (ASP.NET's) has Cache-Control: private; webForCore's empty 404 is outside the application and has none."
+  },
+  {
+    "requests": "^GET /(Probe\\.aspx|other|appx/Probe\\.aspx)$",
+    "field": "header X-AspNet-Version",
+    "reason": "The site's root application's 404 (ASP.NET's) has X-AspNet-Version; webForCore's empty 404 is outside the application and has none."
+  },
+  {
+    "requests": "^GET /app/Bundles\\.aspx$",
+    "field": "body",
+    "reason": "Scripts.Render and Styles.Render end each tag with the platform newline (\\n on Linux, \\r\\n on Windows); the tags are the same (docs/IIS-COMPATIBILITY.md, compatibility decisions)."
+  },
+  {
+    "requests": "^GET /app/(bundles/site|Content/css)$",
+    "field": "header Expires",
+    "reason": "A bundle is cached for a year from when it was built: the date is the time of the run."
+  },
+  {
+    "requests": "^GET /app/(bundles/site|Content/css)$",
+    "field": "header Last-Modified",
+    "reason": "A bundle's Last-Modified is the time it was built: the time of the run."
   }
 ]

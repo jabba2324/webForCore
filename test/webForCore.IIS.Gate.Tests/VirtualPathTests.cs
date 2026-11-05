@@ -47,7 +47,7 @@ namespace IISGate
             Assert.Equal("/", values["forms_cookie_path"]); // <forms path> is "/" by default, under a virtual path too
             Assert.StartsWith("/app/bundles/site?v=", values["bundle_script"]);
             Assert.StartsWith("/app/Content/css?v=", values["bundle_style"]);
-            Assert.Equal("/LM/W3SVC/1/ROOT/app", values["appl_md_path"]);
+            Assert.Equal("/LM/W3SVC/n/ROOT/app", values["appl_md_path"]);
             Assert.Equal("/app/Probe.aspx", values["script_name"]);
             Assert.Equal("/app/Probe.aspx", values["url_var"]);
         }

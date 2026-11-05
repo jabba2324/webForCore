@@ -277,7 +277,14 @@ other header matches, except these, which `tools/ci/iis-known-differences-vpath.
 | Difference | Why |
 | --- | --- |
 | `Server` is `Kestrel`, not `Microsoft-IIS/10.0` | webForCore's host is Kestrel |
-| A URL outside the application gets an empty 404, without `Content-Type` or `X-Powered-By`; IIS's site serves its native 404.0 page. Same status | On webForCore it isn't the application's: it goes on to the rest of the ASP.NET Core pipeline after `UseWebForms` |
+| A URL outside the application gets an empty 404, without `Content-Type`, `Cache-Control`, `X-AspNet-Version` or `X-Powered-By`; on IIS the site's root application (empty, but ASP.NET's) answers with ASP.NET's 404 page. Same status | On webForCore it isn't the application's: it goes on to the rest of the ASP.NET Core pipeline after `UseWebForms` |
+| The tags `Scripts.Render` and `Styles.Render` write end with `\n` on Linux, `\r\n` on IIS | Newlines are the platform's ([above](#compatibility-decisions)) |
+| A bundle's `Expires` and `Last-Modified` | They are the time the bundle was built, the time of each run |
+
+The first run found nothing else: the paths, URLs, redirects (`/app/Content` to `/app/Content/`, the log-in page with
+its `ReturnUrl`), cookies, MVC's route taking `/app` without its slash, Web API's links, bundle URLs and contents,
+Swashbuckle's document, and the module's `REMOTE_ADDR` and `HTTPS` (`UserHostAddress`, `IsSecureConnection`, `Url`,
+`requireSSL`, `[RequireHttps]`) all match IIS 10's. `APPL_MD_PATH` is compared without the site's number, which is IIS's.
 
 How each part came to be is in git: the fork commits in `external/` and this repository's history
 ([MODIFICATIONS.md](MODIFICATIONS.md)).

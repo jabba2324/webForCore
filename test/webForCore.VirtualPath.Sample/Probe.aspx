@@ -33,7 +33,8 @@
             "forms_cookie_path=" + FormsAuthentication.FormsCookiePath,
             "bundle_script=" + Scripts.Url("~/bundles/site"),
             "bundle_style=" + Styles.Url("~/Content/css"),
-            "appl_md_path=" + v["APPL_MD_PATH"],
+            // The application's part of APPL_MD_PATH: the site's number is IIS's (webForCore's site is 1).
+            "appl_md_path=" + System.Text.RegularExpressions.Regex.Replace(v["APPL_MD_PATH"], @"^/LM/W3SVC/\d+/", "/LM/W3SVC/n/"),
             "path_info_var=" + v["PATH_INFO"],
             "script_name=" + v["SCRIPT_NAME"],
             "url_var=" + v["URL"],
