@@ -87,7 +87,9 @@ namespace HostTests
 
         static async Task<Dictionary<string, string>> Get(Running app, string query)
         {
-            var response = await app.GetAsync("/Monitor.aspx?" + query);
+            HttpResponseMessage response;
+            try { response = await app.GetAsync("/Monitor.aspx?" + query); }
+            catch (HttpRequestException e) { throw new Xunit.Sdk.XunitException($"{e.Message}\n{app.Output}"); }
             var answer = await response.Content.ReadAsStringAsync();
             Assert.True(response.StatusCode == HttpStatusCode.OK, $"{(int)response.StatusCode}: {answer}\n{app.Output}");
             Assert.DoesNotContain("failed at folder", answer);
