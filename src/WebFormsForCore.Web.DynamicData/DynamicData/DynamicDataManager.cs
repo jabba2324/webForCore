@@ -203,15 +203,14 @@
             if (fieldControl != null) {
                 fieldControl.FieldsGenerator = new DefaultAutoFieldGenerator(table);
             }
-#if NETFRAMEWORK
             var linqDataSource = dataSource as LinqDataSource;
+#if NETFRAMEWORK // webForCore: no EntityDataSource (System.Web.Entity, Entity Framework 1-4) on .NET.
             var entityDataSource = dataSource as EntityDataSource;
 #endif
             // If the context type is not set, we need to set it
             if (dataSource.ContextType == null) {
                 dataSource.ContextType = table.DataContextType;
 
-#if NETFRAMEWORK
                 // If it's a LinqDataSurce, register for ContextCreating so the context gets created using the correct ctor
                 // Ideally, this would work with other datasource, but we just don't have the right abstraction
                 if (linqDataSource != null) {
@@ -220,6 +219,7 @@
                     };
                 }
 
+#if NETFRAMEWORK
                 if (entityDataSource != null) {
                     entityDataSource.ContextCreating += delegate(object sender, EntityDataSourceContextCreatingEventArgs e) {
                         e.Context = (ObjectContext)table.CreateContext();
@@ -238,12 +238,10 @@
                 dataSource.AutoGenerateWhereClause = true;
             }
 
-#if NETFRAMEWORK
             // If it's a LinqDataSource and the flag is set, pre load the foreign keys
             if (AutoLoadForeignKeys && linqDataSource != null) {
                 linqDataSource.LoadWithForeignKeys(table.EntityType);
             }
-#endif
 
             if (!isPostBack) {
                 if (table.HasPrimaryKey) {

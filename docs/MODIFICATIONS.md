@@ -10,7 +10,7 @@ that code and what had to change.
 
   | Submodule | Fork branch | Upstream commit | Changes |
   | --- | --- | --- | --- |
-  | `external/AspNetWebStack` | [xforcore/AspNetWebStack `webforcore`](https://github.com/xforcore/AspNetWebStack/commits/webforcore) | `2106565` | 163, a casing fix, and upstream's `.gitattributes` kept (Windows line endings for the tests) |
+  | `external/AspNetWebStack` | [xforcore/AspNetWebStack `webforcore`](https://github.com/xforcore/AspNetWebStack/commits/webforcore) | `2106565` | 163, a casing fix, and upstream's `.gitattributes` kept (Windows line endings for the tests); LINQ to SQL's `Binary` support restored (#142): `LinqBinaryModelBinder` and its test brought back, unchanged, and the changes that compiled `Binary` out reverted |
   | `external/AspNetKatana` | [xforcore/AspNetKatana `webforcore`](https://github.com/xforcore/AspNetKatana/commits/webforcore) | `096e225` | 10, and OpenIdConnect, Jwt, WsFederation, ActiveDirectory and the social providers brought back, unchanged |
   | `external/SignalR` | [xforcore/SignalR `webforcore`](https://github.com/xforcore/SignalR/commits/webforcore) | `7f53f26` | 3 |
   | `external/AspNetIdentity` | [xforcore/AspNetIdentity `webforcore`](https://github.com/xforcore/AspNetIdentity/commits/webforcore) | `b7fc094` | 5 |
@@ -54,7 +54,7 @@ that code and what had to change.
 
 | Component | Upstream (pinned commit) | Licence | Files used | Files changed |
 | --- | --- | --- | ---: | ---: |
-| ASP.NET Web API 2, Razor 3, Web Pages 3, MVC 5, MVC Futures, Helpers, CORS | [aspnet/AspNetWebStack@2106565](https://github.com/aspnet/AspNetWebStack/tree/2106565) | Apache 2.0 | 1,553 libraries · 1,266 tests | 26 · 131 |
+| ASP.NET Web API 2, Razor 3, Web Pages 3, MVC 5, MVC Futures, Helpers, CORS | [aspnet/AspNetWebStack@2106565](https://github.com/aspnet/AspNetWebStack/tree/2106565) | Apache 2.0 | 1,554 libraries · 1,267 tests | 22 · 129 |
 | Katana (Microsoft.Owin 4.2.3) | [aspnet/AspNetKatana@096e225](https://github.com/aspnet/AspNetKatana/tree/096e225) | Apache 2.0 | 421 · 63 | 8 · 3 |
 | ASP.NET SignalR 2.4.3 | [SignalR/SignalR@7f53f26](https://github.com/SignalR/SignalR/tree/7f53f26) | Apache 2.0 | 318 · 152 | 2 · 1 |
 | ASP.NET Identity 2 | [aspnet/AspNetIdentity@b7fc094](https://github.com/aspnet/AspNetIdentity/tree/b7fc094) | MIT | 75 · 26 | 0 · 4 |
@@ -65,7 +65,7 @@ that code and what had to change.
 | System.Configuration, System.Web.ApplicationServices, aspnet_compiler, `BindableTypeAttribute` (replacing WebFormsForCore's decompiled copies); System.Data's typed DataSet generator | [microsoft/referencesource@ec9fa9a](https://github.com/microsoft/referencesource/tree/ec9fa9ae770d522a5b5f0607898044b7478574a3) | MIT | 114 | 41 |
 | ResX classes (replacing decompiled copies) | [dotnet/winforms@8266870](https://github.com/dotnet/winforms/tree/8266870) (release/8.0) | MIT | 13 | 13 |
 | StronglyTypedResourceBuilder (replacing an API reconstruction) | mono/mono@0f53e9e (`mcs/class/System.Design`) | MIT | 1 | 1 |
-| **Total** | | | **4,585** | **265** |
+| **Total** | | | **4,587** | **259** |
 
 The fork itself starts from [webformsforcore/WebFormsForCore@52f4172](https://github.com/webformsforcore/WebFormsForCore/tree/52f4172dbc09b3ad0b849c97642720fa7a49aa22),
 whose System.Web, System.Configuration and related assemblies were ported from Microsoft's .NET Framework reference
@@ -77,7 +77,7 @@ webForCore's changes to the port are its git history since the fork: `git diff 5
 
 | Kind | Examples | Where |
 | --- | --- | --- |
-| **APIs .NET doesn't have** | `AppDomain.DefineDynamicAssembly` → `AssemblyBuilder.DefineDynamicAssembly` (SignalR); `AppDomainSetup.PrivateBinPath` → scan the app base (Katana's loader); LINQ to SQL's `Binary` binding compiled out (MVC, Web Pages); `NetDataContractSerializer`, which MVC Futures' `MvcSerializer` uses, is replaced by a `DataContractSerializer` with a type-preserving resolver (`src/webForCore.Microsoft.Web.Mvc`), so `MvcSerializer.cs` itself is unchanged; Code Access Security policy removed, and LINQ to SQL's reflection-permission demands are empty; LINQ to SQL's `DBConvert` uses webForCore's BinaryFormatter port, and a debug build of it doesn't capture compiled readers to an assembly file (`AssemblyBuilderAccess.Save`) | Web Stack, Katana, SignalR, System.Data.Linq |
+| **APIs .NET doesn't have** | `AppDomain.DefineDynamicAssembly` → `AssemblyBuilder.DefineDynamicAssembly` (SignalR); `AppDomainSetup.PrivateBinPath` → scan the app base (Katana's loader); `NetDataContractSerializer`, which MVC Futures' `MvcSerializer` uses, is replaced by a `DataContractSerializer` with a type-preserving resolver (`src/webForCore.Microsoft.Web.Mvc`), so `MvcSerializer.cs` itself is unchanged; Code Access Security policy removed, and LINQ to SQL's reflection-permission demands are empty; LINQ to SQL's `DBConvert` uses webForCore's BinaryFormatter port, and a debug build of it doesn't capture compiled readers to an assembly file (`AssemblyBuilderAccess.Save`) | Web Stack, Katana, SignalR, System.Data.Linq |
 | **Windows-only APIs** | The CryptoAPI certificate context → `PublicKey.ExportSubjectPublicKeyInfo()` (Katana); `DpapiDataProtector` → webForCore's DPAPI emulation (`LocalDataProtection`); the HttpListener host's private-field access → Katana's Mono path | Katana |
 | **.NET Framework behaviour restored** | Web Pages' `WebMail` takes its defaults from `<system.net><mailSettings>`, which .NET's `SmtpClient` ignores; `float`/`double` route constraints reject overflow; a whitespace multipart root path is rejected; `HttpResponseMessage.Content` is never null on .NET, so `ResponseContent.Get` treats `EmptyContent` as no content (11 call sites in the Web API hosts); a request body copied through the seekable stream; `HostString` keeps the host's case | Web Stack, Katana |
 | **Compiler and language** | A `(string)null` where .NET's `ArraySegment<T>` overloads made `null` ambiguous; `LangVersion` pinned to what Microsoft built with (C# 7.3 for SignalR) | SignalR, Web Stack |
@@ -234,8 +234,9 @@ commit that made it, and its issue, say why.
   reference: for one without a public key token, the assembly of that name it finds is the one, whatever its version
   (#171, JabbR deploys Nancy 0.20.0 and a library built against 0.21.1).
 - **System.Web.DynamicData** (`src/WebFormsForCore.Web.DynamicData`, now built and in the "Always" set): the Entity
-  Framework 1–4 and LINQ to SQL model providers, `LinqDataSource`/`EntityDataSource` hookups and EF 5 spatial column
-  types are compiled out (`#if NETFRAMEWORK`); `AssemblyRef.cs` and `ScaffoldTableAttribute` (which .NET dropped) are
+  Framework 1–4 model provider, the `EntityDataSource` hookup and EF 5 spatial column types are compiled out
+  (`#if NETFRAMEWORK`); the LINQ to SQL model provider and the `LinqDataSource` hookups are built again, as the reference
+  source has them, now that System.Data.Linq is (#142); `AssemblyRef.cs` and `ScaffoldTableAttribute` (which .NET dropped) are
   added (#8).
 - **`Response.End()` keeps the response buffered** (`HttpResponse.End`), as after .NET Framework's thread abort: it
   throws the `ThreadAbortException` that `HttpApplication.ExecuteStep` observes, and calls `CompleteRequest`, for

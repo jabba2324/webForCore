@@ -1,5 +1,5 @@
 ﻿#if NETFRAMEWORK
-// webForCore: Entity Framework 1-4 (System.Data.Entity's ObjectContext) and LINQ to SQL aren't on .NET (docs/NAMESPACES.md).
+// webForCore: Entity Framework 1-4 (System.Data.Entity's ObjectContext) isn't on .NET (docs/NAMESPACES.md).
 using System.Data.Metadata.Edm;
 using System.Diagnostics;
 using System.Linq;

@@ -37,6 +37,8 @@
     <!-- machine.config lists System.Web.Services and System.Web.Extensions (ScriptModule); the app deploys them. -->
     <ProjectReference Include="..\..\src\WebFormsForCore.Web.Services\WebFormsForCore.Web.Services.csproj" />
     <ProjectReference Include="..\..\src\WebFormsForCore.Web.Extensions\WebFormsForCore.Web.Extensions.csproj" />
+    <!-- In the "Always" set (MIGRATING.md): linq/DynamicData.aspx registers a LINQ to SQL DataContext with Dynamic Data. -->
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.DynamicData\WebFormsForCore.Web.DynamicData.csproj" />
     <ProjectReference Include="..\..\src\WebFormsForCore.Web.Infrastructure\WebFormsForCore.Web.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\WebFormsForCore.Web.Abstractions\WebFormsForCore.Web.Abstractions.csproj" />
     <ProjectReference Include="..\..\src\WebFormsForCore.Web.Routing\WebFormsForCore.Web.Routing.csproj" />

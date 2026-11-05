@@ -1,0 +1,14 @@
+@model MvcSample.Models.Note
+@{
+    ViewBag.Title = "Edit note";
+}
+@using (Html.BeginForm("Edit", "Notes", FormMethod.Post, new { id = "note-form" }))
+{
+    @Html.HiddenFor(m => m.Id)
+    @Html.EditorFor(m => m.Text)
+    @* [HiddenInput]: the default editor template's hidden input, which writes a Binary as base64. *@
+    @Html.EditorFor(m => m.Version)
+    @* Html.Hidden with a Binary value, written as base64 too. *@
+    @Html.Hidden("check", Model.Version)
+    <input type="submit" value="Save" />
+}

@@ -209,6 +209,7 @@
     <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/JQueryFormValueProviderFactoryTest.cs" Link="Test/JQueryFormValueProviderFactoryTest.cs" />
     <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/JavaScriptResultTest.cs" Link="Test/JavaScriptResultTest.cs" />
     <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/JsonResultTest.cs" Link="Test/JsonResultTest.cs" />
+    <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/LinqBinaryModelBinderTest.cs" Link="Test/LinqBinaryModelBinderTest.cs" />
     <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/JsonValueProviderFactoryTest.cs" Link="Test/JsonValueProviderFactoryTest.cs" />
     <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/MaxLengthAttributeAdapterTest.cs" Link="Test/MaxLengthAttributeAdapterTest.cs" />
     <Compile Include="../../external/AspNetWebStack/test/System.Web.Mvc.Test/Test/MinLengthAttributeAdapterTest.cs" Link="Test/MinLengthAttributeAdapterTest.cs" />
