@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using MachineKeyInterop;
 using WebForCoreGate;
 using Xunit;
@@ -114,7 +114,6 @@ namespace IISGate
                 string temp = Directory.CreateDirectory(Path.Combine(folder, "temp")).FullName;
                 File.WriteAllText(Path.Combine(site, "Web.config"), config.WebConfig());
                 root = config.VirtualPath.TrimEnd('/') + "/";
-                var address = new Uri($"http://127.0.0.1:{FreePort()}");
                 var start = new ProcessStartInfo("dotnet")
                 {
                     WorkingDirectory = SampleDirectory,
@@ -123,7 +122,9 @@ namespace IISGate
                 };
                 start.ArgumentList.Add($"bin_dotnet/{Sample}.dll");
                 start.ArgumentList.Add("--urls");
-                start.ArgumentList.Add(address.ToString());
+                // Port 0: Kestrel takes a free port and says which ("Now listening on: ..."). A port picked here could be
+                // taken by another suite's application before this one binds it, and the requests would go there.
+                start.ArgumentList.Add("http://127.0.0.1:0");
                 start.Environment["MACHINEKEY_SITE"] = site;
                 start.Environment["MACHINEKEY_VIRTUAL_PATH"] = config.VirtualPath;
                 // Temporary ASP.NET Files beside the site (a change in it restarts the application), deleted with it.
@@ -135,25 +136,22 @@ namespace IISGate
                 process.BeginErrorReadLine();
                 client = new HttpClient(new HttpClientHandler { UseCookies = false, AllowAutoRedirect = false })
                 {
-                    BaseAddress = address,
                     Timeout = TimeSpan.FromSeconds(120),
                 };
             }
 
             public string Output { get { lock (output) return output.ToString(); } }
 
-            static int FreePort()
-            {
-                var listener = new TcpListener(IPAddress.Loopback, 0);
-                listener.Start();
-                int port = ((IPEndPoint)listener.LocalEndpoint).Port;
-                listener.Stop();
-                return port;
-            }
-
             public async Task Started()
             {
                 var deadline = DateTime.UtcNow.AddSeconds(90);
+                Match listening;
+                while (!(listening = Regex.Match(Output, @"Now listening on: (http://\S+)")).Success)
+                {
+                    Assert.True(DateTime.UtcNow < deadline && !process.HasExited, "the application didn't start" + Environment.NewLine + Output);
+                    await Task.Delay(100);
+                }
+                client.BaseAddress = new Uri(listening.Groups[1].Value);
                 while (true)
                 {
                     try
