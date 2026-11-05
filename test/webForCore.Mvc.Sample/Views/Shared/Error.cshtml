@@ -1,0 +1,5 @@
+@model System.Web.Mvc.HandleErrorInfo
+@{
+    Layout = null;
+}
+<p>HandleErrorAttribute: @Model.ControllerName.@Model.ActionName: @Model.Exception.GetType().Name: @Model.Exception.Message</p>

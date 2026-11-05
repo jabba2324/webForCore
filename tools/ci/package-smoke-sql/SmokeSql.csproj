@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- #195: webForCore's SQL Server features (SqlDataSource, the SQL membership, role, profile and session state
+       providers, SqlCacheDependency, <DbProviderFactories>, LINQ to SQL, and SqlServices, which webforcore-regsql runs)
+       against SQL Server, on either System.Data.SqlClient, with Microsoft.Data.SqlClient 5 beside it for the
+       application's own code (tools/ci/package-smoke.sh builds it both ways):
+       - by default, webForCore's (the webForCore.Data.SqlClient package, which webForCore.Web depends on, #41);
+       - with -p:SmokeSqlClient=Microsoft, Microsoft's System.Data.SqlClient 4.9.1 package, which a data access library
+         the application references (SharedData, as a solution's workers and services share it) depends on. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <OutputPath>bin_dotnet</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <GenerateDependencyFile>true</GenerateDependencyFile>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+    <PredefinedCulturesOnly>true</PredefinedCulturesOnly>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="bin_dotnet\**;obj\**;SharedData\**" />
+    <Content Remove="bin_dotnet\**;SharedData\**" />
+    <None Remove="bin_dotnet\**;SharedData\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="webForCore" Version="$(WebForCoreVersion)" />
+    <!-- The application's own data access, on the newer provider. -->
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(SmokeSqlClient)' == 'Microsoft'">
+    <ProjectReference Include="SharedData\SharedData.csproj" />
+  </ItemGroup>
+</Project>

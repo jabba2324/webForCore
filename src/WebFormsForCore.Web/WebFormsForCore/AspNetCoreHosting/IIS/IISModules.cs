@@ -156,12 +156,22 @@ namespace WebFormsForCore.Hosting.IIS
 			var rawPath = rawTarget.Split('?')[0];
 			var query = request.QueryString.HasValue ? request.QueryString.Value.Substring(1) : "";
 
-			if (Items(section, "security/requestFiltering/alwaysAllowedUrls").Any(e => string.Equals(Attr(e, "url"), path, StringComparison.OrdinalIgnoreCase)))
+			var limits = Element(section, "security/requestFiltering/requestLimits");
+			bool alwaysAllowed = Items(section, "security/requestFiltering/alwaysAllowedUrls").Any(e => string.Equals(Attr(e, "url"), path, StringComparison.OrdinalIgnoreCase));
+			// #192: the body's limit is maxAllowedContentLength, as IIS's; Kestrel's own (MaxRequestBodySize, 30,000,000
+			// bytes by default) cut a larger body that the application allowed (an upload of 31 MB with
+			// maxAllowedContentLength and maxRequestLength raised) with a broken connection. Kestrel enforces it on
+			// bodies without a Content-Length too; a body with one is answered 413.1 below.
+			var bodySize = context.Features.Get<IHttpMaxRequestBodySizeFeature>();
+			if (bodySize != null && !bodySize.IsReadOnly)
+				bodySize.MaxRequestBodySize = alwaysAllowed ? null : Long(limits, "maxAllowedContentLength", 30000000);
+			if (alwaysAllowed)
 				return false;
 
-			var limits = Element(section, "security/requestFiltering/requestLimits");
 			if (request.ContentLength > Long(limits, "maxAllowedContentLength", 30000000))
-				return await Reject(context, 13, "The request filtering module is configured to deny a request that exceeds the request content length.");
+				// #192: IIS 10 answers 413.1 "Request Entity Too Large" (IIS 7 to 8.5: 404.13), as CI's iis-compare job saw.
+				return await WriteError(context, 413, 1, "Request Entity Too Large", "The request filtering module is configured to deny a request that exceeds the request content length.")
+					.ContinueWith(_ => true, TaskContinuationOptions.ExecuteSynchronously);
 			if (rawPath.Length > Long(limits, "maxUrl", 4096))
 				return await Reject(context, 14, "The request filtering module is configured to deny a request where the URL is too long.");
 			if (query.Length > Long(limits, "maxQueryString", 2048))
@@ -479,7 +489,9 @@ namespace WebFormsForCore.Hosting.IIS
 					context.Request.Path = parts[0];
 					context.Request.QueryString = parts.Length > 1 ? new QueryString("?" + parts[1]) : QueryString.Empty;
 					context.Items.Remove(SubStatusKey);
-					context.Response.OnStarting(() => { context.Response.StatusCode = status; return Task.CompletedTask; }); // IIS keeps the error's status
+					// The child request decides the status, as on IIS: a static page is the static file handler's 200, and
+					// an ASP.NET page's is 200 unless it sets one (#192, CI's iis-compare job, in both pipelines; webForCore
+					// kept the error's status before).
 					try
 					{
 						await inner(context);
