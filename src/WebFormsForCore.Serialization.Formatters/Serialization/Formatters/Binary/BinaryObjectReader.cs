@@ -948,12 +948,42 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
             {
                 type = _binder.BindToType(assemblyString, typeString);
             }
+            // webForCore: .NET Framework's UnitySerializationHolder and MemberInfoSerializationHolder (Type, MemberInfo,
+            // Missing, Assembly, Module) are read by the port's copies of them (#156); .NET's own UnitySerializationHolder,
+            // which a binder may have found by the same name, reads only DBNull.
+            if (type == null || ReflectionSurrogates.IsRuntimeUnityHolder(type))
+            {
+                Type? holder = ReflectionSurrogates.BindHolder(assemblyString, typeString);
+                if (holder != null)
+                {
+                    return holder;
+                }
+            }
             if (type == null)
             {
                 type = FastBindToType(assemblyString, typeString);
             }
             return type;
         }
+
+        // webForCore: a type named by an assembly and a type name, as this reader finds the types of objects; for
+        // UnitySerializationHolder and MemberInfoSerializationHolder (#156). mscorlib's types that .NET's mscorlib facade
+        // doesn't forward are looked up in the core library.
+        [RequiresUnreferencedCode("Types might be removed")]
+        internal static Type GetTypeFromAssemblyName(string assemblyName, string typeName)
+        {
+            Assembly assembly = LoadAssembly(assemblyName);
+            Type? type = null;
+            GetSimplyNamedTypeFromAssembly(assembly, typeName, ref type);
+            if (type == null && ReflectionSurrogates.IsMscorlib(assemblyName))
+            {
+                GetSimplyNamedTypeFromAssembly(typeof(object).Assembly, typeName, ref type);
+            }
+            return type ?? throw new TypeLoadException($"Could not load type '{typeName}' from assembly '{assemblyName}'.");
+        }
+
+        internal static Assembly LoadAssembly(string assemblyName) =>
+            ResolveSimpleAssemblyName(new AssemblyName(assemblyName)) ?? FormatterServices.LoadAssemblyFromString(assemblyName);
 
         internal sealed class TypeNAssembly
         {
@@ -1031,7 +1061,7 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
             return entry.Type;
         }
 
-        private static Assembly? ResolveSimpleAssemblyName(AssemblyName assemblyName)
+        internal static Assembly? ResolveSimpleAssemblyName(AssemblyName assemblyName)
         {
             var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
             try
@@ -1103,6 +1133,13 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
                     else
                     {
                         objectType = FormatterServices.GetTypeFromAssembly(sourceAssembly, name);
+                    }
+
+                    // webForCore: the core library's types are written as mscorlib's (FrameworkSurrogates.GetAssemblyName);
+                    // those .NET's mscorlib facade doesn't forward are found in the core library itself.
+                    if (objectType == null && ReflectionSurrogates.IsMscorlib(assemblyInfo._assemblyString))
+                    {
+                        GetSimplyNamedTypeFromAssembly(typeof(object).Assembly, name, ref objectType);
                     }
 
                     // here let us do the security check

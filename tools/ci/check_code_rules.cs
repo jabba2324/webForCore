@@ -21,6 +21,7 @@ string[] ownDirectories =
 string[] ownFiles =
 [
     "src/WebFormsForCore.Serialization.Formatters/Serialization/Formatters/Binary/FrameworkSurrogates.cs",
+    "src/WebFormsForCore.Serialization.Formatters/Serialization/Formatters/Binary/ReflectionSurrogates.cs",
     // Ported files where webForCore had added code that broke the rules (#57).
     "src/WebFormsForCore.Serialization.Formatters/Serialization/Formatters/Binary/BinaryObjectReader.cs",
     "src/WebFormsForCore.Web/Compilation/CodeDirectoryCompiler.cs",
