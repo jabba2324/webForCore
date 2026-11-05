@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- #147: an assembly outside the IIS sample's folder, which its web.config names in <probing privatePath>
+       ("../webForCore.IIS.Sample.Unprobed/bin_dotnet"). Fusion probes only below the application's folder, so it
+       must not load. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>UnprobedLib</AssemblyName>
+    <RootNamespace>UnprobedLib</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <OutputPath>bin_dotnet</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+</Project>
