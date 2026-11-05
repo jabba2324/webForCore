@@ -5,7 +5,8 @@ using System.Net.Sockets;
 
 namespace WebFormsForCore.Host;
 
-enum WorkerState { Starting, Ready, Retiring }
+// Starting until it says it serves; Warming while it is sent the initialization pages (#193); Ready once it takes traffic.
+enum WorkerState { Starting, Warming, Ready, Retiring }
 
 // One worker process: "dotnet <application>" serving on its own Unix socket, with its stdin a pipe from the host (when
 // that closes, the worker stops: it never outlives the host).
@@ -18,6 +19,10 @@ sealed class Worker : IDisposable
 	public Process? Process { get; private set; }
 	public HttpMessageInvoker Invoker { get; }
 	int requests;
+	long lastActivity = DateTime.UtcNow.Ticks;
+
+	// The initialization requests it is sent before it takes traffic (#193).
+	public IReadOnlyList<(string Page, string? HostName)> WarmUpPages { get; init; } = [];
 
 	public Worker(int id, string socketPath)
 	{
@@ -94,8 +99,31 @@ sealed class Worker : IDisposable
 	}
 
 	public void BeginRequest() => Interlocked.Increment(ref requests);
-	public void EndRequest() => Interlocked.Decrement(ref requests);
+	public void EndRequest()
+	{
+		Interlocked.Exchange(ref lastActivity, DateTime.UtcNow.Ticks);
+		Interlocked.Decrement(ref requests);
+	}
+	// When its last request ended, or it started serving: for the idle timeout (#193).
+	public DateTime LastActivity => new DateTime(Interlocked.Read(ref lastActivity), DateTimeKind.Utc);
+	public void Touch() => Interlocked.Exchange(ref lastActivity, DateTime.UtcNow.Ticks);
 	public int Requests => Volatile.Read(ref requests);
+
+	// A command to the worker, one line on its stdin (WorkerProtocol); false if it is gone.
+	public bool SendCommand(string command)
+	{
+		try
+		{
+			if (Process == null) return false;
+			Process.StandardInput.Write(command + "\n");
+			Process.StandardInput.Flush();
+			return true;
+		}
+		catch (Exception e) when (e is IOException || e is InvalidOperationException || e is ObjectDisposedException)
+		{
+			return false;
+		}
+	}
 
 	// Asks the worker to stop: its stdin closes, and it shuts down as on Ctrl+C.
 	public void RequestStop()

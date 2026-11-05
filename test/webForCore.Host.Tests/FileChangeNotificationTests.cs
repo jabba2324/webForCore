@@ -47,7 +47,7 @@ namespace HostTests
                 for (int i = 0; i < 200; i++) System.IO.Directory.CreateDirectory(Path.Combine(Directory, "App_Data", "folders", "f" + i));
             }
 
-            static void CopyDirectory(string from, string to)
+            internal static void CopyDirectory(string from, string to)
             {
                 System.IO.Directory.CreateDirectory(to);
                 foreach (var file in System.IO.Directory.GetFiles(from)) File.Copy(file, Path.Combine(to, Path.GetFileName(file)));
