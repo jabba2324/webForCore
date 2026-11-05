@@ -172,7 +172,7 @@ namespace IISGate
             {
                 var response = await client.GetAsync(root + "interop.axd?op=produce");
                 string body = await response.Content.ReadAsStringAsync();
-                Assert.True(response.StatusCode == HttpStatusCode.OK, $"{(int)response.StatusCode} {body}");
+                Assert.True(response.StatusCode == HttpStatusCode.OK, $"{(int)response.StatusCode} {body}{Environment.NewLine}{Output}");
                 return JsonSerializer.Deserialize<List<InteropEntry>>(body);
             }
 
