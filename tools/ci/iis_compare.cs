@@ -12,12 +12,14 @@
 //
 // --title=<text> names the IIS side in the report, --gate=<text> the requests (default "Web API gate"); --informational
 // prints the report and exits with 0. The request handling sample (test/webForCore.Requests.Sample, RequestHandlingTests
-// writes requests-responses.json) is compared the same way, with tools/ci/iis-known-differences-requests.json.
+// writes requests-responses.json) is compared the same way, with tools/ci/iis-known-differences-requests.json, and so is
+// the third-party packages sample (test/webForCore.Packages.Sample, Packages.Gate.Tests writes packages-responses.json),
+// with tools/ci/iis-known-differences-packages.json.
 //
 // Both sides are normalised before the comparison: each side's own base address (http://127.0.0.1:<port>) becomes
-// {base} wherever it appears (Location headers, bodies); stack traces are removed from Web API's JSON errors, as
-// GateTests does for its oracle, and from ASP.NET's error pages (the comment at the end), since they name source files
-// and line numbers; and Content-Length is compared as present or absent (the bodies are compared themselves).
+// {base} wherever it appears (Location headers, bodies), and its host and port alone {host} in bodies; stack traces are
+// removed from Web API's JSON errors, as GateTests does for its oracle, and from ASP.NET's error pages (the comment at
+// the end), since they name source files and line numbers; and Content-Length is compared as present or absent (the bodies are compared themselves).
 #:property NuGetAudit=false
 using System.Net;
 using System.Net.Http.Headers;
@@ -81,16 +83,30 @@ async Task<int> Replay(string recordedPath, Uri baseAddress, string outPath)
         // The request's own headers, if it was recorded with any (RequestHandlingTests, #170).
         if (request["headers"] is JsonObject requestHeaders)
             foreach (var (name, value) in requestHeaders) message.Headers.TryAddWithoutValidation(name, (string?)value);
+        // A body recorded as a text and a number of repeats (bodyRepeat, #192: a large upload).
+        int repeat = (int?)request["bodyRepeat"] ?? 1;
         if ((string?)request["body"] is string body)
         {
-            message.Content = new ByteArrayContent(Encoding.UTF8.GetBytes(body));
+            message.Content = new ByteArrayContent(Encoding.UTF8.GetBytes(repeat > 1 ? new StringBuilder(body.Length * repeat).Insert(0, body, repeat).ToString() : body));
             if ((string?)request["contentType"] is string contentType) message.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(contentType);
         }
-        using var response = await client.SendAsync(message);
+        HttpResponseMessage response;
+        try
+        {
+            response = await client.SendAsync(message);
+        }
+        catch (HttpRequestException e)
+        {
+            // The server closed the connection before it answered: recorded as status 0, so that the diff shows it.
+            Console.WriteLine($"(connection closed: {e.Message}) {key}");
+            results[key] = new JsonObject { ["request"] = request.DeepClone(), ["status"] = 0, ["headers"] = new JsonObject(), ["body"] = "(connection closed)" };
+            continue;
+        }
         string responseBody = await response.Content.ReadAsStringAsync();
         var headers = new JsonObject();
         foreach (var h in response.Headers.Concat(response.Content.Headers).OrderBy(h => h.Key, StringComparer.OrdinalIgnoreCase))
             if (h.Key != "Date") headers[h.Key] = string.Join(", ", h.Value);
+        response.Dispose();
         results[key] = new JsonObject
         {
             ["request"] = new JsonObject
@@ -101,6 +117,7 @@ async Task<int> Replay(string recordedPath, Uri baseAddress, string outPath)
                 ["contentType"] = (string?)request["contentType"],
                 ["body"] = (string?)request["body"],
                 ["headers"] = request["headers"]?.DeepClone(),
+                ["bodyRepeat"] = request["bodyRepeat"]?.DeepClone(),
             },
             ["status"] = (int)response.StatusCode,
             ["headers"] = headers,
@@ -196,7 +213,8 @@ Dictionary<string, string> Headers(JsonObject entry, string baseAddress) =>
 
 string? Body(JsonObject entry, string baseAddress)
 {
-    var body = ((string?)entry["body"])?.Replace(baseAddress, "{base}");
+    // The base address, and then its host and port alone (Swashbuckle's document has "host": "127.0.0.1:<port>").
+    var body = ((string?)entry["body"])?.Replace(baseAddress, "{base}").Replace(new Uri(baseAddress).Authority, "{host}");
     if (body == null) return null;
     // ASP.NET's error page ends with the exception and its stack trace in a comment.
     body = Regex.Replace(body, @"<!--\s*\[[A-Za-z.]*Exception\]:[\s\S]*?-->\s*$", "<!-- (stack trace) -->");

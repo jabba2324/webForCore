@@ -1125,8 +1125,8 @@ namespace System.Web
 #pragma warning restore 0618
 #if !NETFRAMEWORK
             // webForCore: and from the folders of <probing privatePath> in the application's Web.config, which fusion
-            // read as the AppDomain's configuration file (#147).
-            AssemblyLoaderNetCore.ReadPrivatePath(appDomainAppPath);
+            // read as the AppDomain's configuration file (#147), and its <bindingRedirect>s and <codeBase>s (#158).
+            AssemblyLoaderNetCore.ReadAssemblyBinding(appDomainAppPath);
 #endif
 
             // If shadow copying was disabled via config, turn it off (DevDiv 30864)
