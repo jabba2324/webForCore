@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- #171: an assembly without a strong name built against SimpleLib 2.0.0.0, which calls it. The IIS sample's build
+       copies SimpleUser.dll, without SimpleLib 2.0.0.0, to its bin_dotnet, where SimpleLib is 1.0.0.0. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>SimpleUser</AssemblyName>
+    <RootNamespace>SimpleUser</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <OutputPath>bin_dotnet</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\webForCore.IIS.Sample.SimpleLib2\webForCore.IIS.Sample.SimpleLib2.csproj" />
+  </ItemGroup>
+</Project>

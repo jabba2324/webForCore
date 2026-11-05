@@ -142,7 +142,11 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
    (`Database.Open`, `WebSecurity`) are Microsoft's `Microsoft.AspNet.WebPages.Data`/`.WebData` 3.2.9 packages (#130);
    Autofac.Configuration 3, Castle.Core 3 and NHibernate 4 need newer versions (#148). An MVC 3 or 4 app needs
    `webpages:Version` `3.0.0.0` and `using CompareAttribute = System.Web.Mvc.CompareAttribute;` where `[Compare]` is
-   `CS0104` (#122). Plug-in libraries built into their own folder need their packages copied there (#150).
+   `CS0104` (#122), and a Razor 1 view (MVC 3, Web Pages 1) with `@` before a C# keyword in a code block
+   (`@string.Join(...)`) needs `@( ... )` (#174). A prebuilt net4x library that uses `CallContext` (`TypeLoadException`
+   for `System.Runtime.Remoting.Messaging.CallContext`) needs a version with a .NET Standard or .NET build: SimpleInjector
+   3.1 → 3.3.2 with its ExecutionContextScoping (#178). Plug-in libraries built into their own folder need their
+   packages copied there (#150).
 6. Add `Program.cs` from `docs/MIGRATING.md` section 4. Use `HandleAllRequestsWithWebForms()` unless the app serves
    only `.aspx`/`.asmx`/`.ashx`. Session state (`Session`, MVC's `TempData`) needs nothing: it is in process, as
    `<sessionState mode="InProc">` (or no `mode`, the default) was on IIS. Add `AddDistributedMemoryCache()` and
@@ -161,8 +165,15 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
      server with no locale runs with the invariant culture. Ask the user which culture IIS used and set it.
    - `Log4Net.Async` in the log4net configuration: it logs nothing on .NET; point the logger at the appender it
      forwards to.
-   - `DynamicDirectory` (null on .NET): use `HttpRuntime.CodegenDir`; `PrivateBinPath`: use `HttpRuntime.BinDirectory`
-     (#139).
+   - `DynamicDirectory` (null on .NET): use `HttpRuntime.CodegenDir`; `PrivateBinPath` and `RelativeSearchPath` (null
+     on .NET): use `HttpRuntime.BinDirectory` (#139, #177).
+   - Relative file names in the logging configuration (log4net's `ConfigFile` and appender `<file>`, NLog's
+     `${basedir}`): they resolve against `bin_dotnet/`, and a file written there restarts the app at every write.
+     Point them at the site (`../App_Data/...`) (#173).
+   - `SecurityProtocolType.Ssl3`: .NET's `ServicePointManager.SecurityProtocol` setter throws for it; remove it from the
+     flags (#176).
+   - `"\r\n` in code that reads SQL text (LINQ to SQL's `GetCommand(...).CommandText`, `DataContext.Log`) or other text
+     .NET generates: it has `\n` on Linux; use `Environment.NewLine` (#175).
    - `ResetAbort`: `Thread.ResetAbort()` throws on .NET. After `catch (ThreadAbortException)`, remove it (#143).
    - `HashAlgorithm.Create()`, `KeyedHashAlgorithm.Create()`, `HMAC.Create()`, `SymmetricAlgorithm.Create()`,
      `AsymmetricAlgorithm.Create()` with no argument: they throw on .NET. Replace each with .NET Framework's default
@@ -212,6 +223,12 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
    | `Conflicting versions of ASP.NET Web Pages detected: specified version is "1.0.0.0"` | An MVC 3/4 `webpages:Version`: set `3.0.0.0` (Phase 2 step 5) |
    | ``LINQ to Entities does not recognize the method '... Contains[Int32](System.ReadOnlySpan`1[...], Int32)'`` | No `<LangVersion>`: set the project's (Phase 2 step 2) |
    | `ArgumentNullException ... (Parameter 'path')` at `DirectoryInfo..ctor` in a plug-in loader | `DynamicDirectory` is null: `HttpRuntime.CodegenDir` (Phase 2 step 7) |
+   | `ArgumentNullException ... (Parameter 'path1')` at `Path.Combine` | `RelativeSearchPath` is null: `HttpRuntime.BinDirectory` (Phase 2 step 7) |
+   | The app restarts again and again (its start logged repeatedly, sessions lost) | A library writes into `bin_dotnet/`, such as a log at a relative path (Phase 2 step 7) |
+   | `NotSupportedException: The requested security protocol is not supported` | `SecurityProtocolType.Ssl3` (Phase 2 step 7) |
+   | `Unexpected "string" keyword after "@" character` (or another C# keyword) | A Razor 1 view: wrap the expression in `@( ... )` (Phase 2 step 5) |
+   | `ArgumentOutOfRangeException: startIndex ('-1')` in code that searches generated SQL or text | It looks for `\r\n` (Phase 2 step 7) |
+   | `TypeLoadException` for `System.Runtime.Remoting.Messaging.CallContext` from `mscorlib`, or "Make sure that the controller has a parameterless public constructor" with it inside | A prebuilt net4x library uses `CallContext`: a version with a .NET Standard or .NET build (Phase 2 step 5) |
    | `PlatformNotSupportedException: Thread abort is not supported on this platform` | Remove `Thread.ResetAbort()` (Phase 2 step 7) |
    | `PlatformNotSupportedException: This platform does not allow the automatic selection of an algorithm` | A parameterless crypto factory (Phase 2 step 7) |
    | `PlatformNotSupportedException: Operation is not supported on this platform` from `CompileAssemblyFrom...` | System.CodeDom compilation: webForCore's provider (Phase 2 step 7) |

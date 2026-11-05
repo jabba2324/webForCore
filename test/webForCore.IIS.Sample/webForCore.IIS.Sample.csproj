@@ -55,9 +55,14 @@
          in. ProbedLib is copied to bin_dotnet/probed, under the site; UnprobedLib stays in its own project, outside it. -->
     <ProjectReference Include="..\webForCore.IIS.Sample.Probed\webForCore.IIS.Sample.Probed.csproj" ReferenceOutputAssembly="false" Private="false" />
     <ProjectReference Include="..\webForCore.IIS.Sample.Unprobed\webForCore.IIS.Sample.Unprobed.csproj" ReferenceOutputAssembly="false" Private="false" />
+    <!-- #171 (JabbR): SimpleLib 1.0.0.0 is deployed (deps.json and bin_dotnet); SimpleUser, built against SimpleLib
+         2.0.0.0, is copied to bin_dotnet without it. Neither has a strong name. -->
+    <ProjectReference Include="..\webForCore.IIS.Sample.SimpleLib\webForCore.IIS.Sample.SimpleLib.csproj" />
+    <ProjectReference Include="..\webForCore.IIS.Sample.SimpleUser\webForCore.IIS.Sample.SimpleUser.csproj" ReferenceOutputAssembly="false" Private="false" />
   </ItemGroup>
 
   <Target Name="CopyProbedLib" AfterTargets="Build">
     <Copy SourceFiles="..\webForCore.IIS.Sample.Probed\bin_dotnet\ProbedLib.dll" DestinationFolder="$(OutDir)probed" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="..\webForCore.IIS.Sample.SimpleUser\bin_dotnet\SimpleUser.dll" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
   </Target>
 </Project>

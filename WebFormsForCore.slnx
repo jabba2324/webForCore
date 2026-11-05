@@ -144,6 +144,9 @@
     <Project Path="test/webForCore.Requests.Sample/webForCore.Requests.Sample.csproj" />
     <Project Path="test/webForCore.IIS.Sample.Probed/webForCore.IIS.Sample.Probed.csproj" />
     <Project Path="test/webForCore.IIS.Sample.Unprobed/webForCore.IIS.Sample.Unprobed.csproj" />
+    <Project Path="test/webForCore.IIS.Sample.SimpleLib/webForCore.IIS.Sample.SimpleLib.csproj" />
+    <Project Path="test/webForCore.IIS.Sample.SimpleLib2/webForCore.IIS.Sample.SimpleLib2.csproj" />
+    <Project Path="test/webForCore.IIS.Sample.SimpleUser/webForCore.IIS.Sample.SimpleUser.csproj" />
     <Project Path="test/webForCore.Host.Tests/webForCore.Host.Tests.csproj" />
     <Project Path="test/webForCore.Host.Sample/webForCore.Host.Sample.csproj" />
     <Project Path="test/webForCore.Precompiled.Host/webForCore.Precompiled.Host.csproj" />

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- #171: an assembly without a strong name, version 1.0.0.0, which the IIS sample deploys (it is in its deps.json and
+       bin_dotnet). SimpleUser was built against version 2.0.0.0 (webForCore.IIS.Sample.SimpleLib2, the same source), as
+       JabbR deploys Nancy 0.20.0 and Nancy.SimpleAuthentication, built against Nancy 0.21.1. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>SimpleLib</AssemblyName>
+    <RootNamespace>SimpleLib</RootNamespace>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <IsPackable>false</IsPackable>
+    <OutputPath>bin_dotnet</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+</Project>
