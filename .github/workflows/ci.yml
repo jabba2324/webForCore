@@ -233,7 +233,8 @@ jobs:
   # Then the same for request handling (#126, #127, #129, #140): test/webForCore.Requests.Sample, served by IIS as it is,
   # gets the requests IIS.Gate.Tests' RequestHandlingTests sent to it, compared with the classic pipeline
   # (tools/ci/iis-known-differences-requests.json). Then <httpRuntime fcnMode> (#167): the changes that restart an application
-  # in Single and Default mode, against what Host.Tests asserts of webForCore (tools/ci/iis_fcn.cs).
+  # in Single and Default mode, against what Host.Tests asserts of webForCore (tools/ci/iis_fcn.cs). Then a request running
+  # when the application restarts (#181, tools/ci/iis_drain.cs).
   iis-compare:
     needs: build-and-test
     runs-on: windows-2025
@@ -346,35 +347,68 @@ jobs:
           cat "$RUNNER_TEMP/gate/iis-fcn.md" | tee -a "$GITHUB_STEP_SUMMARY"
           exit $status
 
+      # A request running when the application restarts (#181): on IIS it runs to its end in the old domain, even
+      # past <httpRuntime shutdownTimeout>, while a new domain serves new requests (tools/ci/iis_drain.cs), as RecyclingTests
+      # asserts of webForCore. The sites are written before IIS serves them, as the fcnMode ones.
+      - name: Drain sites
+        if: ${{ !cancelled() }}
+        run: |
+          dotnet run tools/ci/iis_drain.cs -- site "$RUNNER_TEMP/drain-Classic"
+          dotnet run tools/ci/iis_drain.cs -- site "$RUNNER_TEMP/drain-Integrated"
+
+      - name: Drain sites on IIS 10
+        if: ${{ !cancelled() }}
+        shell: powershell
+        run: |
+          # The WebSocket Protocol role service, for the integrated site's WebSocket.
+          Install-WindowsFeature -Name Web-WebSockets | Out-Null
+          tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\drain-Classic" -Name drain-classic -Port 8097 -Pipeline Classic
+          tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\drain-Integrated" -Name drain-integrated -Port 8098 -Pipeline Integrated
+
+      - name: A request running across a restart
+        if: ${{ !cancelled() }}
+        run: |
+          echo "## A request running when the application restarts (#181)" > "$RUNNER_TEMP/gate/iis-drain.md"
+          status=0
+          dotnet run tools/ci/iis_drain.cs -- check "$RUNNER_TEMP/drain-Classic" http://localhost:8097/ Classic "$RUNNER_TEMP/gate/iis-drain.md" || status=1
+          dotnet run tools/ci/iis_drain.cs -- check "$RUNNER_TEMP/drain-Integrated" http://localhost:8098/ Integrated "$RUNNER_TEMP/gate/iis-drain.md" || status=1
+          cat "$RUNNER_TEMP/gate/iis-drain.md" | tee -a "$GITHUB_STEP_SUMMARY"
+          exit $status
+
       # OpenID Connect: test/webForCore.Oidc.Sample built for .NET Framework 4.8 against Microsoft's Katana 4.2.3 packages
       # (OpenIdConnect, Jwt, Cookies) and IdentityServer3.Contrib.AccessTokenValidation, served by IIS (integrated
       # pipeline: Katana's System.Web host needs it on IIS), is driven through the scenarios OidcGateTests ran on Kestrel,
       # with the same test provider (test/webForCore.Oidc.Provider: sign-in with code id_token and form_post, rejected
       # tokens, sign-out, bearer tokens), and the responses are compared (tools/ci/iis-known-differences-oidc.json).
       - uses: actions/download-artifact@v4
+        if: ${{ !cancelled() }}
         with:
           name: oidc-responses
           path: ${{ runner.temp }}/gate
 
       - name: Build the OpenID Connect sample for .NET Framework 4.8, and the test provider
+        if: ${{ !cancelled() }}
         run: |
           dotnet build test/webForCore.Oidc.Sample.Iis/webForCore.Oidc.Sample.Iis.csproj -c Release -nodeReuse:false "-p:IisSiteDirectory=$RUNNER_TEMP/oidc-site/"
           dotnet build test/webForCore.Oidc.Provider/webForCore.Oidc.Provider.csproj -c Release -nodeReuse:false
 
-      # The sample's Web.config has the provider at http://127.0.0.1:8099 and the site at http://127.0.0.1:8098.
+      # The sample's Web.config has the provider at http://127.0.0.1:8101 and the site at http://127.0.0.1:8100.
       - name: OpenID Connect sample on IIS 10
+        if: ${{ !cancelled() }}
         shell: powershell
-        run: tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\oidc-site" -Name oidc-integrated -Port 8098 -Pipeline Integrated
+        run: tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\oidc-site" -Name oidc-integrated -Port 8100 -Pipeline Integrated
 
       - name: Run the OpenID Connect scenarios on IIS
+        if: ${{ !cancelled() }}
         run: |
           provider=test/webForCore.Oidc.Provider/bin/Release/net10.0/webForCore.Oidc.Provider.dll
-          dotnet $provider serve http://127.0.0.1:8099 > "$RUNNER_TEMP/gate/oidc-provider.log" 2>&1 &
+          dotnet $provider serve http://127.0.0.1:8101 > "$RUNNER_TEMP/gate/oidc-provider.log" 2>&1 &
           pid=$!
-          dotnet $provider scenarios http://127.0.0.1:8098/ http://127.0.0.1:8099 "$RUNNER_TEMP/gate/iis-oidc-responses.json"
+          dotnet $provider scenarios http://127.0.0.1:8100/ http://127.0.0.1:8101 "$RUNNER_TEMP/gate/iis-oidc-responses.json"
           kill $pid || true
 
       - name: Compare OpenID Connect
+        if: ${{ !cancelled() }}
         run: |
           set -o pipefail
           dotnet run tools/ci/iis_compare.cs -- diff "$RUNNER_TEMP/gate/oidc-responses.json" "$RUNNER_TEMP/gate/iis-oidc-responses.json" \

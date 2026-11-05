@@ -25,7 +25,8 @@ static class WorkerProtocol
 	public const string RestartingHeader = "X-WebForCore-Restarting";
 
 	// Control messages, one line each, worker to host: "<token> ready <id>" once the worker serves, and
-	// "<token> recycle <id> <reason>" when the application restarts. The host answers "ok" or "error".
+	// "<token> recycle <id> <drain seconds> <reason>" when the application restarts: the worker finishes its requests,
+	// for up to the drain time (#181), and exits. The host answers "ok" or "error".
 	public const string Ready = "ready";
 	public const string Recycle = "recycle";
 }

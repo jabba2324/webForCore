@@ -111,6 +111,13 @@ commit that made it, and its issue, say why.
 - **Hosting:** webforcore-host and its worker processes (process recycling, #56), IIS's `<system.webServer>` modules,
   the Kestrel worker request (WebSockets, client certificates, server variables, timeouts, integrated-pipeline APIs).
   See [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md).
+- **A restart drains as on .NET Framework** (#181): the host object (`AspNetCoreHost`, Cassini's registered object)
+  unregisters as soon as the hosting environment stops it, as IIS's `ISAPIRuntime` does, so the old worker's requests
+  are drained by `HttpRuntime.Dispose` for `<httpRuntime shutdownTimeout>`, unchanged from the reference source.
+  `HttpRuntime.ReleaseResourcesAndUnloadAppDomain`, which can't unload an AppDomain on .NET, completes
+  `HttpRuntime.Unloaded` instead, and the worker process stops then. The host object used to wait for the requests
+  itself and abort them after `<hostingEnvironment shutdownTimeout>`, and the worker stopped Kestrel at once, which
+  aborted them after its own 30 s.
   `AspNetCoreWorkerRequest.ParseHeaders` stores the request's unknown headers whatever the path: the cookieless
   session check it took from IIS's filter returned before storing them when a path had a `(` and no `/(...)/`
   (#170, OData's `/People(1)` lost `Prefer`).

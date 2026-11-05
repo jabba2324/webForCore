@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Http.Features;
 using Yarp.ReverseProxy.Forwarder;
@@ -185,14 +186,24 @@ sealed class WorkerPool : IHostedLifecycleService, IDisposable
 					return true;
 				case WorkerProtocol.Recycle:
 					if (worker == null) return true; // already retired
+					// "<drain seconds> <reason>": how long the worker's requests may take to finish (#181).
+					var drain = TimeSpan.Zero;
+					int space = reason.IndexOf(' ');
+					if (int.TryParse(space < 0 ? reason : reason[..space], NumberStyles.None, CultureInfo.InvariantCulture, out var seconds))
+					{
+						drain = TimeSpan.FromSeconds(seconds);
+						reason = space < 0 ? "" : reason[(space + 1)..];
+					}
 					worker.State = WorkerState.Retiring;
 					retiring.Add(worker);
 					current = null;
 					logger.LogInformation("Recycling worker {Id} (process {ProcessId}): {Reason}.", id, worker.ProcessId, reason.Length != 0 ? reason : "the application restarted");
 					currentReady.TrySetResult(null);
 					StartWorker($"worker {id} recycled");
-					// The worker drains and exits by itself; one that doesn't is killed after the shutdown time limit.
-					_ = KillAfterAsync(worker, settings.ShutdownTimeLimit);
+					// The worker finishes its requests, for up to the drain time (<httpRuntime shutdownTimeout> and a sixth of
+					// it, as .NET Framework waited for an old domain's requests), and exits by itself; one that doesn't is
+					// killed the shutdown time limit after that.
+					_ = KillAfterAsync(worker, drain + settings.ShutdownTimeLimit);
 					return true;
 				default:
 					return false;

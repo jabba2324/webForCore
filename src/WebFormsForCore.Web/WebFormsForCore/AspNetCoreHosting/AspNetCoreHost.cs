@@ -28,8 +28,7 @@ namespace System.Web.Hosting
 
         private string lowerCasedVirtualPathWithTrailingSlash;
 
-        private volatile int pendingCallsCount;
-        // webForCore: the requests in progress, for Stop(immediate: true) to abort.
+        // webForCore: the requests in progress, for AbortRequests.
         private readonly System.Collections.Concurrent.ConcurrentDictionary<Core.HttpContext, byte> requests =
             new System.Collections.Concurrent.ConcurrentDictionary<Core.HttpContext, byte>();
         private int unregistered;
@@ -174,6 +173,8 @@ namespace System.Web.Hosting
                 new Func<Core.HttpContext, Task>(host.ProcessRequest),
                 new Action(host.Shutdown),
                 new Func<string, bool>(host.RouteClaims),
+                new Func<Task>(() => HttpRuntime.Unloaded),
+                new Action(host.AbortRequests),
             };
         }
 
@@ -206,27 +207,22 @@ namespace System.Web.Hosting
             Interlocked.Exchange(ref stopped, 1);
             Interlocked.Exchange(ref OnShutdown, null)?.Invoke();
 
-            // webForCore: the hosting environment calls Stop(false), waits up to <hostingEnvironment shutdownTimeout> (30 s)
-            // for registered objects to unregister, then calls Stop(true) and unloads the domain. This waited for the
-            // requests in progress here, without limit, so the timeout never applied and one long request (a WebSocket, a
-            // long poll) kept the old domain alive as long as its client stayed. Now Stop(false) unregisters once the
-            // requests finish, and Stop(true) aborts those left, as AppDomain.Unload did on IIS.
-            if (immediate)
+            // webForCore: unregister at once, as IIS's ISAPIRuntime does (#181). The requests in progress are not this
+            // object's to wait for: once the registered objects have stopped, HttpRuntime.Dispose waits for them for
+            // <httpRuntime shutdownTimeout> (90 s), as on .NET Framework, and <hostingEnvironment shutdownTimeout> (30 s)
+            // is the wait for the application's own registered objects only. This waited for the requests here, and
+            // Stop(true) aborted them after <hostingEnvironment shutdownTimeout>: a request running across a restart (DNN's
+            // installer, which changes bin) was cut.
+            Unregister();
+        }
+
+        // webForCore: aborts the requests still in progress once HttpRuntime.Dispose has waited for them, where .NET
+        // Framework unloaded the AppDomain (#181).
+        internal void AbortRequests()
+        {
+            foreach (var context in requests.Keys)
             {
-                foreach (var context in requests.Keys)
-                {
-                    try { context.Abort(); } catch { }
-                }
-                Unregister();
-            }
-            else if (pendingCallsCount <= 0) Unregister();
-            else
-            {
-                Task.Run(() =>
-                {
-                    WaitForPendingCallsToFinish();
-                    Unregister();
-                });
+                try { context.Abort(); } catch { }
             }
         }
 
@@ -412,7 +408,6 @@ namespace System.Web.Hosting
 
         public async Task ProcessRequest(Core.HttpContext context)
         {
-            AddPendingCall();
             requests.TryAdd(context, 0);
             try
             {
@@ -422,9 +417,8 @@ namespace System.Web.Hosting
             }
             finally
             {
-                // webForCore: also when the request throws; Stop waits for the count to reach 0.
+                // webForCore: also when the request throws.
                 requests.TryRemove(context, out _);
-                RemovePendingCall();
             }
         }
 
@@ -432,35 +426,6 @@ namespace System.Web.Hosting
         public void Shutdown()
         {
             HostingEnvironment.InitiateShutdown();
-        }
-
-        private void AddPendingCall()
-        {
-            //TODO: investigate this issue - ref var not volitile
-#pragma warning disable 0420
-            Interlocked.Increment(ref pendingCallsCount);
-#pragma warning restore 0420
-        }
-
-        private void RemovePendingCall()
-        {
-            //TODO: investigate this issue - ref var not volitile
-#pragma warning disable 0420
-            Interlocked.Decrement(ref pendingCallsCount);
-#pragma warning restore 0420
-        }
-
-        private void WaitForPendingCallsToFinish()
-        {
-            for (; ; )
-            {
-                if (pendingCallsCount <= 0 || unregistered != 0)
-                {
-                    break;
-                }
-
-                Thread.Sleep(250);
-            }
         }
     }
 }

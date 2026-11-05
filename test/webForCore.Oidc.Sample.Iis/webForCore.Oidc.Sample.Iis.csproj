@@ -9,7 +9,7 @@
 
        The site is written to $(IisSiteDirectory) (obj/site by default): the pages, the sample's Web.config with the
        binding redirects the packages need, and bin. Its ida:* settings are the sample's: the provider at
-       http://127.0.0.1:8099 and the site at http://127.0.0.1:8098, the ports the job uses. -->
+       http://127.0.0.1:8101 and the site at http://127.0.0.1:8100, the ports the job uses. -->
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <OutputType>Library</OutputType>

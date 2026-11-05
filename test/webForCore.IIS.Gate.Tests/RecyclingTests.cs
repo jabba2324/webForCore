@@ -96,10 +96,12 @@ namespace IISGate
             Assert.All(statuses, status => Assert.Equal(HttpStatusCode.OK, status));
         }
 
-        // A WebSocket open across a restart: the old worker keeps serving it for <hostingEnvironment shutdownTimeout> (5 s
-        // in the sample), then the connection is aborted, as AppDomain.Unload did on IIS, and the worker exits.
+        // A WebSocket open across a restart is aborted once the application's registered objects have stopped, without
+        // waiting for <hostingEnvironment shutdownTimeout> (5 s in the sample) or <httpRuntime shutdownTimeout>, as
+        // HostingEnvironment.ShutdownThisAppDomainOnce aborts every WebSocket on .NET Framework (#181), and the worker exits.
+        // It used to be served until <hostingEnvironment shutdownTimeout>.
         [Fact]
-        public async Task RestartAbortsAWebSocketAfterTheShutdownTimeout()
+        public async Task RestartAbortsAWebSocket()
         {
             var before = await Current();
 
@@ -126,8 +128,53 @@ namespace IISGate
             }
             var elapsed = DateTime.UtcNow - restarted;
             Assert.True(aborted, "the WebSocket stayed open 30 s after the restart");
-            Assert.InRange(elapsed, TimeSpan.FromSeconds(4), TimeSpan.FromSeconds(20)); // served until the timeout, not beyond
+            Assert.True(elapsed < TimeSpan.FromSeconds(4), $"aborted {elapsed.TotalSeconds:0.0} s after the restart");
 
+            await WaitForOutput($"(process {before.Process}) exited", TimeSpan.FromSeconds(30));
+        }
+
+        // #181: a request still running when the application restarts runs to its end in the old worker, while new
+        // requests go to the new one, as on .NET Framework, where HttpRuntime.Dispose waits for the old domain's requests
+        // for <httpRuntime shutdownTimeout> (5 s in the sample), and in the classic pipeline for those still running after
+        // that too (IIS 10 in both pipelines: tools/ci/iis_drain.cs). <hostingEnvironment shutdownTimeout> (5 s in the
+        // sample) is the wait for registered objects, not for requests. DNN's installer streams its progress with
+        // Response.Flush and changes bin; it was cut about 5 s after the restart.
+        [Fact]
+        public async Task ARequestRunningAcrossARestartRunsToItsEnd()
+        {
+            var before = await Current();
+            const int seconds = 12;
+            var started = DateTime.UtcNow;
+            using var response = await _server.Client.GetAsync($"/Stream.aspx?seconds={seconds}&touch=drain.gate", HttpCompletionOption.ResponseHeadersRead);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var read = Task.Run(async () =>
+            {
+                var lines = new List<string>();
+                try
+                {
+                    using var reader = new StreamReader(await response.Content.ReadAsStreamAsync());
+                    while (await reader.ReadLineAsync() is string line) lines.Add(line);
+                }
+                catch (Exception e) when (e is IOException || e is HttpRequestException)
+                {
+                    lines.Add("(" + e.GetBaseException().Message + ")");
+                }
+                return lines;
+            });
+
+            // The page changed bin_dotnet after 2 s: a new worker serves new requests while the old one finishes the page.
+            var after = await Next(before, TimeSpan.FromSeconds(30));
+            Assert.False(read.IsCompleted, "the long request ended before the next worker served");
+
+            var body = await read;
+            var elapsed = DateTime.UtcNow - started;
+            Assert.True(body.Count > 0 && body[^1] == "done", $"after {elapsed.TotalSeconds:0.0} s: {string.Join(" | ", body)}");
+            Assert.Equal($"process={before.Process}", body[0]);
+            Assert.Equal(seconds + 2, body.Count);
+
+            // Removing the file is a change in bin too: the next test starts after that restart.
+            File.Delete(Path.Combine(_server.SampleDirectory, "bin_dotnet", "drain.gate"));
+            await Next(after, TimeSpan.FromSeconds(30));
             await WaitForOutput($"(process {before.Process}) exited", TimeSpan.FromSeconds(30));
         }
 
