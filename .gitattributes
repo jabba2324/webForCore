@@ -2,3 +2,5 @@
 # checkout has it (string literals and test baselines depend on it). Never convert it.
 src/webForCore.*/** -text
 test/webForCore.*/** -text
+# .NET Framework 4.8's aspnet_regsql scripts (#123), byte for byte as they are in its folder (CI compares them).
+src/WebFormsForCore.Web/FrameworkData/** -text

@@ -299,6 +299,41 @@ jobs:
           path: ${{ runner.temp }}/linq/
           if-no-files-found: warn
 
+  # aspnet_regsql's scripts (#123): System.Web carries .NET Framework 4.8's InstallCommon.sql, InstallMembership.sql and
+  # the others (src/WebFormsForCore.Web/FrameworkData/Sql), which referencesource doesn't publish, and IIS.Gate.Tests
+  # compares webforcore-regsql -sqlexportonly with aspnet_regsql's output (test/webForCore.IIS.Gate.Tests/FrameworkData).
+  # This job reads the framework folder and runs aspnet_regsql on Windows again, and fails if the committed files differ.
+  # It needs nothing of webForCore's build. Not a required check (docs/TESTING.md).
+  regsql-framework-data:
+    runs-on: windows-2025
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compare the scripts and aspnet_regsql's exports
+        run: |
+          framework=/c/Windows/Microsoft.NET/Framework64/v4.0.30319
+          out="$RUNNER_TEMP/regsql"; mkdir -p "$out/Sql"
+          find "$framework" -maxdepth 1 -iname '*.sql' -exec cp {} "$out/Sql/" \;
+          "$framework/aspnet_regsql.exe" -sqlexportonly "$(cygpath -w "$out/aspnet_regsql-A-all-d-aspnetdb.sql")" -A all -d aspnetdb
+          "$framework/aspnet_regsql.exe" -sqlexportonly "$(cygpath -w "$out/aspnet_regsql-ssadd-sstype-t.sql")" -ssadd -sstype t
+          diff -r --brief src/WebFormsForCore.Web/FrameworkData/Sql "$out/Sql"
+          for f in aspnet_regsql-A-all-d-aspnetdb.sql aspnet_regsql-ssadd-sstype-t.sql; do
+            cmp "test/webForCore.IIS.Gate.Tests/FrameworkData/$f" "$out/$f"
+          done
+
+      - name: Upload the files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regsql-framework-data
+          path: ${{ runner.temp }}/regsql/
+          if-no-files-found: warn
+
   # A version tag: the tested packages become a GitHub release (not published to nuget.org), and the feed is rebuilt.
   release:
     # Both platforms must pass: Windows is the development environment (#46).
