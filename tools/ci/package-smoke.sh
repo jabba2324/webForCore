@@ -146,5 +146,37 @@ case "$oidc" in "302 https://login.microsoftonline.com/smoke-tenant/oauth2/v2.0/
 # webForCore package brings (issue #142: without it, GetEdmModel() threw and OData applications failed at start, F68).
 odata=$(curl -s http://127.0.0.1:5198/ODataModel)
 case "$odata" in "Blob: Edm.Binary, Bytes: Edm.Binary, Id: Edm.Int32; System.Data.Linq, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089") ;; *) echo "/ODataModel: $odata" | head -c 400; echo; fail=1;; esac
+# Web API's controllers and SignalR's hubs, which they find by scanning the application's assemblies (#195).
+[ "$(curl -s http://127.0.0.1:5198/api/ping)" = '"pong"' ] || { echo "/api/ping: unexpected response"; fail=1; }
+curl -s http://127.0.0.1:5198/signalr/hubs | grep -q "smokeHub" || { echo "/signalr/hubs: no smokeHub"; fail=1; }
 if [ $fail -ne 0 ]; then cat server.log; exit 1; fi
+kill $server; wait $server 2>/dev/null || true
+
+# #195: the same application with Microsoft's System.Data.SqlClient 4.9.1 package referenced. It is the one in the
+# output and deps.json, and Entity Framework binds to it; Assembly.GetTypes() throws on it (#41), so the application's
+# own scan of every assembly fails on it, but MVC, Web API and SignalR, which scan the application's assemblies, use the
+# types that load, as on .NET Framework, and find their controllers and hubs.
+microsoft=$base/mvc-microsoft; mkdir "$microsoft"
+cp -r "$here/package-smoke-mvc/." "$microsoft"
+cp nuget.config global.json "$microsoft"
+cd "$microsoft"
+dotnet build SmokeMvc.csproj -c Release -p:WebForCoreVersion="$version" -p:SmokeSqlClient=Microsoft -nodeReuse:false
+assets=$(dotnet run --file "$here/deps_assets.cs" -- bin_dotnet/SmokeMvc.deps.json System.Data.SqlClient.dll)
+echo "$assets"
+if ! echo "$assets" | grep -q "^System.Data.SqlClient/4.9.1 " || echo "$assets" | grep -q "^webForCore.Data.SqlClient/"; then
+  echo "deps.json: System.Data.SqlClient isn't Microsoft's 4.9.1 alone"; fail=1
+fi
+dotnet bin_dotnet/webforcore-host/webforcore-host.dll --urls http://127.0.0.1:5198 > server.log 2>&1 &
+server=$!
+for i in $(seq 120); do curl -sf -o /dev/null http://127.0.0.1:5198/ && break; sleep 1; done
+scan=$(curl -s http://127.0.0.1:5198/Scan)
+case "$scan" in "SqlClient 4.900."*", GetTypes threw: Could not load type 'SqlGuidCaster'"*", Entity Framework binds: True, scan failures: 1 System.Data.SqlClient") ;; *) echo "/Scan (Microsoft's System.Data.SqlClient): $scan"; fail=1;; esac
+curl -s http://127.0.0.1:5198/ | grep -q "hello from Unity, rendered by Razor" || { echo "/ (Microsoft's System.Data.SqlClient): unexpected response"; fail=1; }
+[ "$(curl -s http://127.0.0.1:5198/api/ping)" = '"pong"' ] || { echo "/api/ping (Microsoft's System.Data.SqlClient): unexpected response"; fail=1; }
+curl -s http://127.0.0.1:5198/signalr/hubs | grep -q "smokeHub" || { echo "/signalr/hubs (Microsoft's System.Data.SqlClient): no smokeHub"; fail=1; }
+if [ $fail -ne 0 ]; then cat server.log; exit 1; fi
+kill $server; wait $server 2>/dev/null || true; server=
+
+# webForCore's SQL Server features on either System.Data.SqlClient, with Microsoft.Data.SqlClient 5 beside them (#195).
+"$here/package-smoke-sql.sh" "$packages" "$version"
 echo "Package smoke test passed ($version)."

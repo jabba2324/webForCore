@@ -43,7 +43,7 @@ There's no `applicationHost.config`, so locking sections (`overrideMode`, `allow
 
 | IIS feature | Status | Behaviour on webForCore |
 | --- | --- | --- |
-| **Request filtering** (`<requestFiltering>`) | Works | IIS's default deny lists and your settings: file extensions 404.7 (`.cs`, `.config`, `.asax`, ...), hidden segments 404.8 (`bin`, `App_Code`, `App_Data`, ..., plus the build output folder and `obj`), verbs 404.6, double escaping and `+` 404.11, high-bit characters 404.12, `denyUrlSequences` 404.5, `denyQueryStringSequences` 404.18, `maxAllowedContentLength` 404.13, `maxUrl` 404.14, `maxQueryString` 404.15, `headerLimits` 404.10, `alwaysAllowedUrls` |
+| **Request filtering** (`<requestFiltering>`) | Works | IIS's default deny lists and your settings: file extensions 404.7 (`.cs`, `.config`, `.asax`, ...), hidden segments 404.8 (`bin`, `App_Code`, `App_Data`, ..., plus the build output folder and `obj`), verbs 404.6, double escaping and `+` 404.11, high-bit characters 404.12, `denyUrlSequences` 404.5, `denyQueryStringSequences` 404.18, `maxAllowedContentLength` 413.1 (IIS 10's; IIS 7 to 8.5 answered 404.13), which is also the body's limit for the worker's Kestrel ([below](#aspnets-errors-and-request-limits)), `maxUrl` 404.14, `maxQueryString` 404.15, `headerLimits` 404.10, `alwaysAllowedUrls` |
 | **Concurrent request limit** (`serverRuntime appConcurrentRequestLimit`) | Works | 503.2 above the limit (5000) |
 | **Custom headers** (`<httpProtocol>`) | Works | `customHeaders` on every response, including IIS's `X-Powered-By: ASP.NET`; `redirectHeaders` on 3xx; `removeServerHeader` |
 | **HTTP redirection** (`<httpRedirect>`) | Works | Destination with the rest of the URL appended, `exactDestination`, `childOnly`, wildcards, status Permanent/Found/Temporary/PermRedirect |
@@ -68,6 +68,31 @@ There's no `applicationHost.config`, so locking sections (`overrideMode`, `allow
 | Configuration errors as 500.19 | Partial | System.Web reports `<system.web>` errors per request, as IIS does; a malformed `<system.webServer>` section is ignored |
 | Event log, ETW providers, performance counters | Not possible | Use structured logging and .NET metrics |
 | ISAPI, ISAPI filters, CGI, native modules | Not possible | Native Windows code |
+
+## ASP.NET's errors and request limits
+
+The `<system.web>` settings that decide error pages and request sizes, beside IIS's `<httpErrors>` and request filtering
+(#192). Each row is compared with IIS 10 by CI's `iis-compare` job (IIS.Gate.Tests' `ErrorsAndLimitsTests` on
+`test/webForCore.Requests.Sample`'s `/errors/` and `/limits/` folders, [below](#request-handling)), except
+`HandleErrorAttribute` (Mvc.Gate.Tests, on Kestrel only).
+
+| Setting | Status | Behaviour on webForCore, as on IIS 10 |
+| --- | --- | --- |
+| `<customErrors mode="On" defaultRedirect>`, `<error statusCode redirect>` | Works | An unhandled exception redirects (302) to `defaultRedirect`, an `HttpException` with a status (a 404, or a page that doesn't exist) to its `<error statusCode>` page, with `aspxerrorpath=<path>`. A status the application sets itself (`Response.StatusCode = 500`) isn't an error to customErrors. Without `defaultRedirect`: ASP.NET's generic "Runtime Error" page, with the error's status |
+| `mode="RemoteOnly"` (the default), `mode="Off"` | Works | RemoteOnly gives a local request (from the server itself, through webforcore-host too) the detailed error page, and others the custom one. The detailed page shows webForCore's source lines, stack and version information |
+| `redirectMode="ResponseRewrite"` | Works | The error page runs in place of the failed one (`Server.Execute`), at the failed URL, with `Server.GetLastError()`. The status is what the error page leaves: **200** unless it sets one, as on .NET Framework (set `Response.StatusCode` in the error page to keep the error's) |
+| With `<httpErrors>` | Works | customErrors decides first: its redirect is a 302, which `<httpErrors>` leaves alone. Otherwise, by `existingResponse`: `PassThrough` keeps the application's error response; `Replace` replaces it; `Auto` replaces it unless the application set `Response.TrySkipIisCustomErrors = true`, which ASP.NET's own error pages, MVC's `HandleErrorAttribute` and Web API do, as IIS's **integrated** pipeline does (in IIS's classic pipeline Auto keeps every ASP.NET response that has a body). An `ExecuteURL` replacement is the child request's response, with its status, in both of IIS's pipelines: a static page answers 200, as IIS's static file handler does, and an ASP.NET page 200 unless it sets one (until 0.10.0 webForCore kept the error's status) |
+| MVC's `HandleErrorAttribute` | Works | Renders the `Error` view with a 500 and `TrySkipIisCustomErrors` only when customErrors is on for the request (`HttpContext.IsCustomErrorEnabled`), including RemoteOnly for a remote request; an `HttpException` other than a 500 goes on to customErrors |
+| `<httpRuntime maxRequestLength>` (KB, 4096 by default) | Works | Checked when the body is read (`Request.Form`, `Files`, `InputStream`, `Params`, a Web Forms page's post-back): `HttpException` "Maximum request length exceeded." (500, the detailed or custom error page), after which ASP.NET closes the connection. A handler that doesn't read the body never sees it. At the limit the body is read; one byte over it fails |
+| `maxRequestLength` and request filtering's `maxAllowedContentLength` (bytes, 30,000,000 by default) | Works | The smaller wins, with its own failure: over `maxAllowedContentLength`, request filtering answers **413.1** before the application runs (whether or not it would read the body; IIS 7 to 8.5 answered 404.13); between `maxAllowedContentLength` and a smaller `maxRequestLength`, the application runs and reading the body fails as above. Raise both for large uploads. `maxAllowedContentLength` is also the worker's Kestrel body limit, for a body without a `Content-Length` too; until 0.10.0 Kestrel's own 30,000,000 bytes stayed, and a larger upload broke the connection although both settings allowed it |
+| `<httpRuntime requestLengthDiskThreshold>` (KB, 80 by default) | Works | A body over it is buffered to a file in the compilation folder's `uploads` folder (`Temporary_ASP.NET_Files`, [Process model](#process-model)) and deleted at the end of the request; up to it, in memory |
+| Multipart uploads near the limits | Works | `Request.Files` at the limit and one byte over each limit, in either order of the two limits, as forms and raw bodies |
+
+Known differences in the details (`tools/ci/iis-known-differences-requests.json`): the "Maximum request length exceeded"
+page is sent chunked and the connection kept, where IIS ends it by closing the connection (same status and page);
+request filtering's 413.1 is webForCore's short error page; a static `ExecuteURL` page has ASP.NET's static file
+headers; customErrors' answer for a page that doesn't exist has no `X-AspNet-Version` or default `Cache-Control`, as in
+the integrated pipeline (the classic one adds them).
 
 ## What the worker request gives ASP.NET
 
@@ -246,7 +271,8 @@ and the policy replaces only the headers it writes; webForCore now does the same
 The job also compares request handling (#126, #127, #129, #140): `test/webForCore.Requests.Sample`, a Web Forms site of
 pages, `App_Code` and static files that IIS serves as it is, gets the requests IIS.Gate.Tests' `RequestHandlingTests`
 sent to it on Kestrel (escaped and invalid characters, path info, default documents, files in another case,
-`Response.End`, `Redirect`, `Server.Transfer` and `CompleteRequest` before forms authentication's `EndRequest`). The
+`Response.End`, `Redirect`, `Server.Transfer` and `CompleteRequest` before forms authentication's `EndRequest`; and
+customErrors, httpErrors and the request length limits, #192, [above](#aspnets-errors-and-request-limits)). The
 reference is IIS's **classic** pipeline, webForCore's; every status, `Location`, body and other header matches, except
 these, which `tools/ci/iis-known-differences-requests.json` lists:
 
@@ -257,6 +283,12 @@ these, which `tools/ci/iis-known-differences-requests.json` lists:
 | A file that doesn't exist gets ASP.NET's 404 page, with `X-AspNet-Version`; IIS serves its native 404.0 page. Same status | As above |
 | Request filtering's 404.11 is webForCore's short error page (`text/html`), without IIS's `Cache-Control: private` and `Connection: close`. Same status and substatus | IIS's detailed error pages aren't reproduced |
 | ASP.NET's 400 page for a character of `requestPathInvalidCharacters` shows webForCore's source lines, stack frames and version information | The error and its message are the same; the details are the platform's |
+| ASP.NET's detailed error page (customErrors RemoteOnly locally, or Off; "Maximum request length exceeded") shows webForCore's source lines, stack frames and version information; the generic Runtime Error page's sample Web.config has `\n` newlines | As above; newlines are the platform's ([decisions](#compatibility-decisions)) |
+| Over `maxRequestLength`, the error page ASP.NET sends before closing the connection is chunked, and the connection stays open; IIS sends it without a length and `Connection: close` | Kestrel frames every HTTP/1.1 response; same status and page |
+| Request filtering's 413.1 is webForCore's short error page (`text/html`), without IIS's `Cache-Control: private` and `Connection: close` | As for 404.11 |
+| An `ExecuteURL` static page (httpErrors) has ASP.NET's static file headers | As for any static file |
+| `existingResponse="Auto"` replaces an error response the application sent without `TrySkipIisCustomErrors` | As IIS's integrated pipeline does; IIS's classic pipeline leaves every ASP.NET response with a body |
+| customErrors' answer for a page that doesn't exist has no `X-AspNet-Version` or default `Cache-Control: private` | As IIS's integrated pipeline, whose rule webForCore follows ([decisions](#compatibility-decisions)) |
 
 The integrated pipeline is recorded too: it also sets `HTTP_URL`, `UNENCODED_URL` and `CACHE_URL` (`ServerVariables.aspx`).
 
