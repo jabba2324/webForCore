@@ -13,6 +13,9 @@
     <GenerateDependencyFile>true</GenerateDependencyFile>
     <NoWarn>$(NoWarn);NU1701</NoWarn>
     <PredefinedCulturesOnly>true</PredefinedCulturesOnly>
+    <!-- The C# version docs/MIGRATING.md gives a project that set none. With it, LogService.cs is CS8370 if CoreWCF's source
+         generator runs (issue #134). -->
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

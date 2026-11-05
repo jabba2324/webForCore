@@ -146,7 +146,10 @@ These differences from .NET Framework projects come up when converting:
   Contains[Int32](System.ReadOnlySpan`1[System.Int32], Int32)' method`` (#138, nopCommerce 3.90's product pages). Keep
   the project's: `<LangVersion>7.3</LangVersion>` if it set none, or 13 for "latest". C# 11's ref-safety rules apply on
   .NET 7 and later whatever the version (`CS8347 ... may expose variables referenced by parameter 'index'`): mark such a
-  `ref` parameter `scoped` (#43).
+  `ref` parameter `scoped` (#43). An application that references CoreWCF itself (a CoreWCF service) gets CoreWCF's source
+  generator, which needs C# 11 for every `[ServiceContract]` (`CS8370: Feature 'file types' is not available`): set
+  `<EnableCoreWCFOperationInvokerGenerator>false</EnableCoreWCFOperationInvokerGenerator>` with an older `LangVersion`.
+  webForCore's own CoreWCF dependency doesn't bring it (#134, C1 CMS).
 - **Calls that become ambiguous** (`CS0121: The call is ambiguous between ...`, #93). `<LangVersion>` doesn't help
   with either of these; qualify the call:
   - *The application's own LINQ-style extension methods.* .NET 6 added `DistinctBy`, `MinBy`, `MaxBy`, `Chunk`,
@@ -354,7 +357,7 @@ These came up migrating real applications; each names one that needed it.
   Bonobo Git Server, ApplicantTracking, ReaLocate, Roadkill). An
   application built against webForCore's projects instead (a source build) gets both, so the compiler sees two
   `System.Web.Mvc`s: `CS0433: The type 'Controller' exists in both 'System.Web.Mvc, Version=5.1.0.0' and
-  'System.Web.Mvc, Version=5.3.1.0'`. There, reference each one that `obj/project.assets.json` lists, at the version
+  'System.Web.Mvc, Version=5.3.0.0'`. There, reference each one that `obj/project.assets.json` lists, at the version
   restored, with no assets, so the direct reference wins and contributes nothing (eShopLegacyMVC):
   ```xml
   <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.1.0" ExcludeAssets="all" />

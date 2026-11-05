@@ -5,6 +5,8 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>Microsoft.Web.Mvc</AssemblyName>
+    <!-- webForCore: Microsoft.AspNet.Mvc.Futures 5.0.0's version, the last Microsoft released (the source's is MVC's development version, 5.3.1.0) (#141). -->
+    <MicrosoftAssemblyVersion>5.0.0.0</MicrosoftAssemblyVersion>
     <RootNamespace>Microsoft.Web.Mvc</RootNamespace>
     <PackageId>webForCore.Microsoft.Web.Mvc</PackageId>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>

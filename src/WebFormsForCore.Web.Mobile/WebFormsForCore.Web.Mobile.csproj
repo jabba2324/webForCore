@@ -10,6 +10,8 @@
         <SignAssembly>True</SignAssembly>
         <AssemblyOriginatorKeyFile>..\SigningKey\WebFormsForCore.snk</AssemblyOriginatorKeyFile>
         <AssemblyName>System.Web.Mobile</AssemblyName>
+        <!-- webForCore: .NET Framework 4's identity (#141). -->
+        <MicrosoftAssemblyVersion>4.0.0.0</MicrosoftAssemblyVersion>
 
         <PackageId>webForCore.Web.Mobile</PackageId>
         <Title>WebFormsForCore.Web.Mobile</Title>
