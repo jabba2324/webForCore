@@ -124,6 +124,8 @@ commit that made it, and its issue, say why.
   `AspNetCoreWorkerRequest.CloseConnection` sends `Connection: close` when the response hasn't started. In a worker of
   webforcore-host, once the response has started, it leaves the connection to the host open (Kestrel drains the
   unread body): a close the response didn't announce reset the next request the host's pool sent on that connection.
+  Request filtering's 413.1 for a body over `maxAllowedContentLength` (`IIS/IISModules.cs`) says `Connection: close`,
+  since Kestrel closes the connection after it, as it can't read a body over its limit.
   `AspNetCoreWorkerRequest.ParseHeaders` stores the request's unknown headers whatever the path: the cookieless
   session check it took from IIS's filter returned before storing them when a path had a `(` and no `/(...)/`
   (#170, OData's `/People(1)` lost `Prefer`).
