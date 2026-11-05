@@ -141,6 +141,16 @@ namespace MachineKeyInterop
             // cookies, reject a key with a modifier on both runtimes.)
             if (config.EndsWith("-isolatebyappid", StringComparison.Ordinal) && (kind == "forms-ticket" || kind == "encode"))
                 return "IsolateByAppId: the application ID differs";
+            // IsolateApps on an explicit key replaces its first 4 bytes with a hash of the virtual path: on .NET Framework
+            // StringComparer.InvariantCultureIgnoreCase's (from Windows' NLS sort keys), which .NET doesn't have (its
+            // string hashes are randomized; webForCore uses ASP.NET's stable string hash, StringUtil.GetStringHashCode).
+            if (config.Contains("-isolateapps") && (kind == "forms-ticket" || kind == "encode"))
+                return "IsolateApps on an explicit key: the hash of the virtual path differs";
+            // No compatibilityMode and no targetFramework: Framework20SP1 on .NET Framework, Framework45 on webForCore,
+            // which runs every application as targetFramework 4.5 or later (IIS-COMPATIBILITY.md, "Compatibility
+            // decisions"). Only the forms ticket depends on it.
+            if (config == "hmacsha256-aes-default" && kind == "forms-ticket")
+                return "no targetFramework: .NET Framework's compatibilityMode is Framework20SP1, webForCore's Framework45";
             return null;
         }
 

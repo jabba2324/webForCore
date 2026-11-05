@@ -158,13 +158,13 @@ namespace IISGate
                 {
                     try
                     {
-                        await client.GetAsync(root + "interop.axd");
-                        return;
+                        // 503 while the application starts.
+                        if ((await client.GetAsync(root + "interop.axd")).StatusCode != HttpStatusCode.ServiceUnavailable || DateTime.UtcNow >= deadline) return;
                     }
                     catch (HttpRequestException) when (DateTime.UtcNow < deadline && !process.HasExited)
                     {
-                        await Task.Delay(250);
                     }
+                    await Task.Delay(250);
                 }
             }
 
@@ -172,7 +172,7 @@ namespace IISGate
             {
                 var response = await client.GetAsync(root + "interop.axd?op=produce");
                 string body = await response.Content.ReadAsStringAsync();
-                Assert.True(response.StatusCode == HttpStatusCode.OK, body);
+                Assert.True(response.StatusCode == HttpStatusCode.OK, $"{(int)response.StatusCode} {body}");
                 return JsonSerializer.Deserialize<List<InteropEntry>>(body);
             }
 
@@ -182,7 +182,7 @@ namespace IISGate
                 var response = await client.GetAsync(root + "owin/signin?type=" + type);
                 string body = await response.Content.ReadAsStringAsync();
                 if (response.StatusCode == HttpStatusCode.InternalServerError && body.StartsWith("error: ", StringComparison.Ordinal)) return body;
-                Assert.True(response.StatusCode == HttpStatusCode.OK, body);
+                Assert.True(response.StatusCode == HttpStatusCode.OK, $"{(int)response.StatusCode} {body}");
                 string prefix = ".AspNet." + type + "=";
                 string cookie = response.Headers.GetValues("Set-Cookie").Single(c => c.StartsWith(prefix, StringComparison.Ordinal));
                 return cookie.Substring(prefix.Length).Split(';')[0];
@@ -196,7 +196,7 @@ namespace IISGate
                 var response = await client.PostAsync(root + "interop.axd?op=consume",
                     new StringContent(JsonSerializer.Serialize(handled), Encoding.UTF8, "application/json"));
                 string body = await response.Content.ReadAsStringAsync();
-                Assert.True(response.StatusCode == HttpStatusCode.OK, body);
+                Assert.True(response.StatusCode == HttpStatusCode.OK, $"{(int)response.StatusCode} {body}");
                 var verdicts = JsonSerializer.Deserialize<List<InteropResult>>(body);
                 foreach (InteropEntry entry in handled)
                 {
