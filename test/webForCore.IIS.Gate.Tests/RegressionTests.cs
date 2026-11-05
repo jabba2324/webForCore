@@ -354,6 +354,20 @@ namespace IISGate
             Assert.Contains("vb page: Int32 42\n", body);
         }
 
+        // #128: Server.MachineName threw DllNotFoundException off Windows (kernel32's GetComputerName). AspNetDocs' Wingtip
+        // Toys: ELMAH's /elmah.axd/rss and /elmah.axd/json failed, and /elmah.axd answered with an empty page. On .NET
+        // Framework it is GetComputerName's name, as Environment.MachineName and health monitoring's are there.
+        [Fact]
+        public async Task ServerMachineNameIsTheMachinesName()
+        {
+            var (response, body) = await Get("/regressions/MachineName.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("server: " + Environment.MachineName + "\n", body);
+            Assert.Contains("wrapper: " + Environment.MachineName + "\n", body);
+            Assert.Contains("environment: " + Environment.MachineName + "\n", body);
+            Assert.Contains("health monitoring: " + Environment.MachineName + "\n", body);
+        }
+
         // #137: BuildManager.GetType(typeName, throwOnError: false) with an assembly-qualified name whose assembly isn't
         // deployed threw FileNotFoundException; on .NET Framework it returns null, as Type.GetType(typeName, false) does.
         // DNN Platform 9 failed at start twice: ClientDependency's module (BuildManager.GetType(type, false, true) for
