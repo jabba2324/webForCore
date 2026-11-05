@@ -240,6 +240,20 @@ namespace IISGate
             Assert.Equal("Deep\n", deepBody);
         }
 
+        // A 304 Not Modified: ASP.NET calculates no Content-Length for it, and one the page appends (AppendHeader) is sent,
+        // as in IIS 10's classic pipeline. One set through Response.Headers isn't, as in the integrated pipeline: a
+        // customer application's CacheCow.Server.WebApi 304s through Katana (Packages.Gate.Tests' CacheCowValidatesWithETags,
+        // compared with IIS's integrated pipeline).
+        [Fact]
+        public async Task A304KeepsTheContentLengthAPageAppends()
+        {
+            var (response, body) = await Get("/status/NotModified.aspx");
+            Assert.Equal(HttpStatusCode.NotModified, response.StatusCode);
+            Assert.Equal("", body);
+            Assert.True(response.Content.Headers.TryGetValues("Content-Length", out var length));
+            Assert.Equal("0", Assert.Single(length));
+        }
+
         // #129 (a WebMatrix Starter Site: WebSecurity.RequireAuthenticatedUser() answered an empty 401 instead of the
         // redirect to the log-in page): after Response.End() the response is still buffered when EndRequest runs, so
         // FormsAuthenticationModule turns the 401 into its redirect, and every module's EndRequest can change it.
@@ -344,19 +358,22 @@ namespace IISGate
         }
 
         // As WebApi.Gate.Tests records its requests for the comparison with IIS (#78); the request's own headers, if it
-        // has any, are sent again on IIS (#170).
-        private static void Record(string key, HttpResponseMessage response, string body, IDictionary<string, string> requestHeaders = null)
+        // has any, are sent again on IIS (#170), and so is its body (#192): the text, repeated bodyRepeat times if that is
+        // more than 1, so that a large body doesn't make the file large.
+        internal static void Record(string key, HttpResponseMessage response, string body, IDictionary<string, string> requestHeaders = null,
+            string requestBody = null, string contentType = null, int bodyRepeat = 1)
         {
             HttpRequestMessage sent = response.RequestMessage;
-            var request = new
+            var request = new Dictionary<string, object>
             {
-                method = sent.Method.Method,
-                url = sent.RequestUri.AbsoluteUri,
-                accept = (string)null,
-                contentType = (string)null,
-                body = (string)null,
-                headers = requestHeaders == null ? null : new SortedDictionary<string, string>(requestHeaders, StringComparer.OrdinalIgnoreCase),
+                ["method"] = sent.Method.Method,
+                ["url"] = sent.RequestUri.AbsoluteUri,
+                ["accept"] = null,
+                ["contentType"] = contentType,
+                ["body"] = requestBody,
+                ["headers"] = requestHeaders == null ? null : new SortedDictionary<string, string>(requestHeaders, StringComparer.OrdinalIgnoreCase),
             };
+            if (bodyRepeat > 1) request["bodyRepeat"] = bodyRepeat;
             var headers = new SortedDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (var h in response.Headers.Concat(response.Content.Headers))
             {

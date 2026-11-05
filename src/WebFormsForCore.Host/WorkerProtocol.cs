@@ -29,4 +29,10 @@ static class WorkerProtocol
 	// for up to the drain time (#181), and exits. The host answers "ok" or "error".
 	public const string Ready = "ready";
 	public const string Recycle = "recycle";
+	// "<token> overlap <id> <reason>": an application pool recycle (Recycling(...)), overlapped as IIS overlaps it (#193):
+	// the worker goes on serving while the host starts and warms the next one; then the host sends it RecycleCommand on
+	// its stdin, and it recycles (its "recycle" message then finds it already retired).
+	public const string Overlap = "overlap";
+	// Host to worker, one line on the worker's stdin: recycle now. Closing stdin stops the worker.
+	public const string RecycleCommand = "recycle";
 }

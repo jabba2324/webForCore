@@ -82,6 +82,9 @@ namespace System.Web {
         // webForCore: the cache headers (Cache-Control, Expires, Last-Modified, ETag, Vary) the application set through
         // Response.Headers, the emulated integrated-pipeline API (AppendHeaderThroughHeaders).
         private ArrayList   _integratedCacheHeaders;
+        // webForCore: Content-Length set through Response.Headers (Web API's OWIN adapter sets 0 for an empty response).
+        // IIS's integrated pipeline sends none with a 304; its classic pipeline sends one AppendHeader set.
+        private bool        _integratedContentLength;
         private bool        _suppressHeaders;
         private bool        _suppressContentSet;
         private bool        _suppressContent;
@@ -599,6 +602,12 @@ namespace System.Web {
             for (int i = 0; i < n; i++)
             {
                 header = headers[i] as HttpResponseHeader;
+                // webForCore: no Content-Length set through Response.Headers on a 304, as in IIS's integrated pipeline
+                // (a customer application's CacheCow.Server.WebApi 304s through Katana, compared with IIS 10).
+                if (_integratedContentLength && StatusCode == 304
+                    && StringUtil.EqualsIgnoreCase(header.Name, "Content-Length")) {
+                    continue;
+                }
                 header.Send(_wr);
             }
         }
@@ -2175,6 +2184,9 @@ namespace System.Web {
         internal void AppendHeaderThroughHeaders(String name, String value) {
             AppendHeader(name, value);
             switch (HttpWorkerRequest.GetKnownResponseHeaderIndex(name)) {
+                case HttpWorkerRequest.HeaderContentLength:
+                    _integratedContentLength = true;
+                    break;
                 case HttpWorkerRequest.HeaderCacheControl:
                 case HttpWorkerRequest.HeaderExpires:
                 case HttpWorkerRequest.HeaderLastModified:
@@ -2204,6 +2216,7 @@ namespace System.Web {
             switch (HttpWorkerRequest.GetKnownResponseHeaderIndex(name)) {
                 case HttpWorkerRequest.HeaderContentLength:
                     _contentLengthSet = false;
+                    _integratedContentLength = false;
                     break;
                 case HttpWorkerRequest.HeaderTransferEncoding:
                     _transferEncodingSet = false;
@@ -2272,6 +2285,7 @@ namespace System.Web {
             _charSet = null;
             _customCharSet = false;
             _contentLengthSet = false;
+            _integratedContentLength = false;
 
             _redirectLocation = null;
             _redirectLocationSet = false;
@@ -2560,7 +2574,10 @@ namespace System.Web {
             }
             else {
                 // VSO bug 360276
-                if(HttpRuntime.UseIntegratedPipeline) {
+                // webForCore: also on the Kestrel host, which applies integrated mode's Content-Type rule
+                // (GenerateResponseHeaders): a redirect before a handler ran, as customErrors makes for a page that
+                // doesn't exist, had no Content-Type; IIS's integrated pipeline sends text/html (#192).
+                if(HttpRuntime.UseIntegratedPipeline || _wr is IAspNetCoreWorkerRequest) {
                     this.ContentType = "text/html";
                 }
 
@@ -3523,7 +3540,7 @@ namespace System.Web {
 
         private String UrlEncodeIDNSafe(String url) {
             // Bug 86594: Should not encode the domain part of the url. For example,
-            // http://Übersite/Überpage.aspx should only encode the 2nd Ü.
+            // http://ï¿½bersite/ï¿½berpage.aspx should only encode the 2nd ï¿½.
             // To accomplish this we must separate the scheme+host+port portion of the url from the path portion,
             // encode the path portion, then reconstruct the url.
             Debug.Assert(!url.Contains("?"), "Querystring should have been stripped off.");

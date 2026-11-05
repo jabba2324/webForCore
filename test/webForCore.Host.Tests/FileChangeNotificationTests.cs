@@ -23,7 +23,7 @@ namespace HostTests
             public string Directory { get; }
             readonly string temp;
 
-            public Site(string fcnMode)
+            public Site(string fcnMode, string runtime = null)
             {
                 temp = System.IO.Directory.CreateTempSubdirectory("webforcore-fcn-").FullName;
                 Directory = Path.Combine(temp, "site");
@@ -40,6 +40,7 @@ namespace HostTests
                         <compilation debug="false" targetFramework="4.8" />
                         <httpRuntime targetFramework="4.8"{attribute} />
                       </system.web>
+                    {runtime}
                     </configuration>
                     """);
                 System.IO.Directory.CreateDirectory(Path.Combine(Directory, "App_Data", "unwatched"));
@@ -47,7 +48,7 @@ namespace HostTests
                 for (int i = 0; i < 200; i++) System.IO.Directory.CreateDirectory(Path.Combine(Directory, "App_Data", "folders", "f" + i));
             }
 
-            static void CopyDirectory(string from, string to)
+            internal static void CopyDirectory(string from, string to)
             {
                 System.IO.Directory.CreateDirectory(to);
                 foreach (var file in System.IO.Directory.GetFiles(from)) File.Copy(file, Path.Combine(to, Path.GetFileName(file)));

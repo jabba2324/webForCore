@@ -147,6 +147,8 @@
     <Project Path="test/webForCore.Oidc.Provider/webForCore.Oidc.Provider.csproj" />
     <Project Path="test/webForCore.Oidc.Sample/webForCore.Oidc.Sample.csproj" />
     <Project Path="test/webForCore.Oidc.Gate.Tests/webForCore.Oidc.Gate.Tests.csproj" />
+    <Project Path="test/webForCore.Packages.Sample/webForCore.Packages.Sample.csproj" />
+    <Project Path="test/webForCore.Packages.Gate.Tests/webForCore.Packages.Gate.Tests.csproj" />
     <Project Path="test/webForCore.System.Web.Mvc.Test/webForCore.System.Web.Mvc.Test.csproj" />
     <Project Path="test/webForCore.Mvc.Sample/webForCore.Mvc.Sample.csproj" />
     <Project Path="test/webForCore.Mvc.Gate.Tests/webForCore.Mvc.Gate.Tests.csproj" />
@@ -158,6 +160,10 @@
     <Project Path="test/webForCore.IIS.Sample.SimpleLib/webForCore.IIS.Sample.SimpleLib.csproj" />
     <Project Path="test/webForCore.IIS.Sample.SimpleLib2/webForCore.IIS.Sample.SimpleLib2.csproj" />
     <Project Path="test/webForCore.IIS.Sample.SimpleUser/webForCore.IIS.Sample.SimpleUser.csproj" />
+    <Project Path="test/webForCore.IIS.Sample.StrongLib/webForCore.IIS.Sample.StrongLib.csproj" />
+    <Project Path="test/webForCore.IIS.Sample.StrongLib2/webForCore.IIS.Sample.StrongLib2.csproj" />
+    <Project Path="test/webForCore.IIS.Sample.StrongUser/webForCore.IIS.Sample.StrongUser.csproj" />
+    <Project Path="test/webForCore.IIS.Sample.CodeBaseLib/webForCore.IIS.Sample.CodeBaseLib.csproj" />
     <Project Path="test/webForCore.Host.Tests/webForCore.Host.Tests.csproj" />
     <Project Path="test/webForCore.Host.Sample/webForCore.Host.Sample.csproj" />
     <Project Path="test/webForCore.Precompiled.Host/webForCore.Precompiled.Host.csproj" />

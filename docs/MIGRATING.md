@@ -325,7 +325,10 @@ webForCore ships only Microsoft assemblies. Two libraries apps commonly have:
   application is in the default context, so `LoadFrom` on a `bin` assembly returns the copy the application has.
   Checked on 0.7.0 with the original WebActivatorEx 2.2.0 and WebActivator 1.5.0 packages (WebActivator 1.x is what MVC
   3 era packages such as Ninject.MVC3 bring; #38, Subtext). As on IIS, a pre-start method in `App_Code` doesn't run:
-  `App_Code` is compiled after the pre-start phase.
+  `App_Code` is compiled after the pre-start phase. Its shutdown methods (`ApplicationShutdownMethod`) run when the
+  application restarts, in the worker that stops, as in the AppDomain that unloaded on IIS: the third-party packages
+  gate (`test/webForCore.Packages.Sample`) checks Ninject.Web.Common.WebHost's `NinjectWebCommon.Start` and `Stop`
+  across a restart.
 - **AjaxControlToolkit** isn't provided: the original package is built for .NET Framework.
   [webForCore-thirdparty](https://github.com/xforcore/webForCore-thirdparty) builds it for .NET 10 (it isn't part of
   webForCore).
@@ -349,6 +352,26 @@ Keep other NuGet packages, preferring versions that target .NET Standard or .NET
 projects in this repository are working examples for Web Forms, MVC, Web API and Web Pages. A .NET Framework package
 built against MVC 5 runs as it is unless it uses an API .NET lacks: Microsoft's own MVC Futures 5.0.0 binary (built for
 .NET Framework 4.0 against MVC 5.0) ran unmodified on webForCore's MVC 5.3, with .NET binding its 5.0.0.0 reference.
+
+The same goes for Web API and OWIN. These net4x packages a customer application has run as they are, checked by the
+third-party packages gate (`test/webForCore.Packages.Sample`, Packages.Gate.Tests) on Linux and Windows, and compared
+with the same application on IIS 10 by CI's `iis-compare` job:
+
+- **Ninject's web integration** (Ninject 3.3.6, Ninject.Web.Common 3.3.2): Ninject.Web.Common.WebHost 3.3.2, started by
+  WebActivatorEx from the `App_Start/NinjectWebCommon.cs` the package wrote, with its `OnePerRequestHttpModule` and
+  `NinjectHttpModule` (`InRequestScope` keyed on `HttpContext.Current`: one object per request, disposed at
+  `EndRequest`); Ninject.Web.Common.OwinHost 3.3.1's `UseNinjectMiddleware` (an OWIN middleware resolving in the request
+  scope it puts in the OWIN environment); and Ninject.Web.WebApi.OwinHost 3.3.0's `UseNinjectWebApi` (controllers
+  constructed by Ninject). Two things Ninject does on IIS too: Ninject.Web.WebApi.OwinHost 3.3.0 needs Ninject.Web.WebApi
+  3.3.0, not 3.3.1, which removed the `IWebApiRequestScopeProvider` it uses (`TypeLoadException`); and its request scope
+  in Web API is a named scope that reaches a controller's dependencies' dependencies only with
+  Ninject.Extensions.ContextPreservation. And `UseNinjectMiddleware` replaces the kernel `Bootstrapper` holds, so with
+  NinjectWebCommon too, keep the kernel each creates where the code that resolves from it can find it.
+- **Swashbuckle.Core 5.6.0** (net40): `config.EnableSwagger(...).EnableSwaggerUi()`, the document
+  (`/swagger/docs/v1`) and the UI with the files embedded in Swashbuckle.Core.dll (`/swagger/ui/index`).
+- **CacheCow.Server.WebApi 2.5.0** (net452): `[HttpCache]`'s ETags, 304 for `If-None-Match`, and a new ETag once a
+  `PUT` or `POST` has changed the resource. It needs the `net452` builds of CacheCow.Server and CacheCow.Common, as
+  below.
 
 ### Packages that need more than a reference
 
@@ -384,11 +407,9 @@ These came up migrating real applications; each names one that needed it.
   with webForCore at 11.0: remove the application's references to them (MVCForum had 4.5 previews). More generally, every
   package webForCore depends on is a floor for the application's reference to it: the System.* packages at 11.0, such
   as `System.DirectoryServices` (Opserver had 4.5.0) (#42). Raise the application's reference, or remove it if the
-  package was only there as another package's dependency. `System.Data.SqlClient` isn't one of them: webForCore brings
-  its own build of Microsoft's 4.9.1 (`webForCore.Data.SqlClient`, #41), and the `System.Data.SqlClient` package's
-  assemblies are left out of the build at any version the application or its packages reference (YAF.NET's
-  ServiceStack.OrmLite.SqlServer had 4.8.1, Entity Framework 6.5.1 brings 4.8.6). `EntityFramework` before 6.4 has no
-  .NET build: use 6.4 or later (6.5.1 works with `System.Data.SqlClient`). EntityFramework 6.5.1 needs `System.ComponentModel.Annotations` 5.0.0,
+  package was only there as another package's dependency. `System.Data.SqlClient` isn't one of them: see the next
+  item. `EntityFramework` before 6.4 has no
+  .NET build: use 6.4 or later (6.5.1 works with `System.Data.SqlClient`, webForCore's or Microsoft's). EntityFramework 6.5.1 needs `System.ComponentModel.Annotations` 5.0.0,
   and .NET 10 treats only versions up to 4.3.0 as part of the framework, so a lower reference fails:
   `NU1605: Detected package downgrade: System.ComponentModel.Annotations from 5.0.0 to 4.4.1` (MVCForum). Raise it to
   5.0.0 in every project that has it, or remove it where the project doesn't use it directly (#62). The application's
@@ -396,6 +417,51 @@ These came up migrating real applications; each names one that needed it.
   packages) must be 5.9.0, `webForCore.Compilers`' version. Roslyn's packages pin each other exactly, so the error is
   `NU1107: Version conflict detected for Microsoft.CodeAnalysis.Common`, not `NU1605` (#153, Umbraco 8.18.15's
   `Microsoft.CodeAnalysis.CSharp` 2.10.0). Roslyn's API is compatible: raise the reference to 5.9.0.
+- **`System.Data.SqlClient`: webForCore's, or Microsoft's supported package** (#41, #195). On .NET, System.Data.SqlClient
+  is a NuGet package. webForCore brings its own build of Microsoft's 4.9.1, `webForCore.Data.SqlClient` (a dependency of
+  `webForCore.Web`), whose only change is that `Assembly.GetTypes()` works on it: on every Microsoft package for .NET
+  (4.4.3 to 4.9.1) it throws a `ReflectionTypeLoadException` for an unused internal type, `SqlGuidCaster` (step 6). Both
+  have the same assembly identity (`System.Data.SqlClient, Version=4.6.1.6`, Microsoft's key) and the same public API,
+  so an application, its libraries and webForCore's own code compile and run against either. Exactly one of them is in
+  the build, and it is decided the same way in every build (`webForCore.Web.targets`, which the package brings to every
+  project that references webForCore, directly or through another project):
+  - **Microsoft's**, when the build has Microsoft's `System.Data.SqlClient` package at **4.9.0 or later**: referenced
+    by the application itself, or by a project or package it references, such as a data access library shared with a
+    solution's workers and services. So an application keeps, or upgrades to, Microsoft's supported package by
+    referencing it (`<PackageReference Include="System.Data.SqlClient" Version="4.9.1" />`), and later Microsoft releases
+    the same way. webForCore.Data.SqlClient's assemblies are then left out of the compiler's references, the output,
+    `deps.json` and a publish.
+  - **webForCore's** otherwise. Packages that bring an older Microsoft package transitively (Entity Framework 6.5.1 brings
+    4.8.6, ServiceStack.OrmLite.SqlServer 4.8.1) don't change it: theirs is left out.
+  - `<WebForCoreSystemDataSqlClient>Microsoft</WebForCoreSystemDataSqlClient>` (or `webForCore`) in the project decides
+    it whatever the versions; `Microsoft` without Microsoft's package in the build is error `WFC0195`.
+
+  When both packages are in the build, the build says which one it kept ("webForCore: System.Data.SqlClient is
+  Microsoft's, from its System.Data.SqlClient 4.9.1 package; webForCore.Data.SqlClient is left out"). It isn't a
+  restore error: NuGet has no way to make two packages of different names conflict, and every Entity Framework
+  application has both. A project that doesn't reference webForCore (the shared library itself, its tests, the workers)
+  has only Microsoft's package and uses it, as before; it is the same assembly identity and API, so the library's code
+  doesn't change between the two.
+
+  Nothing in webForCore needs webForCore's build: `SqlDataSource` (and `ProviderName="System.Data.SqlClient"`),
+  `<DbProviderFactories>` and `DbProviderFactories.GetFactory`, the SQL membership, role and profile providers, SQL
+  Server session state, `SqlCacheDependency`, `SqlServices` (what `webforcore-regsql` runs; the tool itself carries
+  webForCore's build) and LINQ to SQL work on Microsoft's package, as `tools/ci/package-smoke-sql` checks against SQL
+  Server with each; typed DataSets' table adapters run on the same `SqlConnection`, `SqlCommand` and `SqlDataAdapter`
+  (IIS.Gate.Tests' `DataTests`). webForCore's own scans of an application's types
+  (MVC's controllers, Web API's controllers, SignalR's hubs) use the types that load when `GetTypes()` throws, as they
+  do on .NET Framework, and find them with Microsoft's package in the application (`tools/ci/package-smoke-mvc`).
+  **What an application gives up with Microsoft's package is only #41:** its own code, or a library's, that calls
+  `GetTypes()` on every assembly (`AppDomain.CurrentDomain.GetAssemblies()`) without catching
+  `ReflectionTypeLoadException` fails on System.Data.SqlClient (Opserver's tabs, some DI containers' and AutoMapper's
+  assembly scanning, MEF and plugin loaders). Such an application keeps webForCore's, or catches the exception and uses
+  `e.Types.Where(t => t != null)`, as MVC does.
+
+  **Microsoft.Data.SqlClient** (5.x, the successor Microsoft recommends) works beside either, for the application's own
+  data access: it is another assembly in another namespace, and the two don't conflict. webForCore's components keep
+  `System.Data.SqlClient`, as on .NET Framework, but `SqlDataSource` takes `ProviderName="Microsoft.Data.SqlClient"`, which webForCore registers in `DbProviderFactories` when the application
+  references the package. `tools/ci/package-smoke-sql` queries SQL Server with Microsoft.Data.SqlClient 5.2.2 and
+  through such a `SqlDataSource`, beside the SQL providers on System.Data.SqlClient.
 - **.NET Framework assemblies that are packages on .NET** (#9). The root web.config of .NET Framework referenced its
   framework assemblies for every page, so App_Code and pages used them freely. On .NET some are NuGet packages the
   application must reference, or code compiled at run time fails with `CS1069: The type name 'SyndicationItem' could not
@@ -420,11 +486,21 @@ These came up migrating real applications; each names one that needed it.
 - **A package's .NET Standard build can have less than its `net45` build** (#31). NuGet picks the .NET Standard build
   for .NET 10, and some packages built it with a smaller API. WindowsAzure.Storage 9.x has no synchronous blob methods
   there (`Exists`, `OpenRead`, ...: aspnet-mvc5-starter). Hangfire 1.6's has no OWIN extensions (`app.UseHangfireServer`),
-  and its SqlServer storage can't look a connection string name up in web.config (MVCForum). Use the version's `net45`
-  build, in every project that gets the package, the web project included:
+  and its SqlServer storage can't look a connection string name up in web.config (MVCForum). Some have another API
+  altogether: CacheCow.Server and CacheCow.Common 2.x's .NET Standard builds are CacheCow for ASP.NET Core, so
+  CacheCow.Server.WebApi, which has only a `net452` build, fails every `[HttpCache]` action with `MissingMethodException:
+  Method not found: 'Boolean CacheCow.Server.ICacheabilityValidator.IsCacheable(System.Net.Http.HttpRequestMessage)'`
+  (a customer application). Use the version's `net45` (or `net452`) build, in every project that gets the package, the
+  web project included:
   ```xml
   <PackageReference Include="Hangfire.Core" Version="1.6.17" GeneratePathProperty="true" ExcludeAssets="compile;runtime" />
   <Reference Include="Hangfire.Core" HintPath="$(PkgHangfire_Core)/lib/net45/Hangfire.Core.dll" />
+
+  <PackageReference Include="CacheCow.Server.WebApi" Version="2.5.0" />
+  <PackageReference Include="CacheCow.Server" Version="2.5.0" GeneratePathProperty="true" ExcludeAssets="compile;runtime" />
+  <PackageReference Include="CacheCow.Common" Version="2.5.0" GeneratePathProperty="true" ExcludeAssets="compile;runtime" />
+  <Reference Include="CacheCow.Server" HintPath="$(PkgCacheCow_Server)/lib/net452/CacheCow.Server.dll" />
+  <Reference Include="CacheCow.Common" HintPath="$(PkgCacheCow_Common)/lib/net452/CacheCow.Common.dll" />
   ```
 - **Katana's sign-in and token middleware** (#14, #18). webForCore builds all of Katana 4.2.3's security packages:
   `Microsoft.Owin.Security.OpenIdConnect`, `.Jwt`, `.WsFederation`, `.ActiveDirectory` and the social logins of the
@@ -807,7 +883,8 @@ Fix what the blocker search found (see [NAMESPACES.md](NAMESPACES.md) for replac
   System.Data.SqlClient from Microsoft's source with the type fixed (`webForCore.Data.SqlClient`, which `webForCore.Web`
   brings), and leaves the `System.Data.SqlClient` package that Entity Framework and others bring out of the build, so
   such scans work without changes. An application still on an earlier webForCore can catch the exception and use the
-  types that loaded (`e.Types.Where(t => t != null)`).
+  types that loaded (`e.Types.Where(t => t != null)`). An application that references Microsoft's System.Data.SqlClient
+  4.9.0 or later gets Microsoft's, on which `GetTypes()` throws again (step 3, #195).
 
 ## 7. Run and compare
 
@@ -844,9 +921,19 @@ The first request compiles pages, as on IIS. Then compare the responses recorded
 - **In front:** a reverse proxy (nginx, Apache, a load balancer) for TLS and the public port, or the host's own HTTPS.
 - **Recycling:** a `web.config`, `bin` or `App_Code` change restarts the app in a new worker process, as IIS did; no
   request fails (the old worker finishes against the assemblies it compiled, #89), and those that arrive meanwhile
-  wait for the new worker. Set time, request or memory recycling with `UseWebForms(o => o.Recycling(...))`. Run without
+  wait for the new worker. Set time, request or memory recycling with `UseWebForms(o => o.Recycling(...))`: such a
+  recycle is overlapped, as IIS's was, and the old worker serves until the new one is ready. Run without
   the host (`dotnet bin_dotnet/YourApp.dll`), the app stops when it restarts, for whatever started it to start it
   again.
+- **Application pool settings** (#193) go in the `WebForCore:Host` section, from the pool in applicationHost.config:
+  `startMode` is `StartMode` (the host's default is `AlwaysRunning`, IIS's `OnDemand`), `<processModel idleTimeout>`
+  is `IdleTimeout` (the host's default is off; IIS's was 20 minutes: set `"IdleTimeout": "00:20:00"` only if the pool
+  relied on it), and the application's `preloadEnabled` is `PreloadEnabled`. `<applicationInitialization>` stays in
+  `web.config` and works as on IIS: its `initializationPage` requests warm each new worker before it takes traffic, so
+  that after a start or a recycle a load balancer's health check doesn't reach a cold application, and with
+  `doAppInitAfterRestart="true"` after a `web.config`, `bin` or `App_Code` change too. A URL Rewrite rule that tests
+  `{APP_WARMING_UP}` never matches (the variable isn't set); use `remapManagedRequestsTo` for a splash page. See
+  [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md#process-model).
 - **Precompilation** (optional): `aspnetcore_compiler -v / -p <site> -b bin_dotnet [-u] <target>`, then copy the build
   into `<target>/bin_dotnet`. Use `-u` for updatable sites.
 - **Scaling out:** use out-of-process session state (Redis or SQL Server through ASP.NET Core's distributed cache) and
@@ -891,4 +978,4 @@ The first request compiles pages, as on IIS. Then compare the responses recorded
 | Language keys (`[login]`) instead of text, or dates as `MM/dd/yyyy` and `¤` currency, on a server or container only | No locale: the invariant culture; set `<globalization culture uiCulture>` or `LANG` (step 6) |
 | An empty log file with log4net | Log4Net.Async's appenders (step 3, "Libraries that don't run on .NET"); turn on `log4net.Internal.Debug` to see why |
 | 503 right after a deploy | Another process is compiling the same site folder |
-| `ReflectionTypeLoadException`: `Could not load type 'SqlGuidCaster'` | Microsoft's `System.Data.SqlClient` is in the application, not webForCore's (an earlier webForCore, or a build without `webForCore.Web.targets`): see "Scanning every loaded assembly's types" (step 6) |
+| `ReflectionTypeLoadException`: `Could not load type 'SqlGuidCaster'` | Microsoft's `System.Data.SqlClient` is in the application, not webForCore's: the application or a library it references has Microsoft's package at 4.9.0 or later (the build says so), or it is an earlier webForCore, or a build without `webForCore.Web.targets`. See "`System.Data.SqlClient`: webForCore's, or Microsoft's" (step 3) and "Scanning every loaded assembly's types" (step 6) |

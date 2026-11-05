@@ -85,6 +85,21 @@ namespace WebFormsForCore.Hosting
 			services.AddHostedService<WorkerLifetime>();
 		}
 
+		// An application pool recycle, overlapped as IIS overlapped it (#193): the worker asks the host for its replacement
+		// and serves on; once the replacement is ready (and warm), the host sends RecycleCommand on the worker's stdin, and
+		// `recycle` runs. False if the host didn't take the request: the caller recycles at once.
+		const string RecycleCommand = "recycle";
+		static Action recycleRequested;
+
+		internal static bool RequestOverlappedRecycle(string reason, Action recycle)
+		{
+			if (!IsWorker) return false;
+			Volatile.Write(ref recycleRequested, recycle);
+			if (Notify("overlap", reason, TimeSpan.FromSeconds(10))) return true;
+			Interlocked.CompareExchange(ref recycleRequested, null, recycle);
+			return false;
+		}
+
 		// Sends a control message to the host and waits for its answer; false if the host didn't take it.
 		internal static bool Notify(string kind, string detail, TimeSpan timeout)
 		{
@@ -222,14 +237,17 @@ namespace WebFormsForCore.Hosting
 			}
 
 			// The host keeps the worker's stdin open while it wants the worker; when it closes (the host stops, or ends),
-			// the worker stops.
+			// the worker stops. A line on it is a command: "recycle", the end of an overlapped recycle (#193).
 			void WatchStdin()
 			{
 				try
 				{
-					using var stdin = Console.OpenStandardInput();
-					var buffer = new byte[256];
-					while (stdin.Read(buffer, 0, buffer.Length) > 0) { }
+					using var stdin = new StreamReader(Console.OpenStandardInput(), Encoding.ASCII);
+					string line;
+					while ((line = stdin.ReadLine()) != null)
+					{
+						if (line == RecycleCommand) Interlocked.Exchange(ref recycleRequested, null)?.Invoke();
+					}
 				}
 				catch (IOException) { }
 				logger.LogInformation("Worker {Id}: the host closed its connection: stopping.", id);

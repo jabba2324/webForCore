@@ -413,6 +413,39 @@ namespace IISGate
             Assert.Contains("outside the site, Type.GetType: null", lines);
         }
 
+        // #158: Web.config's <assemblyBinding> <bindingRedirect> to a lower version, and <codeBase>, weren't applied. A
+        // customer application carries about 60 redirects, many to a version lower than or equal to the one NuGet
+        // resolved; a reference built against a higher version than the deployed one failed with FileNotFoundException,
+        // where fusion bound it to the deployed version. The sample deploys StrongLib 1.0.0.0 and StrongUser, built
+        // against 2.0.0.0, with redirects of 0.0.0.0-2.5.0.0 and 4.0.0.0 to 1.0.0.0, and a <codeBase> for CodeBaseLib
+        // 1.0.0.0 in bin_dotnet/codebase.
+        [Fact]
+        public async Task BindingRedirectsAndCodeBasesAreApplied()
+        {
+            var (response, body) = await Get("/regressions/BindingRedirects.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var lines = body.Split('\n');
+            Assert.Contains("StrongUser calls StrongLib: hello from StrongLib 1.0.0.0", lines);
+            // Down, within a range and to a single version; the same version; up.
+            Assert.Contains("StrongLib 2.0.0.0: 1.0.0.0", lines);
+            Assert.Contains("StrongLib 2.5.0.0: 1.0.0.0", lines);
+            Assert.Contains("StrongLib 4.0.0.0: 1.0.0.0", lines);
+            Assert.Contains("StrongLib 1.0.0.0: 1.0.0.0", lines);
+            Assert.Contains("StrongLib 0.5.0.0: 1.0.0.0", lines);
+            Assert.Contains("StrongLib 2.0.0.0, Type.GetType: hello from StrongLib 1.0.0.0", lines);
+            // Outside every oldVersion (3.0.0.0 only in an <assemblyBinding> for another runtime), or another public key
+            // token: not redirected.
+            Assert.Contains("StrongLib 3.0.0.0: System.IO.FileNotFoundException", lines);
+            Assert.Contains("StrongLib 4.0.0.1: System.IO.FileNotFoundException", lines);
+            Assert.Contains("StrongLib 2.0.0.0, another key: System.IO.FileNotFoundException", lines);
+            // <codeBase>: for its version, after a redirect to it too, and not for another version.
+            Assert.Contains("CodeBaseLib 1.0.0.0: bin_dotnet/codebase/CodeBaseLib.dll", lines);
+            Assert.Contains("CodeBaseLib 0.5.0.0: 1.0.0.0", lines);
+            Assert.Contains("CodeBaseLib 2.0.0.0: System.IO.FileNotFoundException", lines);
+            // An assembly without a strong name doesn't load from a <codeBase> outside the application's folder.
+            Assert.Contains("UnprobedLib, codeBase outside the site: System.IO.FileNotFoundException", lines);
+        }
+
         // #154: ApplicationSettingsBase (Visual Studio's Settings.settings classes, and the Url of every "Add Web
         // Reference" SOAP client) reads application-scoped settings from <applicationSettings> in web.config, and its
         // [DefaultSettingValue] for one that isn't there. Umbraco 7.15's CheckForUpgrade web reference threw
