@@ -560,8 +560,9 @@ before the upgrade aren't found after it: users start new ones.
 Fix what the blocker search found (see [NAMESPACES.md](NAMESPACES.md) for replacements), then the Linux issues:
 
 - **File paths:** Linux paths are case-sensitive and use `/`. Fix string-built paths (`"~\\Images\\Logo.PNG"`,
-  `Path.Combine` with `\`) and file names whose case differs from the references to them. `Server.MapPath` and
-  virtual paths work as before.
+  `Path.Combine` with `\`) and file names whose case differs from the references to them in code that opens files
+  itself (`File.ReadAllText`, `new FileStream`). `Server.MapPath`, virtual paths and URLs work as before: a URL finds
+  its page, handler, static file or folder in any case, as on IIS (#140).
 - **Telling URLs and paths apart** (#92). Two .NET behaviours on Linux (Unix, not webForCore) break code that checks
   whether a string is a local URL or a physical path:
   - `Uri.TryCreate("/umbraco/Default.aspx", UriKind.Absolute, out uri)` succeeds: a path that starts with `/` is an

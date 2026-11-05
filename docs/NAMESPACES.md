@@ -82,10 +82,12 @@ Caveats:
   [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md)). `HostingEnvironment.MaxConcurrentRequestsPerCPU` and
   `MaxConcurrentThreadsPerCPU` still throw `PlatformNotSupportedException` (`Hosting/HostingEnvironment.cs`).
 - **No thread abort.** `Response.End` and `Redirect(url, true)` end the request by throwing a
-  `ThreadAbortException` instance, but no thread is aborted, so code that relies on an abort interrupting a running thread behaves
-  differently. The instance isn't re-raised at the end of a `catch`, so `Thread.ResetAbort()` isn't needed, and on
-  .NET it throws `PlatformNotSupportedException: Thread abort is not supported on this platform.`: remove it (#143). A request that exceeds `executionTimeout` gets its 500 on time;
-  its code runs to the end.
+  `ThreadAbortException` instance, but no thread is aborted, so code that relies on an abort interrupting a running
+  thread behaves differently. The instance isn't re-raised at the end of a `catch`, so `Thread.ResetAbort()` isn't
+  needed, and on .NET it throws `PlatformNotSupportedException: Thread abort is not supported on this platform.`:
+  remove it (#143); code that catches the exception without rethrowing it runs on. The pipeline itself goes on as
+  after an abort: the response stays buffered for `EndRequest`'s modules (forms authentication's redirect of a 401,
+  #129). A request that exceeds `executionTimeout` gets its 500 on time; its code runs to the end.
 - **Windows-only APIs throw `PlatformNotSupportedException`:** `Util.WorkItem.Post`, `Util.Transactions.InvokeTransacted` (page transactions),
   `HttpRequest.HttpChannelBinding`, and `IisTraceListener`/`IisTraceWebEventProvider`.
 - **Typed DataSets** (`.xsd` files in App_Code) compile with the site, as on IIS: the DataSet, table and row classes

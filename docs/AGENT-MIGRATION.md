@@ -191,7 +191,7 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
    | `System.Web ... conflicts with what is already bound` | Import `webForCore.WebStack.targets` |
    | Razor SDK errors on `.cshtml` | Turn off the three Razor properties |
    | Missing `System.Web.Extensions` / `System.Web.Services` | Add the "Always" references |
-   | `FileNotFoundException`, or 404 for an existing file | Path case or `\` separators: fix the reference in code or markup, never rename to hide it |
+   | `FileNotFoundException` for an existing file | Path case or `\` separators in code that opens the file: fix the reference, never rename to hide it (a URL finds its file in any case, #140) |
    | `CultureNotFoundException` | Expected .NET Framework behaviour; check the culture name |
    | `PlatformNotSupportedException` | A Windows-only API: find it in `docs/NAMESPACES.md`; ask before replacing it |
    | `PlatformNotSupportedException: The named version of this synchronization primitive is not supported` | A named `Semaphore`/`EventWaitHandle` (Phase 2 step 7); ask before replacing it |
