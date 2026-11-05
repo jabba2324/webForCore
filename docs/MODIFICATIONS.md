@@ -156,7 +156,20 @@ commit that made it, and its issue, say why.
 - **Run-time compilation** adds the targets of a referenced facade's type forwards (CS0012 otherwise), leaving out
   those whose types System.Web defines itself (`HttpUtility`).
 - **BinaryFormatter port:** surrogates for .NET Framework types .NET no longer serializes (`NameValueCollection`
-  and others), so session state and view state round-trip.
+  and others), so session state and view state round-trip. `Type`, the runtime's `MethodInfo`, `ConstructorInfo`,
+  `FieldInfo`, `PropertyInfo` and `EventInfo`, `Missing`, `Assembly` and `Module` are written as .NET Framework 4.8
+  writes them (`System.UnitySerializationHolder`, `System.Reflection.MemberInfoSerializationHolder`;
+  `ReflectionSurrogates.cs`, #156), and the reader binds those two names (in mscorlib) to the reading half of
+  referencesource's `UnitySerializationHolder` and `MemberInfoSerializationHolder`, lifted into the port with marked
+  changes: types and assemblies are found as the rest of the reader finds them, mscorlib's assembly and module are
+  .NET's core library's, .NET has no `System.Empty` (unity type 1 throws `SerializationException`), and a
+  generic method whose type arguments aren't complete yet waits for them instead of throwing. The core library's
+  types that have no `TypeForwardedFrom` are written as mscorlib's.
+- **System.Configuration's `AssemblyRef.SystemConfiguration`** (webForCore's `AssemblyRef.cs`) names
+  System.Configuration.ConfigurationManager 14.5.0.0, this assembly, instead of .NET's System.Configuration 4.0.0.0
+  facade, which forwards only public types: the Reference Source creates `ConfigurationManagerInternal`,
+  `ClientConfigurationHost` and `InternalConfigConfigurationFactory` by that name, so every `ApplicationSettingsBase`
+  threw `TypeLoadException` (#154). Microsoft's files are unchanged.
 - **Security:** `bin`, `App_Data`, the build output folder and the other hidden segments return 404, as on IIS.
 - **Full trust only** (`Hosting/ApplicationManager.Core.cs`, `HttpRuntime.cs`): .NET has no Code Access Security, so
   a partial `<trust level>` (Medium, High, ...) is accepted and the application runs in full trust, as with
