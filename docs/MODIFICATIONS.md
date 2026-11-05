@@ -185,6 +185,15 @@ commit that made it, and its issue, say why.
 - **Paths with `/` as the separator:** `configSource` paths written with `\` resolve on Linux
   (`InternalConfigHost.StaticGetStreamNameForConfigSource`, #26), and `/` no longer makes a mapped physical path invalid
   under `relaxedUrlToFileSystemMapping` (`HttpRuntime.s_InvalidPhysicalPathChars`, #27).
+- **Assembly loading** (`AspNetCoreHosting/AssemblyLoaderNetCore.cs`): where the reference source calls
+  `Type.GetType(typeName, throwOnError, ...)`, the port passes an assembly resolver for the application's load
+  context, and .NET's `Type.GetType` lets a resolver's exceptions through whatever `throwOnError` says. The resolver
+  (`AssemblyLoaderNetCore.TypeAssemblyResolver`) returns null for an assembly that isn't there unless `throwOnError`,
+  so `BuildManager.GetType(name, false)` and the other non-throwing lookups (`HttpProfileBase`, `StateManagedCollection`,
+  `HttpStaticObjectsCollection`, `HostingEnvironment`, `ApplicationManager`) return null, as on .NET Framework (#137,
+  DNN and ClientDependency). `HttpRuntime.InitFusion` reads `<runtime><assemblyBinding><probing privatePath>` from the
+  application's web.config, and the load context's resolver searches those folders after the build output, in fusion's
+  order (#147, Orchard; [NAMESPACES.md](NAMESPACES.md)).
 - **System.Web.DynamicData** (`src/WebFormsForCore.Web.DynamicData`, now built and in the "Always" set): the Entity
   Framework 1–4 and LINQ to SQL model providers, `LinqDataSource`/`EntityDataSource` hookups and EF 5 spatial column
   types are compiled out (`#if NETFRAMEWORK`); `AssemblyRef.cs` and `ScaffoldTableAttribute` (which .NET dropped) are

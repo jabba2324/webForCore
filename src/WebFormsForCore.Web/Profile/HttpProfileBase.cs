@@ -248,7 +248,7 @@ namespace System.Web.Profile {
 
                 var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
                 Type t = Type.GetType(inheritsType,
-                    assemblyName => alc.LoadFromAssemblyName(assemblyName),
+                    System.Web.Hosting.AssemblyLoaderNetCore.TypeAssemblyResolver(alc, false),
                     (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)),
                     false, true);
                 if (t == null)
@@ -274,7 +274,7 @@ namespace System.Web.Profile {
 
                 var alc = AssemblyLoadContext.GetLoadContext (Assembly.GetExecutingAssembly());
                 Type t = Type.GetType(inheritsType,
-                    assemblyName => alc.LoadFromAssemblyName(assemblyName),
+                    System.Web.Hosting.AssemblyLoaderNetCore.TypeAssemblyResolver(alc, false),
                     (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)),
                     false, true);
                 if (t == null || t != typeof(ProfileBase))
