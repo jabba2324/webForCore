@@ -3204,19 +3204,14 @@ namespace System.Web {
         public void End() {
             if (_context.IsInCancellablePeriod) {
 #if NETCOREAPP
-                // when cannot abort execution, flush and supress further output
-                _endRequiresObservation = true;
-
-				if (!_flushing)
-				{ // ignore Reponse.End while flushing (in OnPreSendHeaders)
-					Flush();
-					_ended = true;
-
-					if (_context.ApplicationInstance != null)
-					{
-						_context.ApplicationInstance.CompleteRequest();
-					}
-				}
+                // webForCore: .NET can't abort the thread, so AbortCurrentThread throws a ThreadAbortException that
+                // HttpApplication.ExecuteStep observes, as it observed the abort. The response stays buffered, as on .NET
+                // Framework, for EndRequest's modules (FormsAuthenticationModule turns a 401 into its redirect to the
+                // log-in page, #129); this flushed it here, so they could no longer change it. CompleteRequest, in case
+                // the application catches the exception and doesn't rethrow it (a thread abort was rethrown).
+                if (_context.ApplicationInstance != null) {
+                    _context.ApplicationInstance.CompleteRequest();
+                }
 #endif
                 AbortCurrentThread();
             }

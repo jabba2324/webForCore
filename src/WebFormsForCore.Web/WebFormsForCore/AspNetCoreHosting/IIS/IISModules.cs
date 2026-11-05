@@ -128,24 +128,21 @@ namespace WebFormsForCore.Hosting.IIS
 			return config.GetSection(path);
 		}
 
-		string MapPath(string path) => Path.Combine(config.PhysicalRoot, path.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+		// Case-insensitively, as IIS's file system is: each segment as it is on disk (#140).
+		string MapPath(string path)
+		{
+			var relative = path.TrimStart('/');
+			var mapped = Path.Combine(config.PhysicalRoot, relative.Replace('/', Path.DirectorySeparatorChar));
+			if (!OperatingSystem.IsWindows() && !File.Exists(mapped) && !Directory.Exists(mapped))
+				mapped = System.Web.Configuration.UserMapPath.ResolveIgnoreCase(config.PhysicalRoot, relative);
+			return mapped;
+		}
 
-		// Case-insensitively, as IIS's file system is.
+		// Case-insensitively, as IIS's file system is (MapPath).
 		string FindFile(string path)
 		{
 			var mapped = MapPath(path);
-			// On Windows File.Exists ignores case and keeps the requested name: look the file up, so the request is
-			// rewritten to the file's own name, as on Linux (#46).
-			if (!OperatingSystem.IsWindows() && File.Exists(mapped)) return mapped;
-			var directory = Path.GetDirectoryName(mapped);
-			try
-			{
-				return Directory.Exists(directory)
-					? Directory.EnumerateFiles(directory).FirstOrDefault(f => string.Equals(Path.GetFileName(f), Path.GetFileName(mapped), StringComparison.OrdinalIgnoreCase))
-					: null;
-			}
-			catch (IOException) { return null; }
-			catch (UnauthorizedAccessException) { return null; }
+			return File.Exists(mapped) ? mapped : null;
 		}
 
 		// <security><requestFiltering>: IIS answers 404 with a substatus.
@@ -276,7 +273,8 @@ namespace WebFormsForCore.Hosting.IIS
 			{
 				// A route of the application takes it first (RouteExistingFiles), as UrlRoutingModule does on IIS (#13).
 				if (RouteClaims?.Invoke(context.Request.PathBase + path) == true) return false;
-				var location = context.Request.PathBase + path + "/" + context.Request.QueryString;
+				// An absolute URL, as IIS sends it (#127).
+				var location = context.Request.Scheme + "://" + context.Request.Host + context.Request.PathBase + path + "/" + context.Request.QueryString;
 				context.Response.StatusCode = 301;
 				context.Response.Headers.Location = location;
 				await WriteBody(context, "text/html; charset=UTF-8", $"<head><title>Document Moved</title></head>\n<body><h1>Object Moved</h1>This document may be found <a HREF=\"{WebUtility.HtmlEncode(location)}\">here</a></body>");
@@ -289,7 +287,9 @@ namespace WebFormsForCore.Hosting.IIS
 				var file = FindFile(path + document);
 				if (file != null)
 				{
-					context.Request.Path = path + Path.GetFileName(file);
+					// The document's name as configured, as IIS rewrites to it ("/" is "/default.aspx" with
+					// applicationHost.config's list), whatever its case on disk (#127); the file is found in any case (#140).
+					context.Request.Path = path + document;
 					return false;
 				}
 			}

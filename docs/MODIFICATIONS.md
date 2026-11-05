@@ -211,6 +211,14 @@ commit that made it, and its issue, say why.
   Framework 1–4 and LINQ to SQL model providers, `LinqDataSource`/`EntityDataSource` hookups and EF 5 spatial column
   types are compiled out (`#if NETFRAMEWORK`); `AssemblyRef.cs` and `ScaffoldTableAttribute` (which .NET dropped) are
   added (#8).
+- **`Response.End()` keeps the response buffered** (`HttpResponse.End`), as after .NET Framework's thread abort: it
+  throws the `ThreadAbortException` that `HttpApplication.ExecuteStep` observes, and calls `CompleteRequest`, for
+  code that catches the exception without rethrowing it. WebFormsForCore flushed the response first, so `EndRequest`'s
+  modules could no longer change it, and forms authentication sent the 401 itself instead of its redirect to the
+  log-in page (#129). `Redirect(url, true)` and `Server.Transfer` end through it.
+- **URLs find files in any case off Windows** (`Configuration/UserMapPath.cs`): `ResolveIgnoreCase`, which already
+  found configuration paths, is internal so that the worker request (`Request.PhysicalPath`) and the IIS modules map a
+  request's path with it too (#140).
 - **No kernel32 for the machine name** (`HttpServerUtility.GetMachineNameInternal`): `Environment.MachineName` instead of
   `GetComputerName`, which threw `DllNotFoundException` off Windows (ELMAH's log pages, #128). On Windows .NET reads it
   with `GetComputerName` too. The P/Invoke declaration is left in `UnsafeNativeMethods.cs`, unused.
