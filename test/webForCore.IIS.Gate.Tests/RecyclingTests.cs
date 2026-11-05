@@ -96,10 +96,12 @@ namespace IISGate
             Assert.All(statuses, status => Assert.Equal(HttpStatusCode.OK, status));
         }
 
-        // A WebSocket open across a restart: the old worker keeps serving it for <hostingEnvironment shutdownTimeout> (5 s
-        // in the sample), then the connection is aborted, as AppDomain.Unload did on IIS, and the worker exits.
+        // A WebSocket open across a restart is aborted once the application's registered objects have stopped, without
+        // waiting for <hostingEnvironment shutdownTimeout> (5 s in the sample) or <httpRuntime shutdownTimeout>, as
+        // HostingEnvironment.ShutdownThisAppDomainOnce aborts every WebSocket on .NET Framework (#181), and the worker exits.
+        // It used to be served until <hostingEnvironment shutdownTimeout>.
         [Fact]
-        public async Task RestartAbortsAWebSocketAfterTheShutdownTimeout()
+        public async Task RestartAbortsAWebSocket()
         {
             var before = await Current();
 
@@ -126,7 +128,7 @@ namespace IISGate
             }
             var elapsed = DateTime.UtcNow - restarted;
             Assert.True(aborted, "the WebSocket stayed open 30 s after the restart");
-            Assert.InRange(elapsed, TimeSpan.FromSeconds(4), TimeSpan.FromSeconds(20)); // served until the timeout, not beyond
+            Assert.True(elapsed < TimeSpan.FromSeconds(4), $"aborted {elapsed.TotalSeconds:0.0} s after the restart");
 
             await WaitForOutput($"(process {before.Process}) exited", TimeSpan.FromSeconds(30));
         }

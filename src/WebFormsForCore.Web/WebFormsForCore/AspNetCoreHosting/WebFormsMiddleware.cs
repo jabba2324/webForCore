@@ -59,9 +59,15 @@ namespace Microsoft.AspNetCore.Builder
 			public Func<Core.HttpContext, Task> ProcessRequest;
 			public Action Shutdown;
 			public Func<string, bool> RouteClaims;
+			// Completes once the runtime has drained its requests and released its resources after a shutdown (#181).
+			public Func<Task> Unloaded;
+			// Aborts the requests still in progress.
+			public Action AbortRequests;
 			public DateTime Started = DateTime.UtcNow;
 			public long Requests;
 			public int Retired;
+			// An application pool recycle (Recycling: time, requests, private memory), not a restart of the application.
+			public volatile bool ProcessRecycle;
 		}
 
 		// IIS application pool recycling (applicationHost.config <recycling><periodicRestart>), with IIS's defaults.
@@ -133,6 +139,8 @@ namespace Microsoft.AspNetCore.Builder
 			app.ProcessRequest = (Func<Core.HttpContext, Task>)host[1];
 			app.Shutdown = (Action)host[2];
 			app.RouteClaims = (Func<string, bool>)host[3];
+			app.Unloaded = (Func<Task>)host[4];
+			app.AbortRequests = (Action)host[5];
 			logger.LogInformation("Started application {AppId} in process {ProcessId}{Worker}.", AppId, Environment.ProcessId,
 				WorkerProcess.IsWorker ? $" (worker {WorkerProcess.WorkerId} of webforcore-host)" : "");
 			// webForCore: the runtime couldn't start the application (a configuration error, or file change monitoring that
@@ -174,26 +182,64 @@ namespace Microsoft.AspNetCore.Builder
 			var reason = HostingEnvironment.ShutdownReason;
 			logger.LogInformation("Application {AppId} is shutting down ({Reason}).", AppId, reason);
 			if (stopping) return;
+			// #181: the requests in progress run on while HttpRuntime.Dispose waits for them, for <httpRuntime shutdownTimeout>
+			// and a sixth of it again, as on .NET Framework; the process stops after that (StopWhenUnloadedAsync).
 			if (WorkerProcess.IsWorker)
 			{
-				// The host stops sending requests here and starts the next worker; this one finishes its requests and exits.
-				if (!WorkerProcess.Notify("recycle", reason.ToString(), TimeSpan.FromSeconds(10)))
+				// The host sends new requests to the next worker; this one finishes those it has and exits. The host allows it
+				// the drain time beyond its shutdown time limit, except for an application pool recycle, which IIS allowed
+				// the shutdown time limit alone.
+				var drain = app.ProcessRecycle ? 0 : (int)Math.Ceiling(DrainTime().TotalSeconds);
+				if (!WorkerProcess.Notify("recycle", drain.ToString(CultureInfo.InvariantCulture) + " " + reason, TimeSpan.FromSeconds(10)))
+				{
 					logger.LogWarning("Application {AppId}: the host didn't take the recycle message; stopping the process.", AppId);
+					Stop();
+					return;
+				}
 			}
 			else
 			{
 				// Without webforcore-host there is no next worker: the process stops, for its service manager to start it again.
-				logger.LogWarning("Application {AppId} restarted outside webforcore-host: stopping the process.", AppId);
+				logger.LogWarning("Application {AppId} restarted outside webforcore-host: stopping the process once its requests have finished.", AppId);
 			}
-			// Once the process has started: stopping it while it starts (a file change during startup) cancels its start, and
-			// the application's app.Run() throws. The callback runs at once if it has already started.
-			lifetime?.ApplicationStarted.Register(lifetime.StopApplication);
+			_ = StopWhenUnloadedAsync(app);
 		}
+
+		// What HttpRuntime.Dispose waits for the requests at most: <httpRuntime shutdownTimeout>, then a sixth of it again.
+		static TimeSpan DrainTime()
+		{
+			var timeout = TimeSpan.FromSeconds(System.Web.Configuration.HttpRuntimeSection.DefaultShutdownTimeout);
+			try
+			{
+				var runtime = System.Web.Configuration.RuntimeConfig.GetAppLKGConfig().HttpRuntime;
+				if (runtime != null) timeout = runtime.ShutdownTimeout;
+			}
+			catch (Exception)
+			{
+				// HttpRuntime.Dispose falls back to the default too.
+			}
+			return timeout + timeout / 6;
+		}
+
+		// Once the runtime has drained its requests and released its resources (Application_End), where .NET Framework
+		// unloaded the AppDomain: the requests still in progress are aborted, as the unload aborted them, and the process
+		// stops.
+		async Task StopWhenUnloadedAsync(Application app)
+		{
+			await app.Unloaded();
+			app.AbortRequests();
+			Stop();
+		}
+
+		// Once the process has started: stopping it while it starts (a file change during startup) cancels its start, and the
+		// application's app.Run() throws. The callback runs at once if it has already started.
+		void Stop() => lifetime?.ApplicationStarted.Register(lifetime.StopApplication);
 
 		void Recycle(Application app, string reason)
 		{
 			if (app == null || app.Retired != 0) return;
 			logger.LogInformation("Recycling application {AppId}: {Reason}.", AppId, reason);
+			app.ProcessRecycle = true;
 			app.Shutdown();
 		}
 

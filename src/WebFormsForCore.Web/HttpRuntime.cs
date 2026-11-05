@@ -249,6 +249,13 @@ namespace System.Web
 		private AsyncCallback _handlerCompletionCallback;
 		private HttpWorkerRequest.EndOfSendNotification _asyncEndOfSendCallback;
 		private WaitCallback _appDomainUnloadCallback;
+#if NETCOREAPP
+		// webForCore: completes once the runtime has released its resources after a shutdown (Dispose: its requests drained for
+		// <httpRuntime shutdownTimeout>, Application_End run), where .NET Framework went on to unload the AppDomain. The worker
+		// process then stops (#181).
+		private static readonly System.Threading.Tasks.TaskCompletionSource s_unloaded = new System.Threading.Tasks.TaskCompletionSource(System.Threading.Tasks.TaskCreationOptions.RunContinuationsAsynchronously);
+		internal static System.Threading.Tasks.Task Unloaded => s_unloaded.Task;
+#endif
 
 		//
 		// Initialization error (to be reported on subsequent requests)
@@ -2082,8 +2089,10 @@ namespace System.Web
 
 #if NETCOREAPP
             // webForCore: there is no AppDomain to unload: the application is the process (#56), and the host decides what
-            // follows (WebFormsMiddleware asks webforcore-host for the next worker, then stops the process). The loop
-            // below unloaded the AppDomain again until the thread was aborted by the unload; here it spun or threw.
+            // follows: WebFormsMiddleware asked webforcore-host for the next worker when the shutdown began, and stops the
+            // process now that the requests have drained (Unloaded, #181). The loop below unloaded the AppDomain again until
+            // the thread was aborted by the unload; here it spun or threw.
+            s_unloaded.TrySetResult();
             return;
 #endif
 #pragma warning disable CS0162 // unreachable on .NET
