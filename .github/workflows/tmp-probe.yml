@@ -1,0 +1,26 @@
+name: tmp-probe
+on:
+  push:
+    branches: [ci/windows-container]
+jobs:
+  probe:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2025, windows-2022]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - shell: pwsh
+        run: |
+          [System.Environment]::OSVersion
+          (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion') | Select-Object CurrentBuild,UBR,DisplayVersion,ProductName
+          Get-Command docker -ErrorAction SilentlyContinue
+          Get-Service docker -ErrorAction SilentlyContinue
+          docker version
+          docker info
+      - shell: pwsh
+        continue-on-error: true
+        run: |
+          $tag = if ('${{ matrix.os }}' -eq 'windows-2025') { 'ltsc2025' } else { 'ltsc2022' }
+          docker pull mcr.microsoft.com/dotnet/aspnet:10.0-nanoserver-$tag
+          docker run --rm mcr.microsoft.com/dotnet/aspnet:10.0-nanoserver-$tag dotnet --info
