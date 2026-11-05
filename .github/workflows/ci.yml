@@ -42,6 +42,14 @@ jobs:
         options: >-
           --health-cmd "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P 'webForCore-Test1!' -Q 'SELECT 1' -b"
           --health-interval 10s --health-timeout 5s --health-retries 20
+      # IIS.Gate.Tests' SignalR scale-out tests (ScaleoutTests): two instances of an application on one Redis; the same
+      # server tools/ci/redis.sh starts.
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 16379:6379
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 3s --health-retries 20
 
     outputs:
       version: ${{ steps.version.outputs.version }}
@@ -204,6 +212,11 @@ jobs:
       - name: SQL Server
         shell: pwsh
         run: tools/ci/sqlserver-windows.ps1
+
+      # ... and Redis: Memurai Developer, a Redis for Windows.
+      - name: Redis
+        shell: pwsh
+        run: tools/ci/redis-windows.ps1
 
       - name: Test
         run: tools/ci/run-tests.sh "$RUNNER_TEMP/TestResults"

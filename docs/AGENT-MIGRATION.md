@@ -153,11 +153,15 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
    built into their own folder need their packages copied there (#150).
 6. Add `Program.cs` from `docs/MIGRATING.md` section 4. Use `HandleAllRequestsWithWebForms()` unless the app serves
    only `.aspx`/`.asmx`/`.ashx`. Session state (`Session`, MVC's `TempData`) needs nothing: it is in process, as
-   `<sessionState mode="InProc">` (or no `mode`, the default) was on IIS. Add `AddDistributedMemoryCache()` and
-   `UseAspNetCoreSessionProvider()` only if web.config's `<sessionState mode>` is `StateServer`, `SQLServer` or `Custom`
-   (tell the user, and ask which distributed cache to use: Redis, SQL Server or memory), or the user asks to scale out.
-   The provider is out of process: every session value must then be serializable (`docs/MIGRATING.md` section 4,
-   "Session state", #180).
+   `<sessionState mode="InProc">` (or no `mode`, the default) was on IIS. `mode="SQLServer"` and `mode="Custom"` with
+   Microsoft's Redis or SQL providers (`Microsoft.Web.RedisSessionStateProvider`, `SqlSessionStateProviderAsync`,
+   `RedisOutputCacheProvider`) keep their web.config and packages: they run as on IIS. Raise
+   `SqlSessionStateProviderAsync` and `Microsoft.AspNet.SessionState.SessionStateModule` 2.0.0 to 2.1.0-preview1 (and
+   the versions in web.config's `type`s), and remove the `OutputCacheModuleAsync` swap from `<system.webServer><modules>`
+   (`docs/MIGRATING.md` section 4, "Session state"). Add `AddDistributedMemoryCache()` and
+   `UseAspNetCoreSessionProvider()` only for `mode="StateServer"` (tell the user, and ask which distributed cache to
+   use: Redis, SQL Server or memory), or if the user asks to scale out without those providers. Out of process, every
+   session value must be serializable (#180).
 7. Search the code for what behaves differently on Linux (`docs/MIGRATING.md` section 6), and fix each hit minimally:
    - `"~/bin` or `\bin` used to load or scan assemblies: they are in `bin_dotnet/`; use `HttpRuntime.BinDirectory` or
      the app's own setting (Umbraco: `umbracoBinDirectory` = `~/bin_dotnet`).
