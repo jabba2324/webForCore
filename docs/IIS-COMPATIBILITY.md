@@ -84,7 +84,7 @@ IIS hands ASP.NET a worker request (`HttpWorkerRequest`); on Kestrel this is `As
 | `IsClientConnected` | Works | False once the client has gone or the request timed out |
 | Bufferless input (`GetBufferlessInputStream`) | Works | |
 | `executionTimeout` | Partial | .NET can't abort a thread. The client gets ASP.NET's 500 "Request timed out." on time, `Request.TimedOutToken` is cancelled, and the request ends at its next pipeline step; the page's code runs to the end, and its output is dropped |
-| Integrated-pipeline APIs | Works | The fork runs the classic pipeline, but the APIs that need integrated mode work: `CurrentNotification`/`IsPostNotification`, `MapRequestHandler`/`LogRequest`/`PostLogRequest` events, writable `Request.Headers` and `ServerVariables`, `Response.Headers`, `AddOnSendingHeaders`, `InsertEntityBody`, `Request.Abort`, `Response.SubStatusCode`, `Server.TransferRequest` (a new request through the whole pipeline on the same connection; a chain deeper than 16 transfers fails, a guard against loops) |
+| Integrated-pipeline APIs | Works | The fork runs the classic pipeline, but the APIs that need integrated mode work: `CurrentNotification`/`IsPostNotification`, `MapRequestHandler`/`LogRequest`/`PostLogRequest` events, writable `Request.Headers` and `ServerVariables`, `Response.Headers` (a cache header set through it stays when ASP.NET's cache policy writes its own, as in IIS's header block), `AddOnSendingHeaders`, `InsertEntityBody`, `Request.Abort`, `Response.SubStatusCode`, `Server.TransferRequest` (a new request through the whole pipeline on the same connection; a chain deeper than 16 transfers fails, a guard against loops) |
 | Response semantics | Works | Integrated mode's Content-Type rule, server name from the Host header, reason phrases, `X-AspNet-Version` and `Cache-Control: private` as integrated mode adds them (around a managed handler, on a flush and on an error; not on a response a module ends before the handler, as Katana's `OwinHttpModule` does) |
 | Request URLs | Works | As IIS gives them to ASP.NET (#126): `Request.Path`, `FilePath`, `PathInfo` and `PATH_INFO` decoded (`/Product/Convertible Car`), with an escaped `/` and a `\` made `/` and repeated slashes merged, as http.sys does; `PathInfo` after the first segment with a managed handler's extension (`/Page.aspx/a.b/c`); `RawUrl` the URL asked for, decoded the same way, with the query string as sent, before any rewrite or default document (#127). `requestPathInvalidCharacters` gets ASP.NET's 400 and double escapes request filtering's 404.11. `HTTP_URL`, `UNENCODED_URL` and `CACHE_URL` are the integrated pipeline's and aren't set, as in IIS's classic pipeline |
 | File names in URLs | Works | Case-insensitive on every platform, as on IIS's file system: a static file, page, handler or directory asked for in another case is found, the first time (#140). `Request.PhysicalPath` is the file's path as it is on disk |
@@ -212,6 +212,33 @@ IIS integrated pipeline mode"); and with the template's `Web.config`, `PUT`, `DE
 (IIS's 404.0), because the classic-mode extensionless handler accepts only `GET`, `HEAD`, `POST` and `DEBUG`. The job
 records that run too, for reference. webForCore runs such an application as IIS's integrated pipeline does, apart from
 the differences above, with the integrated-only APIs Katana uses provided on the Kestrel worker request.
+
+#### OpenID Connect
+
+The job also compares sign-in with Katana's OpenID Connect middleware: `test/webForCore.Oidc.Sample` (the "Work or
+School Accounts" template's `Startup.Auth.cs` as a customer application configures it for Entra ID) built for .NET
+Framework 4.8 with Microsoft's Katana 4.2.3 packages, IdentityModel 5.6 and IdentityServer3.Contrib.AccessTokenValidation,
+on IIS's **integrated** pipeline (Katana's System.Web host needs it there), against `test/webForCore.Oidc.Provider`, goes
+through the scenarios Oidc.Gate.Tests ran on webForCore: the challenge, the form_post, the page with the user's claims,
+the saved tokens, sign-out, eight rejected responses with the exception type `AuthenticationFailed` saw,
+`SkipToNextMiddleware`, the unhandled failure, a tampered state, JWT and IdentityServer3 bearer tokens, and Katana's
+default ticket format. Random values (ports, nonces, codes, tokens, protected cookies and state) are replaced with
+placeholders, and IdentityModel's telemetry parameters (`x-client-SKU`, `x-client-ver`) and exception messages, which
+name the IdentityModel build, are left out (NAMESPACES.md). Every status, `Location` with its parameters, `Set-Cookie`
+with its attributes (`SameSite=None` on the nonce cookie, the expiry dates), body (the claims, in the same order and
+mapping), `Cache-Control`, `Pragma`, `Expires`, `X-AspNet-Version` and `X-Powered-By` matches, except these, which
+`tools/ci/iis-known-differences-oidc.json` lists:
+
+| Difference | Requests | Why |
+| --- | --- | --- |
+| `Server` is `Kestrel`, not `Microsoft-IIS/10.0` | all 47 | webForCore's host is Kestrel |
+| The 401 page the challenge's redirect carries ends with `Microsoft .NET Version:10.0.x; ASP.NET Version:1.2.0.0`, not `.NET Framework Version:4.0.30319; ASP.NET Version:4.8.x` | 2 | The page names the runtime |
+
+The first run found one more: `Expires: -1`, which Katana's cookie middleware sets through `Response.Headers` when it
+signs in or out, was missing on webForCore, because the classic pipeline writes the cache policy (modified by the cookie)
+in place of the cache headers an application added. In IIS's integrated pipeline the header is in IIS's header block,
+and the policy replaces only the headers it writes; webForCore now does the same for headers set through
+`Response.Headers` (Oidc.Gate.Tests' `CookieMiddlewareResponsesKeepExpires`).
 
 #### Request handling
 

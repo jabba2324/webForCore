@@ -3,5 +3,10 @@
     "requests": ".*",
     "field": "header Server",
     "reason": "IIS sends Server: Microsoft-IIS/10.0; webForCore's host is Kestrel."
+  },
+  {
+    "requests": "^oidc signin (1 challenge|7 signed out)$",
+    "field": "body",
+    "reason": "The challenge's redirect carries ASP.NET's 401 page (Access is denied.), whose last line names the runtime: Microsoft .NET Version:10.0.x on webForCore, .NET Framework Version:4.0.30319 and ASP.NET Version:4.8.x on IIS. The rest of the page is the same."
   }
 ]
