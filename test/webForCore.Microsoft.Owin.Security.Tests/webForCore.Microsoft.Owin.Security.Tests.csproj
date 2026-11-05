@@ -63,6 +63,8 @@
     <Compile Include="../../external/AspNetKatana/tests/FunctionalTests/Facts/Security/Common/SecurityUtils.cs" Link="FunctionalTests/SecurityUtils.cs" />
     <Compile Include="../../external/AspNetKatana/tests/FunctionalTests/Facts/Security/Jwt/SymmetricKeyTokenVerification.cs" Link="FunctionalTests/SymmetricKeyTokenVerification.cs" />
     <Compile Include="TestDataProtectionProvider.cs" />
+    <Compile Include="WsFederationMiddlewareTests.cs" />
+    <Compile Include="ActiveDirectoryBearerTests.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -72,6 +74,7 @@
   <ItemGroup>
     <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security.Cookies/webForCore.Microsoft.Owin.Security.Cookies.csproj" />
     <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security.OAuth/webForCore.Microsoft.Owin.Security.OAuth.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security.ActiveDirectory/webForCore.Microsoft.Owin.Security.ActiveDirectory.csproj" />
     <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security.Facebook/webForCore.Microsoft.Owin.Security.Facebook.csproj" />
     <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security.Google/webForCore.Microsoft.Owin.Security.Google.csproj" />
     <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security.Jwt/webForCore.Microsoft.Owin.Security.Jwt.csproj" />
