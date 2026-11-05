@@ -124,7 +124,10 @@ Caveats:
   with `.exe`). As in fusion, only an `<assemblyBinding>` in the `urn:schemas-microsoft-com:asm.v1` namespace counts,
   and a folder that is rooted or leads out of the site's folder is skipped. `<dependentAssembly><bindingRedirect>`
   isn't needed for the redirects NuGet writes: .NET binds a request for a version at or below the deployed one to the
-  deployed one. A redirect *down* to a lower version than the one requested, and `<codeBase>`, aren't applied (#158).
+  deployed one. A reference without a public key token binds to the deployed assembly of that name whatever its
+  version, higher or lower, as fusion doesn't check the version of an assembly without a strong name (#171). For a
+  strong-named reference, a redirect *down* to a lower version than the one requested, and `<codeBase>`, aren't
+  applied (#158).
   `<publisherPolicy>` and `<qualifyAssembly>` are moot on .NET (no GAC publisher policy; partial names load by simple
   name). The rest of `<runtime>` isn't read: .NET takes runtime settings from `runtimeconfig.json`.
 - **What .NET Framework's machine had:** .NET Framework has every Windows code page and registers SqlClient, OleDb and

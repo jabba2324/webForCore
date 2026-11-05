@@ -183,6 +183,12 @@ namespace System.Web.Hosting
 			}
 		}
 
+		static bool IsStrongNamed(AssemblyName name)
+		{
+			var token = name.GetPublicKeyToken();
+			return token != null && token.Length > 0;
+		}
+
 		public static Assembly Resolve(AssemblyLoadContext context, AssemblyName name)
 		{
             //Debugger.Break();
@@ -223,8 +229,10 @@ namespace System.Web.Hosting
 				.Where(p => File.Exists(p.FullName) && (!p.FullName.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) || IsAssembly(p.FullName)));
 			var assembly = files
 				.Select(p => context.LoadFromAssemblyPath(p.FullName))
+				// webForCore: as fusion, the version is checked only for a strong-named reference; one without a public
+				// key token binds to the assembly of that name found, whatever its version (#171).
 				.Where(assembly => assembly != null &&
-					(name.Version == null || assembly.GetName().Version >= name.Version))
+					(!IsStrongNamed(name) || name.Version == null || assembly.GetName().Version >= name.Version))
 				.FirstOrDefault();
 			if (assembly != null)
 			{

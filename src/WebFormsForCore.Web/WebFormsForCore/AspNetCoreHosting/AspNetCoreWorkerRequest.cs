@@ -937,10 +937,9 @@ namespace System.Web.Hosting
             {
                 int endPos = path.LastIndexOf(")/", StringComparison.Ordinal);
                 int startPos = (endPos > 2 ? path.LastIndexOf("/(", endPos - 1, endPos, StringComparison.Ordinal) : -1);
-                if (startPos < 0) // pattern not found: common case, exit immediately
-                    return;
-
-                if (IsValidHeader(path, startPos + 2, endPos))
+                // webForCore: a path without the pattern only has no session id. The filter code this comes from returned
+                // here, before the unknown headers below were stored, so a path with a '(' lost them (#170).
+                if (startPos >= 0 && IsValidHeader(path, startPos + 2, endPos))
                 {
                     var sessionHeader = path.Substring(startPos + 2, endPos - startPos - 2);
                     headers.Add("AspFilterSessionId");

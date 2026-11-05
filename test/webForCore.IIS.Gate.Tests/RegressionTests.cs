@@ -430,5 +430,20 @@ namespace IISGate
             Assert.Contains("user AppValue: " + unsupported + "\n", body);
             Assert.Contains("user UserValue: " + unsupported + "\n", body);
         }
+
+        // #171: fusion doesn't check the version of a reference to an assembly without a strong name; it binds to the
+        // assembly of that name it finds. JabbR deploys Nancy 0.20.0 and Nancy.SimpleAuthentication, built against Nancy
+        // 0.21.1, and its OWIN startup failed with "Could not load file or assembly 'Nancy, Version=0.21.1.0, ...,
+        // PublicKeyToken=null'". The sample deploys SimpleLib 1.0.0.0 and SimpleUser, built against SimpleLib 2.0.0.0.
+        [Fact]
+        public async Task AReferenceWithoutAStrongNameBindsWhateverTheVersion()
+        {
+            var (response, body) = await Get("/regressions/SimpleNameVersion.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var lines = body.Split('\n');
+            Assert.Contains("SimpleUser calls SimpleLib: hello from SimpleLib 1.0.0.0", lines);
+            Assert.Contains("Assembly.Load SimpleLib 2.0.0.0: 1.0.0.0", lines);
+            Assert.Contains("Assembly.Load SimpleLib 9.9.9.9: 1.0.0.0", lines);
+        }
     }
 }
