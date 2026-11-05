@@ -339,8 +339,8 @@ jobs:
           cat "$RUNNER_TEMP/gate/iis-fcn.md" | tee -a "$GITHUB_STEP_SUMMARY"
           exit $status
 
-      # A request running when the application restarts (#181): on IIS it runs to its end in the old domain, up to
-      # <httpRuntime shutdownTimeout>, while a new domain serves new requests (tools/ci/iis_drain.cs), as RecyclingTests
+      # A request running when the application restarts (#181): on IIS it runs to its end in the old domain, even
+      # past <httpRuntime shutdownTimeout>, while a new domain serves new requests (tools/ci/iis_drain.cs), as RecyclingTests
       # asserts of webForCore. The sites are written before IIS serves them, as the fcnMode ones.
       - name: Drain sites
         if: ${{ !cancelled() }}
