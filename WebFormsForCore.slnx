@@ -149,6 +149,8 @@
     <Project Path="test/webForCore.Oidc.Gate.Tests/webForCore.Oidc.Gate.Tests.csproj" />
     <Project Path="test/webForCore.Packages.Sample/webForCore.Packages.Sample.csproj" />
     <Project Path="test/webForCore.Packages.Gate.Tests/webForCore.Packages.Gate.Tests.csproj" />
+    <Project Path="test/webForCore.SessionCache.Sample/webForCore.SessionCache.Sample.csproj" />
+    <Project Path="test/webForCore.SessionCache.Gate.Tests/webForCore.SessionCache.Gate.Tests.csproj" />
     <Project Path="test/webForCore.System.Web.Mvc.Test/webForCore.System.Web.Mvc.Test.csproj" />
     <Project Path="test/webForCore.Mvc.Sample/webForCore.Mvc.Sample.csproj" />
     <Project Path="test/webForCore.Mvc.Gate.Tests/webForCore.Mvc.Gate.Tests.csproj" />
