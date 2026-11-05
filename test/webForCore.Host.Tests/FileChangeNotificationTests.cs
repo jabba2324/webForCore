@@ -56,8 +56,17 @@ namespace HostTests
                 foreach (var dir in System.IO.Directory.GetDirectories(from)) CopyDirectory(dir, Path.Combine(to, Path.GetFileName(dir)));
             }
 
+            public static readonly List<string> Changes = new List<string>();
+
             public Running Start()
             {
+                // DIAG (temporary): what changes in the site while it runs.
+                var recorder = new FileSystemWatcher(Directory) { IncludeSubdirectories = true, InternalBufferSize = 65536 };
+                recorder.Created += (s, e) => { lock (Changes) Changes.Add("created " + e.Name); };
+                recorder.Changed += (s, e) => { lock (Changes) Changes.Add("changed " + e.Name); };
+                recorder.Deleted += (s, e) => { lock (Changes) Changes.Add("deleted " + e.Name); };
+                recorder.Renamed += (s, e) => { lock (Changes) Changes.Add("renamed " + e.OldName + " " + e.Name); };
+                recorder.EnableRaisingEvents = true;
                 var address = new Uri($"http://127.0.0.1:{FreePort()}");
                 var start = new ProcessStartInfo("dotnet")
                 {
@@ -93,7 +102,7 @@ namespace HostTests
         {
             HttpResponseMessage response;
             try { response = await app.GetAsync("/Monitor.aspx?" + query); }
-            catch (HttpRequestException e) { throw new Xunit.Sdk.XunitException($"{e.Message}\n{app.Output}"); }
+            catch (HttpRequestException e) { throw new Xunit.Sdk.XunitException($"{e.Message}\n{app.Output}\nDIAG changes: {string.Join("\n", Site.Changes)}"); }
             var answer = await response.Content.ReadAsStringAsync();
             Assert.True(response.StatusCode == HttpStatusCode.OK, $"{(int)response.StatusCode}: {answer}\n{app.Output}");
             Assert.DoesNotContain("failed at folder", answer);
