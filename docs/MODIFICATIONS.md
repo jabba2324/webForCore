@@ -197,7 +197,13 @@ commit that made it, and its issue, say why.
   to the directories that would have seen it with a watcher of their own: on .NET 10 each `FileSystemWatcher` is an
   inotify instance, of which a user has 128 (#145, #152). `HttpRuntime.HostingInit` creates the `FileChangesMonitor`
   again with `HostingEnvironment.FcnMode`: `HttpRuntime`'s static constructor runs before the hosting environment has
-  the application's `<httpRuntime fcnMode>`, which was ignored (#146).
+  the application's `<httpRuntime fcnMode>`, which was ignored (#146). In Single mode (`DirectoryMonitor`,
+  `GetFileMonitorForSpecialDirectory`) a change below a special directory goes to the directory it is in first, so
+  `bin_dotnet`'s changes are `bin_dotnet`'s (they matched `bin` as a prefix), and then by the reference source's prefix
+  comparison (`binaries` is still `bin`'s, as on IIS); and a folder below one that is reported as modified without
+  having been created or written since monitoring started is ignored (`IsFolderUnchangedSinceMonitoringStarted`): on
+  Windows that is a freshly copied folder's deferred LastWriteTime, written when the application first opens it, and
+  a freshly copied site restarted at its first request, which IIS 10 does in some runs and not in others (#167).
 - **No ASP.NET telemetry** (`TelemetryLogger.cs`): .NET Framework wrote handler, provider and target-framework events
   to Windows' telemetry (`TelemetryEventSource`, in a provider group Windows' telemetry service enables). webForCore
   writes none; on Windows, TraceLogging's per-thread type cache also kept an application's domain alive (#46).

@@ -310,27 +310,31 @@ jobs:
           head -3 "$RUNNER_TEMP/gate/iis-requests-integrated.md" | tee -a "$GITHUB_STEP_SUMMARY"
 
       # <httpRuntime fcnMode> (#167): which changes restart an application on IIS, in Single and Default mode, compared
-      # with what Host.Tests asserts of webForCore (tools/ci/iis_fcn.cs). The sites are written after IIS serves their
-      # folders, as a deployment copies a site.
-      - name: fcnMode sites on IIS 10
-        shell: powershell
-        run: |
-          foreach ($mode in 'Single', 'Default') {
-            New-Item -ItemType Directory -Force -Path "$env:RUNNER_TEMP\fcn-$mode\App_Data" | Out-Null
-          }
-          tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\fcn-Single" -Name fcn-single -Port 8094 -Pipeline Classic
-          tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\fcn-Default" -Name fcn-default -Port 8095 -Pipeline Classic
-          # Global.asax writes each shutdown's reason to App_Data.
-          foreach ($mode in 'Single', 'Default') { icacls "$env:RUNNER_TEMP\fcn-$mode\App_Data" /grant "IIS_IUSRS:(OI)(CI)M" /T /Q }
-
-      - name: Changes that restart an application (fcnMode)
+      # with what Host.Tests asserts of webForCore (tools/ci/iis_fcn.cs). The compared sites are written before IIS serves
+      # them; a third is written after, as a deployment copies a site, and its start is recorded only (IIS varies).
+      - name: fcnMode sites
         run: |
           dotnet run tools/ci/iis_fcn.cs -- site "$RUNNER_TEMP/fcn-Single" Single
           dotnet run tools/ci/iis_fcn.cs -- site "$RUNNER_TEMP/fcn-Default" Default
+          mkdir -p "$RUNNER_TEMP/fcn-Fresh/App_Data"
+
+      - name: fcnMode sites on IIS 10
+        shell: powershell
+        run: |
+          tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\fcn-Single" -Name fcn-single -Port 8094 -Pipeline Classic
+          tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\fcn-Default" -Name fcn-default -Port 8095 -Pipeline Classic
+          tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\fcn-Fresh" -Name fcn-fresh -Port 8096 -Pipeline Classic
+          # Global.asax writes each shutdown's reason to App_Data.
+          foreach ($site in 'Single', 'Default', 'Fresh') { icacls "$env:RUNNER_TEMP\fcn-$site\App_Data" /grant "IIS_IUSRS:(OI)(CI)M" /T /Q }
+
+      - name: Changes that restart an application (fcnMode)
+        run: |
+          dotnet run tools/ci/iis_fcn.cs -- site "$RUNNER_TEMP/fcn-Fresh" Single
           echo "## Changes that restart an application (#167)" > "$RUNNER_TEMP/gate/iis-fcn.md"
           status=0
           dotnet run tools/ci/iis_fcn.cs -- check "$RUNNER_TEMP/fcn-Single" http://localhost:8094/ Single "$RUNNER_TEMP/gate/iis-fcn.md" || status=1
           dotnet run tools/ci/iis_fcn.cs -- check "$RUNNER_TEMP/fcn-Default" http://localhost:8095/ Default "$RUNNER_TEMP/gate/iis-fcn.md" || status=1
+          dotnet run tools/ci/iis_fcn.cs -- check "$RUNNER_TEMP/fcn-Fresh" http://localhost:8096/ Single "$RUNNER_TEMP/gate/iis-fcn.md" fresh
           cat "$RUNNER_TEMP/gate/iis-fcn.md" | tee -a "$GITHUB_STEP_SUMMARY"
           exit $status
 

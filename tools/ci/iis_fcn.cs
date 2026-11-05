@@ -5,13 +5,17 @@
 //   dotnet run tools/ci/iis_fcn.cs -- site <folder> <fcnMode>
 //     writes a site: Web.config with the fcnMode, Default.aspx (the application's domain id), Global.asax (writes each
 //     domain's shutdown reason to App_Data\end.txt), App_Code, a folder named "binaries", and bin with files in bin\cs,
-//     bin\de and bin\runtimes\win-x64\native, as an application's satellite and native assemblies are. The job writes it
-//     after IIS serves the folder, as a deployment copies a site: Windows then reports bin's folders as modified the first
-//     time the application opens them (their deferred LastWriteTime), during the first request.
-//   dotnet run tools/ci/iis_fcn.cs -- check <folder> <URL> <fcnMode> <report.md>
+//     bin\de and bin\runtimes\win-x64\native, as an application's satellite and native assemblies are.
+//   dotnet run tools/ci/iis_fcn.cs -- check <folder> <URL> <fcnMode> <report.md> [fresh]
 //     requests the site, waits, and checks that it didn't restart; then makes each change, in order, and checks whether
 //     the application restarted (its domain id changed) within 20 s: a new file in bin\cs, bin\cs's LastWriteTime set,
 //     and a new file in binaries. Appends a Markdown report; the exit code is 1 if IIS decided otherwise than webForCore.
+//
+// The job writes the compared sites before IIS serves them: tools/ci/iis-site.ps1 sets their permissions, which opens
+// every folder. A site written after (fresh: the start only, for the record) is what a deployment copies: Windows then
+// reports each of bin's folders as modified the first time the application opens them (it writes their deferred
+// LastWriteTime), during the first request, and in Single mode IIS 10 sometimes restarts the application for that and
+// sometimes not (the reports of different runs differ). webForCore doesn't (#167).
 using System.Text.RegularExpressions;
 
 if (args.Length >= 3 && args[0] == "site")
@@ -47,9 +51,9 @@ if (args.Length >= 3 && args[0] == "site")
     return 0;
 }
 
-if (args.Length < 5 || args[0] != "check")
+if (args.Length < 5 || args[0] != "check" || (args.Length > 5 && args[5] != "fresh"))
 {
-    Console.Error.WriteLine("usage: iis_fcn.cs site <folder> <fcnMode> | check <folder> <URL> <fcnMode> <report.md>");
+    Console.Error.WriteLine("usage: iis_fcn.cs site <folder> <fcnMode> | check <folder> <URL> <fcnMode> <report.md> [fresh]");
     return 2;
 }
 
@@ -57,8 +61,9 @@ var site = args[1];
 var url = args[2].TrimEnd('/') + "/Default.aspx";
 var mode = args[3];
 var single = mode == "Single";
+var fresh = args.Length > 5;
 using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(120) };
-var report = new List<string> { $"### IIS 10, fcnMode=\"{mode}\"", "", "| change | IIS 10 | webForCore |", "| --- | --- | --- |" };
+var report = new List<string> { $"### IIS 10, fcnMode=\"{mode}\"{(fresh ? ", a site copied while IIS serves its folder (for the record)" : "")}", "", "| change | IIS 10 | webForCore |", "| --- | --- | --- |" };
 var failed = false;
 
 async Task<string> Domain()
@@ -81,7 +86,7 @@ void Record(string change, bool restarted, bool expected)
     string Text(bool restart) => restart ? "restart" : "no restart";
     report.Add($"| {change} | {Text(restarted)} | {Text(expected)} |");
     Console.WriteLine($"{change}: IIS {Text(restarted)}, webForCore {Text(expected)}");
-    if (restarted != expected) failed = true;
+    if (restarted != expected && !fresh) failed = true;
 }
 
 async Task Change(string change, Action make, bool expected)
@@ -100,11 +105,13 @@ async Task Change(string change, Action make, bool expected)
 var first = await Domain();
 await Task.Delay(8000);
 Record("start (the first request, then 8 s)", await Domain() != first, false);
+if (fresh) goto End;
 var cs = Path.Combine(site, "bin", "cs");
 await Change(@"a new file in bin\cs", () => File.WriteAllText(Path.Combine(cs, "new.txt"), "new"), true);
 await Change(@"bin\cs's LastWriteTime set", () => Directory.SetLastWriteTimeUtc(cs, DateTime.UtcNow), single);
 await Change(@"a new file in binaries", () => File.WriteAllText(Path.Combine(site, "binaries", "x.txt"), "x"), single);
 
+End:
 var end = Path.Combine(site, "App_Data", "end.txt");
 report.Add("");
 report.Add("Shutdown reasons: " + (File.Exists(end) ? string.Join("; ", File.ReadAllLines(end).Where(l => l.Length > 0)) : "none"));

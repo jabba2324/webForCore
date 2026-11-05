@@ -152,8 +152,9 @@ namespace HostTests
         // every mode but Disabled, and starting doesn't, on Windows as on Linux (#167). The site is a fresh copy, as a
         // deployment is: on Windows, the first time anything opens a folder that files were just copied into, NTFS
         // writes the folder's deferred LastWriteTime and reports the folder as modified (FILE_NOTIFY_CHANGE_LAST_WRITE),
-        // and the application opens every folder of bin_dotnet while it starts (BuildManager hashes bin recursively).
-        // Each change is one IIS 10 makes the same decision on (CI's iis-compare job, tools/ci/iis_fcn.cs): a new file
+        // and the application opens every folder of bin_dotnet while it starts (BuildManager hashes bin recursively);
+        // IIS 10 restarts a freshly copied site for those in some runs and not in others. Each change below is one IIS 10
+        // makes the same decision on, every time (CI's iis-compare job, tools/ci/iis_fcn.cs): a new file
         // in a subfolder, a subfolder's LastWriteTime set after the start (a restart in Single mode only, as IIS's
         // Single mode tells bin of any change below it), and a file in a folder whose name starts with "bin" (Single
         // mode compares the special folders' names as prefixes).

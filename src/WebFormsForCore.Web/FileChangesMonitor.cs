@@ -1216,6 +1216,19 @@ namespace System.Web {
             // fileName should not be in short form (8.3 format)...it was converted to long form in
             // DirMonCompletion::ProcessOneFileNotification
             
+            // webForCore (#167): first the special directory that fileName is (or is in). bin_dotnet holds the application's
+            // assemblies, as bin does on IIS, and the reference source's prefix comparison below gave its changes to bin
+            // ("bin_dotnet\cs" starts with "bin"). Changes in a directory whose name only starts with a special directory's
+            // name ("binaries") still go to that directory below, as on IIS 10 in Single mode.
+            for (int i = 0; i < FileChangesMonitor.s_dirsToMonitor.Length; i++) {
+                string dirName = FileChangesMonitor.s_dirsToMonitor[i];
+                if (StringUtil.StringStartsWithIgnoreCase(fileName, dirName)
+                    && (fileName.Length == dirName.Length || fileName[dirName.Length] == Path.DirectorySeparatorChar)) {
+                    fileMon = (FileMonitor)_fileMons[dirName];
+                    return fileMon != null;
+                }
+            }
+
             // first search for match within s_dirsToMonitor
             for (int i = 0; i < FileChangesMonitor.s_dirsToMonitor.Length; i++) {
                 if (StringUtil.StringStartsWithIgnoreCase(fileName, FileChangesMonitor.s_dirsToMonitor[i])) {
@@ -1240,6 +1253,23 @@ namespace System.Web {
             return false;
         }
 
+
+        // webForCore (#167): path is a folder that was neither created nor written since every target started monitoring.
+        static bool IsFolderUnchangedSinceMonitoringStarted(string path, ArrayList targets) {
+            FileAttributesData fad;
+            if (FileAttributesData.GetFileAttributes(path, out fad) != HResults.S_OK || fad == null
+                || (fad.FileAttributes & FileAttributes.Directory) == 0) {
+                return false;
+            }
+
+            foreach (FileMonitorTarget target in targets) {
+                if (fad.UtcLastWriteTime >= target.UtcStartMonitoring || fad.UtcCreationTime >= target.UtcStartMonitoring) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         //
         // Delegate callback from native code.
@@ -1405,6 +1435,17 @@ namespace System.Web {
                         // ignore if directory
                         ignoreThisChangeNotification = true;
                     }
+                }
+                // webForCore (#167): a folder below a special directory (bin_dotnet\cs, bin\de) reported as modified when
+                // nothing in it changed since monitoring started. On Windows the first opening of a folder that files were
+                // copied into writes its deferred LastWriteTime and reports it (FILE_NOTIFY_CHANGE_LAST_WRITE); the
+                // application opens all of bin's folders while it starts (BuildManager hashes bin recursively), so in
+                // Single mode a freshly copied site restarted at its first request, and Linux reports nothing then. IIS 10
+                // is told of the same folders and restarts for them in some runs and not in others (CI's iis-compare job);
+                // a folder whose LastWriteTime is set after the start restarts it, here as on IIS.
+                else if (isSpecialDirectoryChange && action == FileAction.Modified && targets != null
+                         && IsFolderUnchangedSinceMonitoringStarted(Path.Combine(Directory, fileName), targets)) {
+                    ignoreThisChangeNotification = true;
                 }
 
                 // Dev10 440497: Don't unload AppDomain when a folder is deleted or renamed, unless we're monitoring files in it
