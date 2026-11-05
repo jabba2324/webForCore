@@ -637,7 +637,8 @@ job sends the same requests to the same application as `/app` of an IIS 10 site)
   they reached the application, and one outside it failed with 500.
 - It is the same under `webforcore-host`: the host forwards every URL as the client sent it, and the worker applies
   the path. `UsePathBase("/app")` isn't needed; before `UseWebForms` it does no harm, but on its own it doesn't give the
-  application its path.
+  application its path. Application Initialization's pages (`<applicationInitialization>`, `WebForCore:Host:InitializationPages`)
+  are relative to the application, as on IIS: `/default.aspx` warms up `/app/default.aspx`.
 
 Each IIS application runs as a process of its own on webForCore: the site's other applications are other
 webForCore applications (each with its own `VirtualPath`), behind a proxy that sends each path to its own.

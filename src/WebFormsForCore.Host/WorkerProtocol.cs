@@ -24,7 +24,8 @@ static class WorkerProtocol
 	// the request to the next worker if it has no body.
 	public const string RestartingHeader = "X-WebForCore-Restarting";
 
-	// Control messages, one line each, worker to host: "<token> ready <id>" once the worker serves, and
+	// Control messages, one line each, worker to host: "<token> ready <id> <virtual path>" once the worker serves (the
+	// initialization pages are under the application's path, #190), and
 	// "<token> recycle <id> <drain seconds> <reason>" when the application restarts: the worker finishes its requests,
 	// for up to the drain time (#181), and exits. The host answers "ok" or "error".
 	public const string Ready = "ready";

@@ -102,6 +102,7 @@ namespace Microsoft.AspNetCore.Builder
 			optionsBuilder?.Invoke(new WebFormsOptions(this));
 
 			AppId = ApplicationManager.CreateApplicationId(VirtualPath, PhysicalPath);
+			WorkerProcess.ApplicationVirtualPath = VirtualPath;
 			if (IIS.Enabled)
 			{
 				var webServer = new WebServerConfiguration(PhysicalPath);

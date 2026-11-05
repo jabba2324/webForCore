@@ -70,6 +70,9 @@ namespace WebFormsForCore.Hosting
 
 		public static string WorkerId => id;
 
+		// The application's virtual path, set by WebFormsMiddleware ("/" by default).
+		internal static string ApplicationVirtualPath { get; set; } = "/";
+
 		// Set up by WorkerHostingStartup: the worker serves only on the host's socket (not the application's own endpoints
 		// from --urls or the "Kestrel" configuration section, which are the host's now), applies the host's connection
 		// details before the application's middleware, and talks to the host.
@@ -228,7 +231,9 @@ namespace WebFormsForCore.Hosting
 			{
 				lifetime.ApplicationStarted.Register(() =>
 				{
-					if (!Notify("ready", null, TimeSpan.FromSeconds(10)))
+					// The application's virtual path (UseWebForms(o => o.VirtualPath(...))), under which the host sends the
+					// initialization pages, as IIS takes them relative to the application (#190).
+					if (!Notify("ready", ApplicationVirtualPath, TimeSpan.FromSeconds(10)))
 						logger.LogWarning("Worker {Id}: the host didn't take the ready message.", id);
 				});
 				var watch = new Thread(WatchStdin) { IsBackground = true, Name = "webForCore worker stdin" };

@@ -121,6 +121,20 @@ namespace IISGate
             Assert.Contains("cookie=.ASPXAUTH;path=/;secure=True;httponly=True", body);
         }
 
+        // Application Initialization's pages are relative to the application, as on IIS (#193 with #190): the worker tells
+        // the host its virtual path, and "/Probe.aspx" is sent as /app/Probe.aspx.
+        [Fact]
+        public async Task InitializationPagesAreUnderTheVirtualPath()
+        {
+            using var server = Start(new Dictionary<string, string>
+            {
+                ["WebForCore__Host__InitializationPages__0__InitializationPage"] = "/Probe.aspx",
+            });
+            var (response, _) = await server.Get("/app/Probe.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Matches(@"initialization page /app/Probe\.aspx answered 200", server.Output);
+        }
+
         private static VirtualPathSampleServer Start(IDictionary<string, string> settings) => new VirtualPathSampleServer(settings);
 
         private static async Task<Dictionary<string, string>> Probe(VirtualPathSampleServer server, IDictionary<string, string> headers)

@@ -15,6 +15,8 @@ sealed class Worker : IDisposable
 	public int Id { get; }
 	public string SocketPath { get; }
 	public WorkerState State { get; set; } = WorkerState.Starting;
+	// The application's virtual path without its trailing slash ("" at the root), from its ready message.
+	public string ApplicationPath { get; set; } = "";
 	public DateTime Started { get; } = DateTime.UtcNow;
 	public Process? Process { get; private set; }
 	public HttpMessageInvoker Invoker { get; }

@@ -448,7 +448,8 @@ jobs:
 
       - name: Send the virtual path requests to IIS
         if: ${{ !cancelled() }}
-        run: dotnet run tools/ci/iis_compare.cs -- replay "$RUNNER_TEMP/gate/vpath-responses.json" http://127.0.0.1:8102/ "$RUNNER_TEMP/gate/iis-vpath-responses.json" --warmup=/app/Probe.aspx
+        # MSYS_NO_PATHCONV: Git Bash would make "--warmup=/app/Probe.aspx" a Windows path.
+        run: MSYS_NO_PATHCONV=1 dotnet run tools/ci/iis_compare.cs -- replay "$RUNNER_TEMP/gate/vpath-responses.json" http://127.0.0.1:8102/ "$RUNNER_TEMP/gate/iis-vpath-responses.json" --warmup=/app/Probe.aspx
 
       - name: Compare virtual path
         if: ${{ !cancelled() }}
