@@ -143,6 +143,18 @@ namespace System.Web.Hosting
 				Completed.TrySetResult(true);
 				return;
 			}
+			// webForCore: the request ends with a response ASP.NET chunked itself (classic mode's unbuffered output:
+			// HttpResponse writes Transfer-Encoding: chunked and the chunks, and Kestrel passes them through) but without
+			// its last chunk: sending it failed and the error couldn't be written either (an exception in
+			// PreSendRequestContent, #184's Recycle exception). Kestrel would end the request and keep the connection,
+			// and the client would wait for the rest for ever. The connection is aborted instead, as IIS ends a request
+			// whose response is incomplete: the client sees the response fail, not hang (#184).
+			if (appChunked && !chunkEnded && Context?.Response != null && Context.Response.HasStarted)
+			{
+				Context.Abort();
+				Completed.TrySetResult(true);
+				return;
+			}
 			try
 			{
 				if (Context != null && Context.Response != null)
@@ -690,6 +702,11 @@ namespace System.Web.Hosting
 					return;
 
 
+				case HeaderTransferEncoding:
+					// webForCore: HttpResponse chunks an unbuffered response itself (see EndOfRequest, #184).
+					appChunked = value != null && value.IndexOf("chunked", StringComparison.OrdinalIgnoreCase) >= 0;
+					break;
+
 				// FIX: #12506
 				case HeaderContentType:
 
@@ -711,6 +728,15 @@ namespace System.Web.Hosting
 
 			SendUnknownResponseHeader(GetKnownResponseHeaderName(index), value);
 		}
+
+		// webForCore: whether the response's own chunking (Transfer-Encoding: chunked from HttpResponse) was ended with
+		// its last chunk ("0\r\n\r\n", HttpResponse's s_chunkEnd), which it sends on its own as the final write (#184).
+		bool appChunked;
+		bool chunkEnded;
+
+		static bool EndsWithLastChunk(byte[] data, int length) =>
+			length >= 5 && data[length - 5] == (byte)'0' && data[length - 4] == (byte)'\r' && data[length - 3] == (byte)'\n'
+				&& data[length - 2] == (byte)'\r' && data[length - 1] == (byte)'\n';
 
 		public override void SendResponseFromFile(string filename, long offset, long length)
 		{
@@ -761,6 +787,7 @@ namespace System.Web.Hosting
 					{
 						Context.Response.Body.Write(data, 0, length);
 					}
+					chunkEnded = EndsWithLastChunk(data, length);
 				}
 			}
 		}
@@ -1157,6 +1184,7 @@ namespace System.Web.Hosting
 				f.Seek(offset, SeekOrigin.Begin);
 			}
 
+			chunkEnded = false;
 			using (var noSyncContext = new SafeAsync())
 			{
 				if (length <= MaxChunkLength)
