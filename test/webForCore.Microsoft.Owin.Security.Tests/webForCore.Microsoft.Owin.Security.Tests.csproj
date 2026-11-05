@@ -40,7 +40,11 @@
     <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/CertificateThumbprintValidatorTests.cs" Link="CertificateThumbprintValidatorTests.cs" />
     <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/Cookies/CookieMiddlewareTests.cs" Link="Cookies/CookieMiddlewareTests.cs" />
     <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/DataHandler/Base64UrlTextEncoderTests.cs" Link="DataHandler/Base64UrlTextEncoderTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/Facebook/FacebookMiddlewareTests.cs" Link="Facebook/FacebookMiddlewareTests.cs" />
     <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/Google/GoogleOAuth2MiddlewareTests.cs" Link="Google/GoogleOAuth2MiddlewareTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/JwtHandlerTests.cs" Link="JwtHandlerTests.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/MicrosoftAccount/MicrosoftAccountMiddlewareTests.cs" Link="MicrosoftAccount/MicrosoftAccountMiddlewareTests.cs" />
     <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/OAuth/OAuth2AuthorizationClientCredentialsGrantTests.cs" Link="OAuth/OAuth2AuthorizationClientCredentialsGrantTests.cs" />
     <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/OAuth/OAuth2AuthorizationCustomGrantTests.cs" Link="OAuth/OAuth2AuthorizationCustomGrantTests.cs" />
     <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/OAuth/OAuth2AuthorizationServerAuthorizationCodeGrantTests.cs" Link="OAuth/OAuth2AuthorizationServerAuthorizationCodeGrantTests.cs" />
@@ -48,9 +52,16 @@
     <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/OAuth/OAuth2AuthorizationServerResourceOwnerCredentialsGrantTests.cs" Link="OAuth/OAuth2AuthorizationServerResourceOwnerCredentialsGrantTests.cs" />
     <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/OAuth/OAuth2BearerTokenTests.cs" Link="OAuth/OAuth2BearerTokenTests.cs" />
     <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/OAuth/OAuth2TestServer.cs" Link="OAuth/OAuth2TestServer.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/OpenIdConnect/OpenIdConnectMiddlewareTests.cs" Link="OpenIdConnect/OpenIdConnectMiddlewareTests.cs" />
     <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/Properties/Resources.Designer.cs" Link="Properties/Resources.Designer.cs" />
     <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/SecurityHelperTests.cs" Link="SecurityHelperTests.cs" />
     <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/TestClock.cs" Link="TestClock.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/Microsoft.Owin.Security.Tests/Twitter/TwitterMiddlewareTests.cs" Link="Twitter/TwitterMiddlewareTests.cs" />
+    <!-- Katana's functional test of JwtFormat that needs no host (tests/FunctionalTests deploys the others to IIS Express or
+         HttpListener). X509CertificateTokenVerification isn't built: it signs with whatever certificate with a private key
+         it finds in the machine's or the user's My store, which Microsoft's test machines had and CI's don't. -->
+    <Compile Include="../../external/AspNetKatana/tests/FunctionalTests/Facts/Security/Common/SecurityUtils.cs" Link="FunctionalTests/SecurityUtils.cs" />
+    <Compile Include="../../external/AspNetKatana/tests/FunctionalTests/Facts/Security/Jwt/SymmetricKeyTokenVerification.cs" Link="FunctionalTests/SymmetricKeyTokenVerification.cs" />
     <Compile Include="TestDataProtectionProvider.cs" />
   </ItemGroup>
 
@@ -61,6 +72,12 @@
   <ItemGroup>
     <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security.Cookies/webForCore.Microsoft.Owin.Security.Cookies.csproj" />
     <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security.OAuth/webForCore.Microsoft.Owin.Security.OAuth.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security.Facebook/webForCore.Microsoft.Owin.Security.Facebook.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security.Google/webForCore.Microsoft.Owin.Security.Google.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security.Jwt/webForCore.Microsoft.Owin.Security.Jwt.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security.MicrosoftAccount/webForCore.Microsoft.Owin.Security.MicrosoftAccount.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security.OpenIdConnect/webForCore.Microsoft.Owin.Security.OpenIdConnect.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security.Twitter/webForCore.Microsoft.Owin.Security.Twitter.csproj" />
     <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security.WsFederation/webForCore.Microsoft.Owin.Security.WsFederation.csproj" />
     <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Security/webForCore.Microsoft.Owin.Security.csproj" />
     <ProjectReference Include="../../src/webForCore.Microsoft.Owin.Testing/webForCore.Microsoft.Owin.Testing.csproj" />

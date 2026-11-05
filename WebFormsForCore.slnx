@@ -109,6 +109,14 @@
     <Project Path="src/webForCore.Microsoft.Owin.Security/webForCore.Microsoft.Owin.Security.csproj" />
     <Project Path="src/webForCore.Microsoft.Owin.Security.Cookies/webForCore.Microsoft.Owin.Security.Cookies.csproj" />
     <Project Path="src/webForCore.Microsoft.Owin.Security.OAuth/webForCore.Microsoft.Owin.Security.OAuth.csproj" />
+    <Project Path="src/webForCore.Microsoft.Owin.Security.OpenIdConnect/webForCore.Microsoft.Owin.Security.OpenIdConnect.csproj" />
+    <Project Path="src/webForCore.Microsoft.Owin.Security.Jwt/webForCore.Microsoft.Owin.Security.Jwt.csproj" />
+    <Project Path="src/webForCore.Microsoft.Owin.Security.WsFederation/webForCore.Microsoft.Owin.Security.WsFederation.csproj" />
+    <Project Path="src/webForCore.Microsoft.Owin.Security.ActiveDirectory/webForCore.Microsoft.Owin.Security.ActiveDirectory.csproj" />
+    <Project Path="src/webForCore.Microsoft.Owin.Security.Google/webForCore.Microsoft.Owin.Security.Google.csproj" />
+    <Project Path="src/webForCore.Microsoft.Owin.Security.Facebook/webForCore.Microsoft.Owin.Security.Facebook.csproj" />
+    <Project Path="src/webForCore.Microsoft.Owin.Security.MicrosoftAccount/webForCore.Microsoft.Owin.Security.MicrosoftAccount.csproj" />
+    <Project Path="src/webForCore.Microsoft.Owin.Security.Twitter/webForCore.Microsoft.Owin.Security.Twitter.csproj" />
     <Project Path="src/webForCore.Microsoft.Owin.Host.SystemWeb/webForCore.Microsoft.Owin.Host.SystemWeb.csproj" />
     <Project Path="src/webForCore.Microsoft.Owin.Hosting/webForCore.Microsoft.Owin.Hosting.csproj" />
     <Project Path="src/webForCore.Microsoft.Owin.Host.HttpListener/webForCore.Microsoft.Owin.Host.HttpListener.csproj" />
@@ -136,6 +144,9 @@
     <Project Path="test/webForCore.Microsoft.Owin.Host.SystemWeb.Tests/webForCore.Microsoft.Owin.Host.SystemWeb.Tests.csproj" />
     <Project Path="test/webForCore.WebApi.Sample/webForCore.WebApi.Sample.csproj" />
     <Project Path="test/webForCore.WebApi.Gate.Tests/webForCore.WebApi.Gate.Tests.csproj" />
+    <Project Path="test/webForCore.Oidc.Provider/webForCore.Oidc.Provider.csproj" />
+    <Project Path="test/webForCore.Oidc.Sample/webForCore.Oidc.Sample.csproj" />
+    <Project Path="test/webForCore.Oidc.Gate.Tests/webForCore.Oidc.Gate.Tests.csproj" />
     <Project Path="test/webForCore.System.Web.Mvc.Test/webForCore.System.Web.Mvc.Test.csproj" />
     <Project Path="test/webForCore.Mvc.Sample/webForCore.Mvc.Sample.csproj" />
     <Project Path="test/webForCore.Mvc.Gate.Tests/webForCore.Mvc.Gate.Tests.csproj" />

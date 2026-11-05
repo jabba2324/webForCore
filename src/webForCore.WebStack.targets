@@ -64,7 +64,10 @@
       Microsoft.AspNet.SignalR.Core|99.0.0;Microsoft.AspNet.SignalR.SystemWeb|99.0.0;Microsoft.AspNet.SignalR.Client|99.0.0;
       Microsoft.Owin|99.0.0;Microsoft.Owin.Host.SystemWeb|99.0.0;Microsoft.Owin.Host.HttpListener|99.0.0;
       Microsoft.Owin.Hosting|99.0.0;Microsoft.Owin.Security|99.0.0;Microsoft.Owin.Security.Cookies|99.0.0;
-      Microsoft.Owin.Security.OAuth|99.0.0;Microsoft.Owin.Cors|99.0.0;Microsoft.Owin.Testing|99.0.0
+      Microsoft.Owin.Security.OAuth|99.0.0;Microsoft.Owin.Cors|99.0.0;Microsoft.Owin.Testing|99.0.0;
+      Microsoft.Owin.Security.OpenIdConnect|99.0.0;Microsoft.Owin.Security.Jwt|99.0.0;Microsoft.Owin.Security.WsFederation|99.0.0;
+      Microsoft.Owin.Security.ActiveDirectory|99.0.0;Microsoft.Owin.Security.Google|99.0.0;Microsoft.Owin.Security.Facebook|99.0.0;
+      Microsoft.Owin.Security.MicrosoftAccount|99.0.0;Microsoft.Owin.Security.Twitter|99.0.0
     </_WebForCoreReplacedPackages>
   </PropertyGroup>
   <Target Name="WebForCoreOverrideReplacedPackages" BeforeTargets="_HandlePackageFileConflicts;_HandlePackageFileConflictsForPublish" Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">
