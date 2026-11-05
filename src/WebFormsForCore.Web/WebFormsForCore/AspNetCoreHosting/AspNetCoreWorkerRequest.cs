@@ -31,7 +31,6 @@ namespace System.Web.Hosting
 
 		private const int MaxHeaderBytes = 32 * 1024;
 
-		private static readonly char[] BadPathChars = new[] { '%', '>', '<', ':', '\\' };
 
 		// TODO read default files from web.config
 		private static readonly string[] DefaultFileNames = new[] { "default.aspx", "default.htm", "default.html" };
@@ -272,7 +271,9 @@ namespace System.Web.Hosting
 					request.Headers[name] = transfer.Headers[name];
 			if (transfer.PreserveForm && transfer.Body != null) InsertEntityBody(transfer.Body, 0, transfer.Body.Length);
 			else if (!transfer.PreserveForm) { request.Body = Stream.Null; request.ContentLength = 0; }
-			var next = new AspNetCoreWorkerRequest(Host, Context) { TransferredUser = transfer.User, transferDepth = transferDepth + 1 };
+			// The transferred request's RawUrl is its own URL, as it was before RequestUrlKey (#127).
+			Context.Items[RequestUrlKey] = pathBase + IisPath(request.Path.Value) + request.QueryString.Value;
+			var next =new AspNetCoreWorkerRequest(Host, Context) { TransferredUser = transfer.User, transferDepth = transferDepth + 1 };
 			await next.Process();
 		}
 		readonly object responseLock = new object();
@@ -339,6 +340,10 @@ namespace System.Web.Hosting
 		public override byte[] GetQueryStringRawBytes() => Encoding.ASCII.GetBytes(GetQueryString());
 		public override string GetRawUrl()
 		{
+			// webForCore: the URL the client asked for (RequestUrlKey); this was the parsed path, which a directory
+			// request's default document had rewritten, so FriendlyUrls redirected "/" to "/Default" (#127).
+			if (Context.Items.TryGetValue(RequestUrlKey, out var url) && url is string requestUrl) return requestUrl;
+			ParseRequest();
 			var query = GetQueryString();
 			if (string.IsNullOrEmpty(query)) return path;
 			return $"{path}?{query}";
@@ -445,9 +450,10 @@ namespace System.Web.Hosting
 
 		public override string GetUriPath()
 		{
-			var request = Context.Request;
-			if (string.IsNullOrEmpty(request.Path)) return request.PathBase;
-			else return $"{request.PathBase}/{request.Path}";
+			// webForCore: the decoded path, as IIS's (see IisPath); this was the escaped path base and path, with a '/'
+			// between them that doubled the path's own.
+			ParseRequest();
+			return path;
 		}
 
 		public override IntPtr GetUserToken()
@@ -539,7 +545,13 @@ namespace System.Web.Hosting
 				else
 				{
 					// inside app but not the app path itself
-					mappedPath = Path.Combine(Host.PhysicalPath, path.Substring(Host.NormalizedVirtualPath.Length));
+					string relative = path.Substring(Host.NormalizedVirtualPath.Length);
+					mappedPath = Path.Combine(Host.PhysicalPath, relative);
+					// webForCore: the file in any case, as on IIS's file system and as HostingEnvironment.MapPath finds it
+					// (UserMapPath). Request.PhysicalPath was the URL's case, so a static file asked for in another case
+					// was 404 until a request in its own case had cached the mapping (#140).
+					if (!OperatingSystem.IsWindows() && !File.Exists(mappedPath) && !Directory.Exists(mappedPath))
+						mappedPath = System.Web.Configuration.UserMapPath.ResolveIgnoreCase(Host.PhysicalPath, relative);
 				}
 			}
 			else
@@ -845,26 +857,15 @@ namespace System.Web.Hosting
 			}
 		}
 
+		// webForCore: only a ".." segment, which Kestrel removes before the path gets here (as http.sys does). This was
+		// Cassini's check of '%', '<', '>', ':', '\\', ".." and "//" anywhere in the path, answered with an empty 400: on
+		// IIS the characters of <httpRuntime requestPathInvalidCharacters> get ASP.NET's 400 ("A potentially dangerous
+		// Request.Path value was detected"), which System.Web's request validation gives here too, double escapes get
+		// request filtering's 404.11 (IISModules), and the rest are served (#126).
 		private bool IsBadPath()
 		{
 			ParseRequest();
-
-			if (path.IndexOfAny(BadPathChars) >= 0)
-			{
-				return true;
-			}
-
-			if (CultureInfo.InvariantCulture.CompareInfo.IndexOf(path, "..", CompareOptions.Ordinal) >= 0)
-			{
-				return true;
-			}
-
-			if (CultureInfo.InvariantCulture.CompareInfo.IndexOf(path, "//", CompareOptions.Ordinal) >= 0)
-			{
-				return true;
-			}
-
-			return false;
+			return path.Split('/').Any(segment => segment == "..");
 		}
 
 		private bool IsRequestForRestrictedDirectory()
@@ -1037,21 +1038,58 @@ namespace System.Web.Hosting
 			} */
 		}
 
+		// webForCore: the request's URL as IIS gives it to ASP.NET (#126, #127). http.sys decodes the path (PATH_INFO,
+		// Request.Path: "/Product/Convertible Car"), an escaped '/' included, turns '\' into '/' and merges repeated
+		// slashes. Kestrel decodes it too, but keeps "%2F"; only a "%2F" the client sent is decoded here, so that "%252F",
+		// which Kestrel decodes to "%2F", stays a double escape for request filtering. The worker request had the escaped
+		// form (PathString.ToString()), whose '%' made every escaped request an empty 400 before it reached the application.
+		internal static string IisPath(string path, bool escapedSlashes = false)
+		{
+			if (string.IsNullOrEmpty(path)) return "/";
+			if (escapedSlashes) path = path.Replace("%2F", "/", StringComparison.OrdinalIgnoreCase);
+			path = path.Replace('\\', '/');
+			while (path.Contains("//", StringComparison.Ordinal)) path = path.Replace("//", "/", StringComparison.Ordinal);
+			return path;
+		}
+
+		// HttpRequest.RawUrl: IIS's CACHE_URL, the URL as the client asked for it, decoded and normalised as above, with
+		// the query string as it was sent; unaffected by rewriting, so a directory request's RawUrl is "/" while its Path
+		// is the default document's (#127). WebFormsMiddleware records it before the IIS modules run.
+		public const string RequestUrlKey = "webForCore.RequestUrl";
+
+		internal static void BeginRequest(Core.HttpContext context)
+		{
+			var request = context.Request;
+			var rawTarget = context.Features.Get<Microsoft.AspNetCore.Http.Features.IHttpRequestFeature>()?.RawTarget ?? "";
+			int query = rawTarget.IndexOf('?');
+			var rawPath = query >= 0 ? rawTarget.Substring(0, query) : rawTarget;
+			var normalized = IisPath(request.Path.Value, rawPath.Contains("%2F", StringComparison.OrdinalIgnoreCase));
+			if (normalized != request.Path.Value) request.Path = new Core.PathString(normalized);
+			context.Items.TryAdd(RequestUrlKey, (request.PathBase.Value ?? "") + normalized + request.QueryString.Value);
+		}
+
 		bool requestParsed = false;
 		private void ParseRequest()
 		{
 			if (!requestParsed)
 			{
-				path = $"{Context.Request.PathBase}{Context.Request.Path}";
+				path = (Context.Request.PathBase.Value ?? "") + IisPath(Context.Request.Path.Value);
 
-				int lastDot = path.LastIndexOf('.');
-				int lastSlh = path.LastIndexOf('/');
-
-				if (lastDot >= 0 && lastSlh >= 0 && lastDot < lastSlh)
+				// webForCore: the script is the first segment with an extension of a managed handler, as IIS maps it
+				// ("/Page.aspx/a.b/c": FilePath "/Page.aspx", PathInfo "/a.b/c"). This took the last dot's segment, and
+				// "/Page.aspx/extra/path" was 404.
+				int scriptEnd = -1;
+				for (int slash = path.IndexOf('/', 1); slash > 0; slash = path.IndexOf('/', slash + 1))
 				{
-					int ipi = path.LastIndexOf('/', path.Length-1, path.Length - lastDot - 1); 
-					filePath = path[..ipi];
-					pathInfo = path[ipi..];
+					var prefix = path.Substring(0, slash);
+					if (Host.HandleExtensions.Any(ext => prefix.EndsWith(ext, StringComparison.OrdinalIgnoreCase))) scriptEnd = slash;
+					if (scriptEnd > 0) break;
+				}
+
+				if (scriptEnd > 0)
+				{
+					filePath = path[..scriptEnd];
+					pathInfo = path[scriptEnd..];
 				}
 				else
 				{

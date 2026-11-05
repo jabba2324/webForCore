@@ -120,8 +120,9 @@ namespace System.Web.Configuration {
 
         // Given a path and a VirtualDirectoryMapping, return the corresponding
         // physical path.
-        // webForCore: see GetPhysicalPathForPath. Segments that do not exist in any case are kept as given.
-        static string ResolveIgnoreCase(string directory, string relativePath) {
+        // webForCore: see GetPhysicalPathForPath; also the hosting layer's paths of a request (#140). Segments that do not
+        // exist in any case are kept as given.
+        internal static string ResolveIgnoreCase(string directory, string relativePath) {
             string current = directory;
             string[] segments = relativePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
             for (int i = 0; i < segments.Length; i++) {
