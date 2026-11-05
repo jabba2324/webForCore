@@ -353,5 +353,62 @@ namespace IISGate
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Contains("vb page: Int32 42\n", body);
         }
+
+        // #128: Server.MachineName threw DllNotFoundException off Windows (kernel32's GetComputerName). AspNetDocs' Wingtip
+        // Toys: ELMAH's /elmah.axd/rss and /elmah.axd/json failed, and /elmah.axd answered with an empty page. On .NET
+        // Framework it is GetComputerName's name, as Environment.MachineName and health monitoring's are there.
+        [Fact]
+        public async Task ServerMachineNameIsTheMachinesName()
+        {
+            var (response, body) = await Get("/regressions/MachineName.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("server: " + Environment.MachineName + "\n", body);
+            Assert.Contains("wrapper: " + Environment.MachineName + "\n", body);
+            Assert.Contains("environment: " + Environment.MachineName + "\n", body);
+            Assert.Contains("health monitoring: " + Environment.MachineName + "\n", body);
+        }
+
+        // #137: BuildManager.GetType(typeName, throwOnError: false) with an assembly-qualified name whose assembly isn't
+        // deployed threw FileNotFoundException; on .NET Framework it returns null, as Type.GetType(typeName, false) does.
+        // DNN Platform 9 failed at start twice: ClientDependency's module (BuildManager.GetType(type, false, true) for
+        // its MVC filter, in ClientDependency.Core.Mvc, which DNN doesn't deploy) and DNN's provider registration (the
+        // providers of packages that aren't installed). With throwOnError: true, the exceptions are .NET Framework's.
+        [Fact]
+        public async Task GetTypeWithoutThrowOnErrorReturnsNullForAMissingAssembly()
+        {
+            var (response, body) = await Get("/regressions/GetTypeMissing.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var lines = body.Split('\n');
+            Assert.Contains("missing assembly: null", lines);
+            Assert.Contains("missing assembly, ignoreCase: null", lines);
+            Assert.Contains("missing generic argument: null", lines);
+            Assert.Contains("missing type: null", lines);
+            Assert.Contains("present: found System.Web.HttpContext", lines);
+            Assert.Contains("present, ignoreCase: found System.Web.HttpContext", lines);
+            Assert.Contains("missing assembly, throwOnError: System.IO.FileNotFoundException", lines);
+            Assert.Contains("missing type, throwOnError: System.TypeLoadException", lines);
+            Assert.Contains("malformed: null", lines);
+            Assert.Contains("malformed generic: null", lines);
+            Assert.Contains("Type.GetType missing assembly: null", lines);
+            Assert.Contains("Type.GetType missing assembly, ignoreCase: null", lines);
+            Assert.Contains("Type.GetType missing assembly, throwOnError: System.IO.FileNotFoundException", lines);
+        }
+
+        // #147: the <probing privatePath> of the application's Web.config wasn't applied, so Assembly.Load of an
+        // assembly that is only in such a folder failed. Orchard 1.10 copies every module to App_Data/Dependencies and
+        // loads it by name: no module loaded. The folders are relative to the application's, and fusion probes none
+        // outside it.
+        [Fact]
+        public async Task ProbingPrivatePathFoldersAreSearched()
+        {
+            var (response, body) = await Get("/regressions/Probing.aspx");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var lines = body.Split('\n');
+            Assert.Contains("Assembly.Load: bin_dotnet/probed/ProbedLib.dll", lines);
+            Assert.Contains("Type.GetType: hello from a privatePath folder", lines);
+            Assert.Contains("BuildManager.GetType: ProbedLib.Greeting", lines);
+            Assert.Contains("outside the site: System.IO.FileNotFoundException", lines);
+            Assert.Contains("outside the site, Type.GetType: null", lines);
+        }
     }
 }

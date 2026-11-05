@@ -442,7 +442,11 @@ namespace WebFormsForCore.CodeDom.Compiler
 #else
 				//results.CompiledAssembly = Assembly.Load(assemblyBuff, symbolsBuff);
 				var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
-				results.CompiledAssembly = alc.LoadFromStream(new MemoryStream(assemblyBuff), new MemoryStream(symbolsBuff));
+				// webForCore: without a PDB (no debug information), no symbol stream, as Assembly.Load(assemblyBuff, null)
+				// takes none on .NET Framework; new MemoryStream(null) threw ArgumentNullException (#135).
+				results.CompiledAssembly = symbolsBuff == null
+					? alc.LoadFromStream(new MemoryStream(assemblyBuff))
+					: alc.LoadFromStream(new MemoryStream(assemblyBuff), new MemoryStream(symbolsBuff));
 #endif
 #pragma warning restore 618
 

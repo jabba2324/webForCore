@@ -180,7 +180,28 @@ commit that made it, and its issue, say why.
 - **Paths with `/` as the separator:** `configSource` paths written with `\` resolve on Linux
   (`InternalConfigHost.StaticGetStreamNameForConfigSource`, #26), and `/` no longer makes a mapped physical path invalid
   under `relaxedUrlToFileSystemMapping` (`HttpRuntime.s_InvalidPhysicalPathChars`, #27).
+- **Assembly loading** (`AspNetCoreHosting/AssemblyLoaderNetCore.cs`): where the reference source calls
+  `Type.GetType(typeName, throwOnError, ...)`, the port passes an assembly resolver for the application's load
+  context, and .NET's `Type.GetType` lets a resolver's exceptions through whatever `throwOnError` says. The resolver
+  (`AssemblyLoaderNetCore.TypeAssemblyResolver`) returns null for an assembly that isn't there unless `throwOnError`,
+  so `BuildManager.GetType(name, false)` and the other non-throwing lookups (`HttpProfileBase`, `StateManagedCollection`,
+  `HttpStaticObjectsCollection`, `HostingEnvironment`, `ApplicationManager`) return null, as on .NET Framework (#137,
+  DNN and ClientDependency). `HttpRuntime.InitFusion` reads `<runtime><assemblyBinding><probing privatePath>` from the
+  application's web.config, and the load context's resolver searches those folders after the build output, in fusion's
+  order (#147, Orchard; [NAMESPACES.md](NAMESPACES.md)).
 - **System.Web.DynamicData** (`src/WebFormsForCore.Web.DynamicData`, now built and in the "Always" set): the Entity
   Framework 1–4 and LINQ to SQL model providers, `LinqDataSource`/`EntityDataSource` hookups and EF 5 spatial column
   types are compiled out (`#if NETFRAMEWORK`); `AssemblyRef.cs` and `ScaffoldTableAttribute` (which .NET dropped) are
   added (#8).
+- **No kernel32 for the machine name** (`HttpServerUtility.GetMachineNameInternal`): `Environment.MachineName` instead of
+  `GetComputerName`, which threw `DllNotFoundException` off Windows (ELMAH's log pages, #128). On Windows .NET reads it
+  with `GetComputerName` too. The P/Invoke declaration is left in `UnsafeNativeMethods.cs`, unused.
+- **aspnet_regsql's scripts as resources** (`Management/SqlServices.cs`, `WebFormsForCore/SqlScripts.cs`): `SqlServices`
+  reads `InstallCommon.sql` and the others from System.Web's resources, which are .NET Framework 4.8's files
+  (`FrameworkData/Sql`, read as data from its folder on a Windows CI runner: referencesource doesn't have them), with
+  the name matched without case, as Windows does (`InstallProfile.SQL`). It read them from
+  `HttpRuntime.AspInstallDirectory`, .NET's folder on webForCore, which has none (#123). `webforcore-regsql`
+  (`src/WebFormsForCore.RegSql`) is webForCore's own aspnet_regsql, on `SqlServices`.
+- **CodeDom provider** (`WebFormsForCore/CodeDom`, from Microsoft's RoslynCodeDomProvider): `CompilerOptions` may be
+  null (the `/nowarn:` check webForCore added didn't allow it), and an assembly compiled in memory without a PDB is
+  loaded without a symbol stream, as `Assembly.Load(byte[], null)` was on .NET Framework (#135).

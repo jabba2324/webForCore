@@ -1116,6 +1116,11 @@ namespace System.Web
             // Allow assemblies from 'bin' to be loaded
             appDomain.AppendPrivatePath(appDomainAppPath + BinDirectoryName);
 #pragma warning restore 0618
+#if !NETFRAMEWORK
+            // webForCore: and from the folders of <probing privatePath> in the application's Web.config, which fusion
+            // read as the AppDomain's configuration file (#147).
+            AssemblyLoaderNetCore.ReadPrivatePath(appDomainAppPath);
+#endif
 
             // If shadow copying was disabled via config, turn it off (DevDiv 30864)
             if (hostingEnvironmentSection != null && !hostingEnvironmentSection.ShadowCopyBinAssemblies) {

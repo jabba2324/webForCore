@@ -220,7 +220,7 @@ namespace System.Web {
                     bool lateBound = reader.ReadBoolean();
                     var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
                     entry = new HttpStaticObjectsEntry(name, Type.GetType(typename,
-                        assemblyName => alc.LoadFromAssemblyName(assemblyName),
+                        System.Web.Hosting.AssemblyLoaderNetCore.TypeAssemblyResolver(alc, false),
                         (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase))
                         ), lateBound);
                 }

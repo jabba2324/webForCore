@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- #147: an assembly the IIS sample doesn't reference. Its build copies it to bin_dotnet/probed, a folder its
+       web.config names in <probing privatePath>, as Orchard copies its modules to App_Data/Dependencies. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>ProbedLib</AssemblyName>
+    <RootNamespace>ProbedLib</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <OutputPath>bin_dotnet</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+</Project>

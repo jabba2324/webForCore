@@ -23,6 +23,10 @@
     <Compile Include="..\Shared\WebForCoreHost.cs" Link="WebForCoreHost.cs" />
     <!-- webforcore-regiis, run by ProtectedConfigurationTests. -->
     <ProjectReference Include="..\..\src\WebFormsForCore.RegIIS\WebFormsForCore.RegIIS.csproj" ReferenceOutputAssembly="false" />
+    <!-- What .NET Framework 4.8 gave: aspnet_regsql -sqlexportonly (SqlServicesTests, #123), CodeDom (CodeDomTests, #135). -->
+    <None Include="FrameworkData\*" CopyToOutputDirectory="PreserveNewest" />
+    <!-- webforcore-regsql, run by SqlServicesTests. -->
+    <ProjectReference Include="..\..\src\WebFormsForCore.RegSql\WebFormsForCore.RegSql.csproj" ReferenceOutputAssembly="false" />
     <!-- aspnet_compiler and the host for the precompiled site, run by PrecompilationTests. -->
     <ProjectReference Include="..\..\src\WebFormsForCore.AspNetCompiler\WebFormsForCore.AspNetCompiler.csproj" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\webForCore.Precompiled.Host\webForCore.Precompiled.Host.csproj" ReferenceOutputAssembly="false" />

@@ -198,7 +198,8 @@ namespace System.Web.Management {
         public static string GenerateSessionStateScripts(bool install, SessionStateType type, string customDatabase) {
             SessionStateParamCheck(type, ref customDatabase);
             string  fullpath = Path.Combine(HttpRuntime.AspInstallDirectory, install ? SESSION_STATE_INSTALL_FILE : SESSION_STATE_UNINSTALL_FILE);
-            string  content  = File.ReadAllText(fullpath);
+            // webForCore: .NET Framework's scripts are System.Web's resources; .NET's folder has none (#123).
+            string  content  = SqlScripts.ReadAllText(install ? SESSION_STATE_INSTALL_FILE : SESSION_STATE_UNINSTALL_FILE);
             return FixContent(content, customDatabase, null, true, type);
         }
 
@@ -394,7 +395,8 @@ namespace System.Web.Management {
             )
         {
             string          fullpath = Path.Combine(HttpRuntime.AspInstallDirectory, file);
-            string          content = File.ReadAllText(fullpath);
+            // webForCore: .NET Framework's scripts are System.Web's resources; .NET's folder has none (#123).
+            string          content = SqlScripts.ReadAllText(file);
             StringReader    sr;
             string          cmdText = null;
             string          cur;
@@ -541,7 +543,8 @@ namespace System.Web.Management {
 
             foreach (string sqlFile in files) {
                 string fullpath = Path.Combine(HttpRuntime.AspInstallDirectory, sqlFile);
-                content = File.ReadAllText(fullpath);
+                // webForCore: .NET Framework's scripts are System.Web's resources; .NET's folder has none (#123).
+                content = SqlScripts.ReadAllText(sqlFile);
                 sb.Append(FixContent(content, database, null, false, SessionStateType.Temporary));
             }
 

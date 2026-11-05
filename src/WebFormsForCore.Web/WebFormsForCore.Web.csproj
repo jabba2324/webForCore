@@ -51,6 +51,11 @@
         <EmbeddedResource Include="*.bmp">
             <LogicalName>%(FileName)%(Extension)</LogicalName>
         </EmbeddedResource>
+        <!-- webForCore: .NET Framework 4.8's SQL scripts for SqlServices and webforcore-regsql (aspnet_regsql), read
+             as data from its folder (%WINDIR%\Microsoft.NET\Framework64\v4.0.30319), which .NET doesn't have (#123). -->
+        <EmbeddedResource Include="FrameworkData\Sql\*">
+            <LogicalName>System.Web.Management.Sql.%(FileName)%(Extension)</LogicalName>
+        </EmbeddedResource>
         <EmbeddedResource Include="*.resx">
             <LogicalName>%(FileName).resources</LogicalName>
         </EmbeddedResource>

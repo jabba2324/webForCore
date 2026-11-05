@@ -1,3 +1,4 @@
+| webforcore-regsql | aspnet_regsql: the SQL providers' database, session state, SQL cache dependency (#123) |
 # Implemented namespaces and their caveats
 
 This page lists, assembly by assembly, the .NET Framework and ASP.NET namespaces webForCore provides on .NET 10, and
@@ -49,7 +50,7 @@ in the code; the rest come from the test suites and gates ([TESTING.md](TESTING.
 
 | Namespace | Types (approx.) | Notes |
 | --- | ---: | --- |
-| `System.Web` | 107 | `HttpContext`, `HttpRequest`, `HttpResponse`, `HttpApplication`, `HttpUtility` (Microsoft's, with `<httpRuntime encoderType>`), the `*Base`/`*Wrapper` abstractions |
+| `System.Web` | 107 | `HttpContext`, `HttpRequest`, `HttpResponse`, `HttpApplication`, `HttpUtility` (Microsoft's, with `<httpRuntime encoderType>`), the `*Base`/`*Wrapper` abstractions. `Server.MachineName` is `Environment.MachineName`: on Windows the computer name, as on .NET Framework (both read `GetComputerName`; Windows keeps its case); on Linux the host name up to its first dot, not upper-cased or cut to NetBIOS's 15 characters (#128) |
 | `System.Web.UI` | 187 | Pages, controls, master pages, themes, view state |
 | `System.Web.UI.WebControls` | 413 | All the server controls, including GridView, ListView, DetailsView, FormView, Login controls, Menu, TreeView, SqlDataSource (System.Data.SqlClient), ObjectDataSource, XmlDataSource |
 | `System.Web.UI.WebControls.WebParts` | 120 | Web Parts and personalization |
@@ -114,6 +115,16 @@ Caveats:
   `<connectionManagement>` (.NET doesn't limit connections per server, which is also what ASP.NET's `autoConfig`
   set), `<settings>`, `<webRequestModules>`, `<authenticationModules>`, `<requestCaching>`, and proxy
   auto-detection or scripts (WPAD, PAC).
+- **`<runtime><assemblyBinding>`:** on .NET Framework the application's AppDomain had web.config as its configuration
+  file, and fusion read `<runtime>` from it. webForCore applies `<probing privatePath>` (#147): its folders,
+  separated by `;` and relative to the site's folder, are searched after the build output, in fusion's order
+  (`name.dll`, then `name/name.dll`, in a culture's subfolder for a satellite assembly, in every folder, then the same
+  with `.exe`). As in fusion, only an `<assemblyBinding>` in the `urn:schemas-microsoft-com:asm.v1` namespace counts,
+  and a folder that is rooted or leads out of the site's folder is skipped. `<dependentAssembly><bindingRedirect>`
+  isn't needed for the redirects NuGet writes: .NET binds a request for a version at or below the deployed one to the
+  deployed one. A redirect *down* to a lower version than the one requested, and `<codeBase>`, aren't applied (#158).
+  `<publisherPolicy>` and `<qualifyAssembly>` are moot on .NET (no GAC publisher policy; partial names load by simple
+  name). The rest of `<runtime>` isn't read: .NET takes runtime settings from `runtimeconfig.json`.
 - **What .NET Framework's machine had:** .NET Framework has every Windows code page and registers SqlClient, OleDb and
   ODBC in machine.config; .NET has neither. System.Web registers `CodePagesEncodingProvider` (so
   `requestEncoding="windows-1252"` works), reads files without a BOM in the ANSI code page when `fileEncoding` isn't
