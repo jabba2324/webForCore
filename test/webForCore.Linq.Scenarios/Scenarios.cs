@@ -10,7 +10,8 @@ namespace LinqScenarios
     // does (every input with its value, checked check boxes, __EVENTTARGET and __EVENTARGUMENT from the link's
     // __doPostBack call). The recorded body is the page's form without what differs between servers by design: the
     // values of __VIEWSTATE and __EVENTVALIDATION (protected with each server's machine key) and WebResource.axd's
-    // d and t parameters.
+    // d and t parameters; __VIEWSTATEGENERATOR's value is recorded on its own, as "(__VIEWSTATEGENERATOR)" beside the
+    // headers.
     public static class Scenarios
     {
         public static async Task<SortedDictionary<string, JsonObject>> RunAsync(HttpClient client)
@@ -126,6 +127,10 @@ namespace LinqScenarios
                 string body = await response.Content.ReadAsStringAsync();
                 var headers = new JsonObject();
                 if (response.Content.Headers.ContentType != null) headers["Content-Type"] = response.Content.Headers.ContentType.ToString();
+                // The page's __VIEWSTATEGENERATOR, out of the body, under a name of its own: it differs from IIS's
+                // (tools/ci/iis-known-differences-linq.json), and everything else in the form must not.
+                Match generator = Regex.Match(body, "id=\"__VIEWSTATEGENERATOR\" value=\"([^\"]*)\"");
+                if (generator.Success) headers["(__VIEWSTATEGENERATOR)"] = generator.Groups[1].Value;
                 _results["linq " + key] = new JsonObject
                 {
                     ["request"] = new JsonObject
@@ -153,7 +158,7 @@ namespace LinqScenarios
         {
             Match form = Regex.Match(body, @"<form[\s\S]*</form>");
             string text = form.Success ? form.Value : body;
-            text = Regex.Replace(text, @"(id=""__(VIEWSTATE|EVENTVALIDATION)"" value="")[^""]*""", "$1(...)\"");
+            text = Regex.Replace(text, @"(id=""__(VIEWSTATE|VIEWSTATEGENERATOR|EVENTVALIDATION)"" value="")[^""]*""", "$1(...)\"");
             text = Regex.Replace(text, @"(WebResource\.axd\?d=)[^""&]*(&amp;t=)\d+", "$1(...)$2(...)");
             return text;
         }

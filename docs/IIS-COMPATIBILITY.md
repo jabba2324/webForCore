@@ -269,8 +269,14 @@ by the data source, `Selecting`, `Updating`, `Updated`, `Inserted` and `Deleted`
 edit, update (and fail with LINQ to SQL's `ChangeConflictException` on a row whose `rowversion` changed), delete and
 insert, `AutoGenerateWhereClause` with a `Select` projection, a `Selecting` handler's own `e.Result`, and Dynamic Data's
 `MetaModel.RegisterContext` with the `DataContext`. Each page's form is compared, apart from the values of `__VIEWSTATE`
-and `__EVENTVALIDATION` (each server's machine key protects them) and `WebResource.axd`'s parameters;
-`tools/ci/iis-known-differences-linq.json` lists no difference.
+and `__EVENTVALIDATION` (each server's machine key protects them) and `WebResource.axd`'s parameters. Every page,
+grid row, pager, edit box, event log line and the conflict's message are the same as IIS's; the one difference, which
+`tools/ci/iis-known-differences-linq.json` lists, is `__VIEWSTATEGENERATOR`'s value (`D1602CB0` on IIS, `73C738F5` on
+webForCore for `linq/Products.aspx`): `Page.GetClientStateIdentifier` hashes the page's directory and class name with
+`StringUtil.GetNonRandomizedHashCode`, which on .NET Framework is `StringComparer.InvariantCultureIgnoreCase.GetHashCode`
+(Windows' NLS sort keys) and on webForCore System.Web's own stable hash. System.Web reads the value back only when a
+postback's view state fails its MAC check, to tell an error in the page's own view state (reported) from view state
+meant for another page (ignored): a page posted back to the server that rendered it isn't affected.
 
 How each part came to be is in git: the fork commits in `external/` and this repository's history
 ([MODIFICATIONS.md](MODIFICATIONS.md)).
