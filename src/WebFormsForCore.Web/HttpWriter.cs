@@ -88,22 +88,30 @@ namespace System.Web {
      */
     internal sealed class HttpResponseBufferElement : HttpBaseMemoryResponseBufferElement, IHttpResponseElement {
 
-        const int BufferSize = BufferingParams.OUTPUT_BUFFER_SIZE;
-        private ArrayPool<byte> Pool = ArrayPool<byte>.Shared;
         private byte[] _data;
 
-        internal HttpResponseBufferElement()
-        {
-            _data = Pool.Rent(BufferSize);
+        // webForCore: .NET has no unmanaged buffer pool (HttpResponseUnmanagedBufferElement), so the writer's output
+        // buffers are managed ones rented from ArrayPool.Shared (CreateNewMemoryBufferElement). Only those go back to
+        // the pool, and only while recyclable, as the unmanaged ones: a buffer the output cache keeps (GetSnapshot's
+        // DisableRecycling) stays the cache's. The arrays the other constructor wraps (FlushCharBuffer's, Clone's,
+        // Substitute's, the output cache's) aren't the pool's: the GC frees them, as on .NET Framework. Returning
+        // those threw "The buffer is not associated with this pool" for every unbuffered Response.Write, or handed an
+        // array the response or the cache still used to another response (#184).
+        private const int PooledBufferSize = BufferingParams.OUTPUT_BUFFER_SIZE;
+        private readonly bool _pooled;
+
+        internal HttpResponseBufferElement() {
+            _data = ArrayPool<byte>.Shared.Rent(PooledBufferSize);
+            _pooled = true;
             _size = _data.Length;
             _free = _size;
-            _recycle = false;
+            _recycle = true;
         }
-		
+
         /*
          * Constructor that accepts the data buffer and holds on to it
          */
-		internal HttpResponseBufferElement(byte[] data, int size) {
+        internal HttpResponseBufferElement(byte[] data, int size) {
             _data = data;
             _size = size;
             _free = 0;
@@ -123,9 +131,15 @@ namespace System.Web {
         }
 
         internal override void Recycle() {
-            Pool.Return(_data);
-            _data = null;
-            _free = 0;
+            // webForCore: the pool's buffer goes back, as HttpResponseUnmanagedBufferElement.Recycle (#184).
+            if (_pooled && _recycle) {
+                byte[] data = Interlocked.Exchange(ref _data, null);
+                if (data != null) {
+                    _free = 0;
+                    _recycle = false;
+                    ArrayPool<byte>.Shared.Return(data);
+                }
+            }
         }
 
         internal override int Append(byte[] data, int offset, int size) {
@@ -166,6 +180,18 @@ namespace System.Web {
          * Get bytes (for filtering)
          */
         byte[] IHttpResponseElement.GetBytes() {
+            // webForCore: a pool's buffer is longer than its content and goes back to the pool, so its bytes are
+            // copied, as HttpResponseUnmanagedBufferElement.GetBytes does. The output cache keeps the whole array
+            // (OutputCache.Convert, for a provider of the application's own): it sent the rest of the buffer, another
+            // response's bytes, with the page (#184).
+            if (_pooled) {
+                int n = _size - _free;
+                if (n == 0)
+                    return null;
+                byte[] data = new byte[n];
+                Buffer.BlockCopy(_data, 0, data, 0, n);
+                return data;
+            }
             return _data;
         }
 
@@ -177,8 +203,6 @@ namespace System.Web {
             if (n > 0)
                 wr.SendResponseFromMemory(_data, n);
         }
-
-        
     }
 
 #if !FEATURE_PAL // FEATURE_PAL does not enable IIS-based hosting features
@@ -917,11 +941,11 @@ namespace System.Web {
 #if NETFRAMEWORK
             return new HttpResponseUnmanagedBufferElement(); /* using unmanaged buffers */
 #else
-			return new HttpResponseBufferElement();
+            return new HttpResponseBufferElement(); // webForCore: a buffer rented from ArrayPool.Shared (#184)
 #endif
         }
 
-		internal void DisposeIntegratedBuffers() {
+        internal void DisposeIntegratedBuffers() {
             Debug.Assert(HttpRuntime.UseIntegratedPipeline);
 
             // don't recycle char buffers here (ClearBuffers will)

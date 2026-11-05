@@ -60,5 +60,35 @@ namespace MvcGate
 
             Assert.Equal(404, (int)response.StatusCode);
         }
+
+        [Fact]
+        public async Task OutOfProcessSessionState()
+        {
+            // The sample's session state is UseAspNetCoreSessionProvider()'s, in place of Web.config's StateServer: the
+            // session is found again by <sessionState cookieName>, the only cookie, as on IIS.
+            var get = new HttpRequestMessage(HttpMethod.Get, "/Visits");
+            HttpResponseMessage first = await _server.Client.SendAsync(get);
+            Assert.Equal("visits=1", (await first.Content.ReadAsStringAsync()).Trim());
+            string cookie = Assert.Single(first.Headers.GetValues("Set-Cookie"));
+            Assert.StartsWith("WebPagesSample_SessionId=", cookie);
+
+            var again = new HttpRequestMessage(HttpMethod.Get, "/Visits");
+            again.Headers.Add("Cookie", cookie.Substring(0, cookie.IndexOf(';')));
+            Assert.Equal("visits=2", (await (await _server.Client.SendAsync(again)).Content.ReadAsStringAsync()).Trim());
+        }
+
+        [Fact]
+        public async Task OutOfProcessSessionStateNeedsSerializableValues()
+        {
+            // #180: out of process, as with StateServer and SQLServer on IIS, every session value is serialized at the end
+            // of the request, and one that isn't [Serializable] fails the request with ASP.NET's error. In-process session
+            // state (the default) keeps the object itself (GateTests.InProcSessionStateKeepsTheObjectsThemselves).
+            HttpResponseMessage response = await _server.Client.GetAsync("/Visits?keep=unserializable");
+
+            Assert.Equal(500, (int)response.StatusCode);
+            string body = await response.Content.ReadAsStringAsync();
+            Assert.Contains("Unable to serialize the session state", body);
+            Assert.Contains("is not marked as serializable", body);
+        }
     }
 }

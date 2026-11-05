@@ -504,12 +504,10 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddWebForms();                 // IIS compression, W3C logging
-        builder.Services.AddDistributedMemoryCache();   // session state (or Redis, SQL Server, ...)
 
         var app = builder.Build();
         app.UseWebForms(o => o
-            .HandleAllRequestsWithWebForms()            // routing, extensionless URLs, static files through IIS rules
-            .UseAspNetCoreSessionProvider());
+            .HandleAllRequestsWithWebForms());          // routing, extensionless URLs, static files through IIS rules
         app.Run();
     }
 }
@@ -518,14 +516,42 @@ public class Program
 Without `HandleAllRequestsWithWebForms()`, only ASP.NET's own extensions (`.aspx`, `.ashx`, `.asmx`, `.axd`, ...)
 reach System.Web, and ASP.NET Core serves everything else.
 
+Session state needs nothing here when it was in process on IIS (`<sessionState mode="InProc">`, or no `mode`: the
+default). Only an application whose session state was out of process adds a distributed cache and
+`UseAspNetCoreSessionProvider()` ("Session state", next).
+
 ### Session state
 
-`UseAspNetCoreSessionProvider()` keeps session state in ASP.NET Core's distributed cache (`IDistributedCache`), as
-`<sessionState mode="StateServer">` or `"SQLServer"` kept it out of process on IIS: `AddDistributedMemoryCache()` for
-one server, `AddStackExchangeRedisCache(...)` or `AddDistributedSqlServerCache(...)` to share it between servers. Without
-it, session state is in process (`mode="InProc"`, the default), and is lost when the application restarts. The rest is
-`<sessionState>`'s, as on IIS:
+**In process (`mode="InProc"`, the default), as on IIS.** With no `UseAspNetCoreSessionProvider()`, System.Web's
+`SessionStateModule` keeps sessions in its own `InProcSessionStateStore` (.NET Framework 4.8's, unchanged), in the
+application's cache: a value is the object the application stored, not a copy, so it needn't be serializable
+(MVC's `TempData` included), and sessions are lost when the application restarts (a recycle,
+a `web.config` change), as on IIS. Keep it this way for an application that ran in process on IIS, which is most of
+them: changing it would make every session value go through `BinaryFormatter` (#180).
 
+**Out of process: `UseAspNetCoreSessionProvider()`.** It keeps session state in ASP.NET Core's distributed cache
+(`IDistributedCache`), as `<sessionState mode="StateServer">` or `"SQLServer"` kept it out of process on IIS. Use it
+where the application's session state was out of process on IIS (`mode="StateServer"`, `"SQLServer"` or `"Custom"`
+with a provider that stored it elsewhere, such as Redis's), or to share sessions between servers (scaling out):
+
+```csharp
+builder.Services.AddDistributedMemoryCache();   // one server; or AddStackExchangeRedisCache(...),
+                                                // AddDistributedSqlServerCache(...) to share it between servers
+...
+app.UseWebForms(o => o.HandleAllRequestsWithWebForms().UseAspNetCoreSessionProvider());
+```
+
+It takes the place of `<sessionState mode>` (whatever it says) and of a custom provider; the rest of `<sessionState>`
+applies, as on IIS:
+
+- **Every session value must be serializable**, as with StateServer and SQLServer: each one is serialized at the end
+  of the request. A value that isn't (a view model in MVC's `TempData` that isn't `[Serializable]`, MVCForum's
+  `GenericMessageViewModel`) fails the request with `HttpException: Unable to serialize the session state. In
+  'StateServer' and 'SQLServer' mode, ASP.NET will serialize the session state objects, ...` and
+  `SerializationException: Type '...' is not marked as serializable` at
+  `AspNetCoreSessionProvider.SetAndReleaseItemExclusive`. An application that ran in process on IIS doesn't need the
+  provider: leave it out. Values are copies: changing an object read from the session changes the session only when
+  the request ends, as with StateServer.
 - The session ID and its cookie are System.Web's (`SessionIDManager`): `ASP.NET_SessionId`, or `<sessionState cookieName>`,
   with `SameSite=Lax` (`<sessionState cookieSameSite>`). It is the only session cookie: ASP.NET Core's
   session (`AddSession()`, `UseSession()` and its `.AspNetCore.Session` cookie) isn't used, and isn't needed (#79).
@@ -804,6 +830,7 @@ The first request compiles pages, as on IIS. Then compare the responses recorded
 | `CS0103` in `CodeFile=` code-behind, in a project with no old `.csproj` | A Web Site Project: compile only `Program.cs` (step 2) |
 | `CS0234: ... 'Design' does not exist in the namespace 'System.Web.UI'` | The app's designer classes: remove them from the build (step 2) |
 | ``LINQ to Entities does not recognize the method 'Boolean Contains[Int32](System.ReadOnlySpan`1[System.Int32], Int32)'`` | C# 14's span conversions: set `<LangVersion>` (step 2) |
+| `HttpException: Unable to serialize the session state`, `SerializationException: Type '...' is not marked as serializable` at `AspNetCoreSessionProvider.SetAndReleaseItemExclusive` (often after a redirect that keeps a view model in `TempData`) | `UseAspNetCoreSessionProvider()` in an application whose session state was in process on IIS: remove it and its `AddDistributedMemoryCache()` (section 4, "Session state"). If the application needs it (out of process on IIS, or scaling out), make the type `[Serializable]` |
 | `NU1107: Version conflict detected for Microsoft.CodeAnalysis.Common` | The app's own Roslyn packages: use 5.9.0 (step 3) |
 | `CS0234: ... 'Services' does not exist in the namespace 'System.Data'` | WCF Data Services' client: `Microsoft.Data.Services.Client` 5.8.4 (step 3) |
 | `FileNotFoundException` for a plug-in's package when the plug-in loads | SDK libraries don't copy packages: "Plug-in libraries" (step 2) |

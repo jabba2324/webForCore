@@ -22,4 +22,25 @@
             DomainState.GlobalResourceAtStart = x.GetType().Name + ": " + x.Message;
         }
     }
+
+    // RegressionTests (#184): a flush after the output cache took its snapshot of the response's buffers (EndRequest
+    // comes after UpdateRequestCache) sends and clears them; the cached copy must keep its bytes.
+    void Application_EndRequest(object sender, EventArgs e)
+    {
+        if (Request.Path.EndsWith("/regressions/unbuffered/Cached.aspx", StringComparison.OrdinalIgnoreCase) && Request.QueryString["flush"] == "1")
+        {
+            Response.Flush();
+        }
+    }
+
+    // RegressionTests (#184): regressions/unbuffered/Cached.aspx?provider=1 is cached by the application's own output
+    // cache provider (Web.config's GateOutputCache).
+    public override string GetOutputCacheProviderName(HttpContext context)
+    {
+        if (context.Request.Path.EndsWith("/regressions/unbuffered/Cached.aspx", StringComparison.OrdinalIgnoreCase) && context.Request.QueryString["provider"] == "1")
+        {
+            return "GateOutputCache";
+        }
+        return base.GetOutputCacheProviderName(context);
+    }
 </script>

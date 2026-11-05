@@ -14,16 +14,13 @@ namespace WebFormsForCore.Test
 		{
 			var builder = WebApplication.CreateBuilder(args);
 
-			builder.Services.AddDistributedMemoryCache();
-			builder.Services.AddSession();
-
 			var app = builder.Build();
 
-			app.UseSession();
-
+			// Session state (SessionTest.aspx) is in process, as <sessionState> (no mode: InProc) had it on IIS. Only an
+			// application whose session state was out of process (StateServer, SQLServer) adds a distributed cache and
+			// UseAspNetCoreSessionProvider() (docs/MIGRATING.md, "Session state", #180).
 			app.UseWebForms(options => options
-				.HandleAllRequestsWithWebForms()
-				.UseAspNetCoreSessionProvider());
+				.HandleAllRequestsWithWebForms());
 
 			app.Run();
 
