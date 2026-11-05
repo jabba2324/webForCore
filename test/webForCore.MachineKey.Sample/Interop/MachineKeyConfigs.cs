@@ -135,12 +135,12 @@ namespace MachineKeyInterop
         // Both sides check that each listed one still differs.
         public static string KnownDifference(string config, string kind)
         {
-            // IsolateByAppId derives the key from HttpRuntime.AppDomainAppId: on IIS the site's metabase path
-            // (/LM/W3SVC/<site ID>/ROOT/...), on webForCore and in .NET Framework's ApplicationHost a hash of the virtual
-            // and physical paths. Different applications don't share output, as on IIS. (MachineKey.Protect, and so the
-            // cookies, reject a key with a modifier on both runtimes.)
+            // IsolateByAppId on an explicit key replaces bytes 4 to 7 with a hash of HttpRuntime.AppDomainAppId (IIS's
+            // /LM/W3SVC/1/ROOT here, as FrameworkMachineKey creates the application): on .NET Framework
+            // StringComparer.InvariantCultureIgnoreCase's, as for IsolateApps below, so it differs even for the same ID.
+            // (MachineKey.Protect, and so the cookies, reject a key with a modifier on both runtimes.)
             if (config.EndsWith("-isolatebyappid", StringComparison.Ordinal) && (kind == "forms-ticket" || kind == "encode"))
-                return "IsolateByAppId: the application ID differs";
+                return "IsolateByAppId on an explicit key: the hash of the application ID differs";
             // IsolateApps on an explicit key replaces its first 4 bytes with a hash of the virtual path: on .NET Framework
             // StringComparer.InvariantCultureIgnoreCase's (from Windows' NLS sort keys), which .NET doesn't have (its
             // string hashes are randomized; webForCore uses ASP.NET's stable string hash, StringUtil.GetStringHashCode).

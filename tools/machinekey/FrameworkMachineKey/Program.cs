@@ -1,9 +1,9 @@
 // webForCore (#191): .NET Framework 4.8's side of the <machineKey> interop check. For each configuration of
 // MachineKeyConfigs, a site with its Web.config is hosted in an application domain of its own
-// (ApplicationHost.CreateApplicationHost, with the configuration's virtual path), where Interop.Produce writes .NET
+// (ApplicationManager.CreateObject, with the configuration's virtual path and IIS's application ID, /LM/W3SVC/1/ROOT[/vdir]), where Interop.Produce writes .NET
 // Framework's outputs (FormsAuthentication tickets, MachineKey.Protect and Encode, Katana cookies), and Interop.Consume
 // reads:
-//   - the committed .NET Framework outputs (test/webForCore.IIS.Gate.Tests/FrameworkData/MachineKey/framework.json),
+//   - the committed .NET Framework outputs (test/webForCore.IIS.Gate.Tests/FrameworkData/machinekey-framework.json),
 //     which IIS.Gate.Tests' MachineKeyInteropTests has webForCore read; an output .NET Framework gives the same every
 //     time (Deterministic) must be what is committed;
 //   - webForCore's outputs (MachineKeyInteropTests writes them; build-and-test's machinekey-webforcore artifact), when
@@ -55,8 +55,7 @@ internal static class Program
             }
         }
 
-        // The sites: each configuration's Web.config, and this program's assemblies in bin. At the same path every run:
-        // the application ID (IsolateByAppId's key) is a hash of the virtual and physical paths.
+        // The sites: each configuration's Web.config, and this program's assemblies in bin.
         string sites = Path.Combine(Path.GetPathRoot(Path.GetTempPath()), "webforcore-machinekey");
         if (Directory.Exists(sites)) Directory.Delete(sites, recursive: true);
         string programDirectory = AppDomain.CurrentDomain.BaseDirectory;
@@ -70,6 +69,7 @@ internal static class Program
         report.AppendLine("| Configuration | Kind | Case | Deterministic | Committed .NET Framework output | webForCore's output on .NET Framework |");
         report.AppendLine("| --- | --- | --- | --- | --- | --- |");
         int failures = 0;
+        ApplicationManager manager = ApplicationManager.GetApplicationManager();
         foreach (MachineKeyConfig config in MachineKeyConfigs.All)
         {
             string site = Path.Combine(sites, config.Name);
@@ -79,7 +79,9 @@ internal static class Program
             {
                 File.Copy(file, Path.Combine(site, "bin", Path.GetFileName(file)));
             }
-            var runner = (Runner)ApplicationHost.CreateApplicationHost(typeof(Runner), config.VirtualPath, site);
+            // IIS's application ID for site 1 (IsolateByAppId derives the key from it), which webForCore gives too.
+            string appId = "/LM/W3SVC/1/ROOT" + (config.VirtualPath == "/" ? "" : config.VirtualPath);
+            var runner = (Runner)manager.CreateObject(appId, typeof(Runner), config.VirtualPath, site, failIfExists: true);
 
             List<InteropEntry> mine = json.Deserialize<List<InteropEntry>>(runner.Produce(config.Name));
             produced.AddRange(mine);
@@ -121,9 +123,15 @@ internal static class Program
                 Console.WriteLine((failed ? "FAILED  " : "ok      ") + key + (committedProblem != null ? "; committed: " + committedProblem : "") +
                     (webForCoreProblem != null ? "; webForCore's: " + webForCoreProblem + (known != null ? " (known)" : "") : ""));
             }
+            // The next configuration has the same ID: wait until this one's domain is gone.
+            manager.ShutdownApplication(appId);
+            DateTime deadline = DateTime.UtcNow.AddSeconds(60);
+            while (manager.GetRunningApplications().Any(a => a.ID == appId) && DateTime.UtcNow < deadline)
+            {
+                System.Threading.Thread.Sleep(100);
+            }
         }
-        HostingEnvironment.InitiateShutdown();
-        ApplicationManager.GetApplicationManager().ShutdownAll();
+        manager.ShutdownAll();
 
         File.WriteAllText(Path.Combine(output, "framework.json"), Indent(json.Serialize(produced)));
         report.AppendLine();
@@ -155,8 +163,9 @@ internal static class Program
         return array.Replace("},{", "},\n {").Replace("[{", "[\n {").Replace("}]", "}\n]") + "\n";
     }
 
-    // Runs in the configuration's application domain (HttpRuntime set up for the site, its Web.config read).
-    public sealed class Runner : MarshalByRefObject
+    // Runs in the configuration's application domain (HttpRuntime set up for the site, its Web.config read), created
+    // with IIS's application ID.
+    public sealed class Runner : MarshalByRefObject, IRegisteredObject
     {
         public string Produce(string config)
         {
@@ -167,6 +176,12 @@ internal static class Program
         {
             var json = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
             return json.Serialize(Interop.Consume(json.Deserialize<List<InteropEntry>>(entries), owin: true));
+        }
+
+        // ApplicationManager.CreateObject registers the object; it lets the domain go when the application stops.
+        public void Stop(bool immediate)
+        {
+            HostingEnvironment.UnregisterObject(this);
         }
 
         public override object InitializeLifetimeService()
