@@ -30,7 +30,7 @@ restore the old behaviour, the difference is documented.
 | --- | --- | --- |
 | Web Forms | System.Web, System.Web.Extensions (AJAX), System.Web.Services (ASMX), DataVisualization (Chart), DynamicData, Mobile | Pages, user controls, master pages, App_Code, Global.asax, themes; compiled at run time by Roslyn, or precompiled |
 | MVC 5 | System.Web.Mvc 5.3, Razor 3, Web Pages 3, Helpers, MVC Futures | `.cshtml` views compiled at run time as on IIS |
-| Web API 2 | System.Web.Http 5.3, WebHost, OWIN host, CORS, System.Net.Http.Formatting | |
+| Web API 2 | System.Web.Http 5.3, WebHost, OWIN host, CORS, tracing (System.Diagnostics), System.Net.Http.Formatting | |
 | OWIN | Microsoft.Owin 4.2.3, Host.SystemWeb, Security (Cookies, OAuth), Hosting, HttpListener, Testing, Cors | |
 | SignalR 2.4.3 | Core, SystemWeb, .NET client | WebSockets, Server-Sent Events, long polling |
 | ASP.NET Identity 2 | Core, EntityFramework (EF 6.5), Owin | |

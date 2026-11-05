@@ -88,6 +88,7 @@
     <Project Path="src/webForCore.System.Web.Http/webForCore.System.Web.Http.csproj" />
     <Project Path="src/webForCore.System.Web.Cors/webForCore.System.Web.Cors.csproj" />
     <Project Path="src/webForCore.System.Web.Http.Cors/webForCore.System.Web.Http.Cors.csproj" />
+    <Project Path="src/webForCore.System.Web.Http.Tracing/webForCore.System.Web.Http.Tracing.csproj" />
     <Project Path="src/webForCore.System.Web.Http.WebHost/webForCore.System.Web.Http.WebHost.csproj" />
     <Project Path="src/webForCore.System.Web.Http.Owin/webForCore.System.Web.Http.Owin.csproj" />
     <Project Path="src/webForCore.System.Web.WebPages.Deployment/webForCore.System.Web.WebPages.Deployment.csproj" />
@@ -135,6 +136,7 @@
     <Project Path="test/webForCore.System.Web.Http.Test/webForCore.System.Web.Http.Test.csproj" />
     <Project Path="test/webForCore.System.Web.Cors.Test/webForCore.System.Web.Cors.Test.csproj" />
     <Project Path="test/webForCore.System.Web.Http.Cors.Test/webForCore.System.Web.Http.Cors.Test.csproj" />
+    <Project Path="test/webForCore.System.Web.Http.Tracing.Test/webForCore.System.Web.Http.Tracing.Test.csproj" />
     <Project Path="test/webForCore.System.Web.MonoTests/webForCore.System.Web.MonoTests.csproj" />
     <Project Path="test/webForCore.Serialization.Tests/webForCore.Serialization.Tests.csproj" />
     <Project Path="test/webForCore.System.Web.Http.WebHost.Test/webForCore.System.Web.Http.WebHost.Test.csproj" />

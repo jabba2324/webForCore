@@ -57,7 +57,7 @@
     <_WebForCoreReplacedPackages>
       Microsoft.AspNet.Mvc|99.0.0;Microsoft.AspNet.Mvc.Futures|99.0.0;Microsoft.AspNet.Razor|99.0.0;
       Microsoft.AspNet.WebPages|99.0.0;Microsoft.AspNet.WebApi.Core|99.0.0;Microsoft.AspNet.WebApi.WebHost|99.0.0;
-      Microsoft.AspNet.WebApi.Owin|99.0.0;Microsoft.AspNet.WebApi.Cors|99.0.0;Microsoft.AspNet.WebApi.Client|99.0.0;
+      Microsoft.AspNet.WebApi.Owin|99.0.0;Microsoft.AspNet.WebApi.Cors|99.0.0;Microsoft.AspNet.WebApi.Tracing|99.0.0;Microsoft.AspNet.WebApi.Client|99.0.0;
       Microsoft.AspNet.Cors|99.0.0;Microsoft.AspNet.Web.Optimization|99.0.0;Microsoft.AspNet.Web.Optimization.WebForms|99.0.0;
       WebGrease|99.0.0;Microsoft.Web.Infrastructure|99.0.0;Microsoft.AspNet.Identity.Core|99.0.0;
       Microsoft.AspNet.Identity.EntityFramework|99.0.0;Microsoft.AspNet.Identity.Owin|99.0.0;

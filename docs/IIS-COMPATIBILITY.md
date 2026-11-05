@@ -187,7 +187,7 @@ Where .NET Framework, IIS and .NET disagree, these choices decide what webForCor
 
 ### Compared with IIS 10
 
-CI's `iis-compare` job ([TESTING.md](TESTING.md#compared-with-iis-10), #78) sends the Web API gate's 66 requests
+CI's `iis-compare` job ([TESTING.md](TESTING.md#compared-with-iis-10), #78) sends the Web API gate's 67 requests
 (`test/webForCore.WebApi.Sample`, through `GlobalConfiguration` and through OWIN under `/owin`) to the same sample built
 for .NET Framework 4.8 with Microsoft's Web API 5.3.0 and Katana 4.2.3 packages, on IIS 10 (Windows Server 2025), and
 compares the responses. In IIS's **integrated** pipeline every status, `Content-Type`, `Location`, `Allow`, body
@@ -198,8 +198,9 @@ occurring):
 
 | Difference | Requests | Why |
 | --- | --- | --- |
-| `Server` is `Kestrel`, not `Microsoft-IIS/10.0` | all 66 | webForCore's host is Kestrel |
+| `Server` is `Kestrel`, not `Microsoft-IIS/10.0` | all 67 | webForCore's host is Kestrel |
 | An unmatched extensionless URL (no route matches) gets ASP.NET's 404 page, with `X-AspNet-Version`; IIS serves its native 404 page ("HTTP Error 404.0 - Not Found", `StaticFile` handler), without it. The status is 404 on both | 2 | In IIS's integrated pipeline a URL that no managed handler claims falls through to IIS's static file handler; webForCore gives every request to ASP.NET |
+| `/api/trace/listeners`, the names in `System.Diagnostics.Trace.Listeners`: IIS has the listener the sample's Web.config adds in `<system.diagnostics>` (`["Default","webconfig","code"]`); webForCore hasn't (`["Default","code"]`) | 1 | webForCore doesn't apply `<system.diagnostics>` ([NAMESPACES.md](NAMESPACES.md#summary-of-what-doesnt-work)): .NET reads it only through `TraceConfiguration.Register()` in .NET's System.Configuration.ConfigurationManager, which webForCore replaces with .NET Framework's System.Configuration. Listeners added in code receive Web API's trace records on both |
 
 ASP.NET adds `X-AspNet-Version` and the default `Cache-Control: private` around a managed handler, when the response is
 flushed and when it reports an error. The responses Katana's `OwinHttpModule` ends under `/owin`, before a handler

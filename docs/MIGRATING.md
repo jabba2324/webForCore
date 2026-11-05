@@ -308,7 +308,7 @@ packages, so the app's `nuget.config` needs drawingForCore's feed (above). Every
 | MVC 5 | `webForCore.System.Web.Mvc` (brings Razor and Web Pages); `webForCore.Microsoft.Web.Mvc` for MVC Futures |
 | Web Pages (`.cshtml` without MVC) | `webForCore.System.Web.WebPages.Razor`, `webForCore.System.Web.WebPages.Deployment` |
 | Helpers (WebGrid, Chart, WebImage) | `webForCore.System.Web.Helpers` |
-| Web API 2 | `webForCore.System.Web.Http.WebHost` (and `webForCore.System.Web.Http.Cors` for CORS) |
+| Web API 2 | `webForCore.System.Web.Http.WebHost` (and `webForCore.System.Web.Http.Cors` for CORS, `webForCore.System.Web.Http.Tracing` for `EnableSystemDiagnosticsTracing`) |
 | Web API on OWIN | `webForCore.System.Web.Http.Owin`, `webForCore.Microsoft.Owin.Host.SystemWeb` |
 | OWIN security | `webForCore.Microsoft.Owin.Security.Cookies`, `.OAuth`; `.OpenIdConnect` and `.Jwt` (Entra ID / Azure AD), `.WsFederation`, `.ActiveDirectory`, `.Google`, `.Facebook`, `.MicrosoftAccount`, `.Twitter` ([below](#packages-that-need-more-than-a-reference)) |
 | SignalR 2 | `webForCore.Microsoft.AspNet.SignalR.SystemWeb` |
@@ -654,6 +654,21 @@ before the upgrade aren't found after it: users start new ones.
 - **`<system.net><defaultProxy>`** is applied at application start to `HttpClient.DefaultProxy`. Without it, .NET
   uses `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`. `<connectionManagement>` and the other `<system.net>` sections
   have no effect.
+- **`<system.diagnostics>` isn't applied.** Trace listeners, sources and switches in Web.config (or machine.config)
+  aren't created: `System.Diagnostics.Trace` writes only to its default listener, so a `TextWriterTraceListener` that
+  wrote a log file on IIS writes nothing ([NAMESPACES.md](NAMESPACES.md#summary-of-what-doesnt-work)). Web API's
+  tracing (`config.EnableSystemDiagnosticsTracing()`, "Tracing in ASP.NET Web API 2", package
+  `webForCore.Web.Http.Tracing`) writes its records through `Trace` as on .NET Framework, so add the listeners in code
+  at the start of `Application_Start`:
+
+  ```csharp
+  System.Diagnostics.Trace.AutoFlush = true;
+  System.Diagnostics.Trace.Listeners.Add(new System.Diagnostics.TextWriterTraceListener(
+      System.Web.Hosting.HostingEnvironment.MapPath("~/App_Data/trace.log"), "file"));
+  ```
+
+  Keep the file in `App_Data` or outside the application: a relative path is resolved against `bin_dotnet/`, and a file
+  written there restarts the application at every line (#173).
 - **Typed DataSets** (`.xsd` in App_Code) and their TableAdapters are generated when the site compiles. The `.xsd`'s
   provider must be registered; a TableAdapter's connection string comes from `<connectionStrings>`, as on IIS.
 

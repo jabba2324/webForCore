@@ -18,7 +18,7 @@ ulimit -s 8192 2>/dev/null || echo "warning: could not set the stack limit to 8 
 echo "Stack limit: $(ulimit -s) KB"
 
 SUITES=(
-  Serialization.Tests System.Net.Http.Formatting.Test System.Web.Cors.Test System.Web.Http.Cors.Test
+  Serialization.Tests System.Net.Http.Formatting.Test System.Web.Cors.Test System.Web.Http.Cors.Test System.Web.Http.Tracing.Test
   System.Web.Razor.Test System.Web.Http.Test System.Web.Http.WebHost.Test System.Web.Http.Owin.Test
   Microsoft.Owin.Tests Microsoft.Owin.Host.SystemWeb.Tests Microsoft.Owin.Security.Tests System.Web.MonoTests
   System.Web.Mvc.Test Microsoft.Web.Mvc.Test System.Web.WebPages.Test System.Web.WebPages.Razor.Test
