@@ -1,0 +1,64 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- The scale-out gate's application: session state and the output cache kept outside the process with Microsoft's
+       .NET Framework providers, unchanged, configured in web.config as on IIS (configs/*.config, one per provider):
+       Microsoft.Web.RedisSessionStateProvider and .RedisOutputCacheProvider, the async session state module
+       (Microsoft.AspNet.SessionState.SessionStateModule) with SqlSessionStateProviderAsync, and System.Web's own
+       <sessionState mode="SQLServer">. test/webForCore.SessionCache.Gate.Tests runs two instances of it on one store. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>SessionCacheSample</RootNamespace>
+    <OutputPath>bin_dotnet</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <GenerateDependencyFile>true</GenerateDependencyFile>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+  </PropertyGroup>
+
+  <Import Project="..\..\src\webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <!-- App_Code and the pages are compiled at run time from the app folder, as on IIS. -->
+    <Compile Remove="App_Code\**" />
+    <Content Remove="bin_dotnet\**" />
+    <None Remove="bin_dotnet\**" />
+    <Compile Remove="bin_dotnet\**" />
+    <!-- The gate writes them as Web.config into its copies of the site. -->
+    <Content Update="configs\**" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\WebFormsForCore.Configuration\WebFormsForCore.Configuration.csproj" />
+    <PackageReference Include="drawingForCore" Version="$(DrawingForCoreVersion)" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Serialization.Formatters\WebFormsForCore.Serialization.Formatters.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web\WebFormsForCore.Web.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.ApplicationServices\WebFormsForCore.Web.ApplicationServices.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.RegularExpressions\WebFormsForCore.Web.RegularExpressions.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Services\WebFormsForCore.Web.Services.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Extensions\WebFormsForCore.Web.Extensions.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Infrastructure\WebFormsForCore.Web.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Compilers\WebFormsForCore.Compilers.csproj" />
+    <!-- System.Data.SqlClient for <sessionState mode="SQLServer">, as the webForCore package brings it. -->
+    <ProjectReference Include="..\..\src\webForCore.System.Data.SqlClient\webForCore.System.Data.SqlClient.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Microsoft's packages for .NET Framework (net462/net472), used as they are, with the dependencies they bring
+         (StackExchange.Redis, Microsoft.Data.SqlClient, Microsoft.Azure.Cosmos). SqlSessionStateProviderAsync 2.1.0-preview1
+         and the module it depends on, not 2.0.0: 2.0.0 adds String.GetHashCode() of the application's ID to session IDs,
+         and on .NET that hash is different in every process, so two servers, or one after a restart, never find each
+         other's sessions; 2.1.0-preview1 uses a hash of its own. -->
+    <PackageReference Include="Microsoft.Web.RedisSessionStateProvider" Version="5.0.4" />
+    <PackageReference Include="Microsoft.Web.RedisOutputCacheProvider" Version="4.0.1" />
+    <PackageReference Include="Microsoft.AspNet.SessionState.SessionStateModule" Version="2.1.0-preview1" />
+    <PackageReference Include="Microsoft.AspNet.SessionState.SqlSessionStateProviderAsync" Version="2.1.0-preview1" />
+    <PackageReference Include="Microsoft.AspNet.SessionState.CosmosDBSessionStateProviderAsync" Version="2.1.0-preview1" />
+    <PackageReference Include="Microsoft.AspNet.OutputCache.OutputCacheModuleAsync" Version="1.0.2" />
+    <!-- Cosmos DB's SDK (3.46) requires an explicit Newtonsoft.Json reference, on .NET Framework too. -->
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+  </ItemGroup>
+</Project>
