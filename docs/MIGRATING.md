@@ -38,6 +38,12 @@ For an AI agent doing the migration, the same procedure is written as instructio
        is an ambiguous reference between 'System.ComponentModel.DataAnnotations.CompareAttribute' and
        'System.Web.Mvc.CompareAttribute'`. Keep MVC's, which it compiled to on 4.0 (and which keeps the client
        validation): `using CompareAttribute = System.Web.Mvc.CompareAttribute;`.
+
+     Views written for Razor 1 (MVC 3, Web Pages 1 and WebMatrix sites) can fail to parse on Razor 3, the only Razor
+     webForCore has (#174): Razor 2 and 3 refuse `@` before a C# keyword inside a code block (`@string.Join(...)`,
+     `@int.Parse(...)`), `Parser Error Message: Unexpected "string" keyword after "@" character. Once inside code, you
+     do not need to prefix constructs like "string" with "@".` Razor 1 accepted it (rabbit-webpages, a WebMatrix 1.0
+     site, shipped its page editor so). Wrap the expression: `@(string.Join(", ", Page.Tags))`.
    - Pure managed libraries that target .NET Standard or .NET usually work as they are. Newtonsoft.Json, Autofac,
      EntityFramework 6.4+ and log4net are examples.
    - Libraries built only for .NET Framework that reference System.Web often load, because webForCore's assemblies
@@ -458,6 +464,13 @@ These came up migrating real applications; each names one that needed it.
       <appender-ref ref="rollingFile" />   <!-- was: AsynchronousLog4NetAppender (Log4Net.Async.ParallelForwardingAppender) -->
     </root>
     ```
+  - **Other prebuilt .NET Framework libraries that use `CallContext`** fail the same way, with `TypeLoadException: Could
+    not load type 'System.Runtime.Remoting.Messaging.CallContext' from assembly 'mscorlib, Version=4.0.0.0'` (#178).
+    Look for a version with a .NET Standard or .NET build, which NuGet then picks. BlogEngine.NET's SimpleInjector
+    3.1.0: `.Integration.WebApi`'s `BeginScope` uses `SimpleInjector.Extensions.ExecutionContextScoping` 3.1.0 (both
+    its builds use `CallContext`), so every Web API controller failed with "Make sure that the controller has a
+    parameterless public constructor", the `TypeLoadException` inside. SimpleInjector, `.Extensions.ExecutionContextScoping`
+    and `.Integration.WebApi` 3.3.2 work: that ExecutionContextScoping has a .NET Standard 1.3 build (on `AsyncLocal`).
   - **Autofac.Configuration 3.x** (3.3.0, the last for Autofac 3) throws reading a configuration file (#148, Orchard
     1.10): `MissingMethodException: Method not found: 'System.String System.AppDomainSetup.get_ConfigurationFile()'`
     in `SectionHandler.NormalizeConfigurationFilePath`. 4.x is a rewrite on Microsoft.Extensions.Configuration and
@@ -617,13 +630,29 @@ Fix what the blocker search found (see [NAMESPACES.md](NAMESPACES.md) for replac
   `HttpRuntime.AppDomainAppPath`, `HostingEnvironment.ApplicationPhysicalPath` or `Server.MapPath("~/...")` instead
   ([NAMESPACES.md](NAMESPACES.md)). Search for `BaseDirectory` and `ApplicationBase`: eShopLegacyMVC's database seed read
   its SQL scripts that way.
+  Libraries resolve their own relative paths against it too (#173): log4net's `XmlConfigurator` `ConfigFile` and an
+  appender's `<file>`, NLog's `${basedir}`. `bin_dotnet` is the application's `bin`, so a file the application writes
+  there restarts it, as a file written into `bin` does on IIS. mojoPortal's log4net appender
+  (`<file value="Data/currentlog.config" />`) wrote into `bin_dotnet/Data`, and since it logs at start, the
+  application restarted in a loop, losing session state each time. Point such paths at the site
+  (`<file value="../Data/currentlog.config" />` from `bin_dotnet/`, or a path set from `HttpRuntime.AppDomainAppPath`
+  before configuring the library). Search the logging configuration for relative file names.
 - **`AppDomain.CurrentDomain.DynamicDirectory` is null** on .NET (#139). On IIS it was the application's code
   generation folder (`Temporary ASP.NET Files/<app>/<hash>`), where plug-in loaders (nopCommerce, SmartStoreNET, and
   others descended from Umbraco's) copy plug-in DLLs before `Assembly.Load`ing them and adding them to `BuildManager`.
   They fail at start: `ArgumentNullException: Value cannot be null. (Parameter 'path') at
   System.IO.DirectoryInfo..ctor(String path)`. Use `HttpRuntime.CodegenDir`, the same folder, which webForCore's
   assembly resolver probes: with it nopCommerce 3.90's plug-ins load as on IIS. Likewise `AppDomainSetup.PrivateBinPath`
-  doesn't exist on .NET (`CS1061`): use `HttpRuntime.BinDirectory`. Search for `DynamicDirectory` and `PrivateBinPath`.
+  doesn't exist on .NET (`CS1061`): use `HttpRuntime.BinDirectory`. `AppDomain.CurrentDomain.RelativeSearchPath`,
+  the application's `bin` on IIS, compiles but is null (#177): CarrotCake CMS's resource handler built
+  `Path.Combine(AppDomain.CurrentDomain.RelativeSearchPath, fileName)` and threw `ArgumentNullException: Value cannot
+  be null. (Parameter 'path1')`. Use `HttpRuntime.BinDirectory` there too. Search for `DynamicDirectory`,
+  `PrivateBinPath` and `RelativeSearchPath`.
+- **`SecurityProtocolType.Ssl3` throws** (#176, CarrotCake CMS): .NET's `ServicePointManager.SecurityProtocol` setter
+  rejects SSL 3, `NotSupportedException: The requested security protocol is not supported.`, where .NET Framework 4.8
+  accepted it among the flags. The "enable TLS 1.2" line of 4.5-era applications often kept it
+  (`SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | ... | SecurityProtocolType.Tls12`). Remove `Ssl3`, or the
+  whole line: .NET's default, `SystemDefault`, lets the OS choose. Search for `SecurityProtocolType.Ssl3`.
 - **`Thread.ResetAbort()` throws** `PlatformNotSupportedException: Thread abort is not supported on this platform.`
   (#143, DNN 9's URL rewriter and module host). Where it follows `catch (ThreadAbortException)` (after `Response.End`,
   `Response.Redirect(url, true)` or `Server.Transfer`), remove it: webForCore's `ThreadAbortException` isn't
@@ -702,8 +731,12 @@ Fix what the blocker search found (see [NAMESPACES.md](NAMESPACES.md) for replac
   designer generates) and `XmlMappingSource` need no changes, and errors have .NET Framework's exception types and
   messages. The `webForCore` package brings System.Data.Linq; remove a `<Reference>` to a copy of .NET Framework's.
   Three things need SQL Server and a connection string instead: SQL Server Compact (`.sdf`), and off Windows a `.mdf` path or
-  LocalDB (see [NAMESPACES.md](NAMESPACES.md#summary-of-what-doesnt-work)). Code that compares `DataContext.Log`'s
-  text gets `\n` line endings on Linux. `LinqDataSource` isn't available yet: bind an `ObjectDataSource` or model
+  LocalDB (see [NAMESPACES.md](NAMESPACES.md#summary-of-what-doesnt-work)). The SQL it generates has the platform's
+  newline, `\n` on Linux, as .NET Framework's `SqlFormatter` writes it with `AppendLine`: in `DataContext.Log` and in
+  `GetCommand(query).CommandText` (#175). CarrotCake CMS's batch delete and update helper, a pattern several LINQ to SQL
+  applications copied, looked for `"\r\nFROM "` in the generated SELECT and threw `ArgumentOutOfRangeException:
+  startIndex ('-1')` on Linux. Search for `"\r\n` in code that reads SQL text, and use `Environment.NewLine`.
+  `LinqDataSource` isn't available yet: bind an `ObjectDataSource` or model
   binding to the `DataContext`'s queries. Web API OData's `ODataConventionModelBuilder` needs System.Data.Linq for
   its `Binary` mapping, so OData applications, which failed in `Application_Start` before 0.9.0, now start.
 - **Scanning every loaded assembly's types** (#41, fixed). `Assembly.GetTypes()` on Microsoft's System.Data.SqlClient
@@ -776,6 +809,12 @@ The first request compiles pages, as on IIS. Then compare the responses recorded
 | `FileNotFoundException` for a plug-in's package when the plug-in loads | SDK libraries don't copy packages: "Plug-in libraries" (step 2) |
 | `MissingMethodException: Method not found: '... AppDomainSetup.get_ConfigurationFile()'` or `'... AppDomain.DefineDynamicAssembly(...)'` | Autofac.Configuration 3, Castle.Core 3 or NHibernate 4 (step 3, "Libraries that don't run on .NET") |
 | `ArgumentNullException ... (Parameter 'path')` at `DirectoryInfo..ctor` in a plug-in loader | `AppDomain.CurrentDomain.DynamicDirectory` is null: use `HttpRuntime.CodegenDir` (step 6) |
+| `ArgumentNullException ... (Parameter 'path1')` at `Path.Combine` | `AppDomain.CurrentDomain.RelativeSearchPath` is null: use `HttpRuntime.BinDirectory` (step 6) |
+| The application restarts again and again (its start logged repeatedly, sessions lost) | A library writes a file into `bin_dotnet`, such as log4net's log at a relative path (step 6, "The site's folder") |
+| `NotSupportedException: The requested security protocol is not supported` | `SecurityProtocolType.Ssl3` in `ServicePointManager.SecurityProtocol` (step 6) |
+| `Parser Error Message: Unexpected "string" keyword after "@" character` (or another C# keyword) | A Razor 1 view: wrap it in `@( ... )` ("Before you start", step 2) |
+| `ArgumentOutOfRangeException: startIndex ('-1')` in code that searches SQL or other generated text | It looks for `\r\n`; the text has `\n` on Linux (step 6, "LINQ to SQL") |
+| `TypeLoadException: Could not load type 'System.Runtime.Remoting.Messaging.CallContext' from assembly 'mscorlib'`, or "Make sure that the controller has a parameterless public constructor" with it inside | A prebuilt .NET Framework library uses `CallContext`: a version with a .NET Standard or .NET build (step 3, "Libraries that don't run on .NET") |
 | `PlatformNotSupportedException: Thread abort is not supported on this platform` | `Thread.ResetAbort()`: remove it (step 6) |
 | `PlatformNotSupportedException: This platform does not allow the automatic selection of an algorithm` | `HashAlgorithm.Create()` or another parameterless crypto factory (step 6) |
 | `PlatformNotSupportedException` from `CompileAssemblyFromSource`, `...FromDom` or `...FromFile` | System.CodeDom can't compile on .NET: use webForCore's provider (step 6) |
