@@ -487,12 +487,9 @@ namespace WebFormsForCore.Hosting.IIS
 					context.Request.Path = parts[0];
 					context.Request.QueryString = parts.Length > 1 ? new QueryString("?" + parts[1]) : QueryString.Empty;
 					context.Items.Remove(SubStatusKey);
-					// The child request's handler decides the status, as on IIS: ASP.NET's leaves the error's, IIS's static
-					// file handler answers 200 (#192, CI's iis-compare job, in both pipelines).
-					var targetExtension = Path.GetExtension(parts[0]);
-					bool staticTarget = targetExtension.Length > 0 && !options.DynamicExtensions.Contains(targetExtension) && !IsManagedHandlerExtension(section, targetExtension);
-					if (!staticTarget)
-						context.Response.OnStarting(() => { context.Response.StatusCode = status; return Task.CompletedTask; });
+					// The child request decides the status, as on IIS: a static page is the static file handler's 200, and
+					// an ASP.NET page's is 200 unless it sets one (#192, CI's iis-compare job, in both pipelines; webForCore
+					// kept the error's status before).
 					try
 					{
 						await inner(context);

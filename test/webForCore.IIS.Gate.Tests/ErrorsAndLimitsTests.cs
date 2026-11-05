@@ -43,7 +43,8 @@ namespace IISGate
             { "/errors/nodefault/Throw.aspx", 500 },
             { "/errors/nodefault/Http404.aspx", 404 },
             // <httpErrors errorMode="Custom"> with customErrors off, by existingResponse. A replaced response is the
-            // ExecuteURL child request's: a static page (iis500.htm) is IIS's static file handler's 200.
+            // ExecuteURL child request's: a static page (iis500.htm) is IIS's static file handler's 200, and a page
+            // (IisError.aspx) that sets no status is 200 too.
             { "/errors/iis-auto/Throw.aspx", 500 },
             { "/errors/iis-auto/Http404.aspx", 404 },
             { "/errors/iis-auto/Status500.aspx", 200 },
@@ -51,8 +52,8 @@ namespace IISGate
             { "/errors/iis-replace/Throw.aspx", 200 },
             { "/errors/iis-replace/Status500.aspx", 200 },
             { "/errors/iis-replace/Status500Skip.aspx", 200 },
-            { "/errors/iis-replace-page/Throw.aspx", 500 },
-            { "/errors/iis-replace-page/Status500.aspx", 500 },
+            { "/errors/iis-replace-page/Throw.aspx", 200 },
+            { "/errors/iis-replace-page/Status500.aspx", 200 },
             { "/errors/iis-passthrough/Throw.aspx", 500 },
             { "/errors/iis-passthrough/Status500.aspx", 500 },
             { "/errors/iis-passthrough/Status500Skip.aspx", 500 },
@@ -120,8 +121,8 @@ namespace IISGate
 
         // <httpErrors existingResponse>: Auto replaces an error response unless the application set
         // TrySkipIisCustomErrors (ASP.NET's own error pages set it), as IIS's integrated pipeline does; Replace always
-        // replaces; PassThrough never does. The replacement is the ExecuteURL child request's response: 200 from a
-        // static page, as IIS's static file handler answers; a page keeps the error's status.
+        // replaces; PassThrough never does. The replacement is the ExecuteURL child request's response, with its status:
+        // 200 from a static page, as IIS's static file handler answers, and from a page that sets none.
         [Theory]
         [InlineData("/errors/iis-auto/Status500.aspx", 200)]
         [InlineData("/errors/iis-auto/Status500Skip.aspx", 0)]
@@ -130,7 +131,7 @@ namespace IISGate
         [InlineData("/errors/iis-passthrough/Status500.aspx", 0)]
         [InlineData("/errors/iis-passthrough/Status500Skip.aspx", 0)]
         [InlineData("/errors/iis-on/Status500.aspx", 200)]
-        [InlineData("/errors/iis-replace-page/Status500.aspx", 500)]
+        [InlineData("/errors/iis-replace-page/Status500.aspx", 201)]
         public async Task HttpErrorsReplacesByExistingResponse(string path, int replacedWith)
         {
             var (response, body) = await Send(HttpMethod.Get, path);
@@ -139,10 +140,11 @@ namespace IISGate
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.Contains("The 500 page of &lt;httpErrors&gt;", body);
             }
-            else if (replacedWith == 500)
+            else if (replacedWith == 201)
             {
-                Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
-                Assert.StartsWith("IisError.aspx\n", body);
+                // By the page.
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.StartsWith("IisError.aspx\nstatus: 200\n", body);
             }
             else
             {
