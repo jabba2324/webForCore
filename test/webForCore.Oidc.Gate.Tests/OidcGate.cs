@@ -29,6 +29,9 @@ namespace OidcGate
                 ["WFC_IDA_AUTHORITY"] = Provider.Issuer,
                 ["WFC_IDA_REDIRECTURI"] = new Uri(AppBase, "/signin-oidc").AbsoluteUri,
                 ["WFC_IDA_POSTLOGOUTREDIRECTURI"] = AppBase.AbsoluteUri,
+                // Behind a proxy that ends TLS (Entra ID needs HTTPS redirect URIs): the host takes the scheme and client
+                // address from X-Forwarded-Proto and X-Forwarded-For (ASP.NET Core's setting). The scenarios send neither.
+                ["ASPNETCORE_FORWARDEDHEADERS_ENABLED"] = "true",
             }, out _tempDirectory);
             _process = Process.Start(start)!;
             _process.OutputDataReceived += (s, e) => { lock (_output) _output.AppendLine(e.Data); };

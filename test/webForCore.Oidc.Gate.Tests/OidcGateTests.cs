@@ -233,6 +233,40 @@ namespace OidcGate
             Assert.Contains("&x-client-SKU=ID_NET10_0&x-client-ver=" + version + ".0", response.Headers.Location!.AbsoluteUri);
         }
 
+        // Behind a proxy that ends TLS, with the host's ASPNETCORE_FORWARDEDHEADERS_ENABLED=true: Katana sees HTTPS, so
+        // the nonce cookie is Secure (browsers drop a SameSite=None cookie that isn't, and the sign-in then fails with
+        // OpenIdConnectProtocolInvalidNonceException, as "nonce cookie missing" shows), and the browser goes back to the
+        // https:// URL it asked for. Startup.Auth.cs is the same.
+        [Fact]
+        public async Task BehindATlsProxyTheNonceCookieIsSecure()
+        {
+            using var client = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false });
+            HttpRequestMessage Request(HttpMethod method, string path, string cookie = null)
+            {
+                var request = new HttpRequestMessage(method, new Uri(_gate.AppBase, path));
+                request.Headers.Add("X-Forwarded-Proto", "https");
+                request.Headers.Add("X-Forwarded-For", "203.0.113.7");
+                if (cookie != null) request.Headers.Add("Cookie", cookie);
+                return request;
+            }
+
+            using var challenge = await client.SendAsync(Request(HttpMethod.Get, "/Secure/Claims.aspx"));
+            Assert.Equal(System.Net.HttpStatusCode.Redirect, challenge.StatusCode);
+            string nonceCookie = Assert.Single(challenge.Headers.GetValues("Set-Cookie"));
+            Assert.Contains("; secure", nonceCookie, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("; SameSite=None", nonceCookie);
+
+            string html = await client.GetStringAsync(challenge.Headers.Location);
+            var fields = System.Text.RegularExpressions.Regex.Matches(html, "<input type=\"hidden\" name=\"([^\"]*)\" value=\"([^\"]*)\" />")
+                .Select(m => new KeyValuePair<string, string>(System.Net.WebUtility.HtmlDecode(m.Groups[1].Value), System.Net.WebUtility.HtmlDecode(m.Groups[2].Value)));
+            var post = Request(HttpMethod.Post, "/signin-oidc", nonceCookie.Split(';')[0]);
+            post.Content = new FormUrlEncodedContent(fields);
+            using var signedIn = await client.SendAsync(post);
+            Assert.Equal(System.Net.HttpStatusCode.Redirect, signedIn.StatusCode);
+            Assert.Equal("https://" + _gate.AppBase.Authority + "/Secure/Claims.aspx", signedIn.Headers.Location!.OriginalString);
+            Assert.Contains(signedIn.Headers.GetValues("Set-Cookie"), c => c.StartsWith(".AspNet.Cookies=wfc1.", StringComparison.Ordinal));
+        }
+
         // Katana's default TicketDataFormat on System.Web (the machine key's data protection): a cookie it wrote reads back.
         [Fact]
         public void DefaultTicketFormatRoundTrips()
