@@ -97,11 +97,14 @@ The full guide is [docs/MIGRATING.md](docs/MIGRATING.md). In outline:
    ```csharp
    var builder = WebApplication.CreateBuilder(args);
    builder.Services.AddWebForms();                 // IIS compression, W3C logging
-   builder.Services.AddDistributedMemoryCache();   // if the app uses session state
    var app = builder.Build();
-   app.UseWebForms(o => o.HandleAllRequestsWithWebForms().UseAspNetCoreSessionProvider());
+   app.UseWebForms(o => o.HandleAllRequestsWithWebForms());
    app.Run();
    ```
+   Session state is in process, as `<sessionState mode="InProc">` (the default) was on IIS. An app whose session state
+   was out of process (`StateServer`, `SQLServer`) adds `AddDistributedMemoryCache()` (or Redis, ...) and
+   `.UseAspNetCoreSessionProvider()`, and then every session value must be serializable
+   ([docs/MIGRATING.md](docs/MIGRATING.md#session-state)).
 4. **Keep `web.config`**, `<system.webServer>` included. Set an explicit `<machineKey>` so cookies and view state
    survive restarts.
 5. **Run it** from the app folder under the host, `dotnet bin_dotnet/webforcore-host/webforcore-host.dll --urls

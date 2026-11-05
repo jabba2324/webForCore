@@ -52,6 +52,24 @@ namespace MvcSample.Controllers
             return RedirectToAction("Details", new { id = product.Id });
         }
 
+        // The object the last Delete put in TempData, to tell whether the next request gets that object or a copy.
+        private static GenericMessageViewModel _lastMessage;
+
+        // As MVCForum after deleting a member or creating a topic: a message for the next page, in TempData (#180).
+        [HttpPost]
+        public ActionResult Delete(int id)
+        {
+            _lastMessage = new GenericMessageViewModel { Message = "Deleted " + id };
+            TempData["message"] = _lastMessage;
+            return RedirectToAction("Message");
+        }
+
+        public ActionResult Message()
+        {
+            var message = TempData["message"] as GenericMessageViewModel;
+            return Content(message == null ? "none" : message.Message + "; same object: " + ReferenceEquals(message, _lastMessage), "text/plain");
+        }
+
         [HttpPost]
         public ActionResult Echo(Product product)
         {

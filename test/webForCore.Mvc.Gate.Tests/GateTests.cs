@@ -125,6 +125,25 @@ namespace MvcGate
         }
 
         [Fact]
+        public async Task InProcSessionStateKeepsTheObjectsThemselves()
+        {
+            // #180 (MVCForum): the sample has no <sessionState mode>, so its session state is in process, as on IIS. A
+            // view model that isn't [Serializable] survives the redirect in TempData, and is the object the action put
+            // there: nothing is serialized. Out-of-process session state (UseAspNetCoreSessionProvider(), StateServer,
+            // SQLServer) fails here with "Unable to serialize the session state".
+            using var client = CookieClient();
+
+            HttpResponseMessage post = await client.PostAsync("/Products/Delete/1", Form(("x", "1")));
+            Assert.Equal(302, (int)post.StatusCode);
+            Assert.Equal("/Products/Message", post.Headers.Location.OriginalString);
+
+            HttpResponseMessage message = await client.GetAsync("/Products/Message");
+            Assert.Equal(200, (int)message.StatusCode);
+            Assert.Equal("Deleted 1; same object: True", await message.Content.ReadAsStringAsync());
+            Assert.Equal("none", await client.GetStringAsync("/Products/Message"));
+        }
+
+        [Fact]
         public async Task OneSessionCookie()
         {
             // #79: session state through UseAspNetCoreSessionProvider() (every application the smoke test migrates with

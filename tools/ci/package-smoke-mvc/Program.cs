@@ -8,6 +8,8 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddWebForms();
+        // The packaged out-of-process session provider, exercised on purpose: an application that was InProc on IIS
+        // leaves it out (docs/MIGRATING.md, "Session state", #180).
         builder.Services.AddDistributedMemoryCache();
         builder.Services.AddSession();
 
