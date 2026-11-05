@@ -32,6 +32,9 @@
     <!-- aspnet_compiler and the host for the precompiled site, run by PrecompilationTests. -->
     <ProjectReference Include="..\..\src\WebFormsForCore.AspNetCompiler\WebFormsForCore.AspNetCompiler.csproj" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\webForCore.Precompiled.Host\webForCore.Precompiled.Host.csproj" ReferenceOutputAssembly="false" />
+    <!-- SignalR scale-out (ScaleoutTests): the sample, run twice, and System.Data.SqlClient for its database. -->
+    <ProjectReference Include="..\webForCore.Scaleout.Sample\webForCore.Scaleout.Sample.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\src\webForCore.System.Data.SqlClient\webForCore.System.Data.SqlClient.csproj" />
     <!-- SignalR's .NET client, for the hub in the sample. -->
     <ProjectReference Include="..\..\src\webForCore.Microsoft.AspNet.SignalR.Client\webForCore.Microsoft.AspNet.SignalR.Client.csproj" />
   </ItemGroup>

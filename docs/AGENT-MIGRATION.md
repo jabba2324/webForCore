@@ -59,6 +59,7 @@ Do this before changing anything, and present the findings to the user.
    | No `.csproj` for the web site (a solution `Project("{E24C65DC-...}")` web site), `CodeFile=` in `.aspx`/`.ascx`, `Bin/*.dll.refresh` | A Web Site Project: not a blocker, but Phase 2 differs (step 3) |
    | `Transaction=` in `@Page`, `System.EnterpriseServices` | COM+: not available |
    | `DataProtectionConfigurationProvider` in a `configProtectedData` section | Must be decrypted on Windows first |
+   | `UseServiceBus`, `Microsoft.AspNet.SignalR.ServiceBus`, `.ServiceBus3` | SignalR's Azure Service Bus backplane: not available (`WindowsAzure.ServiceBus` is .NET Framework only). The Redis and SQL Server backplanes work (`webForCore.Microsoft.AspNet.SignalR.StackExchangeRedis`, `.Redis`, `.SqlServer`, MIGRATING.md "Scaling out SignalR") |
 3. List NuGet packages and DLL references in three groups:
    - (a) replaced by webForCore (the Microsoft ASP.NET packages in Phase 2);
    - (b) managed libraries to keep;

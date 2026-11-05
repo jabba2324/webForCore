@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- From SignalR/SignalR 7f53f26 (test/Microsoft.AspNet.SignalR.Redis.Tests) by way of the external/SignalR submodule (xforcore/SignalR's webforcore branch, #61).
+       Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>Microsoft.AspNet.SignalR.Redis.Tests</AssemblyName>
+    <RootNamespace>Microsoft.AspNet.SignalR.Redis.Tests</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>7.3</LangVersion>
+    <DefineConstants>$(DefineConstants);NET45;SIGNED</DefineConstants>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;CA1416;xUnit1013;xUnit1019;xUnit1031;xUnit2013;xUnit2014;xUnit1031;xUnit1048</NoWarn>
+    <!-- Delay signed with Microsoft's public key, as Microsoft's build does (the backplane's InternalsVisibleTo names it). -->
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>../../src/SigningKey/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <Import Project="../../src/webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Redis.Tests/RedisMessageBusFacts.cs" Link="RedisMessageBusFacts.cs" />
+    <Compile Include="../../external/SignalR/test/Microsoft.AspNet.SignalR.Redis.Tests/TimeoutTaskExtensions.cs" Link="TimeoutTaskExtensions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/webForCore.Microsoft.AspNet.SignalR.Core/webForCore.Microsoft.AspNet.SignalR.Core.csproj" />
+    <ProjectReference Include="../../src/webForCore.Microsoft.AspNet.SignalR.Redis/webForCore.Microsoft.AspNet.SignalR.Redis.csproj" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="xunit" Version="2.4.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5" />
+    <PackageReference Include="Moq" Version="4.21.0" />
+    <PackageReference Include="Castle.Core" Version="5.2.1" />
+  </ItemGroup>
+</Project>

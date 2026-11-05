@@ -42,6 +42,7 @@ in the code; the rest come from the test suites and gates ([TESTING.md](TESTING.
 | BinaryFormatter in app code | .NET's `System.Runtime.Serialization.Formatters.Binary.BinaryFormatter` throws (since .NET 9) | `WebFormsForCore.Serialization.Formatters.Binary.BinaryFormatter` (System.Web uses it for session and view state) |
 | Windows-DPAPI-encrypted configuration | Sections encrypted on Windows with `DataProtectionConfigurationProvider` | Decrypt them on Windows; re-encrypt with `webforcore-regiis` or RSA (see [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md#deployment-tools)) |
 | Code Access Security, partial trust | Trust levels, CAS attributes | Ignored: everything runs in full trust. A partial `<trust level>` (Medium, ...) is accepted and runs in full trust; demands of `AspNetHostingPermission` succeed at every level (#87) |
+| SignalR's Service Bus backplane | `Microsoft.AspNet.SignalR.ServiceBus`, `.ServiceBus3` (their `WindowsAzure.ServiceBus` is .NET Framework only) | The Redis or SQL Server backplane ([MIGRATING.md](MIGRATING.md#scaling-out-signalr)) |
 | Registry, WMI, COM interop, MSMQ, Office | Windows only | Replace |
 
 ## System.Web and its companions (ported)
@@ -272,9 +273,12 @@ signs in to an application configured as for Entra ID, and CI compares it with I
 
 | Assembly | Namespaces | Caveats |
 | --- | --- | --- |
-| Microsoft.AspNet.SignalR.Core 2.4.3 | `Microsoft.AspNet.SignalR` (+ `.Hubs`, `.Hosting`, `.Infrastructure`, `.Messaging`, `.Transports`, `.Json`, `.Owin`, `.Tracing`) | No scale-out backplanes (Redis, SQL Server, Service Bus) are lifted |
+| Microsoft.AspNet.SignalR.Core 2.4.3 | `Microsoft.AspNet.SignalR` (+ `.Hubs`, `.Hosting`, `.Infrastructure`, `.Messaging`, `.Transports`, `.Json`, `.Owin`, `.Tracing`) | Scale-out backplanes: the three packages below. The Service Bus ones (`Microsoft.AspNet.SignalR.ServiceBus`, `.ServiceBus3`) aren't built: `WindowsAzure.ServiceBus`, which they are written on, is .NET Framework only (every version, to 7.0.1, is built on WCF's `System.ServiceModel`), and Azure's .NET clients (`Azure.Messaging.ServiceBus`) have another API. Use Redis or SQL Server ([MIGRATING.md](MIGRATING.md#scaling-out-signalr)) |
 | Microsoft.AspNet.SignalR.SystemWeb 2.4.3 | `Microsoft.AspNet.SignalR`, `System.Web.Routing` | The obsolete `MapConnection`/`MapHubs` throw, as upstream; use `MapSignalR` |
 | Microsoft.AspNet.SignalR.Client 2.4.3 | `Microsoft.AspNet.SignalR.Client` (+ `.Hubs`, `.Http`, `.Transports`) | The JavaScript client is the app's own script, unchanged |
+| Microsoft.AspNet.SignalR.StackExchangeRedis 2.4.3 | `Microsoft.AspNet.SignalR` (`UseStackExchangeRedis`, `RedisScaleoutConfiguration`), `.StackExchangeRedis` | The Redis backplane on StackExchange.Redis 2 (a NuGet dependency, 2.9.32; Microsoft's package asks for 2.0.513 or later). As in Microsoft's 2.4.3, its error messages are missing from the assembly (its `Resources` class looks for the Redis project's), so where one would be read a `MissingManifestResourceException` is thrown |
+| Microsoft.AspNet.SignalR.Redis 2.4.3 | `Microsoft.AspNet.SignalR` (`UseRedis`, `RedisScaleoutConfiguration`), `.Redis` | The Redis backplane on StackExchange.Redis.StrongName 1.x (a NuGet dependency, 1.2.6, its .NET Standard 1.5 build; Microsoft's package asks for 1.1.608 or later). Its `RedisScaleoutConfiguration` has the full name of StackExchangeRedis's: an application references one of the two |
+| Microsoft.AspNet.SignalR.SqlServer 2.4.3 | `Microsoft.AspNet.SignalR` (`UseSqlServer`, `SqlScaleoutConfiguration`), `.SqlServer` | The SQL Server backplane, on webForCore's System.Data.SqlClient. It creates its `[SignalR]` schema and tables at start; with Service Broker on in the database (`ALTER DATABASE ... SET ENABLE_BROKER`) it is notified of new messages (`SqlDependency`), otherwise it polls, as on .NET Framework. SQL Server, not Azure SQL Database (as upstream) |
 | Microsoft.AspNet.Identity.Core / .EntityFramework / .Owin 2 | `Microsoft.AspNet.Identity`, `.EntityFramework`, `.Owin` | On Entity Framework 6.5; LocalDB is Windows only, so use SQL Server or another provider. Token providers use the DPAPI emulation |
 
 ## System.Drawing (drawingForCore)

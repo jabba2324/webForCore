@@ -104,6 +104,7 @@ IIS hands ASP.NET a worker request (`HttpWorkerRequest`); on Kestrel this is `As
 | Request queue, 503 on overflow | Partial | `appConcurrentRequestLimit` (503.2); no HTTP.sys queue |
 | Idle timeout, AlwaysRunning, preload | Not built | The app starts on its first request |
 | Web gardens | Not built | One app folder per process: run several processes behind a load balancer, with out-of-process session state |
+| Web farm (several servers behind a load balancer) | Works | Several hosts, each with its own copy of the site, as several IIS servers: the same `<machineKey>` everywhere, out-of-process session state, and for SignalR a scale-out backplane (Redis or SQL Server, Microsoft's 2.4.3 packages, [MIGRATING.md](MIGRATING.md#scaling-out-signalr)); no sticky sessions needed, as on IIS. The IIS gate tests run two instances on one Redis and on one SQL Server: messages, groups, a restart and requests alternating between the instances (`ScaleoutTests`). SignalR's Azure Service Bus backplane isn't built (.NET Framework only) |
 | Pool identity | Partial | Run each service as its own Linux user |
 | CPU and memory limits | Partial | The service manager's or container runtime's (cgroups on Linux) |
 | Several sites, applications, virtual directories in one process | Partial | One application per process, with an optional virtual path |

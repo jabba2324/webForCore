@@ -311,7 +311,7 @@ packages, so the app's `nuget.config` needs drawingForCore's feed (above). Every
 | Web API 2 | `webForCore.System.Web.Http.WebHost` (and `webForCore.System.Web.Http.Cors` for CORS) |
 | Web API on OWIN | `webForCore.System.Web.Http.Owin`, `webForCore.Microsoft.Owin.Host.SystemWeb` |
 | OWIN security | `webForCore.Microsoft.Owin.Security.Cookies`, `.OAuth`; `.OpenIdConnect` and `.Jwt` (Entra ID / Azure AD), `.WsFederation`, `.ActiveDirectory`, `.Google`, `.Facebook`, `.MicrosoftAccount`, `.Twitter` ([below](#packages-that-need-more-than-a-reference)) |
-| SignalR 2 | `webForCore.Microsoft.AspNet.SignalR.SystemWeb` |
+| SignalR 2 | `webForCore.Microsoft.AspNet.SignalR.SystemWeb`; for several instances, a backplane: `webForCore.Microsoft.AspNet.SignalR.StackExchangeRedis`, `.Redis` or `.SqlServer` ([below](#scaling-out-signalr)) |
 | ASP.NET Identity 2 | `webForCore.Microsoft.AspNet.Identity.Owin`, `webForCore.Microsoft.AspNet.Identity.EntityFramework` |
 | Bundling | `WebFormsForCore.Web.Optimization` (+ `.Optimization.WebForms` for `<webopt:BundleReference>`) |
 | Chart control | `WebFormsForCore.Web.DataVisualization` |
@@ -843,7 +843,40 @@ The first request compiles pages, as on IIS. Then compare the responses recorded
   into `<target>/bin_dotnet`. Use `-u` for updatable sites.
 - **Scaling out:** use out-of-process session state (Redis or SQL Server through ASP.NET Core's distributed cache) and
   the same `<machineKey>` everywhere.
+  SignalR needs a backplane too ([below](#scaling-out-signalr)).
 - Several processes must not share one site folder: they share the compilation folder.
+
+### Scaling out SignalR
+
+On one instance SignalR keeps its messages in that process: behind a load balancer, a client connected to one instance
+gets nothing a hub sends on another. As on IIS, a **backplane** joins the instances' message buses. webForCore builds
+Microsoft's three that run on .NET, from SignalR 2.4.3's source, with Microsoft's names and versions, so the code and
+configuration an IIS web farm has work unchanged:
+
+| Backplane | Package (in place of Microsoft's) | In `Startup.Configuration`, before `MapSignalR` |
+| --- | --- | --- |
+| Redis, on StackExchange.Redis 2 | `webForCore.Microsoft.AspNet.SignalR.StackExchangeRedis` (`Microsoft.AspNet.SignalR.StackExchangeRedis`) | `GlobalHost.DependencyResolver.UseStackExchangeRedis(new RedisScaleoutConfiguration("redis:6379,password=...", "MyApp"));` |
+| Redis, on StackExchange.Redis.StrongName 1.x | `webForCore.Microsoft.AspNet.SignalR.Redis` (`Microsoft.AspNet.SignalR.Redis`) | `GlobalHost.DependencyResolver.UseRedis("redis", 6379, "password", "MyApp");` |
+| SQL Server | `webForCore.Microsoft.AspNet.SignalR.SqlServer` (`Microsoft.AspNet.SignalR.SqlServer`) | `GlobalHost.DependencyResolver.UseSqlServer(ConfigurationManager.ConnectionStrings["SignalR"].ConnectionString);` |
+
+- **Connection settings** are the backplane's own, as on .NET Framework: a StackExchange.Redis configuration string
+  (`host:port,password=...,ssl=true,abortConnect=false`) and an event key, the Redis channel every instance of the
+  application shares; or a SQL Server connection string (with `TrustServerCertificate=True` or a trusted certificate,
+  as above). The SQL Server backplane creates its `[SignalR]` schema and tables at start, so its login needs
+  `CREATE SCHEMA` and `CREATE TABLE` the first time; turn Service Broker on in its database (`ALTER DATABASE ... SET
+  ENABLE_BROKER`) and it is notified of each message, otherwise it polls. `SqlScaleoutConfiguration.TableCount` spreads
+  the messages over several tables. Azure SQL Database isn't supported, as upstream.
+- **Sticky sessions aren't needed** with a backplane, as on IIS: any instance can serve any request of a connection,
+  long polling's polls and sends included. Every instance needs **the same `<machineKey>`**: SignalR protects its
+  connection and groups tokens with it, so a token one instance gave must read on the others and on an instance after
+  it restarts. With the keys the same, a client whose instance restarts reconnects to it (or to another) with its
+  connection and groups.
+- The **Redis and StackExchange.Redis packages' dependencies** (StackExchange.Redis.StrongName, StackExchange.Redis) are
+  NuGet packages, restored as they are: webForCore ships only Microsoft's assemblies.
+- **Azure Service Bus** (`Microsoft.AspNet.SignalR.ServiceBus`, `.ServiceBus3`) isn't built: `WindowsAzure.ServiceBus`
+  is .NET Framework only. Move to the Redis or SQL Server backplane (or Azure Cache for Redis).
+- The IIS gate tests run two instances of an application, each under its own `webforcore-host`, on each backplane
+  (`ScaleoutTests`, [TESTING.md](TESTING.md)).
 
 ## Troubleshooting
 
