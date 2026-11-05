@@ -12,12 +12,16 @@
 //
 // --title=<text> names the IIS side in the report, --gate=<text> the requests (default "Web API gate"); --informational
 // prints the report and exits with 0. The request handling sample (test/webForCore.Requests.Sample, RequestHandlingTests
-// writes requests-responses.json) is compared the same way, with tools/ci/iis-known-differences-requests.json.
+// writes requests-responses.json) is compared the same way, with tools/ci/iis-known-differences-requests.json, and so is
+// the application under a virtual path (test/webForCore.VirtualPath.Sample, VirtualPathTests writes vpath-responses.json,
+// tools/ci/iis-known-differences-vpath.json); replay's --warmup=<path> is the first request, which starts the
+// application (/api/values by default).
 //
 // Both sides are normalised before the comparison: each side's own base address (http://127.0.0.1:<port>) becomes
 // {base} wherever it appears (Location headers, bodies); stack traces are removed from Web API's JSON errors, as
 // GateTests does for its oracle, and from ASP.NET's error pages (the comment at the end), since they name source files
-// and line numbers; and Content-Length is compared as present or absent (the bodies are compared themselves).
+// and line numbers; Content-Length is compared as present or absent (the bodies are compared themselves); and the values
+// of the forms authentication and session cookies, which are random, are left out of Set-Cookie.
 #:property NuGetAudit=false
 using System.Net;
 using System.Net.Http.Headers;
@@ -28,7 +32,8 @@ using System.Text.RegularExpressions;
 
 var json = new JsonSerializerOptions { WriteIndented = true, TypeInfoResolver = System.Text.Json.Serialization.Metadata.JsonTypeInfoResolver.Combine() };
 
-if (args.Length >= 4 && args[0] == "replay") return await Replay(args[1], new Uri(args[2]), args[3]);
+if (args.Length >= 4 && args[0] == "replay")
+    return await Replay(args[1], new Uri(args[2]), args[3], args.FirstOrDefault(a => a.StartsWith("--warmup="))?["--warmup=".Length..] ?? "/api/values");
 var options = args.Where(a => a.StartsWith("--")).ToList();
 var positional = args.Where(a => !a.StartsWith("--")).ToArray();
 if (positional.Length >= 3 && positional[0] == "diff")
@@ -39,10 +44,10 @@ if (positional.Length >= 3 && positional[0] == "diff")
     // --informational: the report only, exit code 0.
     return options.Contains("--informational") ? 0 : result;
 }
-Console.Error.WriteLine("Usage: iis_compare.cs replay <gate-responses.json> <base URL> <out.json>\n       iis_compare.cs diff <gate-responses.json> <iis-responses.json> [<known differences.json>] [--title=<IIS side>] [--gate=<requests>] [--informational]");
+Console.Error.WriteLine("Usage: iis_compare.cs replay <gate-responses.json> <base URL> <out.json> [--warmup=<path>]\n       iis_compare.cs diff <gate-responses.json> <iis-responses.json> [<known differences.json>] [--title=<IIS side>] [--gate=<requests>] [--informational]");
 return 2;
 
-async Task<int> Replay(string recordedPath, Uri baseAddress, string outPath)
+async Task<int> Replay(string recordedPath, Uri baseAddress, string outPath, string warmupPath)
 {
     var recorded = JsonNode.Parse(File.ReadAllText(recordedPath))!.AsObject();
     using var client = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false })
@@ -55,7 +60,7 @@ async Task<int> Replay(string recordedPath, Uri baseAddress, string outPath)
     {
         try
         {
-            using var warmup = await client.GetAsync(new Uri(baseAddress, "/api/values"));
+            using var warmup = await client.GetAsync(new Uri(baseAddress, warmupPath));
             Console.WriteLine($"warm-up: {(int)warmup.StatusCode}");
             break;
         }
@@ -191,7 +196,10 @@ string BaseOf(JsonObject entry)
 
 Dictionary<string, string> Headers(JsonObject entry, string baseAddress) =>
     entry["headers"]!.AsObject().ToDictionary(h => h.Key,
-        h => h.Key.Equals("Content-Length", StringComparison.OrdinalIgnoreCase) ? "(present)" : ((string)h.Value!).Replace(baseAddress, "{base}"),
+        h => h.Key.Equals("Content-Length", StringComparison.OrdinalIgnoreCase) ? "(present)"
+            // The values of forms authentication's and session state's cookies are random; their attributes are compared.
+            : h.Key.Equals("Set-Cookie", StringComparison.OrdinalIgnoreCase) ? Regex.Replace(((string)h.Value!).Replace(baseAddress, "{base}"), @"(\.ASPXAUTH|ASP\.NET_SessionId)=[^;]*", "$1={value}")
+            : ((string)h.Value!).Replace(baseAddress, "{base}"),
         StringComparer.OrdinalIgnoreCase);
 
 string? Body(JsonObject entry, string baseAddress)

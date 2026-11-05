@@ -450,8 +450,10 @@ These came up migrating real applications; each names one that needed it.
   the OpenID Connect gate runs the "Work or School Accounts" template's, configured as a customer application has it
   for Entra ID (code id_token, form_post, the code redeemed, `SaveTokens`, notifications, its own ticket and state
   formats, JWT and IdentityServer3 bearer tokens on its Web API), and compares it with IIS 10. For Entra ID:
-  - **Behind a proxy that ends TLS** (an ingress, a load balancer, App Gateway), set `ASPNETCORE_FORWARDEDHEADERS_ENABLED=true`
-    in `webforcore-host`'s environment, so that X-Forwarded-Proto and X-Forwarded-For reach the application. Katana marks
+  - **Behind a proxy that ends TLS** (an ingress, a load balancer, App Gateway), have the host apply its
+    X-Forwarded-Proto and X-Forwarded-For: `WebForCore:Host:ForwardedHeaders` with the proxy's address, or
+    `ASPNETCORE_FORWARDEDHEADERS_ENABLED=true` in `webforcore-host`'s environment where only the proxy can reach the
+    host ([Behind a reverse proxy](#behind-a-reverse-proxy)). Katana marks
     its nonce cookie `Secure` only on an HTTPS request, and the cookie is `SameSite=None` (the form_post comes from
     Entra ID's site): without `Secure`, browsers drop it, and every sign-in fails with
     `OpenIdConnectProtocolInvalidNonceException` (IDX21323), as on IIS behind such a proxy. The setting also sends the
@@ -597,6 +599,112 @@ applies, as on IIS:
 Up to 0.7.0, the provider kept session state inside ASP.NET Core's session, which set a second cookie
 (`.AspNetCore.Session`), needed `UseSession()`, and ended sessions after `SessionOptions.IdleTimeout`. Sessions stored
 before the upgrade aren't found after it: users start new ones.
+
+### An application under a path
+
+An application that IIS ran under a site's path (`https://host/app`: an *application* of the site in IIS Manager, not
+the site itself) gets the same path in `UseWebForms`:
+
+```csharp
+app.UseWebForms(o => o
+    .HandleAllRequestsWithWebForms()
+    .VirtualPath("/app"));                      // IIS's application /app
+```
+
+The application then sees the path as it did on IIS (#190; `VirtualPathTests` in the IIS gate, and CI's `iis-compare`
+job sends the same requests to the same application as `/app` of an IIS 10 site):
+
+- `HttpRuntime.AppDomainAppVirtualPath` and `Request.ApplicationPath` are `/app`, `APPL_MD_PATH` is
+  `/LM/W3SVC/1/ROOT/app`. `Request.Path`, `FilePath`, `CurrentExecutionFilePath`, `RawUrl`, `Url` and the `PATH_INFO`,
+  `SCRIPT_NAME` and `URL` variables are the whole URL (`/app/Page.aspx`); `AppRelativeCurrentExecutionFilePath` is
+  `~/Page.aspx`.
+- Everything made from `~/` starts with `/app/`: `ResolveUrl`, `VirtualPathUtility.ToAbsolute`,
+  `Response.Redirect("~/...")`, `FormsAuthentication.LoginUrl` and `DefaultUrl` (and the redirect to the log-in page,
+  with `ReturnUrl=%2fapp%2f...`), System.Web.Optimization's bundle URLs (`/app/bundles/site?v=...`), MVC's
+  `Url.Content`, `Url.Action` and `Url.RouteUrl`, Web API's `Url.Link`, `Url.Route` and `RequestContext.VirtualPathRoot`,
+  and Swashbuckle's `basePath`. Routes stay relative to the application (`{controller}/{action}`, `api/{controller}`),
+  as on IIS.
+- The forms authentication and session cookies' path is `/`, as on IIS (`<forms path>` is `/` unless the application
+  sets it).
+- The path matches in any case (`/APP/Page.aspx`), and the request's own paths keep the case it was asked in.
+- `/app` without its trailing slash is the application's own URL: a route that takes `~/` (MVC's default route) serves
+  it, as on IIS; otherwise it is redirected (301) to `/app/`, as a directory of the application asked for without its
+  slash is (`/app/Content` to `http://host/app/Content/`).
+- `<system.webServer>` settings in `<location path>` elements and subfolders apply relative to the application, as on
+  IIS.
+- URLs outside `/app` aren't the application's: they go on to whatever the ASP.NET Core pipeline has after
+  `UseWebForms`, which answers 404 at its end, where IIS gave them to the site or its other applications. Up to 0.9.0
+  they reached the application, and one outside it failed with 500.
+- It is the same under `webforcore-host`: the host forwards every URL as the client sent it, and the worker applies
+  the path. `UsePathBase("/app")` isn't needed; before `UseWebForms` it does no harm, but on its own it doesn't give the
+  application its path.
+
+Each IIS application runs as a process of its own on webForCore: the site's other applications are other
+webForCore applications (each with its own `VirtualPath`), behind a proxy that sends each path to its own.
+
+**A proxy that strips the path** (it gets `https://host/app/Page.aspx` and sends `/Page.aspx`) makes the application
+one at `/`: every URL it makes (links, redirects, `LoginUrl`, bundles, Web API's links) lacks `/app`, and only rewriting
+the responses on the way back would fix them. Have the proxy forward the path as it is and set `VirtualPath` instead.
+`X-Forwarded-Prefix` isn't taken: the application's path is fixed when it starts, as an IIS application's is.
+
+### Behind a reverse proxy
+
+On IIS, a request's client address and scheme are those of the connection to IIS: behind a load balancer or an
+ingress that ends TLS, `Request.UserHostAddress` is the proxy's address and `Request.IsSecureConnection` is false,
+unless something applies `X-Forwarded-For` and `X-Forwarded-Proto` (an `HttpModule`, or URL Rewrite's
+`<serverVariables>`). webForCore is the same by default: `X-Forwarded-*` are request headers like any other. These
+apply them (#194; `ForwardedHeadersTests` in the IIS gate, and `AModuleSetsRemoteAddrAndHttps`, which CI also runs on
+IIS 10):
+
+- **The host's `WebForCore:Host:ForwardedHeaders`** (recommended). `webforcore-host` applies the headers of the
+  proxies it trusts, with ASP.NET Core's forwarded headers middleware, before it forwards the request to the worker;
+  only the host sees which proxy a request came from. In the host's configuration (the application's
+  `appsettings.json`, or `WebForCore__Host__ForwardedHeaders__...` environment variables):
+  ```json
+  "WebForCore": {
+    "Host": {
+      "ForwardedHeaders": {
+        "Headers": "XForwardedFor, XForwardedProto",
+        "KnownProxies": [ "10.0.0.4" ],
+        "KnownNetworks": [ "10.1.0.0/16" ]
+      }
+    }
+  }
+  ```
+  `Headers`: `XForwardedFor`, `XForwardedProto`, `XForwardedHost` (none by default; `XForwardedPrefix` stops the host
+  with an explanation, see above). `KnownProxies` and `KnownNetworks`: the proxies trusted; with neither, a proxy on
+  the same machine (the loopback addresses). Headers from any other peer are ignored, so a client that can reach the
+  host directly can't set its own address or scheme. `ForwardLimit` (1): how many proxies' entries are applied, from
+  the right; a client's own entries before them aren't. `AllowedHosts`: the names `X-Forwarded-Host` may give. The
+  host logs the setting when it starts (`Forwarded headers: ... from ...`).
+- **ASP.NET Core's `ASPNETCORE_FORWARDEDHEADERS_ENABLED=true`** in the host's environment: `X-Forwarded-For` and
+  `X-Forwarded-Proto` from *any* peer, so only where nothing but the proxy can reach the host (a container behind its
+  ingress). The host applies it; its workers don't apply it again. Up to 0.9.0 they did, and took the entry a client
+  had put in `X-Forwarded-For` before the proxy's own: a client could set its address past the proxy.
+- **The application's own `app.UseForwardedHeaders(...)`** before `UseWebForms`, with the headers named
+  (`new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto }`,
+  and `KnownProxies` unless the proxy is on the same machine): it runs in the worker, where the connection's address is
+  the one the host received, so it trusts the same peers it would without the host. `UseForwardedHeaders()` with no
+  options applies nothing, as in ASP.NET Core.
+- **A module that sets server variables**, as applications did on IIS's integrated pipeline:
+  `Request.ServerVariables["REMOTE_ADDR"] = ...` and `Request.ServerVariables["HTTPS"] = "on"` in `BeginRequest` change
+  `Request.UserHostAddress`, `IsSecureConnection` and `Request.Url`'s scheme for the rest of the request, as on IIS
+  (and `LOCAL_ADDR`, `SERVER_NAME`, `SERVER_PORT` likewise). `REMOTE_HOST` keeps the connection's address, and
+  `SERVER_PORT_SECURE` its value once `ServerVariables` has been read, as on IIS. Before 0.10.0 only the
+  `ServerVariables` collection changed. The module must check that the request came from the proxy, as on IIS.
+  (URL Rewrite's `<serverVariables>` aren't built.)
+
+With the headers applied, the application sees the client's address in `Request.UserHostAddress`, `REMOTE_ADDR` and
+`<ipSecurity>` (without `enableProxyMode`; with it, the entries left in `X-Forwarded-For` are checked too), and the
+proxy's scheme in `IsSecureConnection`, `HTTPS`, `SERVER_PORT_SECURE` and `Request.Url`: forms authentication's
+`requireSSL` cookie is issued and read, MVC's `[RequireHttps]` passes, Katana's cookies are `Secure`. With
+`XForwardedHost`, `SERVER_NAME` and `Request.Url`'s host are the proxy's. `SERVER_PORT`, and so `Request.Url`'s port,
+stay the host binding's, as on IIS behind such a proxy: absolute URLs made from `Request.Url` (Web API's `Url.Link`,
+`Url.RouteUrl` with a protocol) are `https://www.example.com:8080/...`. `<add key="aspnet:UseHostHeaderForRequestUrl"
+value="true" />` in `<appSettings>` makes `Request.Url` from the `Host` header instead, as on .NET Framework (with
+`XForwardedHost`, the proxy's). `X-Forwarded-For` keeps the entries that weren't applied, and ASP.NET Core adds
+`X-Original-For` and `X-Original-Proto` with the values replaced. Swashbuckle reads `X-Forwarded-Proto`, `-Host` and
+`-Port` itself, whatever the setting, as on IIS.
 
 ## 5. Configuration
 
@@ -834,6 +942,9 @@ The first request compiles pages, as on IIS. Then compare the responses recorded
   configuration. The host's own settings (startup and shutdown time limits, rapid-fail protection) are in the
   `WebForCore:Host` section ([IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md#process-model)).
 - **In front:** a reverse proxy (nginx, Apache, a load balancer) for TLS and the public port, or the host's own HTTPS.
+  Behind a proxy, have the host apply its `X-Forwarded-*` headers ([Behind a reverse proxy](#behind-a-reverse-proxy));
+  an application that IIS ran under a site's path gets the path with `VirtualPath`, and the proxy forwards it as it is
+  ([An application under a path](#an-application-under-a-path)).
 - **Recycling:** a `web.config`, `bin` or `App_Code` change restarts the app in a new worker process, as IIS did; no
   request fails (the old worker finishes against the assemblies it compiled, #89), and those that arrive meanwhile
   wait for the new worker. Set time, request or memory recycling with `UseWebForms(o => o.Recycling(...))`. Run without

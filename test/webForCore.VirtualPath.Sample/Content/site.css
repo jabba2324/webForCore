@@ -1,0 +1,5 @@
+/* The application's styles, bundled into ~/Content/css; the image URL is relative to this file. */
+body {
+    background: url("images/back.png");
+    margin: 0;
+}

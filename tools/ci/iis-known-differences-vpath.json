@@ -1,0 +1,22 @@
+[
+  {
+    "requests": ".*",
+    "field": "header Server",
+    "reason": "IIS sends Server: Microsoft-IIS/10.0; webForCore's host is Kestrel."
+  },
+  {
+    "requests": "^GET /(Probe\\.aspx|other|appx/Probe\\.aspx)$",
+    "field": "body",
+    "reason": "A URL outside the application is IIS's site's: its native 404.0 page (the site's root is empty). On webForCore it goes on to the rest of the ASP.NET Core pipeline, which ends with an empty 404. Same status."
+  },
+  {
+    "requests": "^GET /(Probe\\.aspx|other|appx/Probe\\.aspx)$",
+    "field": "header Content-Type",
+    "reason": "IIS's native 404.0 page for a URL outside the application is text/html; ASP.NET Core's empty 404 has no Content-Type."
+  },
+  {
+    "requests": "^GET /(Probe\\.aspx|other|appx/Probe\\.aspx)$",
+    "field": "header X-Powered-By",
+    "reason": "IIS's site adds X-Powered-By: ASP.NET (applicationHost.config) to its 404 for a URL outside the application; the application's <customHeaders> don't apply there, and webForCore's empty 404 has none."
+  }
+]
