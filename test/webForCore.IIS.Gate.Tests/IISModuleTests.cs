@@ -234,12 +234,14 @@ namespace IISGate
             Assert.Contains("The resource cannot be found.", body);
         }
 
-        // existingResponse="Replace" with <error statusCode="500" responseMode="ExecuteURL" path="/Error.aspx"/>.
+        // existingResponse="Replace" with <error statusCode="500" responseMode="ExecuteURL" path="/Error.aspx"/>. The
+        // response is the child request's: Error.aspx sets no status, so 200, as IIS 10 answers in both pipelines (#192,
+        // CI's iis-compare job: ErrorsAndLimitsTests' /errors/iis-replace-page/).
         [Fact]
         public async Task HttpErrorsReplaceExecutesUrl()
         {
             var (response, body) = await Get("/replace/Throw.aspx");
-            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Contains("Custom 500 page", body);
             Assert.DoesNotContain("InvalidOperationException", body);
         }

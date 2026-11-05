@@ -2574,7 +2574,10 @@ namespace System.Web {
             }
             else {
                 // VSO bug 360276
-                if(HttpRuntime.UseIntegratedPipeline) {
+                // webForCore: also on the Kestrel host, which applies integrated mode's Content-Type rule
+                // (GenerateResponseHeaders): a redirect before a handler ran, as customErrors makes for a page that
+                // doesn't exist, had no Content-Type; IIS's integrated pipeline sends text/html (#192).
+                if(HttpRuntime.UseIntegratedPipeline || _wr is IAspNetCoreWorkerRequest) {
                     this.ContentType = "text/html";
                 }
 
@@ -3537,7 +3540,7 @@ namespace System.Web {
 
         private String UrlEncodeIDNSafe(String url) {
             // Bug 86594: Should not encode the domain part of the url. For example,
-            // http://Übersite/Überpage.aspx should only encode the 2nd Ü.
+            // http://ï¿½bersite/ï¿½berpage.aspx should only encode the 2nd ï¿½.
             // To accomplish this we must separate the scheme+host+port portion of the url from the path portion,
             // encode the path portion, then reconstruct the url.
             Debug.Assert(!url.Contains("?"), "Querystring should have been stripped off.");

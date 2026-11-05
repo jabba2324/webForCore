@@ -56,4 +56,10 @@
     <!-- Built against Microsoft's System.Web.Optimization 1.1.0.0, as SmartStoreNET has it (#141). -->
     <PackageReference Include="BundleTransformer.Core" Version="1.10.0" />
   </ItemGroup>
+
+  <!-- -p:SmokeSqlClient=Microsoft: the application references Microsoft's supported System.Data.SqlClient package, at a
+       later version than webForCore's, which then is the one in the build (#195). -->
+  <ItemGroup Condition="'$(SmokeSqlClient)' == 'Microsoft'">
+    <PackageReference Include="System.Data.SqlClient" Version="4.9.1" />
+  </ItemGroup>
 </Project>

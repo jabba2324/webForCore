@@ -125,7 +125,13 @@ commit that made it, and its issue, say why.
   server name from the Host header, `X-AspNet-Version` and the default `Cache-Control: private` only once a managed
   handler ran, the response was flushed or an error was reported; a cache header (`Expires`, `Cache-Control`, ...) set
   through `Response.Headers` stays when the cache policy writes its own, which then replaces only the same names, as
-  in IIS's header block (Katana's cookie middleware's `Expires: -1`, found by the OpenID Connect comparison with IIS 10).
+  in IIS's header block (Katana's cookie middleware's `Expires: -1`, found by the OpenID Connect comparison with IIS 10);
+  `Response.Redirect` sets `text/html` as in the integrated pipeline, so a redirect before any handler ran (customErrors'
+  for a page that doesn't exist) has its Content-Type (#192).
+- **.NET's base class library, where an application sees the difference:** `HttpException` and its subclasses built
+  with a null message have .NET Framework's `Exception` default ("Exception of type '...' was thrown."), not .NET's
+  `ExternalException` one ("External component has thrown an exception."): Page.HandleError's `HttpUnhandledException`
+  on error pages and in `Server.GetLastError()` (#192).
 - **Configuration:** protected configuration on Linux (DPAPI emulation, RSA key containers as files), section type
   identity across load contexts, `machine.config` refreshed by content.
 - **Compilation:** csc and vbc run in process, through Roslyn's public API (below), and `AssemblyBuilder` loads every
@@ -176,6 +182,9 @@ commit that made it, and its issue, say why.
     next to webForCore's System.Web (CS0433, CS7069 otherwise). They are matched by the reference pack's name, not by
     the SDK's `packs` folder: an SDK newer than the target framework takes the pack from the NuGet cache
     (`microsoft.netcore.app.ref/<version>/`). `tools/ci/package-smoke.sh` builds once that way.
+  - One System.Data.SqlClient (#41, #195): Microsoft's package when the build has it at 4.9.0 or later, otherwise
+    `webForCore.Data.SqlClient`; the other's compile, runtime and runtime-target assets are removed as soon as NuGet's
+    assets are resolved (`WebForCoreSystemDataSqlClient` decides it explicitly).
 - **Run-time compilation** adds the targets of a referenced facade's type forwards (CS0012 otherwise), leaving out
   those whose types System.Web defines itself (`HttpUtility`).
 - **BinaryFormatter port:** surrogates for .NET Framework types .NET no longer serializes (`NameValueCollection`
@@ -232,7 +241,11 @@ commit that made it, and its issue, say why.
   application's web.config, and the load context's resolver searches those folders after the build output, in fusion's
   order (#147, Orchard; [NAMESPACES.md](NAMESPACES.md)). As fusion does, it checks the version only of a strong-named
   reference: for one without a public key token, the assembly of that name it finds is the one, whatever its version
-  (#171, JabbR deploys Nancy 0.20.0 and a library built against 0.21.1).
+  (#171, JabbR deploys Nancy 0.20.0 and a library built against 0.21.1). It reads `<dependentAssembly>` too and applies
+  `<bindingRedirect>` and `<codeBase>` as fusion does (#158; a customer application has about 60 redirects, many to a
+  version lower than or equal to the one its references were built against): a redirected reference loads the new
+  version through the load context, and a code base is the only place a version is looked for. The call in
+  `HttpRuntime.InitFusion` is webForCore's own (`AssemblyLoaderNetCore.ReadAssemblyBinding`).
 - **System.Web.DynamicData** (`src/WebFormsForCore.Web.DynamicData`, now built and in the "Always" set): the Entity
   Framework 1–4 and LINQ to SQL model providers, `LinqDataSource`/`EntityDataSource` hookups and EF 5 spatial column
   types are compiled out (`#if NETFRAMEWORK`); `AssemblyRef.cs` and `ScaffoldTableAttribute` (which .NET dropped) are
