@@ -225,7 +225,8 @@ jobs:
   # Then the same for request handling (#126, #127, #129, #140): test/webForCore.Requests.Sample, served by IIS as it is,
   # gets the requests IIS.Gate.Tests' RequestHandlingTests sent to it, compared with the classic pipeline
   # (tools/ci/iis-known-differences-requests.json). Then <httpRuntime fcnMode> (#167): the changes that restart an application
-  # in Single and Default mode, against what Host.Tests asserts of webForCore (tools/ci/iis_fcn.cs).
+  # in Single and Default mode, against what Host.Tests asserts of webForCore (tools/ci/iis_fcn.cs). Then a request running
+  # when the application restarts (#181, tools/ci/iis_drain.cs).
   iis-compare:
     needs: build-and-test
     runs-on: windows-2025
@@ -336,6 +337,34 @@ jobs:
           dotnet run tools/ci/iis_fcn.cs -- check "$RUNNER_TEMP/fcn-Default" http://localhost:8095/ Default "$RUNNER_TEMP/gate/iis-fcn.md" || status=1
           dotnet run tools/ci/iis_fcn.cs -- check "$RUNNER_TEMP/fcn-Fresh" http://localhost:8096/ Single "$RUNNER_TEMP/gate/iis-fcn.md" fresh
           cat "$RUNNER_TEMP/gate/iis-fcn.md" | tee -a "$GITHUB_STEP_SUMMARY"
+          exit $status
+
+      # A request running when the application restarts (#181): on IIS it runs to its end in the old domain, even
+      # past <httpRuntime shutdownTimeout>, while a new domain serves new requests (tools/ci/iis_drain.cs), as RecyclingTests
+      # asserts of webForCore. The sites are written before IIS serves them, as the fcnMode ones.
+      - name: Drain sites
+        if: ${{ !cancelled() }}
+        run: |
+          dotnet run tools/ci/iis_drain.cs -- site "$RUNNER_TEMP/drain-Classic"
+          dotnet run tools/ci/iis_drain.cs -- site "$RUNNER_TEMP/drain-Integrated"
+
+      - name: Drain sites on IIS 10
+        if: ${{ !cancelled() }}
+        shell: powershell
+        run: |
+          # The WebSocket Protocol role service, for the integrated site's WebSocket.
+          Install-WindowsFeature -Name Web-WebSockets | Out-Null
+          tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\drain-Classic" -Name drain-classic -Port 8097 -Pipeline Classic
+          tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\drain-Integrated" -Name drain-integrated -Port 8098 -Pipeline Integrated
+
+      - name: A request running across a restart
+        if: ${{ !cancelled() }}
+        run: |
+          echo "## A request running when the application restarts (#181)" > "$RUNNER_TEMP/gate/iis-drain.md"
+          status=0
+          dotnet run tools/ci/iis_drain.cs -- check "$RUNNER_TEMP/drain-Classic" http://localhost:8097/ Classic "$RUNNER_TEMP/gate/iis-drain.md" || status=1
+          dotnet run tools/ci/iis_drain.cs -- check "$RUNNER_TEMP/drain-Integrated" http://localhost:8098/ Integrated "$RUNNER_TEMP/gate/iis-drain.md" || status=1
+          cat "$RUNNER_TEMP/gate/iis-drain.md" | tee -a "$GITHUB_STEP_SUMMARY"
           exit $status
 
       - name: Upload the responses
