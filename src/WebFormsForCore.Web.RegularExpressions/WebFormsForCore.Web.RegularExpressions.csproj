@@ -8,6 +8,8 @@
 		<DefineConstants>$(DefineConstants);WebFormsForCore</DefineConstants>
 		<SignAssembly>True</SignAssembly>
         <AssemblyName>System.Web.RegularExpressions</AssemblyName>
+        <!-- webForCore: .NET Framework 4's identity (#141). -->
+        <MicrosoftAssemblyVersion>4.0.0.0</MicrosoftAssemblyVersion>
         <AssemblyOriginatorKeyFile>..\SigningKey\WebFormsForCore.snk</AssemblyOriginatorKeyFile>
 
         <PackageId>webForCore.Web.RegularExpressions</PackageId>

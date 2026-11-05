@@ -133,6 +133,12 @@ jobs:
       - name: Pack
         run: tools/ci/pack.sh ${{ steps.version.outputs.version }} "$RUNNER_TEMP/packages"
 
+      # Every assembly in the packages has the identity of the Microsoft assembly it replaces (name, version, culture,
+      # public key token), read from Microsoft's NuGet package (#141: System.Web.Optimization was 11.0.0.0 with another
+      # token, and BundleTransformer didn't compile against it).
+      - name: Assembly identities
+        run: dotnet run tools/ci/check_assembly_identities.cs -- "$RUNNER_TEMP/packages"
+
       # An application that references the webForCore package (not the projects) builds, runs and serves pages.
       - name: Package smoke test
         run: tools/ci/package-smoke.sh "$RUNNER_TEMP/packages" ${{ steps.version.outputs.version }}
@@ -204,6 +210,9 @@ jobs:
 
       - name: Pack
         run: tools/ci/pack.sh 0.0.0-windows.${{ github.run_number }} "$RUNNER_TEMP/packages"
+
+      - name: Assembly identities
+        run: dotnet run tools/ci/check_assembly_identities.cs -- "$RUNNER_TEMP/packages"
 
       - name: Package smoke test
         run: tools/ci/package-smoke.sh "$RUNNER_TEMP/packages" 0.0.0-windows.${{ github.run_number }}

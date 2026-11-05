@@ -1,5 +1,5 @@
 // webForCore: the assembly identities the Reference Source names through its build-generated AssemblyRef class (MIT
-// license). System.Web, System.Web.Mobile and System.Configuration carry webForCore's identities on .NET.
+// license). System.Web and System.Configuration carry webForCore's identities on .NET; System.Web.Mobile has .NET Framework's (#141).
 namespace System.Web
 {
 	internal static class AssemblyRef
@@ -18,7 +18,7 @@ namespace System.Web
 #else
 		internal const string SystemConfiguration = "System.Configuration.ConfigurationManager, Version=13.5.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51";
 		internal const string SystemWeb = "System.Web, Version=11.0.0.0, Culture=neutral, PublicKeyToken=" + MicrosoftPublicKey;
-		internal const string SystemWebMobile = "System.Web.Mobile, Version=11.0.0.0, Culture=neutral, PublicKeyToken=" + MicrosoftPublicKey;
+		internal const string SystemWebMobile = "System.Web.Mobile, Version=4.0.0.0, Culture=neutral, PublicKeyToken=" + MicrosoftPublicKey;
 #endif
 		internal const string SystemDesign = "System.Design, Version=4.0.0.0, Culture=neutral, PublicKeyToken=" + MicrosoftPublicKey;
 		internal const string SystemDrawingDesign = "System.Drawing.Design, Version=4.0.0.0, Culture=neutral, PublicKeyToken=" + MicrosoftPublicKey;
