@@ -334,8 +334,10 @@ namespace IISGate
         }
     }
 
-    // The scale-out classes run one after another, each with its two instances, so that one farm runs at a time.
-    [CollectionDefinition(Name)]
+    // The scale-out classes run one after another, each with its two instances, so that one farm runs at a time, and
+    // after the other collections, not beside them: four more processes (two hosts, two workers) next to the samples'
+    // would make the suite's load, and its use of inotify instances on Linux, higher than it needs to be.
+    [CollectionDefinition(Name, DisableParallelization = true)]
     public class ScaleoutCollection
     {
         public const string Name = "Scale-out";
