@@ -545,7 +545,7 @@ namespace System.Web.Hosting
             // Type.GetType will return null if the type doesn't exist; it will throw on catastrophic failure.
             var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly()); ;
             Type appContextType = Type.GetType("System.AppContext, " + AssemblyRef.Mscorlib,
-                    assemblyName => alc.LoadFromAssemblyName(assemblyName),
+                    AssemblyLoaderNetCore.TypeAssemblyResolver(alc, false),
                     (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase)));
             if (appContextType == null)
             {

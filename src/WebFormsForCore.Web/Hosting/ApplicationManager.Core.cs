@@ -1853,7 +1853,7 @@ setup,
                         var alc = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
                         hostSecurityPolicyResolver = Activator.CreateInstance(
                             Type.GetType(HttpRuntime.HostSecurityPolicyResolverType,
-                                assemblyName => alc.LoadFromAssemblyName(assemblyName),
+                                AssemblyLoaderNetCore.TypeAssemblyResolver(alc, false),
                                 (asm, typeName, ignoreCase) => (asm != null ? asm.GetType(typeName, false, ignoreCase) : global::System.Type.GetType(typeName, false, ignoreCase))
                                 )) as HostSecurityPolicyResolver;
                     }
