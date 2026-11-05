@@ -81,16 +81,30 @@ async Task<int> Replay(string recordedPath, Uri baseAddress, string outPath)
         // The request's own headers, if it was recorded with any (RequestHandlingTests, #170).
         if (request["headers"] is JsonObject requestHeaders)
             foreach (var (name, value) in requestHeaders) message.Headers.TryAddWithoutValidation(name, (string?)value);
+        // A body recorded as a text and a number of repeats (bodyRepeat, #192: a large upload).
+        int repeat = (int?)request["bodyRepeat"] ?? 1;
         if ((string?)request["body"] is string body)
         {
-            message.Content = new ByteArrayContent(Encoding.UTF8.GetBytes(body));
+            message.Content = new ByteArrayContent(Encoding.UTF8.GetBytes(repeat > 1 ? new StringBuilder(body.Length * repeat).Insert(0, body, repeat).ToString() : body));
             if ((string?)request["contentType"] is string contentType) message.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(contentType);
         }
-        using var response = await client.SendAsync(message);
+        HttpResponseMessage response;
+        try
+        {
+            response = await client.SendAsync(message);
+        }
+        catch (HttpRequestException e)
+        {
+            // The server closed the connection before it answered: recorded as status 0, so that the diff shows it.
+            Console.WriteLine($"(connection closed: {e.Message}) {key}");
+            results[key] = new JsonObject { ["request"] = request.DeepClone(), ["status"] = 0, ["headers"] = new JsonObject(), ["body"] = "(connection closed)" };
+            continue;
+        }
         string responseBody = await response.Content.ReadAsStringAsync();
         var headers = new JsonObject();
         foreach (var h in response.Headers.Concat(response.Content.Headers).OrderBy(h => h.Key, StringComparer.OrdinalIgnoreCase))
             if (h.Key != "Date") headers[h.Key] = string.Join(", ", h.Value);
+        response.Dispose();
         results[key] = new JsonObject
         {
             ["request"] = new JsonObject
@@ -101,6 +115,7 @@ async Task<int> Replay(string recordedPath, Uri baseAddress, string outPath)
                 ["contentType"] = (string?)request["contentType"],
                 ["body"] = (string?)request["body"],
                 ["headers"] = request["headers"]?.DeepClone(),
+                ["bodyRepeat"] = request["bodyRepeat"]?.DeepClone(),
             },
             ["status"] = (int)response.StatusCode,
             ["headers"] = headers,

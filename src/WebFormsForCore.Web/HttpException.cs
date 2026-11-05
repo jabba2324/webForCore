@@ -36,6 +36,18 @@ namespace System.Web {
         private const int FACILITY_WIN32 = 7;
 
         private int _httpCode;
+        // webForCore: .NET's ExternalException replaces a null message with "External component has thrown an
+        // exception."; .NET Framework's kept it null, so Message was Exception's "Exception of type '...' was thrown."
+        // Page.HandleError's HttpUnhandledException has no message: an error page that shows Server.GetLastError()'s
+        // (customErrors' ResponseRewrite) and ASP.NET's error page differed from IIS's (#192, CI's iis-compare job).
+        [NonSerialized]
+        private bool _nullMessage;
+
+        public override string Message {
+            get {
+                return _nullMessage ? "Exception of type '" + GetType().FullName + "' was thrown." : base.Message;
+            }
+        }
         private ErrorFormatter _errorFormatter;
         private int _webEventCode = WebEventCodes.UndefinedEventCode;
 
@@ -78,11 +90,13 @@ namespace System.Web {
         public HttpException(String message)
 
         : base(message) {
+            _nullMessage = message == null;
         }
 
         internal HttpException(String message, Exception innerException, int code)
         
         : base(message, innerException) {
+            _nullMessage = message == null;
             _webEventCode = code;
         }
         
@@ -93,6 +107,7 @@ namespace System.Web {
         public HttpException(String message, int hr)
 
         : base(message) {
+            _nullMessage = message == null;
             HResult = hr;
         }
 
@@ -105,6 +120,7 @@ namespace System.Web {
         public HttpException(String message, Exception innerException)
 
         : base(message, innerException) {
+            _nullMessage = message == null;
         }
 
 
@@ -116,6 +132,7 @@ namespace System.Web {
         public HttpException(int httpCode, String message, Exception innerException)
 
         : base(message, innerException) {
+            _nullMessage = message == null;
             _httpCode = httpCode;
         }
 
@@ -127,6 +144,7 @@ namespace System.Web {
         public HttpException(int httpCode, String message)
 
         : base(message) {
+            _nullMessage = message == null;
             _httpCode = httpCode;
         }
 
@@ -138,6 +156,7 @@ namespace System.Web {
         public HttpException(int httpCode, String message, int hr)
 
         : base(message) {
+            _nullMessage = message == null;
             HResult = hr;
             _httpCode = httpCode;
         }

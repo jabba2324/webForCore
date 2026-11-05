@@ -344,19 +344,22 @@ namespace IISGate
         }
 
         // As WebApi.Gate.Tests records its requests for the comparison with IIS (#78); the request's own headers, if it
-        // has any, are sent again on IIS (#170).
-        private static void Record(string key, HttpResponseMessage response, string body, IDictionary<string, string> requestHeaders = null)
+        // has any, are sent again on IIS (#170), and so is its body (#192): the text, repeated bodyRepeat times if that is
+        // more than 1, so that a large body doesn't make the file large.
+        internal static void Record(string key, HttpResponseMessage response, string body, IDictionary<string, string> requestHeaders = null,
+            string requestBody = null, string contentType = null, int bodyRepeat = 1)
         {
             HttpRequestMessage sent = response.RequestMessage;
-            var request = new
+            var request = new Dictionary<string, object>
             {
-                method = sent.Method.Method,
-                url = sent.RequestUri.AbsoluteUri,
-                accept = (string)null,
-                contentType = (string)null,
-                body = (string)null,
-                headers = requestHeaders == null ? null : new SortedDictionary<string, string>(requestHeaders, StringComparer.OrdinalIgnoreCase),
+                ["method"] = sent.Method.Method,
+                ["url"] = sent.RequestUri.AbsoluteUri,
+                ["accept"] = null,
+                ["contentType"] = contentType,
+                ["body"] = requestBody,
+                ["headers"] = requestHeaders == null ? null : new SortedDictionary<string, string>(requestHeaders, StringComparer.OrdinalIgnoreCase),
             };
+            if (bodyRepeat > 1) request["bodyRepeat"] = bodyRepeat;
             var headers = new SortedDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (var h in response.Headers.Concat(response.Content.Headers))
             {

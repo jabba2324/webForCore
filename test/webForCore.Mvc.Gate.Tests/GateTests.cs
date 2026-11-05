@@ -88,6 +88,28 @@ namespace MvcGate
             Assert.Contains("[InvalidOperationException]: Boom", body);
         }
 
+        // #192: HandleErrorAttribute (FilterConfig) handles an action's exception only when customErrors is on
+        // (<location path="Errors">): it renders Views/Shared/Error.cshtml with a 500 and sets TrySkipIisCustomErrors, so
+        // IIS's httpErrors pass it through. An HttpException other than a 500 is left to customErrors, which redirects
+        // it to its page; with customErrors off (/ErrorsOff), the exception is ASP.NET's detailed error page.
+        [Fact]
+        public async Task HandleErrorAttributeNeedsCustomErrors()
+        {
+            HttpResponseMessage handled = await _server.Client.GetAsync("/Errors/Throws");
+            Assert.Equal(500, (int)handled.StatusCode);
+            Assert.Equal("<p>HandleErrorAttribute: Errors.Throws: InvalidOperationException: Thrown by the action.</p>",
+                (await handled.Content.ReadAsStringAsync()).Trim());
+
+            HttpResponseMessage notFound = await _server.Client.GetAsync("/Errors/NotFound");
+            Assert.Equal(302, (int)notFound.StatusCode);
+            Assert.Equal("/Errors/Page?aspxerrorpath=/Errors/NotFound", notFound.Headers.Location?.OriginalString);
+
+            HttpResponseMessage off = await _server.Client.GetAsync("/ErrorsOff/Throws");
+            Assert.Equal(500, (int)off.StatusCode);
+            string body = await off.Content.ReadAsStringAsync();
+            Assert.Contains("<title>Thrown by the action.</title>", body);
+            Assert.Contains("[InvalidOperationException]: Thrown by the action.", body);
+        }
         [Fact]
         public async Task ComplexModelBinding()
         {
