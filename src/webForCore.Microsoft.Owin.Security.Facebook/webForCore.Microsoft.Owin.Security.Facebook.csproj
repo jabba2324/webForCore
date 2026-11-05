@@ -1,0 +1,62 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- From aspnet/AspNetKatana 096e225 (src/Microsoft.Owin.Security.Facebook/Microsoft.Owin.Security.Facebook.csproj) by way of the external/AspNetKatana submodule (xforcore/AspNetKatana's webforcore branch, #61).
+       Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>Microsoft.Owin.Security.Facebook</AssemblyName>
+    <RootNamespace>Microsoft.Owin.Security.Facebook</RootNamespace>
+    <PackageId>webForCore.Microsoft.Owin.Security.Facebook</PackageId>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- Microsoft's builds use C# 9 (Web Stack, tools/WebStack.settings.targets) and Latest (Katana). -->
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;SYSLIB0003;SYSLIB0011;SYSLIB0014;SYSLIB0051</NoWarn>
+    <DefineConstants>$(DefineConstants);</DefineConstants>
+    <!-- Delay signed with Microsoft's public key, as Microsoft's build does: PublicKeyToken=31bf3856ad364e35. -->
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>../SigningKey/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <AssemblyVersion>4.2.3.0</AssemblyVersion>
+    <FileVersion>4.200.325.35202</FileVersion>
+    <InformationalVersion>4.2.3</InformationalVersion>
+    <Company>Microsoft Corporation</Company>
+    <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
+    <Product>Microsoft.Owin.Security.Facebook</Product>
+    <Description>Middleware that enables an application to support Facebook's OAuth 2.0 authentication workflow.</Description>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+  </PropertyGroup>
+
+  <Import Project="../webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Facebook/Constants.cs" Link="Constants.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Facebook/FacebookAuthenticationExtensions.cs" Link="FacebookAuthenticationExtensions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Facebook/FacebookAuthenticationHandler.cs" Link="FacebookAuthenticationHandler.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Facebook/FacebookAuthenticationMiddleware.cs" Link="FacebookAuthenticationMiddleware.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Facebook/FacebookAuthenticationOptions.cs" Link="FacebookAuthenticationOptions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Facebook/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Facebook/Provider/FacebookApplyRedirectContext.cs" Link="Provider/FacebookApplyRedirectContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Facebook/Provider/FacebookAuthenticatedContext.cs" Link="Provider/FacebookAuthenticatedContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Facebook/Provider/FacebookAuthenticationProvider.cs" Link="Provider/FacebookAuthenticationProvider.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Facebook/Provider/FacebookReturnEndpointContext.cs" Link="Provider/FacebookReturnEndpointContext.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Facebook/Provider/IFacebookAuthenticationProvider.cs" Link="Provider/IFacebookAuthenticationProvider.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Facebook/Resources.Designer.cs" Link="Resources.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.Facebook/Resources.resx" Link="Resources.resx" LogicalName="Microsoft.Owin.Security.Facebook.Resources.resources" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../webForCore.Microsoft.Owin.Security/webForCore.Microsoft.Owin.Security.csproj" />
+    <ProjectReference Include="../webForCore.Microsoft.Owin/webForCore.Microsoft.Owin.csproj" />
+    <ProjectReference Include="../WebFormsForCore.Net.Http.WebRequest/WebFormsForCore.Net.Http.WebRequest.csproj" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Owin" Version="1.0.0" />
+  </ItemGroup>
+</Project>

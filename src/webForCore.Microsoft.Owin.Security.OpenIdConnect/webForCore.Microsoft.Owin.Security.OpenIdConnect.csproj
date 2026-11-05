@@ -1,0 +1,68 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- From aspnet/AspNetKatana 096e225 (src/Microsoft.Owin.Security.OpenIdConnect/Microsoft.Owin.Security.OpenIdConnect.csproj) by way of the external/AspNetKatana submodule (xforcore/AspNetKatana's webforcore branch, #61).
+       Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>Microsoft.Owin.Security.OpenIdConnect</AssemblyName>
+    <RootNamespace>Microsoft.Owin.Security.OpenIdConnect</RootNamespace>
+    <PackageId>webForCore.Microsoft.Owin.Security.OpenIdConnect</PackageId>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- Microsoft's builds use C# 9 (Web Stack, tools/WebStack.settings.targets) and Latest (Katana). -->
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;SYSLIB0003;SYSLIB0011;SYSLIB0014;SYSLIB0051</NoWarn>
+    <DefineConstants>$(DefineConstants);</DefineConstants>
+    <!-- Delay signed with Microsoft's public key, as Microsoft's build does: PublicKeyToken=31bf3856ad364e35. -->
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>../SigningKey/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <AssemblyVersion>4.2.3.0</AssemblyVersion>
+    <FileVersion>4.200.325.35202</FileVersion>
+    <InformationalVersion>4.2.3</InformationalVersion>
+    <Company>Microsoft Corporation</Company>
+    <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
+    <Product>Microsoft.Owin.Security.OpenIdConnect</Product>
+    <Description>Middleware that enables an application to use OpenIdConnect for authentication.</Description>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+  </PropertyGroup>
+
+  <Import Project="../webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OpenIdConnect/GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OpenIdConnect/Notifications/AuthorizationCodeReceivedNotification.cs" Link="Notifications/AuthorizationCodeReceivedNotification.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OpenIdConnect/Notifications/TokenResponseReceivedNotification.cs" Link="Notifications/TokenResponseReceivedNotification.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OpenIdConnect/OAuthConstants.cs" Link="OAuthConstants.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OpenIdConnect/OpenIdConnectAuthenticationDefaults.cs" Link="OpenIdConnectAuthenticationDefaults.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OpenIdConnect/OpenIdConnectAuthenticationExtensions.cs" Link="OpenIdConnectAuthenticationExtensions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OpenIdConnect/OpenidConnectAuthenticationHandler.cs" Link="OpenidConnectAuthenticationHandler.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OpenIdConnect/OpenIdConnectAuthenticationMiddleware.cs" Link="OpenIdConnectAuthenticationMiddleware.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OpenIdConnect/OpenIdConnectAuthenticationNotifications.cs" Link="OpenIdConnectAuthenticationNotifications.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OpenIdConnect/OpenIdConnectAuthenticationOptions.cs" Link="OpenIdConnectAuthenticationOptions.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OpenIdConnect/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OpenIdConnect/Resources.Designer.cs" Link="Resources.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="../../external/AspNetKatana/src/Microsoft.Owin.Security.OpenIdConnect/Resources.resx" Link="Resources.resx" LogicalName="Microsoft.Owin.Security.OpenIdConnect.Resources.resources" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../webForCore.Microsoft.Owin.Security/webForCore.Microsoft.Owin.Security.csproj" />
+    <ProjectReference Include="../webForCore.Microsoft.Owin/webForCore.Microsoft.Owin.csproj" />
+    <ProjectReference Include="../WebFormsForCore.Net.Http.WebRequest/WebFormsForCore.Net.Http.WebRequest.csproj" />
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="$(IdentityModelVersion)" />
+    <PackageReference Include="Microsoft.IdentityModel.Logging" Version="$(IdentityModelVersion)" />
+    <PackageReference Include="Microsoft.IdentityModel.Protocols" Version="$(IdentityModelVersion)" />
+    <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="$(IdentityModelVersion)" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="$(IdentityModelVersion)" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Owin" Version="1.0.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="$(IdentityModelVersion)" />
+  </ItemGroup>
+</Project>

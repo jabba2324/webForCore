@@ -85,7 +85,7 @@ namespace System.Web {
         public override void Add(String name, String value) {
             if (_managedResponse) {
                 CheckNameAndValue(name, value);
-                _response.AppendHeader(name, value);
+                _response.AppendHeaderThroughHeaders(name, value);
                 return;
             }
             if (_iis7WorkerRequest == null && !KestrelRequest) {
@@ -115,7 +115,7 @@ namespace System.Web {
                 }
                 _response.RemoveManagedHeader(name);
                 base.Remove(name);
-                _response.AppendHeader(name, value);
+                _response.AppendHeaderThroughHeaders(name, value);
                 return;
             }
             if (_iis7WorkerRequest == null && !KestrelRequest) {

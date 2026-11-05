@@ -1,0 +1,61 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- The OpenID Connect gate's application: the Visual Studio "Work or School Accounts" (Entra ID) template's OWIN
+       startup with the cookie and OpenID Connect middleware (code id_token, form_post, the code redeemed, SaveTokens,
+       notifications, the application's own ticket and state formats), and a Web API behind Katana's JWT bearer middleware
+       and IdentityServer3.Contrib.AccessTokenValidation (the original net45 package, unchanged). Hosted on Kestrel by
+       the fork's System.Web; test/webForCore.Oidc.Gate.Tests drives it with test/webForCore.Oidc.Provider, and
+       test/webForCore.Oidc.Sample.Iis builds the same files for IIS 10 with Microsoft's packages. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>OidcSample</RootNamespace>
+    <OutputPath>bin_dotnet</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <GenerateDependencyFile>true</GenerateDependencyFile>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+  </PropertyGroup>
+
+  <Import Project="..\..\src\webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Content Remove="bin_dotnet\**" />
+    <None Remove="bin_dotnet\**" />
+    <Compile Remove="bin_dotnet\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\WebFormsForCore.Configuration\WebFormsForCore.Configuration.csproj" />
+    <PackageReference Include="drawingForCore" Version="$(DrawingForCoreVersion)" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Serialization.Formatters\WebFormsForCore.Serialization.Formatters.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web\WebFormsForCore.Web.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.ApplicationServices\WebFormsForCore.Web.ApplicationServices.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.RegularExpressions\WebFormsForCore.Web.RegularExpressions.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Services\WebFormsForCore.Web.Services.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Extensions\WebFormsForCore.Web.Extensions.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Infrastructure\WebFormsForCore.Web.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Compilers\WebFormsForCore.Compilers.csproj" />
+    <ProjectReference Include="..\..\src\webForCore.System.Web.Http.Owin\webForCore.System.Web.Http.Owin.csproj" />
+    <ProjectReference Include="..\..\src\webForCore.Microsoft.Owin.Host.SystemWeb\webForCore.Microsoft.Owin.Host.SystemWeb.csproj" />
+    <ProjectReference Include="..\..\src\webForCore.Microsoft.Owin.Security.Cookies\webForCore.Microsoft.Owin.Security.Cookies.csproj" />
+    <ProjectReference Include="..\..\src\webForCore.Microsoft.Owin.Security.OpenIdConnect\webForCore.Microsoft.Owin.Security.OpenIdConnect.csproj" />
+    <ProjectReference Include="..\..\src\webForCore.Microsoft.Owin.Security.Jwt\webForCore.Microsoft.Owin.Security.Jwt.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Third-party, net45, built against Microsoft.Owin.Security.Jwt 4.0.1 and IdentityModel 5.6: used as it is. -->
+    <PackageReference Include="IdentityServer3.Contrib.AccessTokenValidation" Version="4.1.16" />
+    <!-- A build against webForCore's projects (not its packages) gets Microsoft's packages that this one depends on as
+         well; with no assets, the projects' assemblies are the only ones (docs/MIGRATING.md, "Packages built on MVC, Web
+         API or OWIN bring Microsoft's packages back"). -->
+    <PackageReference Include="Microsoft.Owin.Security.Jwt" Version="4.2.3" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.2.3" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.Owin.Security" Version="4.2.3" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.Owin" Version="4.2.3" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" ExcludeAssets="all" />
+  </ItemGroup>
+</Project>

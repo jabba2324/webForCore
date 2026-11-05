@@ -102,6 +102,17 @@ if grep -q -E '"System\.Data\.SqlClient/|netcoreapp2\.1/System\.Data\.SqlClient\
   grep -n 'System.Data.SqlClient' bin_dotnet/SmokeMvc.deps.json | head -20
   fail=1
 fi
+# One version of each IdentityModel package, the one CoreWCF brings, although IdentityServer3.Contrib.AccessTokenValidation
+# asks for 5.6 (a mix of IdentityModel 5 and 8 is what an application that kept Microsoft's Microsoft.Owin.Security.OpenIdConnect
+# got; with the packages.config list of IdentityModel 5 references, restore failed with NU1605), and webForCore's
+# Microsoft.Owin.Security.Jwt, not the 4.0.1 the third-party package depends on.
+identitymodel=$(grep -o -E '"(Microsoft|System)\.IdentityModel[A-Za-z.]*/[0-9.]+"' bin_dotnet/SmokeMvc.deps.json | sed 's|.*/||; s|"||' | sort -u)
+[ "$(echo "$identitymodel" | wc -l)" = 1 ] || { echo "deps.json: more than one IdentityModel version: $identitymodel"; fail=1; }
+if grep -q -E '"lib/net4[0-9]*/Microsoft\.Owin\.Security\.(Jwt|OpenIdConnect)\.dll"' bin_dotnet/SmokeMvc.deps.json; then
+  echo "deps.json: Microsoft's Katana assemblies replaced webForCore's:"
+  grep -o -E '"lib/net4[0-9]*/Microsoft\.Owin\.Security\.[A-Za-z]*\.dll"' bin_dotnet/SmokeMvc.deps.json | sort -u
+  fail=1
+fi
 dotnet bin_dotnet/webforcore-host/webforcore-host.dll --urls http://127.0.0.1:5198 > server.log 2>&1 &
 server=$!
 for i in $(seq 120); do curl -sf -o /dev/null http://127.0.0.1:5198/ && break; sleep 1; done
@@ -127,6 +138,10 @@ echo "$home" | grep -q "hello from Unity, rendered by Razor" || { echo "/: unexp
 # every request failed).
 location=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' http://127.0.0.1:5198/challenge)
 case "$location" in "302 https://accounts.google.com/"*) ;; *) echo "/challenge: $location"; fail=1;; esac
+# webForCore's OpenID Connect middleware (Entra ID's settings: code id_token, form_post) redirects a challenge to the
+# authorize endpoint, built against IdentityModel 8 (its telemetry parameter says which platform).
+oidc=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' http://127.0.0.1:5198/oidc/challenge)
+case "$oidc" in "302 https://login.microsoftonline.com/smoke-tenant/oauth2/v2.0/authorize?client_id=smoke-client-id&"*"response_mode=form_post"*"x-client-SKU=ID_NET10_0"*) ;; *) echo "/oidc/challenge: $oidc"; fail=1;; esac
 # Web API OData's model builder, built for .NET Framework, maps LINQ to SQL's Binary, from the System.Data.Linq the
 # webForCore package brings (issue #142: without it, GetEdmModel() threw and OData applications failed at start, F68).
 odata=$(curl -s http://127.0.0.1:5198/ODataModel)

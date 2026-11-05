@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- A minimal OpenID Connect provider for the OpenID Connect gate (test/webForCore.Oidc.Gate.Tests): discovery, JWKS,
+       an authorize endpoint (code, id_token and code id_token; query and form_post), a token endpoint (authorization code,
+       client credentials), introspection and end session. It also holds the scenarios (Scenarios.cs) that drive a
+       sample application through sign-in with it, as a browser would, and records the application's responses.
+
+       It is plain ASP.NET Core, with nothing of webForCore's, so CI's iis-compare job builds and runs it on its own and
+       drives test/webForCore.Oidc.Sample.Iis on IIS 10 through the same scenarios: the built program takes
+       "serve <provider URL>" and "scenarios <application URL> <provider URL> <out.json>" (Program.cs). -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>WebForCoreOidc</RootNamespace>
+  </PropertyGroup>
+</Project>

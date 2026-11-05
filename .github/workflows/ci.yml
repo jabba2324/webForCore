@@ -130,6 +130,14 @@ jobs:
           path: test/webForCore.IIS.Gate.Tests/bin/Release/net10.0/requests-responses.json
           if-no-files-found: error
 
+      # ... and every response of the OpenID Connect gate (OidcGateTests), for the same scenarios on IIS 10.
+      - name: Upload the OpenID Connect gate's responses
+        uses: actions/upload-artifact@v4
+        with:
+          name: oidc-responses
+          path: test/webForCore.Oidc.Gate.Tests/bin/Release/net10.0/oidc-responses.json
+          if-no-files-found: error
+
       - name: Pack
         run: tools/ci/pack.sh ${{ steps.version.outputs.version }} "$RUNNER_TEMP/packages"
 
@@ -366,6 +374,45 @@ jobs:
           dotnet run tools/ci/iis_drain.cs -- check "$RUNNER_TEMP/drain-Integrated" http://localhost:8098/ Integrated "$RUNNER_TEMP/gate/iis-drain.md" || status=1
           cat "$RUNNER_TEMP/gate/iis-drain.md" | tee -a "$GITHUB_STEP_SUMMARY"
           exit $status
+
+      # OpenID Connect: test/webForCore.Oidc.Sample built for .NET Framework 4.8 against Microsoft's Katana 4.2.3 packages
+      # (OpenIdConnect, Jwt, Cookies) and IdentityServer3.Contrib.AccessTokenValidation, served by IIS (integrated
+      # pipeline: Katana's System.Web host needs it on IIS), is driven through the scenarios OidcGateTests ran on Kestrel,
+      # with the same test provider (test/webForCore.Oidc.Provider: sign-in with code id_token and form_post, rejected
+      # tokens, sign-out, bearer tokens), and the responses are compared (tools/ci/iis-known-differences-oidc.json).
+      - uses: actions/download-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: oidc-responses
+          path: ${{ runner.temp }}/gate
+
+      - name: Build the OpenID Connect sample for .NET Framework 4.8, and the test provider
+        if: ${{ !cancelled() }}
+        run: |
+          dotnet build test/webForCore.Oidc.Sample.Iis/webForCore.Oidc.Sample.Iis.csproj -c Release -nodeReuse:false "-p:IisSiteDirectory=$RUNNER_TEMP/oidc-site/"
+          dotnet build test/webForCore.Oidc.Provider/webForCore.Oidc.Provider.csproj -c Release -nodeReuse:false
+
+      # The sample's Web.config has the provider at http://127.0.0.1:8101 and the site at http://127.0.0.1:8100.
+      - name: OpenID Connect sample on IIS 10
+        if: ${{ !cancelled() }}
+        shell: powershell
+        run: tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\oidc-site" -Name oidc-integrated -Port 8100 -Pipeline Integrated
+
+      - name: Run the OpenID Connect scenarios on IIS
+        if: ${{ !cancelled() }}
+        run: |
+          provider=test/webForCore.Oidc.Provider/bin/Release/net10.0/webForCore.Oidc.Provider.dll
+          dotnet $provider serve http://127.0.0.1:8101 > "$RUNNER_TEMP/gate/oidc-provider.log" 2>&1 &
+          pid=$!
+          dotnet $provider scenarios http://127.0.0.1:8100/ http://127.0.0.1:8101 "$RUNNER_TEMP/gate/iis-oidc-responses.json"
+          kill $pid || true
+
+      - name: Compare OpenID Connect
+        if: ${{ !cancelled() }}
+        run: |
+          set -o pipefail
+          dotnet run tools/ci/iis_compare.cs -- diff "$RUNNER_TEMP/gate/oidc-responses.json" "$RUNNER_TEMP/gate/iis-oidc-responses.json" \
+            tools/ci/iis-known-differences-oidc.json "--gate=OpenID Connect" "--title=IIS 10 (integrated pipeline)" | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Upload the responses
         if: always()

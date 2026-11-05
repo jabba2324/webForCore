@@ -310,7 +310,7 @@ packages, so the app's `nuget.config` needs drawingForCore's feed (above). Every
 | Helpers (WebGrid, Chart, WebImage) | `webForCore.System.Web.Helpers` |
 | Web API 2 | `webForCore.System.Web.Http.WebHost` (and `webForCore.System.Web.Http.Cors` for CORS) |
 | Web API on OWIN | `webForCore.System.Web.Http.Owin`, `webForCore.Microsoft.Owin.Host.SystemWeb` |
-| OWIN security | `webForCore.Microsoft.Owin.Security.Cookies`, `.OAuth` |
+| OWIN security | `webForCore.Microsoft.Owin.Security.Cookies`, `.OAuth`; `.OpenIdConnect` and `.Jwt` (Entra ID / Azure AD), `.WsFederation`, `.ActiveDirectory`, `.Google`, `.Facebook`, `.MicrosoftAccount`, `.Twitter` ([below](#packages-that-need-more-than-a-reference)) |
 | SignalR 2 | `webForCore.Microsoft.AspNet.SignalR.SystemWeb` |
 | ASP.NET Identity 2 | `webForCore.Microsoft.AspNet.Identity.Owin`, `webForCore.Microsoft.AspNet.Identity.EntityFramework` |
 | Bundling | `WebFormsForCore.Web.Optimization` (+ `.Optimization.WebForms` for `<webopt:BundleReference>`) |
@@ -426,17 +426,50 @@ These came up migrating real applications; each names one that needed it.
   <PackageReference Include="Hangfire.Core" Version="1.6.17" GeneratePathProperty="true" ExcludeAssets="compile;runtime" />
   <Reference Include="Hangfire.Core" HintPath="$(PkgHangfire_Core)/lib/net45/Hangfire.Core.dll" />
   ```
-- **Katana packages webForCore doesn't build** (#14, #18). webForCore provides `Microsoft.Owin`, its hosts, `Security`,
-  `Security.Cookies`, `Security.OAuth` and `Cors`. The social logins of the Visual Studio templates
-  (`Microsoft.Owin.Security.Facebook`, `.Google`, `.MicrosoftAccount`, `.Twitter`) and `.WsFederation` are not: keep
-  the application's package (any version from 2.0). Its Katana dependencies lose to webForCore's `Microsoft.Owin`
-  4.2.3, and the `System.Net.Http.WebRequest` they create their back-channel handler from is in the "Always" set
-  (before 0.3.0 it wasn't, and registering a provider failed every request: OpenOrderFramework, SocialGoal). Every
-  template app has `using Microsoft.Owin.Security.Google;` in `Startup.Auth.cs`, even with the providers commented out
-  (MvcMovie, Bonobo Git Server).
+- **Katana's sign-in and token middleware** (#14, #18). webForCore builds all of Katana 4.2.3's security packages:
+  `Microsoft.Owin.Security.OpenIdConnect`, `.Jwt`, `.WsFederation`, `.ActiveDirectory` and the social logins of the
+  Visual Studio templates (`.Google`, `.Facebook`, `.MicrosoftAccount`, `.Twitter`), besides `.Cookies` and `.OAuth`.
+  Replace each of the application's packages with webForCore's, `webForCore.` and the same name. Before 0.10.0 they
+  weren't built and the application kept Microsoft's: the social logins ran (OpenOrderFramework, SocialGoal; every
+  template app has `using Microsoft.Owin.Security.Google;` in `Startup.Auth.cs`, even with the providers commented out:
+  MvcMovie, Bonobo Git Server), and so did OpenID Connect, but on a mix of IdentityModel 5 and 8 (below). A package
+  built on Microsoft's (IdentityServer3.Contrib.AccessTokenValidation on `Microsoft.Owin.Security.Jwt` 4.0.1) gets
+  webForCore's as long as the application references webForCore's; the original package is used as it is.
   ```xml
-  <PackageReference Include="Microsoft.Owin.Security.Google" Version="3.0.1" />
+  <PackageReference Include="webForCore.Microsoft.Owin.Security.OpenIdConnect" Version="0.10.0" />
+  <PackageReference Include="webForCore.Microsoft.Owin.Security.Jwt" Version="0.10.0" />
   ```
+  OpenID Connect, JWT, WS-Federation and Active Directory are built against **IdentityModel 8.19.1**, the version
+  CoreWCF (System.Web.Extensions) brings to every webForCore application, where Microsoft's packages use 5.x
+  ([NAMESPACES.md](NAMESPACES.md#owin--katana-upstream)). Remove the application's own references to the
+  `Microsoft.IdentityModel.*` and `System.IdentityModel.Tokens.Jwt` 5.x packages, which a packages.config conversion
+  lists, or reference 8.19.1: a 5.x reference fails restore with `NU1605: Detected package downgrade:
+  Microsoft.IdentityModel.Tokens from 8.19.1 to 5.3.0` (Bonobo Git Server, with WS-Federation). The application's own
+  code that uses IdentityModel (Microsoft's `OpenIdConnectCachingSecurityTokenProvider` for the Web API samples,
+  `JwtSecurityTokenHandler`, `TokenValidationParameters`) then compiles against 8.x. `Startup.Auth.cs` needs no change:
+  the OpenID Connect gate runs the "Work or School Accounts" template's, configured as a customer application has it
+  for Entra ID (code id_token, form_post, the code redeemed, `SaveTokens`, notifications, its own ticket and state
+  formats, JWT and IdentityServer3 bearer tokens on its Web API), and compares it with IIS 10. For Entra ID:
+  - **Behind a proxy that ends TLS** (an ingress, a load balancer, App Gateway), set `ASPNETCORE_FORWARDEDHEADERS_ENABLED=true`
+    in `webforcore-host`'s environment, so that X-Forwarded-Proto and X-Forwarded-For reach the application. Katana marks
+    its nonce cookie `Secure` only on an HTTPS request, and the cookie is `SameSite=None` (the form_post comes from
+    Entra ID's site): without `Secure`, browsers drop it, and every sign-in fails with
+    `OpenIdConnectProtocolInvalidNonceException` (IDX21323), as on IIS behind such a proxy. The setting also sends the
+    browser back to the `https://` URL it asked for: when nothing sets `AuthenticationProperties.RedirectUri`, Katana
+    returns to the request's own scheme and host. The `redirect_uri` sent to Entra ID is `RedirectUri` from
+    `Startup.Auth.cs` (`ida:RedirectUri`), the same as on IIS; register it in Entra ID as it is.
+  - Pages that `<authorization>` in Web.config protects challenge only with `app.UseStageMarker(PipelineStage.Authenticate)`
+    after the authentication middleware, as in IIS's integrated pipeline: without it Katana runs at
+    `PreHandlerExecute`, which a refused request never reaches. MVC's `[Authorize]` doesn't need it.
+  - The back-channel (metadata, keys, the token endpoint) uses `WebRequestHandler` from webForCore's
+    `System.Net.Http.WebRequest`, and the OS's certificate store: a Linux container needs `ca-certificates` (Microsoft's
+    .NET images have it); Windows containers have the store.
+  - The authorize redirect's telemetry says IdentityModel 8 (`x-client-SKU=ID_NET10_0&x-client-ver=8.19.1.0`), and
+    IdentityModel's exception messages (IDX...) are 8.x's wording; the exception types are the same.
+  - NuGet warns `NU1903` about `Microsoft.Owin` 4.0.1 when a package such as IdentityServer3.Contrib.AccessTokenValidation
+    depends on it: webForCore's `Microsoft.Owin` 4.2.3 replaces it in the build, so the warning is about an assembly the
+    application doesn't run. `<PackageReference Include="Microsoft.Owin" Version="4.2.3" ExcludeAssets="all" />`
+    silences it.
 - **Libraries that don't run on .NET** (#22). Remove them or move to a version that does:
   - **Glimpse 1.x** (`Glimpse`, `.AspNet`, `.Ado`, `.EF6`, `.Mvc5`, ...), a development diagnostics tool, can't run:
     Glimpse.Ado's pre-start method reflects into .NET Framework's private `DbProviderFactories` table

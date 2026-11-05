@@ -53,7 +53,7 @@ Do this before changing anything, and present the findings to the user.
    | `Metafile`, `.emf`, `.wmf` | System.Drawing metafiles: not implemented |
    | `NetDataContractSerializer` (outside MVC Futures) | Not on .NET (`Html.Serialize`/`[Deserialize]` work) |
    | `AppDomain.CreateDomain`, `Thread.Abort` | Different on .NET |
-   | `System.IdentityModel`, `<system.identityModel`, `WSFederationAuthenticationModule`, `SessionAuthenticationModule`, `FederatedAuthentication`; IdentityServer3, Thinktecture.IdentityModel | Windows Identity Foundation: not available (`System.Security.Claims` works). WS-Federation sign-in: Katana's `Microsoft.Owin.Security.WsFederation`; tokens: `System.IdentityModel.Tokens.Jwt` |
+   | `System.IdentityModel`, `<system.identityModel`, `WSFederationAuthenticationModule`, `SessionAuthenticationModule`, `FederatedAuthentication`; IdentityServer3, Thinktecture.IdentityModel, IdentityServer3.AccessTokenValidation 2.x (not `IdentityServer3.Contrib.AccessTokenValidation` 4.x, which runs) | Windows Identity Foundation: not available (`System.Security.Claims` works). WS-Federation sign-in: Katana's `Microsoft.Owin.Security.WsFederation` (`webForCore.Microsoft.Owin.Security.WsFederation`); tokens: `System.IdentityModel.Tokens.Jwt` |
    | `System.Workflow`, `.xoml`, `System.Activities`, `WorkflowServiceHost` | Windows Workflow Foundation: not available. WF4 code can move to CoreWF; WF3 needs a rewrite (to WF4 for CoreWF, or plain code) |
    | `System.Data.Services` (not `.Client`), `DataService<`, `.svc` with `DataServiceHostFactory` | WCF Data Services hosting: not available (the client: `Microsoft.Data.Services.Client` 5.8.4, Phase 2 step 5) |
    | No `.csproj` for the web site (a solution `Project("{E24C65DC-...}")` web site), `CodeFile=` in `.aspx`/`.ascx`, `Bin/*.dll.refresh` | A Web Site Project: not a blocker, but Phase 2 differs (step 3) |
@@ -133,7 +133,9 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
    "Packages that need more than a reference" in the same section: packages that bring Microsoft's ASP.NET packages
    back (`CS0433`), `lib/net45` packages with a `build/` folder, the versions webForCore requires (`NU1605`,
    including `System.ComponentModel.Annotations` 5.0.0 with EntityFramework 6.5.1), .NET Framework assemblies that are
-   packages on .NET (`CS1069` in App_Code), and Katana packages webForCore doesn't build. Every `Microsoft.NET.Sdk`
+   packages on .NET (`CS1069` in App_Code), and Katana's sign-in packages (`Microsoft.Owin.Security.OpenIdConnect`,
+   `.Jwt`, `.WsFederation`, the social logins: replace each with `webForCore.` and its name, and remove the app's
+   `Microsoft.IdentityModel.*` and `System.IdentityModel.Tokens.Jwt` 5.x references, `NU1605`). Every `Microsoft.NET.Sdk`
    class library that references webForCore gets `<FrameworkReference Include="Microsoft.AspNetCore.App" />`
    (`docs/MIGRATING.md` section 2, "Class libraries that reference webForCore"); without it, its
    `Microsoft.Extensions.*` references fail with `NU1605`. Remove the references `NU1510` then reports.

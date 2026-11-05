@@ -22,6 +22,12 @@
              feed in nuget.config). -p:DrawingForCoreSource=<checkout> builds a local checkout's projects instead
              (Directory.Build.targets). -->
         <DrawingForCoreVersion>0.3.0</DrawingForCoreVersion>
+
+        <!-- Microsoft.IdentityModel.* and System.IdentityModel.Tokens.Jwt, for Katana's OpenID Connect, JWT, WS-Federation
+             and Active Directory middleware: the version CoreWCF (System.Web.Extensions' WCF client support) already brings
+             to every application, so that an application has one IdentityModel and NuGet never sees a downgrade (NU1605).
+             Change it with CoreWCF's. -->
+        <IdentityModelVersion>8.19.1</IdentityModelVersion>
     </PropertyGroup>
 
     <!-- webForCore: a package's licence follows its code's origin (NOTICE). Lifted ASP.NET Web Stack, Katana and SignalR
