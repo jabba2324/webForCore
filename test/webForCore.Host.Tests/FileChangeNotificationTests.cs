@@ -105,6 +105,7 @@ namespace HostTests
         [Theory]
         [InlineData(null)]
         [InlineData("Default")]
+        [InlineData("Single")]
         public async Task ManyMonitoredFoldersStayWithinTheInotifyBudget(string fcnMode)
         {
             using var site = new Site(fcnMode);
@@ -131,6 +132,7 @@ namespace HostTests
         [Theory]
         [InlineData(null)]
         [InlineData("Default")]
+        [InlineData("Single")]
         public async Task AChangeToWebConfigRestartsTheApplication(string fcnMode)
         {
             using var site = new Site(fcnMode);
@@ -146,24 +148,54 @@ namespace HostTests
             Assert.Contains("restarted outside webforcore-host: stopping the process", app.Output);
         }
 
-        // fcnMode="Single" off Windows. On Windows (build-windows) the sample restarts on its first request in Single mode
-        // (BinDirChangeOrDirectoryRename): Windows reports bin_dotnet's subdirectories as changed while the application
-        // starts, and in Single mode a change below bin restarts it, as in the reference source. Whether IIS sees the same
-        // changes for bin isn't known yet.
-        const string SingleOnWindows = "Single mode restarts while the sample starts on Windows, which is still to be investigated";
-
-        [NotOnWindowsTheory(SingleOnWindows)]
-        [InlineData("Single")]
-        public Task ManyMonitoredFoldersStayWithinTheInotifyBudgetInSingleMode(string fcnMode)
+        // bin_dotnet holds the application's assemblies, as bin does on IIS: a change there restarts the application in
+        // every mode but Disabled, and starting doesn't, on Windows as on Linux (#167). The site is a fresh copy, as a
+        // deployment is: on Windows, the first time anything opens a folder that files were just copied into, NTFS
+        // writes the folder's deferred LastWriteTime and reports the folder as modified (FILE_NOTIFY_CHANGE_LAST_WRITE),
+        // and the application opens every folder of bin_dotnet while it starts (BuildManager hashes bin recursively);
+        // IIS 10 restarts a freshly copied site for those in some runs and not in others. Each change below is one IIS 10
+        // makes the same decision on, every time (CI's iis-compare job, tools/ci/iis_fcn.cs): a new file
+        // in a subfolder, a subfolder's LastWriteTime set after the start (a restart in Single mode only, as IIS's
+        // Single mode tells bin of any change below it), and a file in a folder whose name starts with "bin" (Single
+        // mode compares the special folders' names as prefixes).
+        [Theory]
+        [InlineData(null, "file", true)]
+        [InlineData("Default", "file", true)]
+        [InlineData("Single", "file", true)]
+        [InlineData("Default", "folder time", false)]
+        [InlineData("Single", "folder time", true)]
+        [InlineData("Default", "binaries", false)]
+        [InlineData("Single", "binaries", true)]
+        public async Task AChangeInBinDotnetRestartsTheApplicationAndStartingDoesNot(string fcnMode, string change, bool restarts)
         {
-            return ManyMonitoredFoldersStayWithinTheInotifyBudget(fcnMode);
-        }
+            using var site = new Site(fcnMode);
+            var binaries = Path.Combine(site.Directory, "binaries");
+            System.IO.Directory.CreateDirectory(binaries);
+            using var app = site.Start();
+            var first = await Get(app, "");
+            await Task.Delay(5000);
+            Assert.False(app.Process.HasExited, "the application restarted while it started\n" + app.Output);
+            Assert.Equal(first["process"], (await Get(app, ""))["process"]);
+            Assert.DoesNotContain("is shutting down", app.Output);
 
-        [NotOnWindowsTheory(SingleOnWindows)]
-        [InlineData("Single")]
-        public Task AChangeToWebConfigRestartsTheApplicationInSingleMode(string fcnMode)
-        {
-            return AChangeToWebConfigRestartsTheApplication(fcnMode);
+            var cs = Path.Combine(site.Directory, "bin_dotnet", "cs");
+            switch (change)
+            {
+                case "file": File.WriteAllText(Path.Combine(cs, "new.txt"), "new"); break;
+                case "folder time": System.IO.Directory.SetLastWriteTimeUtc(cs, DateTime.UtcNow); break;
+                case "binaries": File.WriteAllText(Path.Combine(binaries, "x.txt"), "x"); break;
+            }
+
+            if (restarts)
+            {
+                Assert.True(app.Process.WaitForExit(30000), $"the application was still running 30 s after the change ({change})\n" + app.Output);
+                Assert.Contains("BinDirChangeOrDirectoryRename", app.Output);
+            }
+            else
+            {
+                await Task.Delay(5000);
+                Assert.False(app.Process.HasExited, $"the change ({change}) restarted the application\n" + app.Output);
+            }
         }
 
         [Fact]
