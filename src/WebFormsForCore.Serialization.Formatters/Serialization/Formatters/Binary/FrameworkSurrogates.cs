@@ -109,7 +109,7 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
             {
                 return s_collection;
             }
-            return null;
+            return ReflectionSurrogates.GetSurrogate(type); // #156
         }
 
         // .NET's NameObjectCollectionBase.OnDeserialization and TextInfo's IDeserializationCallback throw
@@ -122,6 +122,8 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
         // the wire it is written with .NET Framework's version, as System.Web's types were. The other .NET Framework 4.x
         // assemblies this repository builds have .NET Framework's identity (#141), and the rest (the Web Stack's) are
         // written as they are.
+        // The core library is mscorlib, as on .NET Framework, for its types that have no TypeForwardedFrom (System.Type[]
+        // in a MemberInfoSerializationHolder, #156).
         private static readonly HashSet<string> s_frameworkAssemblies = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "System.Web", "System.Web.ApplicationServices", "System.Web.DataVisualization", "System.Web.DynamicData",
@@ -132,6 +134,10 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
 
         internal static string GetAssemblyName(Assembly assembly) => s_assemblyNames.GetOrAdd(assembly, static a =>
         {
+            if (a == typeof(object).Assembly)
+            {
+                return Mscorlib;
+            }
             AssemblyName name = a.GetName();
             byte[]? token = name.GetPublicKeyToken();
             if (name.Name != null && s_frameworkAssemblies.Contains(name.Name) && name.Version?.Major > 4 && token is { Length: 8 })
