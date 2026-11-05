@@ -156,10 +156,18 @@ namespace WebFormsForCore.Hosting.IIS
 			var rawPath = rawTarget.Split('?')[0];
 			var query = request.QueryString.HasValue ? request.QueryString.Value.Substring(1) : "";
 
-			if (Items(section, "security/requestFiltering/alwaysAllowedUrls").Any(e => string.Equals(Attr(e, "url"), path, StringComparison.OrdinalIgnoreCase)))
+			var limits = Element(section, "security/requestFiltering/requestLimits");
+			bool alwaysAllowed = Items(section, "security/requestFiltering/alwaysAllowedUrls").Any(e => string.Equals(Attr(e, "url"), path, StringComparison.OrdinalIgnoreCase));
+			// #192: the body's limit is maxAllowedContentLength, as IIS's; Kestrel's own (MaxRequestBodySize, 30,000,000
+			// bytes by default) cut a larger body that the application allowed (an upload of 31 MB with
+			// maxAllowedContentLength and maxRequestLength raised) with a broken connection. Kestrel enforces it on
+			// bodies without a Content-Length too; a body with one is answered 404.13 below.
+			var bodySize = context.Features.Get<IHttpMaxRequestBodySizeFeature>();
+			if (bodySize != null && !bodySize.IsReadOnly)
+				bodySize.MaxRequestBodySize = alwaysAllowed ? null : Long(limits, "maxAllowedContentLength", 30000000);
+			if (alwaysAllowed)
 				return false;
 
-			var limits = Element(section, "security/requestFiltering/requestLimits");
 			if (request.ContentLength > Long(limits, "maxAllowedContentLength", 30000000))
 				return await Reject(context, 13, "The request filtering module is configured to deny a request that exceeds the request content length.");
 			if (rawPath.Length > Long(limits, "maxUrl", 4096))
