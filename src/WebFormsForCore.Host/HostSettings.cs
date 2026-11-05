@@ -29,11 +29,54 @@ public sealed class HostSettings
 	// (SignalR waits up to 110 s) and for slow pages (<httpRuntime executionTimeout> is 110 s).
 	public TimeSpan RequestIdleTimeout { get; set; } = TimeSpan.FromMinutes(10);
 
+	// <applicationPools><add startMode> (#193): AlwaysRunning starts the first worker when the host starts, OnDemand at the
+	// first request. IIS's default is OnDemand; the host's is AlwaysRunning, as it has always started its first worker
+	// with the host, and as production pools are usually set (the host is a service that runs one application).
+	public StartMode StartMode { get; set; } = StartMode.AlwaysRunning;
+
+	// <sites><application preloadEnabled> (#193): when <applicationInitialization> has no initialization pages, a new
+	// worker is sent a request for "/" before it takes traffic, which starts the application (Application_Start runs with
+	// its first request) without a client waiting for it. With pages, those are requested instead, whatever this says.
+	// IIS's default, false.
+	public bool PreloadEnabled { get; set; }
+
+	// <system.webServer><applicationInitialization> (#193) is read from the application's Web.config; these replace what
+	// it says. InitializationPages: the requests sent to a new worker, one after the other, before it takes traffic (each
+	// "InitializationPage" and optional "HostName", as <add initializationPage hostName>); null takes Web.config's.
+	public List<InitializationPageSetting>? InitializationPages { get; set; }
+	// doAppInitAfterRestart: the pages are also requested when the worker replaces one whose application restarted
+	// (a Web.config, bin or App_Code change, HttpRuntime.UnloadAppDomain); null takes Web.config's (IIS's default: false).
+	public bool? DoAppInitAfterRestart { get; set; }
+	// remapManagedRequestsTo: a file of the site sent in answer to requests while a worker is being warmed and no other
+	// worker serves; null takes Web.config's (IIS's default: none, and the requests wait).
+	public string? RemapManagedRequestsTo { get; set; }
+
+	// <processModel idleTimeout idleTimeoutAction> (#193): a worker that has had no request for this long is stopped
+	// (Terminate), and the next request starts a new one; with StartMode AlwaysRunning a new one starts at once, as WAS
+	// keeps an AlwaysRunning pool's worker running. IIS's default is 20 minutes; the host's is zero, off, as before: that
+	// is what AlwaysRunning pools are usually set to, and on a host that runs one application an idle timeout only ends
+	// the application (Application_End, in-process sessions and caches lost) and makes the next client wait for its
+	// start. Suspend leaves the worker running: IIS paged a suspended worker out and kept its application, which .NET
+	// can't do; the application sees what it saw on IIS.
+	public TimeSpan IdleTimeout { get; set; } = TimeSpan.Zero;
+	public IdleTimeoutAction IdleTimeoutAction { get; set; } = IdleTimeoutAction.Terminate;
+
 	// Client certificates on an HTTPS binding with "ClientCertificateMode": "AllowCertificate" (IIS's SSL setting
 	// "Accept") are validated by Kestrel, which refuses one whose chain isn't trusted. With this set, any certificate
 	// is passed to the application, which sees whether it is valid (Request.ClientCertificate.IsValid, CERT_FLAGS).
 	// For tests and private deployments; off by default.
 	public bool AcceptUntrustedClientCertificates { get; set; }
+}
+
+public enum StartMode { OnDemand, AlwaysRunning }
+
+public enum IdleTimeoutAction { Terminate, Suspend }
+
+// <applicationInitialization><add initializationPage hostName>
+public sealed class InitializationPageSetting
+{
+	public string InitializationPage { get; set; } = "";
+	public string? HostName { get; set; }
 }
 
 // The application the workers run: dotnet <Application> <Arguments>.
