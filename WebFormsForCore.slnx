@@ -158,6 +158,10 @@
     <Project Path="test/webForCore.IIS.Sample.SimpleLib/webForCore.IIS.Sample.SimpleLib.csproj" />
     <Project Path="test/webForCore.IIS.Sample.SimpleLib2/webForCore.IIS.Sample.SimpleLib2.csproj" />
     <Project Path="test/webForCore.IIS.Sample.SimpleUser/webForCore.IIS.Sample.SimpleUser.csproj" />
+    <Project Path="test/webForCore.IIS.Sample.StrongLib/webForCore.IIS.Sample.StrongLib.csproj" />
+    <Project Path="test/webForCore.IIS.Sample.StrongLib2/webForCore.IIS.Sample.StrongLib2.csproj" />
+    <Project Path="test/webForCore.IIS.Sample.StrongUser/webForCore.IIS.Sample.StrongUser.csproj" />
+    <Project Path="test/webForCore.IIS.Sample.CodeBaseLib/webForCore.IIS.Sample.CodeBaseLib.csproj" />
     <Project Path="test/webForCore.Host.Tests/webForCore.Host.Tests.csproj" />
     <Project Path="test/webForCore.Host.Sample/webForCore.Host.Sample.csproj" />
     <Project Path="test/webForCore.Precompiled.Host/webForCore.Precompiled.Host.csproj" />
