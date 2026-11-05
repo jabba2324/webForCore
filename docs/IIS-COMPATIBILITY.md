@@ -114,6 +114,7 @@ IIS hands ASP.NET a worker request (`HttpWorkerRequest`); on Kestrel this is `As
 | --- | --- | --- |
 | Anonymous | Works | |
 | Forms, ASP.NET Identity, OWIN cookies, OAuth | Works | All in managed code |
+| Sharing `<machineKey>` output with .NET Framework 4.8 (forms tickets, `MachineKey.Protect` and `Encode`, OWIN and ASP.NET Identity cookies) | Works | With the same `<machineKey>`, each runtime reads the other's output, both ways: validation SHA1, HMACSHA256 and HMACSHA512, decryption AES and 3DES, `compatibilityMode` Framework20SP1, Framework20SP2 and Framework45, and none with `<httpRuntime targetFramework="4.5">` or later. Katana's cookies (`UseCookieAuthentication` on `Microsoft.Owin.Host.SystemWeb`, Identity's application cookie with `SecurityStampValidator` too) are protected with the machine key, not DPAPI, as on IIS. Output that is the same on every call (`MachineKey.Encode` with `Validation`) is the same bytes; the rest has a random IV, on both. Not shared: an application without `targetFramework` and without `compatibilityMode` (Framework20SP1 on .NET Framework, Framework45 here: forms tickets; set `compatibilityMode` on both), and `IsolateApps` or `IsolateByAppId` after an explicit key (the key is changed with a hash of the virtual path or the application ID, which differ). Fixed in 0.10.0: HMACSHA256 and HMACSHA512 in the Framework20 modes and `MachineKey.Encode` (#191). Tested by `MachineKeyInteropTests` and CI's `machinekey-framework-interop` job ([TESTING.md](TESTING.md)) |
 | URL authorization (`<system.web>` and `<system.webServer>`) | Works | |
 | Windows (Negotiate, Kerberos, NTLM) | Not built | Kestrel's Negotiate handler exists but isn't connected to System.Web's `User` |
 | Basic, Digest | Not built | There are no Windows accounts to check against |
@@ -153,8 +154,15 @@ Windows they use Windows' DPAPI and key containers, as on .NET Framework. Elsewh
   machine-scope keys go in `/var/lib/webforcore/keys` when it is writable, and everything else in `~/.webforcore/keys`.
   A key is created the first time it's needed. Payloads are AES-256-CBC with an HMAC-SHA256, keyed by HKDF from the
   master key, a salt and the entropy; the wrong key or entropy fails with DPAPI's "Key not valid for use in specified
-  state." Katana's `DpapiDataProtectionProvider` (ASP.NET Identity's token providers) uses the same emulation, in user
-  scope.
+  state." Katana's `DpapiDataProtectionProvider` uses the same emulation, in user scope.
+- **Katana on System.Web doesn't use DPAPI** (#191): `Microsoft.Owin.Host.SystemWeb` gives the middleware the machine
+  key's data protection (`MachineKey.Protect`), so cookies, and ASP.NET Identity's tokens when `IdentityFactoryOptions`'
+  `DataProtectionProvider` (`app.GetDataProtectionProvider()`) creates the token provider as the templates do, are
+  protected with `<machineKey>` and shared with .NET Framework as in [Authentication](#authentication). Only an
+  application that creates a `DpapiDataProtectionProvider` itself (or Katana's HttpListener host, which has no machine
+  key) uses DPAPI, and that output never leaves the machine and user that protected it, on .NET Framework too. Even
+  there it isn't .NET Framework's: on Windows webForCore calls DPAPI with different entropy (a SHA-256 of the
+  application name and purposes), because .NET Framework's `DpapiDataProtector` isn't in the reference source.
 - **A section encrypted by Windows DPAPI** is recognised by its blob header and fails with an explanation: those keys
   never leave the Windows machine. Decrypt it there (`aspnet_regiis -pdf`), then protect it again here
   (`webforcore-regiis -pef`) or with RSA and an exported key container.

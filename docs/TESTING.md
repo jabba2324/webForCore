@@ -88,7 +88,22 @@ fails if they differ from System.Web's scripts (`src/WebFormsForCore.Web/Framewo
 `SqlServicesTests` compares webforcore-regsql's with (`test/webForCore.IIS.Gate.Tests/FrameworkData`). It is not a
 required check either.
 
-Both jobs then run `tools/ci/testapp-smoke.sh` (#80): `src/WebFormsForCore.TestApp` is rebuilt with its pages newer than
+CI's `machinekey-framework-interop` job (#191) checks that what webForCore protects with a `<machineKey>` reads on .NET
+Framework 4.8 and the reverse. `test/webForCore.MachineKey.Sample/Interop` lists the configurations (validation SHA1,
+HMACSHA256 and HMACSHA512; decryption AES and 3DES; `compatibilityMode` Framework20SP1, Framework20SP2 and Framework45,
+none with `<httpRuntime targetFramework="4.5">` and none at all; `ticketCompatibilityMode="Framework40"`; `IsolateApps`
+and `IsolateByAppId`) and what is protected with each: `FormsAuthentication.Encrypt`, `MachineKey.Protect` (with and
+without purposes), `MachineKey.Encode`, and Katana cookies, a plain one and ASP.NET Identity's. IIS.Gate.Tests'
+`MachineKeyInteropTests` runs the sample once for each configuration, has it read .NET Framework's outputs
+(`test/webForCore.IIS.Gate.Tests/FrameworkData/machinekey-framework.json`; the cookies through Katana's cookie
+middleware on `Microsoft.Owin.Host.SystemWeb`), and writes its own (the `machinekey-webforcore` artifact). The job, after
+`build-and-test`, runs the same `Interop` code on .NET Framework 4.8 (`tools/machinekey/FrameworkMachineKey`, an
+application domain per configuration): it reads webForCore's outputs and the committed ones, and fails if a committed
+output that .NET Framework writes the same every time differs. Outputs with a random IV differ on every call, so they
+are compared by reading each other's; deterministic ones are compared byte for byte too. Its output is the
+`machinekey-framework` artifact, with a report in the job's summary. It is not a required check.
+
+`build-and-test` and `build-windows` then run `tools/ci/testapp-smoke.sh` (#80): `src/WebFormsForCore.TestApp` is rebuilt with its pages newer than
 their designer files, so that this repository's designer-file task runs (upstream's WebFormsForCore.Build package,
 which the TestApp used before, started `dotnet.exe` there and failed on Linux), its `deps.json` must be the SDK's with
 System.Web's real `assemblyVersion` (no checked-in `deps.json`), and the app must start and serve its pages.
