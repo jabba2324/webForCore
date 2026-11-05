@@ -143,8 +143,13 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
    Autofac.Configuration 3, Castle.Core 3 and NHibernate 4 need newer versions (#148). An MVC 3 or 4 app needs
    `webpages:Version` `3.0.0.0` and `using CompareAttribute = System.Web.Mvc.CompareAttribute;` where `[Compare]` is
    `CS0104` (#122). Plug-in libraries built into their own folder need their packages copied there (#150).
-6. Add `Program.cs` from `docs/MIGRATING.md` section 4. Include session state only if the app uses `Session`. Use
-   `HandleAllRequestsWithWebForms()` unless the app serves only `.aspx`/`.asmx`/`.ashx`.
+6. Add `Program.cs` from `docs/MIGRATING.md` section 4. Use `HandleAllRequestsWithWebForms()` unless the app serves
+   only `.aspx`/`.asmx`/`.ashx`. Session state (`Session`, MVC's `TempData`) needs nothing: it is in process, as
+   `<sessionState mode="InProc">` (or no `mode`, the default) was on IIS. Add `AddDistributedMemoryCache()` and
+   `UseAspNetCoreSessionProvider()` only if web.config's `<sessionState mode>` is `StateServer`, `SQLServer` or `Custom`
+   (tell the user, and ask which distributed cache to use: Redis, SQL Server or memory), or the user asks to scale out.
+   The provider is out of process: every session value must then be serializable (`docs/MIGRATING.md` section 4,
+   "Session state", #180).
 7. Search the code for what behaves differently on Linux (`docs/MIGRATING.md` section 6), and fix each hit minimally:
    - `"~/bin` or `\bin` used to load or scan assemblies: they are in `bin_dotnet/`; use `HttpRuntime.BinDirectory` or
      the app's own setting (Umbraco: `umbracoBinDirectory` = `~/bin_dotnet`).
@@ -214,6 +219,7 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
    | `FileNotFoundException` for a package of a plug-in built into its own folder | Copy the plug-in's packages there (`docs/MIGRATING.md` section 2, "Plug-in libraries") |
    | `MissingMethodException: ... AppDomainSetup.get_ConfigurationFile()` or `... AppDomain.DefineDynamicAssembly(...)` | Autofac.Configuration 3, Castle.Core 3 or NHibernate 4: newer versions (Phase 2 step 5) |
    | Prices shown with three decimals (`8.990`) | ICU's `en-US`/`en-GB` `NumberDecimalDigits` (Phase 2 step 7) |
+   | `HttpException: Unable to serialize the session state` and `SerializationException: Type '...' is not marked as serializable` at `AspNetCoreSessionProvider.SetAndReleaseItemExclusive` (often the request after a redirect, with a view model in `TempData`) | `UseAspNetCoreSessionProvider()` where the app's session state was in process on IIS: remove it and `AddDistributedMemoryCache()` (Phase 2 step 6). If web.config says `StateServer`, `SQLServer` or `Custom`, the type was serializable on IIS too; otherwise ask the user before marking types `[Serializable]` |
 
 **Check:** every page type renders without errors.
 
@@ -233,7 +239,8 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
 
 Follow `docs/MIGRATING.md` section 8: the site folder with `bin_dotnet/`, run under `webforcore-host` by the user's
 service manager or container runtime, one host per site folder, an explicit
-`<machineKey>`, and out-of-process session state before scaling out. Don't deploy, push or commit without the user's
+`<machineKey>`, and out-of-process session state (`UseAspNetCoreSessionProvider()`, serializable values) before
+scaling out. Don't deploy, push or commit without the user's
 instruction.
 
 ## Final report
