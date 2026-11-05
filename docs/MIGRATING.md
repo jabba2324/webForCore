@@ -542,6 +542,33 @@ before the upgrade aren't found after it: users start new ones.
   trust (#87). Code that worked around Medium trust keeps working; code that checks the trust level sees full trust.
 - **Connection strings:** `System.Data.SqlClient` is used, as on .NET Framework. Add `TrustServerCertificate=True` or
   a trusted certificate if the server's certificate isn't trusted on Linux. LocalDB doesn't exist on Linux.
+- **The SQL providers' database (`aspnetdb`)** (#123). The default `SqlMembershipProvider`, `SqlRoleProvider`,
+  `SqlProfileProvider`, personalization and `SqlWebEventProvider` use machine.config's `LocalSqlServer`: SQL Express with
+  `AttachDBFilename=|DataDirectory|aspnetdb.mdf;User Instance=true`, which ASP.NET created on first use. That can't
+  exist on Linux: the first sign-in or registration is a 500 ("SQLExpress database file auto-creation error", MVC Music
+  Store). Point `LocalSqlServer` at a SQL Server in the application's web.config:
+
+  ```xml
+  <connectionStrings>
+    <remove name="LocalSqlServer" />
+    <add name="LocalSqlServer" providerName="System.Data.SqlClient"
+         connectionString="Data Source=db.example.com;Initial Catalog=aspnetdb;User ID=app;Password=...;TrustServerCertificate=True" />
+  </connectionStrings>
+  ```
+
+  Then create the database once, as `aspnet_regsql` did, with `webforcore-regsql`, which has its switches (from 0.9.0;
+  `dotnet tool install -g webForCore.RegSql --add-source https://xforcore.github.io/webForCore/index.json`):
+
+  ```bash
+  webforcore-regsql -S db.example.com -U sa -P '...' -d aspnetdb -A mr
+  ```
+
+  `-A all`, or the letters `m` (membership), `r` (roles), `p` (profile), `c` (personalization) and `w` (web events);
+  `-C <connection string>` instead of `-S`/`-U`/`-P`; `-sqlexportonly <file>` writes the script instead, for a DBA to
+  run. SQL Server session state is `-ssadd -sstype t|p|c`. An application can also call
+  `System.Web.Management.SqlServices.Install(...)`, as on .NET Framework. The scripts are .NET Framework 4.8's, which
+  System.Web carries, so an `aspnetdb` that served the application on IIS works as it is: move the database with its
+  users.
 - **Protected sections:** sections encrypted with RSA can be read once the key container is imported
   (`webforcore-regiis -pi`). Sections encrypted with Windows DPAPI must be decrypted on Windows first. See
   [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md#deployment-tools).
@@ -620,10 +647,14 @@ Fix what the blocker search found (see [NAMESPACES.md](NAMESPACES.md) for replac
   `VBCodeProvider`) creates one directly. They take System.CodeDom's `CompilerParameters` and return its
   `CompilerResults`, so only the provider's type changes (in a file that names it,
   `using CodeDomProvider = WebFormsForCore.CodeDom.Compiler.CodeDomProvider;`); they don't derive from
-  System.CodeDom's `CodeDomProvider`, so code that passes one to an API typed with it needs that API changed too. In
-  0.8.0 (#135), set `CompilerOptions` (`""` will do; `null` throws a `NullReferenceException`) and, with
-  `GenerateInMemory`, `IncludeDebugInformation = true` (without it the in-memory load throws an
-  `ArgumentNullException`).
+  System.CodeDom's `CodeDomProvider`, so code that passes one to an API typed with it needs that API changed too.
+  `CompilerParameters`' options (`GenerateInMemory`, `IncludeDebugInformation`, `CompilerOptions`, `OutputAssembly`, `TempFiles.KeepFiles`)
+  give the results and leave the files .NET Framework 4.8's provider did; up to 0.8.0, `CompilerOptions = null` threw a
+  `NullReferenceException` and `GenerateInMemory` without debug information an `ArgumentNullException` (#135). Two
+  differences remain. A reference by file name alone (`ReferencedAssemblies.Add("System.dll")`) isn't found
+  (`CS0006: Metadata file 'System.dll' could not be found`): .NET Framework's csc looked in the framework folder;
+  give the path, `Path.Combine(RuntimeEnvironment.GetRuntimeDirectory(), "System.dll")`. And, as Microsoft's DotNetCompilerPlatform provider they are built
+  from does, they put `/nowarn:1659;1699;1701;612;618` in front of the parameters' `CompilerOptions`.
 - **Newlines:** `Environment.NewLine` is `\n`.
 - **Fonts and drawing:** install the fonts the app uses, or fontconfig's metric-compatible substitutes for Windows
   fonts (Liberation, Carlito, Caladea).

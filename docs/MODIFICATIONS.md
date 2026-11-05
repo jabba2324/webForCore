@@ -198,3 +198,15 @@ commit that made it, and its issue, say why.
   Framework 1–4 and LINQ to SQL model providers, `LinqDataSource`/`EntityDataSource` hookups and EF 5 spatial column
   types are compiled out (`#if NETFRAMEWORK`); `AssemblyRef.cs` and `ScaffoldTableAttribute` (which .NET dropped) are
   added (#8).
+- **No kernel32 for the machine name** (`HttpServerUtility.GetMachineNameInternal`): `Environment.MachineName` instead of
+  `GetComputerName`, which threw `DllNotFoundException` off Windows (ELMAH's log pages, #128). On Windows .NET reads it
+  with `GetComputerName` too. The P/Invoke declaration is left in `UnsafeNativeMethods.cs`, unused.
+- **aspnet_regsql's scripts as resources** (`Management/SqlServices.cs`, `WebFormsForCore/SqlScripts.cs`): `SqlServices`
+  reads `InstallCommon.sql` and the others from System.Web's resources, which are .NET Framework 4.8's files
+  (`FrameworkData/Sql`, read as data from its folder on a Windows CI runner: referencesource doesn't have them), with
+  the name matched without case, as Windows does (`InstallProfile.SQL`). It read them from
+  `HttpRuntime.AspInstallDirectory`, .NET's folder on webForCore, which has none (#123). `webforcore-regsql`
+  (`src/WebFormsForCore.RegSql`) is webForCore's own aspnet_regsql, on `SqlServices`.
+- **CodeDom provider** (`WebFormsForCore/CodeDom`, from Microsoft's RoslynCodeDomProvider): `CompilerOptions` may be
+  null (the `/nowarn:` check webForCore added didn't allow it), and an assembly compiled in memory without a PDB is
+  loaded without a symbol stream, as `Assembly.Load(byte[], null)` was on .NET Framework (#135).

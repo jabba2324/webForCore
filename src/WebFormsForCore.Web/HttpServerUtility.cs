@@ -936,13 +936,10 @@ namespace System.Web {
                 if (_machineName != null)
                     return _machineName;
 
-                StringBuilder   buf = new StringBuilder (_maxMachineNameLength);
-                int             len = _maxMachineNameLength;
-
-                if (UnsafeNativeMethods.GetComputerName (buf, ref len) == 0)
-                    throw new HttpException (SR.GetString(SR.Get_computer_name_failed));
-
-                _machineName = buf.ToString();
+                // webForCore: Environment.MachineName, not kernel32's GetComputerName, which isn't there off Windows (#128).
+                // On Windows .NET reads it with GetComputerName, so the name is the same (the NetBIOS name, as Windows
+                // stores it: not upper-cased); elsewhere it is the host name up to its first dot.
+                _machineName = Environment.MachineName;
             }
             return _machineName;
         }

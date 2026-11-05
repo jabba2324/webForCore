@@ -198,6 +198,7 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
    | `Could not load file or assembly '<site>/bin/...'` | A hard-coded `~/bin`: use `HttpRuntime.BinDirectory` or `~/bin_dotnet` |
    | A redirect or "another domain" error for a local URL such as `/admin/` | `Uri.TryCreate(url, UriKind.Absolute, ...)` accepts `/path` on Linux (Phase 2 step 7) |
    | `~/...` paths not mapped, or a folder named `~` appears in the site | A `Path.VolumeSeparatorChar` check (Phase 2 step 7) |
+   | `SQLExpress database file auto-creation error`, or `Cannot open database "aspnetdb"` on sign-in or registration | The SQL providers' `LocalSqlServer` (SQL Express `aspnetdb.mdf`): point it at a SQL Server and create the database with `webforcore-regsql -A` (`docs/MIGRATING.md` section 5); ask the user for the server |
    | Language keys (`[login]`) or invariant formats (`¤`, `MM/dd/yyyy`) only on some servers or in containers | No locale: the invariant culture. Set `<globalization culture uiCulture>` (ask the user which) or `LANG` |
    | log4net writes nothing | Log4Net.Async (Phase 2 step 7); `log4net.Internal.Debug` shows the `TypeLoadException` |
    | Lost logins or view state errors after a restart | Add an explicit `<machineKey>` (ask the user for keys, or generate new ones and say so) |

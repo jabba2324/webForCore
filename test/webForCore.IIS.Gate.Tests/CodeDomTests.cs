@@ -59,5 +59,28 @@ namespace IISGate
                 @"vb: warning BC42024 \w+\.0\.vb\(3,0\): Unused local variable: 'unused'\.\n$",
                 body);
         }
+
+        // #135: WebFormsForCore.CodeDom.Compiler.CSharpCodeProvider, which applications create themselves (Composite C1),
+        // threw ArgumentNullException with GenerateInMemory and no PDB, and NullReferenceException with CompilerOptions
+        // null. regressions/CodeDomOptions.aspx compiles with each combination of GenerateInMemory,
+        // IncludeDebugInformation, CompilerOptions (null, empty, set), OutputAssembly (set or not) and TempFiles.KeepFiles,
+        // and writes the results, the output and the files left; FrameworkData/CodeDomMatrix-net48.txt is what .NET
+        // Framework 4.8's Microsoft.CSharp.CSharpCodeProvider gave for the same App_Code/CodeDomMatrix.cs.
+        [Fact]
+        public async Task CompilerParametersAsOnDotNetFramework()
+        {
+            var response = await _server.Client.GetAsync("/regressions/CodeDomOptions.aspx");
+            string body = await response.Content.ReadAsStringAsync();
+            Assert.True(response.StatusCode == HttpStatusCode.OK, body);
+
+            string[] expected = File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "FrameworkData", "CodeDomMatrix-net48.txt"));
+            string[] actual = body.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            // One difference is kept: the provider is Microsoft's DotNetCompilerPlatform one, which with UseAspNetSettings
+            // (the default) puts "/nowarn:1659;1699;1701;612;618" in front of the caller's CompilerOptions, where .NET
+            // Framework's CSharpCodeProvider leaves them as they are (docs/NAMESPACES.md).
+            Assert.All(actual, line => Assert.Contains(" options=changed ", line));
+            var framework = new System.Text.RegularExpressions.Regex(" options=(null|same) ");
+            Assert.Equal(expected.Select(line => framework.Replace(line, " options=changed ")), actual);
+        }
     }
 }
