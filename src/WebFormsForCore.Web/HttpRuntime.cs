@@ -423,6 +423,13 @@ namespace System.Web
                     // To ignore FCN during initialization
                     _firstRequestStartTime = DateTime.UtcNow;
 
+                    // webForCore: <httpRuntime fcnMode> (#146). On .NET Framework HttpRuntime's static constructor ran in the application's
+                    // new domain after HostingEnvironment.Initialize, so Init created the FileChangesMonitor with the mode the
+                    // application's configuration gave. Here the process's only HttpRuntime is created earlier, while
+                    // ApplicationManager reads that configuration (which .NET Framework did in the default domain), and the
+                    // monitor had FcnMode.NotSet: Disabled and Single were ignored. Nothing is monitored before this point.
+                    _fcm = new FileChangesMonitor(HostingEnvironment.FcnMode);
+
                     SetUpDataDirectory();
 
                     // Throw an exception about lack of access to app directory early on

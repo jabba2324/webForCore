@@ -10,7 +10,7 @@ namespace HostTests
 {
     // webforcore-host (#56) with test/webForCore.Host.Sample, and on its own. One class: the tests share the sample's
     // folder (its compilation output), so they run one at a time.
-    public class HostTests
+    public partial class HostTests
     {
         const string Sample = "webForCore.Host.Sample";
         static readonly string Repository = WebForCoreHost.Repository(Path.Combine("test", Sample));
