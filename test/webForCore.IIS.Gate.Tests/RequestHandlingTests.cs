@@ -94,6 +94,9 @@ namespace IISGate
             { "/end/Transfer.aspx", 200 },
             { "/end/Complete.aspx", 200 },
             { "/end/FlushEnd.aspx", 200 },
+            // #184: Response.Write with BufferOutput = false
+            { "/unbuffered/Write.aspx", 200 },
+            { "/unbuffered/Stream.aspx", 200 },
             { "/Login.aspx", 200 },
             // The integrated pipeline's URL server variables (none in the classic pipeline, IIS's or webForCore's).
             { "/ServerVariables.aspx", 200 },
@@ -105,6 +108,22 @@ namespace IISGate
         {
             var (response, _) = await Get(path);
             Assert.Equal(status, (int)response.StatusCode);
+        }
+
+        // #184 (Bonobo Git Server: git's smart HTTP never answered): Response.Write with BufferOutput = false, and then
+        // copies to Response.OutputStream, are sent, chunked, and the response ends.
+        [Fact]
+        public async Task UnbufferedWritesAreSent()
+        {
+            var (write, body) = await Get("/unbuffered/Write.aspx");
+            Assert.Equal(HttpStatusCode.OK, write.StatusCode);
+            Assert.Equal("hello world\n", body);
+            Assert.True(write.Headers.TransferEncodingChunked);
+            var (stream, streamed) = await Get("/unbuffered/Stream.aspx");
+            Assert.Equal(HttpStatusCode.OK, stream.StatusCode);
+            var data = new char[10000];
+            for (int i = 0; i < data.Length; i++) data[i] = i % 64 == 63 ? '\n' : (char)('a' + i % 26);
+            Assert.Equal("001e# service=git-upload-pack\n" + new string(data) + "|end\n", streamed);
         }
 
         // #126 (Wingtip Toys: every product link, /Product/Convertible%20Car, was an empty 400): the request reaches the
