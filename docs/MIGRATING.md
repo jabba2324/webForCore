@@ -550,8 +550,9 @@ Without `HandleAllRequestsWithWebForms()`, only ASP.NET's own extensions (`.aspx
 reach System.Web, and ASP.NET Core serves everything else.
 
 Session state needs nothing here when it was in process on IIS (`<sessionState mode="InProc">`, or no `mode`: the
-default). Only an application whose session state was out of process adds a distributed cache and
-`UseAspNetCoreSessionProvider()` ("Session state", next).
+default), or out of process in SQL Server or Redis through `web.config` (its providers run as they are). Only an
+application that used the ASP.NET State Service (`mode="StateServer"`), or that moves to ASP.NET Core's distributed
+cache, adds one and `UseAspNetCoreSessionProvider()` ("Session state", next).
 
 ### Session state
 
@@ -562,10 +563,39 @@ application's cache: a value is the object the application stored, not a copy, s
 a `web.config` change), as on IIS. Keep it this way for an application that ran in process on IIS, which is most of
 them: changing it would make every session value go through `BinaryFormatter` (#180).
 
+**Out of process, configured in `web.config` as on IIS (from 0.10.0).** `<sessionState mode="SQLServer">` and the
+scale-out packages Microsoft made for .NET Framework run as they are, with the `web.config` they had on IIS: keep the
+package references (they restore for `net10.0` from their `net462`/`net472` builds) and the configuration. Each is
+tested with two instances sharing one store (`test/webForCore.SessionCache.Gate.Tests`, on Linux and Windows): a value
+set on one is read on the other, a request holding a session's exclusive lock makes a request for the same session on
+the other instance wait (read-only requests don't wait for each other), `Session.Abandon` on one ends it on both, a
+session ends `Session.Timeout` minutes after its last request, and a value that isn't serializable fails the request
+with "Unable to serialize the session state", as on IIS:
+
+| On IIS | On webForCore |
+| --- | --- |
+| `<sessionState mode="SQLServer" sqlConnectionString="...">` (System.Web's `SqlSessionStateStore`) | As it is. Create the database with `webforcore-regsql -ssadd` (`-sstype t`, `p` or `c`, as `aspnet_regsql`, section 5). Expired sessions are deleted by the SQL Server Agent job the script adds, as on IIS: where no agent runs (SQL Server Express, the Linux container by default), run `DeleteExpiredSessions` on a schedule |
+| `Microsoft.Web.RedisSessionStateProvider` (`<sessionState mode="Custom" customProvider=...>` with `type="Microsoft.Web.Redis.RedisSessionStateProvider"`; 5.x with the async module below) | As it is |
+| `Microsoft.AspNet.SessionState.SessionStateModule` (the async module: `<system.webServer><modules>`'s `<remove name="Session" />` and `<add name="Session" type="Microsoft.AspNet.SessionState.SessionStateModuleAsync, ...">`) | As it is: webForCore runs `<system.webServer><modules>`' managed modules, and the swap replaces System.Web's module |
+| `Microsoft.AspNet.SessionState.SqlSessionStateProviderAsync` | **2.1.0-preview1 or later** (with the module of the same version), as it is (it creates its table). 2.0.0 adds `String.GetHashCode()` of the application's ID to every session ID; .NET Framework's string hash is the same in every process, .NET's is different in every process (randomized), so with 2.0.0 two servers never share a session and a restart loses them all. 2.1.0-preview1 uses a hash of its own. Update the package and the version in `web.config`'s `type` |
+| `Microsoft.AspNet.SessionState.CosmosDBSessionStateProviderAsync` | Restores and loads; not tested against Cosmos DB |
+| `Microsoft.Web.RedisOutputCacheProvider` (`<caching><outputCache defaultProvider=...>`) | As it is, with System.Web's output cache module: pages are cached and served to every server until they expire, but see below. **`VaryByParam` (and any other vary) doesn't cache with 4.0.1, on IIS either**: its `Add` casts the Redis result to `byte[]` and fails (Microsoft's bug; 3.x converted it but serializes with `BinaryFormatter`, which .NET doesn't have), so after a page's first rendering no response of it is found again. Pages without a vary (`VaryByParam="none"`) are cached and shared. **Remove the `OutputCache` module swap** that its dependency `Microsoft.AspNet.OutputCache.OutputCacheModuleAsync` adds to `<system.webServer><modules>` (`<remove name="OutputCache" />` and `<add name="OutputCache" type="Microsoft.AspNet.OutputCache.OutputCacheModuleAsync, ...">`): the async module hands the provider entries of its own types, which System.Web's `OutputCache.Serialize` refuses, so the provider logs a warning and caches nothing, on IIS too |
+
+Every server must have the same application path (all at `/`, or all at the same virtual directory):
+`HttpRuntime.AppDomainAppId` is IIS's `/LM/W3SVC/1/ROOT` (and the path of a virtual directory), as on IIS servers
+whose site IDs match, and SQL Server session state keys sessions by it. Up to 0.9.0 it was a hash of the site's folder,
+so servers with the site in different folders didn't share sessions through SQL Server. Use the same `<machineKey>` on
+every server for forms authentication and view state.
+
+The async module's `aspnet:AllowConcurrentRequestsPerSession` setting keeps objects in its own collection, which
+serializes them with .NET's `BinaryFormatter`; it throws `PlatformNotSupportedException` on .NET, so with that setting
+only strings and primitive values can be stored out of process. The default (off) uses System.Web's collection and
+webForCore's BinaryFormatter.
+
 **Out of process: `UseAspNetCoreSessionProvider()`.** It keeps session state in ASP.NET Core's distributed cache
-(`IDistributedCache`), as `<sessionState mode="StateServer">` or `"SQLServer"` kept it out of process on IIS. Use it
-where the application's session state was out of process on IIS (`mode="StateServer"`, `"SQLServer"` or `"Custom"`
-with a provider that stored it elsewhere, such as Redis's), or to share sessions between servers (scaling out):
+(`IDistributedCache`), as `<sessionState mode="StateServer">` kept it out of process on IIS. Use it where the
+application used the ASP.NET State Service (`mode="StateServer"`; the service is part of .NET Framework on
+Windows), or a store its `web.config` can't name, or to share sessions between servers through a distributed cache:
 
 ```csharp
 builder.Services.AddDistributedMemoryCache();   // one server; or AddStackExchangeRedisCache(...),
@@ -841,8 +871,9 @@ The first request compiles pages, as on IIS. Then compare the responses recorded
   again.
 - **Precompilation** (optional): `aspnetcore_compiler -v / -p <site> -b bin_dotnet [-u] <target>`, then copy the build
   into `<target>/bin_dotnet`. Use `-u` for updatable sites.
-- **Scaling out:** use out-of-process session state (Redis or SQL Server through ASP.NET Core's distributed cache) and
-  the same `<machineKey>` everywhere.
+- **Scaling out:** use out-of-process session state (SQL Server or Redis through `web.config` as on IIS, or ASP.NET
+  Core's distributed cache; "Session state", section 4), the same application path on every server, and the same
+  `<machineKey>` everywhere.
 - Several processes must not share one site folder: they share the compilation folder.
 
 ## Troubleshooting

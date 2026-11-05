@@ -60,7 +60,7 @@ in the code; the rest come from the test suites and gates ([TESTING.md](TESTING.
 | `System.Web.Compilation` | 34 | `BuildManager`; run-time compilation with Roslyn (C# and VB) |
 | `System.Web.ModelBinding` | 99 | Web Forms model binding |
 | `System.Web.Security` | 39 | Forms authentication, membership, roles, `MachineKey`, URL authorization |
-| `System.Web.SessionState` | 22 | In-process session state (the default, as `mode="InProc"` on IIS), and `AspNetCoreSessionProvider` (`UseAspNetCoreSessionProvider()`: out of process, in ASP.NET Core's distributed cache, for applications that used StateServer or SQLServer or scale out; values must be serializable, [MIGRATING.md](MIGRATING.md#session-state)) |
+| `System.Web.SessionState` | 22 | In-process session state (the default, as `mode="InProc"` on IIS), `mode="SQLServer"` (`SqlSessionStateStore`), custom providers and module swaps (Microsoft's Redis and async SQL providers run unchanged: [MIGRATING.md](MIGRATING.md#session-state)), and `AspNetCoreSessionProvider` (`UseAspNetCoreSessionProvider()`: out of process, in ASP.NET Core's distributed cache, for applications that used StateServer or SQLServer or scale out; values must be serializable, [MIGRATING.md](MIGRATING.md#session-state)) |
 | `System.Web.Caching` | 25 | Cache, output cache, `SqlCacheDependency` |
 | `System.Web.Routing` | 16 | |
 | `System.Web.Management` | 44 | Health monitoring |
