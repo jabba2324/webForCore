@@ -10,7 +10,7 @@ namespace LinqScenarios
     // does (every input with its value, checked check boxes, __EVENTTARGET and __EVENTARGUMENT from the link's
     // __doPostBack call). The recorded body is the page's form without what differs between servers by design: the
     // values of __VIEWSTATE and __EVENTVALIDATION (protected with each server's machine key) and WebResource.axd's
-    // d and t parameters; __VIEWSTATEGENERATOR's value is recorded on its own, as "(__VIEWSTATEGENERATOR)" beside the
+    // d and t parameters, with \r\n read as \n (the platform's newline); __VIEWSTATEGENERATOR's value is recorded on its own, as "(__VIEWSTATEGENERATOR)" beside the
     // headers.
     public static class Scenarios
     {
@@ -159,6 +159,9 @@ namespace LinqScenarios
             Match form = Regex.Match(body, @"<form[\s\S]*</form>");
             string text = form.Success ? form.Value : body;
             text = Regex.Replace(text, @"(id=""__(VIEWSTATE|VIEWSTATEGENERATOR|EVENTVALIDATION)"" value="")[^""]*""", "$1(...)\"");
+            // Product output keeps the platform's newline (docs/IIS-COMPATIBILITY.md, "Compatibility decisions"): the
+            // TextWriter.WriteLine(string) calls in System.Web write \n on Linux where IIS writes \r\n.
+            text = text.Replace("\r\n", "\n");
             text = Regex.Replace(text, @"(WebResource\.axd\?d=)[^""&]*(&amp;t=)\d+", "$1(...)$2(...)");
             return text;
         }
