@@ -947,9 +947,19 @@ The first request compiles pages, as on IIS. Then compare the responses recorded
   ([An application under a path](#an-application-under-a-path)).
 - **Recycling:** a `web.config`, `bin` or `App_Code` change restarts the app in a new worker process, as IIS did; no
   request fails (the old worker finishes against the assemblies it compiled, #89), and those that arrive meanwhile
-  wait for the new worker. Set time, request or memory recycling with `UseWebForms(o => o.Recycling(...))`. Run without
+  wait for the new worker. Set time, request or memory recycling with `UseWebForms(o => o.Recycling(...))`: such a
+  recycle is overlapped, as IIS's was, and the old worker serves until the new one is ready. Run without
   the host (`dotnet bin_dotnet/YourApp.dll`), the app stops when it restarts, for whatever started it to start it
   again.
+- **Application pool settings** (#193) go in the `WebForCore:Host` section, from the pool in applicationHost.config:
+  `startMode` is `StartMode` (the host's default is `AlwaysRunning`, IIS's `OnDemand`), `<processModel idleTimeout>`
+  is `IdleTimeout` (the host's default is off; IIS's was 20 minutes: set `"IdleTimeout": "00:20:00"` only if the pool
+  relied on it), and the application's `preloadEnabled` is `PreloadEnabled`. `<applicationInitialization>` stays in
+  `web.config` and works as on IIS: its `initializationPage` requests warm each new worker before it takes traffic, so
+  that after a start or a recycle a load balancer's health check doesn't reach a cold application, and with
+  `doAppInitAfterRestart="true"` after a `web.config`, `bin` or `App_Code` change too. A URL Rewrite rule that tests
+  `{APP_WARMING_UP}` never matches (the variable isn't set); use `remapManagedRequestsTo` for a splash page. See
+  [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md#process-model).
 - **Precompilation** (optional): `aspnetcore_compiler -v / -p <site> -b bin_dotnet [-u] <target>`, then copy the build
   into `<target>/bin_dotnet`. Use `-u` for updatable sites.
 - **Scaling out:** use out-of-process session state (Redis or SQL Server through ASP.NET Core's distributed cache) and

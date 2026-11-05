@@ -68,6 +68,8 @@ namespace Microsoft.AspNetCore.Builder
 			public int Retired;
 			// An application pool recycle (Recycling: time, requests, private memory), not a restart of the application.
 			public volatile bool ProcessRecycle;
+			// The host was asked for an overlapped recycle (#193): it says when to recycle.
+			public int Overlapping;
 		}
 
 		// IIS application pool recycling (applicationHost.config <recycling><periodicRestart>), with IIS's defaults.
@@ -238,6 +240,23 @@ namespace Microsoft.AspNetCore.Builder
 		void Recycle(Application app, string reason)
 		{
 			if (app == null || app.Retired != 0) return;
+			// An application pool recycle is overlapped, as IIS overlapped it (#193): a worker of webforcore-host serves on
+			// while the host starts (and warms) the next, and recycles when the host says so.
+			if (WorkerProcess.IsWorker)
+			{
+				if (Interlocked.Exchange(ref app.Overlapping, 1) != 0) return;
+				if (WorkerProcess.RequestOverlappedRecycle(reason, () => RecycleNow(app, reason)))
+				{
+					logger.LogInformation("Recycling application {AppId}: {Reason}. It serves until the next worker is ready.", AppId, reason);
+					return;
+				}
+			}
+			RecycleNow(app, reason);
+		}
+
+		void RecycleNow(Application app, string reason)
+		{
+			if (app.Retired != 0) return;
 			logger.LogInformation("Recycling application {AppId}: {Reason}.", AppId, reason);
 			app.ProcessRecycle = true;
 			app.Shutdown();
