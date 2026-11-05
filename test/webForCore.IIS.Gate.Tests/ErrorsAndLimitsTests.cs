@@ -42,21 +42,24 @@ namespace IISGate
             // On without a defaultRedirect: ASP.NET's generic "Runtime Error" page.
             { "/errors/nodefault/Throw.aspx", 500 },
             { "/errors/nodefault/Http404.aspx", 404 },
-            // <httpErrors errorMode="Custom"> with customErrors off, by existingResponse.
+            // <httpErrors errorMode="Custom"> with customErrors off, by existingResponse. A replaced response is the
+            // ExecuteURL child request's: a static page (iis500.htm) is IIS's static file handler's 200.
             { "/errors/iis-auto/Throw.aspx", 500 },
             { "/errors/iis-auto/Http404.aspx", 404 },
-            { "/errors/iis-auto/Status500.aspx", 500 },
+            { "/errors/iis-auto/Status500.aspx", 200 },
             { "/errors/iis-auto/Status500Skip.aspx", 500 },
-            { "/errors/iis-replace/Throw.aspx", 500 },
-            { "/errors/iis-replace/Status500.aspx", 500 },
-            { "/errors/iis-replace/Status500Skip.aspx", 500 },
+            { "/errors/iis-replace/Throw.aspx", 200 },
+            { "/errors/iis-replace/Status500.aspx", 200 },
+            { "/errors/iis-replace/Status500Skip.aspx", 200 },
+            { "/errors/iis-replace-page/Throw.aspx", 500 },
+            { "/errors/iis-replace-page/Status500.aspx", 500 },
             { "/errors/iis-passthrough/Throw.aspx", 500 },
             { "/errors/iis-passthrough/Status500.aspx", 500 },
             { "/errors/iis-passthrough/Status500Skip.aspx", 500 },
             // customErrors on with httpErrors Replace: customErrors's redirect isn't an error.
             { "/errors/iis-on/Throw.aspx", 302 },
             { "/errors/iis-on/Http404.aspx", 302 },
-            { "/errors/iis-on/Status500.aspx", 500 },
+            { "/errors/iis-on/Status500.aspx", 200 },
         };
 
         [Theory]
@@ -78,6 +81,9 @@ namespace IISGate
             var (response, _) = await Send(HttpMethod.Get, path);
             Assert.Equal(HttpStatusCode.Found, response.StatusCode);
             Assert.Equal(location, response.Headers.Location?.OriginalString);
+            // The redirect's body is text/html, also for a page that doesn't exist, where no handler ran (#192: it had
+            // no Content-Type).
+            Assert.Equal("text/html; charset=utf-8", response.Content.Headers.ContentType?.ToString());
         }
 
         // redirectMode="ResponseRewrite": the error page runs in place of the failed one (Server.Execute), at its URL,
@@ -90,6 +96,10 @@ namespace IISGate
             Assert.Equal(HttpStatusCode.OK, thrown.StatusCode);
             Assert.StartsWith("Oops.aspx\nstatus: 200\naspxerrorpath: (none)\n", body);
             Assert.Contains("RawUrl: /errors/rewrite/Throw.aspx\n", body);
+            // Page.HandleError's HttpUnhandledException has no message: .NET Framework's default, not .NET's
+            // ExternalException's "External component has thrown an exception." (#192).
+            Assert.Contains("last error: System.Web.HttpUnhandledException: Exception of type 'System.Web.HttpUnhandledException' was thrown.\n" +
+                "inner error: System.InvalidOperationException: Thrown by the page.\n", body);
             var (notFound, notFoundBody) = await Send(HttpMethod.Get, "/errors/rewrite/Http404.aspx");
             Assert.Equal(HttpStatusCode.OK, notFound.StatusCode);
             Assert.StartsWith("NotFound.aspx\n", notFoundBody);
@@ -109,21 +119,36 @@ namespace IISGate
         }
 
         // <httpErrors existingResponse>: Auto replaces an error response unless the application set
-        // TrySkipIisCustomErrors (ASP.NET's own error pages set it); Replace always replaces; PassThrough never does.
+        // TrySkipIisCustomErrors (ASP.NET's own error pages set it), as IIS's integrated pipeline does; Replace always
+        // replaces; PassThrough never does. The replacement is the ExecuteURL child request's response: 200 from a
+        // static page, as IIS's static file handler answers; a page keeps the error's status.
         [Theory]
-        [InlineData("/errors/iis-auto/Status500.aspx", true)]
-        [InlineData("/errors/iis-auto/Status500Skip.aspx", false)]
-        [InlineData("/errors/iis-replace/Status500.aspx", true)]
-        [InlineData("/errors/iis-replace/Status500Skip.aspx", true)]
-        [InlineData("/errors/iis-passthrough/Status500.aspx", false)]
-        [InlineData("/errors/iis-passthrough/Status500Skip.aspx", false)]
-        [InlineData("/errors/iis-on/Status500.aspx", true)]
-        public async Task HttpErrorsReplacesByExistingResponse(string path, bool replaced)
+        [InlineData("/errors/iis-auto/Status500.aspx", 200)]
+        [InlineData("/errors/iis-auto/Status500Skip.aspx", 0)]
+        [InlineData("/errors/iis-replace/Status500.aspx", 200)]
+        [InlineData("/errors/iis-replace/Status500Skip.aspx", 200)]
+        [InlineData("/errors/iis-passthrough/Status500.aspx", 0)]
+        [InlineData("/errors/iis-passthrough/Status500Skip.aspx", 0)]
+        [InlineData("/errors/iis-on/Status500.aspx", 200)]
+        [InlineData("/errors/iis-replace-page/Status500.aspx", 500)]
+        public async Task HttpErrorsReplacesByExistingResponse(string path, int replacedWith)
         {
             var (response, body) = await Send(HttpMethod.Get, path);
-            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
-            if (replaced) Assert.Contains("The 500 page of &lt;httpErrors&gt;", body);
-            else Assert.StartsWith("500 set by the page", body);
+            if (replacedWith == 200)
+            {
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Contains("The 500 page of &lt;httpErrors&gt;", body);
+            }
+            else if (replacedWith == 500)
+            {
+                Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+                Assert.StartsWith("IisError.aspx\n", body);
+            }
+            else
+            {
+                Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+                Assert.StartsWith("500 set by the page", body);
+            }
         }
 
         // Request bodies against <httpRuntime maxRequestLength> (/limits/app: 8 KB, under maxAllowedContentLength's
@@ -132,11 +157,12 @@ namespace IISGate
         public static readonly TheoryData<string, string, int, int> LimitRequests = new TheoryData<string, string, int, int>
         {
             // maxRequestLength is the smaller: a body over it reaches the application, and reading it throws
-            // "Maximum request length exceeded" (500); over maxAllowedContentLength it doesn't (404.13).
+            // "Maximum request length exceeded" (500); over maxAllowedContentLength it doesn't: IIS 10 answers 413.1
+            // (IIS 7 to 8.5 answered 404.13).
             { "/limits/app/Form.ashx", "form", 8192, 200 },
             { "/limits/app/Form.ashx", "form", 8193, 500 },
             { "/limits/app/Form.ashx", "form", 16384, 500 },
-            { "/limits/app/Form.ashx", "form", 16385, 404 },
+            { "/limits/app/Form.ashx", "form", 16385, 413 },
             { "/limits/app/Files.ashx", "multipart", 8192, 200 },
             { "/limits/app/Files.ashx", "multipart", 8193, 500 },
             { "/limits/app/Input.ashx", "raw", 8192, 200 },
@@ -144,13 +170,13 @@ namespace IISGate
             { "/limits/app/Page.aspx", "form", 8193, 500 },
             { "/limits/app/Ignore.ashx", "form", 16384, 200 },
             { "/limits/app/Catch.ashx", "form", 8193, 200 },
-            // maxAllowedContentLength is the smaller: request filtering answers 404.13 before the application runs,
+            // maxAllowedContentLength is the smaller: request filtering answers 413.1 before the application runs,
             // whether or not it would read the body.
             { "/limits/iis/Form.ashx", "form", 8192, 200 },
-            { "/limits/iis/Form.ashx", "form", 8193, 404 },
+            { "/limits/iis/Form.ashx", "form", 8193, 413 },
             { "/limits/iis/Files.ashx", "multipart", 8192, 200 },
-            { "/limits/iis/Files.ashx", "multipart", 8193, 404 },
-            { "/limits/iis/Ignore.ashx", "form", 8193, 404 },
+            { "/limits/iis/Files.ashx", "multipart", 8193, 413 },
+            { "/limits/iis/Ignore.ashx", "form", 8193, 413 },
             // requestLengthDiskThreshold (16 KB): a body over it is buffered to a file.
             { "/limits/disk/Files.ashx", "multipart", 16384, 200 },
             { "/limits/disk/Files.ashx", "multipart", 16385, 200 },
@@ -185,13 +211,14 @@ namespace IISGate
             Assert.StartsWith("files: 1, file upload.bin ", withinBody);
         }
 
-        // Over maxAllowedContentLength, request filtering's 404.13, before the application runs.
+        // Over maxAllowedContentLength, request filtering's 413.1 "Request Entity Too Large", before the application runs:
+        // IIS 10's answer (IIS 7 to 8.5 answered 404.13, as webForCore did before #192).
         [Fact]
-        public async Task MaxAllowedContentLengthIsRequestFilterings404_13()
+        public async Task MaxAllowedContentLengthIsRequestFilterings413_1()
         {
             var (response, body) = await Post("/limits/iis/Ignore.ashx", "form", 8193);
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-            Assert.Contains("404.13", body);
+            Assert.Equal(HttpStatusCode.RequestEntityTooLarge, response.StatusCode);
+            Assert.Contains("HTTP Error 413.1 - Request Entity Too Large", body);
             Assert.DoesNotContain("body not read", body);
         }
 
