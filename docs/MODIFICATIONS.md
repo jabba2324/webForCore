@@ -292,6 +292,12 @@ commit that made it, and its issue, say why.
 - **No kernel32 for the machine name** (`HttpServerUtility.GetMachineNameInternal`): `Environment.MachineName` instead of
   `GetComputerName`, which threw `DllNotFoundException` off Windows (ELMAH's log pages, #128). On Windows .NET reads it
   with `GetComputerName` too. The P/Invoke declaration is left in `UnsafeNativeMethods.cs`, unused.
+- **webengine4.dll's HMAC-SHA1 in managed code** (`UnsafeNativeMethods.GetHMACSHA1Hash`, `GetSHA1Hash`): .NET
+  Framework's native engine isn't shipped, so `MachineKeySection`'s legacy MAC (Framework20SP1/SP2 forms tickets and
+  view state, `MachineKey.Encode` in every mode) computes it with `IncrementalHash`. Like webengine4's, it fails for
+  any hash size but SHA1's, so that `validation="HMACSHA256"`, `"HMACSHA384"` and `"HMACSHA512"` use the
+  `KeyedHashAlgorithm` of that name, as on .NET Framework; it had returned HMAC-SHA1 padded with zeros, which .NET
+  Framework rejects (#191, checked against .NET Framework 4.8 by `MachineKeyInteropTests`).
 - **aspnet_regsql's scripts as resources** (`Management/SqlServices.cs`, `WebFormsForCore/SqlScripts.cs`): `SqlServices`
   reads `InstallCommon.sql` and the others from System.Web's resources, which are .NET Framework 4.8's files
   (`FrameworkData/Sql`, read as data from its folder on a Windows CI runner: referencesource doesn't have them), with

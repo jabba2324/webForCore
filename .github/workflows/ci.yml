@@ -154,13 +154,7 @@ jobs:
           path: test/webForCore.Oidc.Gate.Tests/bin/Release/net10.0/oidc-responses.json
           if-no-files-found: error
 
-      # ... and every response of the virtual path sample, the application /app (VirtualPathTests, #190, #194).
-      - name: Upload the virtual path responses
-        uses: actions/upload-artifact@v4
-        with:
-          name: vpath-responses
-          path: test/webForCore.IIS.Gate.Tests/bin/Release/net10.0/vpath-responses.json
-          if-no-files-found: error
+
 
       # ... and every request Packages.Gate.Tests sent to the third-party packages sample (Ninject, Swashbuckle, CacheCow).
       - name: Upload the third-party packages gate's responses
@@ -739,6 +733,59 @@ jobs:
         with:
           name: regsql-framework-data
           path: ${{ runner.temp }}/regsql/
+          if-no-files-found: warn
+
+  # <machineKey> output across runtimes (#191): tools/machinekey/FrameworkMachineKey runs
+  # test/webForCore.MachineKey.Sample/Interop on .NET Framework 4.8 (its System.Web, Microsoft's Katana 4.2.3 and ASP.NET
+  # Identity 2.2.4 packages), for each <machineKey> configuration in an application domain of its own: it checks that
+  # the committed .NET Framework outputs (test/webForCore.IIS.Gate.Tests/FrameworkData/machinekey-framework.json, which
+  # IIS.Gate.Tests' MachineKeyInteropTests has webForCore read) still read on .NET Framework and that the deterministic
+  # ones are what it writes, and reads what webForCore protected in build-and-test (the machinekey-webforcore artifact):
+  # FormsAuthentication tickets, MachineKey.Protect and Encode output, and the cookies Katana's cookie middleware issued
+  # through Microsoft.Owin.Host.SystemWeb. A difference that MachineKeyConfigs doesn't list fails the job. Its output
+  # (framework.json, to commit when a configuration or case is added, and results.md) is the machinekey-framework
+  # artifact. It runs when build-and-test fails too, so that the data is there. Not a required check (docs/TESTING.md).
+  machinekey-framework-interop:
+    needs: build-and-test
+    if: ${{ !cancelled() }}
+    runs-on: windows-2025
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET (global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: machinekey-webforcore
+          path: ${{ runner.temp }}/machinekey-webforcore
+
+      - name: .NET Framework reads webForCore's outputs, and its own committed ones
+        run: |
+          set -o pipefail
+          dotnet build tools/machinekey/FrameworkMachineKey/FrameworkMachineKey.csproj -c Release -nodeReuse:false
+          webforcore="$RUNNER_TEMP/machinekey-webforcore"
+          status=0
+          tools/machinekey/FrameworkMachineKey/bin/Release/net48/FrameworkMachineKey.exe "$RUNNER_TEMP/machinekey" \
+            test/webForCore.IIS.Gate.Tests/FrameworkData/machinekey-framework.json \
+            $( ls "$webforcore"/*.json > /dev/null 2>&1 && echo "$webforcore" ) || status=$?
+          cat "$RUNNER_TEMP/machinekey/results.md" >> "$GITHUB_STEP_SUMMARY" || true
+          exit $status
+
+      - name: Upload the outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: machinekey-framework
+          path: ${{ runner.temp }}/machinekey/
           if-no-files-found: warn
 
   # A version tag: the tested packages become a GitHub release (not published to nuget.org), and the feed is rebuilt.

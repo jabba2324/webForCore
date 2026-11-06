@@ -600,10 +600,14 @@ namespace System.Web {
         // webForCore: webengine4.dll (IIS's native engine, a .NET Framework binary) is not shipped, so MachineKey.Encode,
         // LosFormatter and ViewState MACs with SHA1 validation use this managed version on every OS. It computes the same
         // value: HMAC from the precomputed pads, SHA1(outer || SHA1(inner || data1[offset..offset+size] || data2)).
+        // Like webengine4's, it computes HMAC-SHA1 only: for any other hash size (validation="HMACSHA256", "HMACSHA384",
+        // "HMACSHA512") it fails, and MachineKeySection.HashData uses the KeyedHashAlgorithm of that name, as on .NET
+        // Framework 4.8 (#191). It used to put HMAC-SHA1 in the first 20 bytes and leave the rest zero, a MAC that .NET
+        // Framework rejects: Framework20SP1/SP2 forms tickets and view state, and MachineKey.Encode in every mode.
         internal static int GetHMACSHA1Hash(byte[] data1, int dataOffset1, int dataSize1, byte[] data2, int dataSize2,
                                             byte[] innerKey, int innerKeySize, byte[] outerKey, int outerKeySize,
                                             byte[] hash, int hashSize) {
-            if (hash == null || hashSize < SHA1HashSize)
+            if (hash == null || hashSize != SHA1HashSize)
                 return E_INVALIDARG;
             using (var inner = System.Security.Cryptography.IncrementalHash.CreateHash(System.Security.Cryptography.HashAlgorithmName.SHA1))
             using (var outer = System.Security.Cryptography.IncrementalHash.CreateHash(System.Security.Cryptography.HashAlgorithmName.SHA1)) {
