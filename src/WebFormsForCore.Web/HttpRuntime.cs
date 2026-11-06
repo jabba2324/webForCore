@@ -581,6 +581,16 @@ namespace System.Web
                     // Initialize the build manager
                     BuildManager.InitializeBuildManager();
 
+#if !NETFRAMEWORK
+                    // webForCore (#213): .NET's System.Diagnostics reads no configuration of its own; .NET Framework's
+                    // Trace, TraceSource and Switch read <system.diagnostics> through ASP.NET's configuration system when
+                    // first used. Registered once the application's configuration and assemblies (listener types) can be
+                    // read: Trace's listeners are created now, sources and switches when first used.
+                    if ((hostingFlags & HostingEnvironmentFlags.ClientBuildManager) == 0) {
+                        System.Diagnostics.TraceConfiguration.Register();
+                    }
+#endif
+
                     if(compilationSection != null && compilationSection.ProfileGuidedOptimizations == ProfileGuidedOptimizationsFlags.All) {
                         ProfileOptimization.SetProfileRoot(_codegenDir);
                         ProfileOptimization.StartProfile(profileFileName);

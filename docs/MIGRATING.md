@@ -878,21 +878,14 @@ value="true" />` in `<appSettings>` makes `Request.Url` from the `Host` header i
 - **`<system.net><defaultProxy>`** is applied at application start to `HttpClient.DefaultProxy`. Without it, .NET
   uses `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`. `<connectionManagement>` and the other `<system.net>` sections
   have no effect.
-- **`<system.diagnostics>` isn't applied.** Trace listeners, sources and switches in Web.config (or machine.config)
-  aren't created: `System.Diagnostics.Trace` writes only to its default listener, so a `TextWriterTraceListener` that
-  wrote a log file on IIS writes nothing ([NAMESPACES.md](NAMESPACES.md#summary-of-what-doesnt-work)). Web API's
-  tracing (`config.EnableSystemDiagnosticsTracing()`, "Tracing in ASP.NET Web API 2", package
-  `webForCore.Web.Http.Tracing`) writes its records through `Trace` as on .NET Framework, so add the listeners in code
-  at the start of `Application_Start`:
-
-  ```csharp
-  System.Diagnostics.Trace.AutoFlush = true;
-  System.Diagnostics.Trace.Listeners.Add(new System.Diagnostics.TextWriterTraceListener(
-      System.Web.Hosting.HostingEnvironment.MapPath("~/App_Data/trace.log"), "file"));
-  ```
-
-  Keep the file in `App_Data` or outside the application: a relative path is resolved against `bin_dotnet/`, and a file
-  written there restarts the application at every line (#173).
+- **`<system.diagnostics>`** is applied as on .NET Framework (from 0.10.1, #213): trace listeners, sources, shared
+  listeners, switches and `<trace autoflush indentsize>`, so Web API's tracing (`config.EnableSystemDiagnosticsTracing()`,
+  "Tracing in ASP.NET Web API 2", package `webForCore.Web.Http.Tracing`) and the application's `TraceSource`s write to
+  the listeners Web.config names. A relative `initializeData` file name is relative to Web.config's folder; on Linux
+  write it with `/` (`App_Data/trace.log`), and keep the file in `App_Data` or outside the application, not in
+  `bin_dotnet/`, where a file written restarts the application at every line (#173). `Trace.Refresh()` doesn't apply
+  `<trace>` again, and `EventLogTraceListener` needs Windows
+  ([NAMESPACES.md](NAMESPACES.md#systemconfiguration-srcwebformsforcoreconfiguration)).
 - **Typed DataSets** (`.xsd` in App_Code) and their TableAdapters are generated when the site compiles. The `.xsd`'s
   provider must be registered; a TableAdapter's connection string comes from `<connectionStrings>`, as on IIS.
 

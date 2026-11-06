@@ -878,4 +878,52 @@
     <value>Timeout can be only be set to 'System.Threading.Timeout.Infinite' or a value &gt; 0.</value>
     <comment>webForCore: from microsoft/referencesource System/System.txt</comment>
   </data>
+  <data name="AttributeNotSupported" xml:space="preserve">
+    <value>'{0}' is not a valid configuration attribute for type '{1}'.</value>
+    <comment>webForCore: from microsoft/referencesource System/System.txt</comment>
+  </data>
+  <data name="BadConfigSwitchValue" xml:space="preserve">
+    <value>The config value for Switch '{0}' was invalid.</value>
+    <comment>webForCore: from microsoft/referencesource System/System.txt</comment>
+  </data>
+  <data name="Could_not_create_listener" xml:space="preserve">
+    <value>Couldn't create listener '{0}'.</value>
+    <comment>webForCore: from microsoft/referencesource System/System.txt</comment>
+  </data>
+  <data name="Could_not_create_type_instance" xml:space="preserve">
+    <value>Could not create {0}.</value>
+    <comment>webForCore: from microsoft/referencesource System/System.txt</comment>
+  </data>
+  <data name="Could_not_find_type" xml:space="preserve">
+    <value>Couldn't find type for class {0}.</value>
+    <comment>webForCore: from microsoft/referencesource System/System.txt</comment>
+  </data>
+  <data name="Could_not_get_constructor" xml:space="preserve">
+    <value>Couldn't find constructor for class {0}.</value>
+    <comment>webForCore: from microsoft/referencesource System/System.txt</comment>
+  </data>
+  <data name="EmptyTypeName_NotAllowed" xml:space="preserve">
+    <value>switchType needs to be a valid class name. It can't be empty.</value>
+    <comment>webForCore: from microsoft/referencesource System/System.txt</comment>
+  </data>
+  <data name="Incorrect_base_type" xml:space="preserve">
+    <value>The specified type, '{0}' is not derived from the appropriate base type, '{1}'.</value>
+    <comment>webForCore: from microsoft/referencesource System/System.txt</comment>
+  </data>
+  <data name="Only_specify_one" xml:space="preserve">
+    <value>'switchValue' and 'switchName' cannot both be specified on source '{0}'.</value>
+    <comment>webForCore: from microsoft/referencesource System/System.txt</comment>
+  </data>
+  <data name="Reference_listener_cant_have_properties" xml:space="preserve">
+    <value>A listener with no type name specified references the sharedListeners section and cannot have any attributes other than 'Name'.  Listener: '{0}'.</value>
+    <comment>webForCore: from microsoft/referencesource System/System.txt</comment>
+  </data>
+  <data name="Reference_to_nonexistent_listener" xml:space="preserve">
+    <value>Listener '{0}' does not exist in the sharedListeners section.</value>
+    <comment>webForCore: from microsoft/referencesource System/System.txt</comment>
+  </data>
+  <data name="TL_InitializeData_NotSpecified" xml:space="preserve">
+    <value>initializeData needs to be valid for this TraceListener.</value>
+    <comment>webForCore: from microsoft/referencesource System/System.txt</comment>
+  </data>
 </root>

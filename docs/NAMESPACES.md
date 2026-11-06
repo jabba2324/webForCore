@@ -31,7 +31,6 @@ in the code; the rest come from the test suites and gates ([TESTING.md](TESTING.
 | WCF Data Services | Hosting OData v1-v3 services (`System.Data.Services`, `DataService<T>`, `DataServiceHostFactory`). The client, `System.Data.Services.Client`, isn't on .NET either | The client: `Microsoft.Data.Services.Client` 5.8.4, same namespace ([MIGRATING.md](MIGRATING.md#3-references), #149). Hosting: Web API OData (`Microsoft.AspNet.OData`, which runs on webForCore) |
 | Windows Identity Foundation | `System.IdentityModel` and `System.IdentityModel.Services` 4.0.0.0: `<system.identityModel>`, `<system.identityModel.services>`, `WSFederationAuthenticationModule`, `SessionAuthenticationModule`, `FederatedAuthentication`, `ClaimsAuthorizationManager`, WIF's security tokens and `System.IdentityModel.Protocols.WSTrust`, and libraries built on them (IdentityServer3: `Could not load file or assembly 'System.IdentityModel, Version=4.0.0.0'`, #119; Thinktecture.IdentityModel; IdentityServer3.AccessTokenValidation 2.x, whose `System.IdentityModel.Tokens.Jwt` 4.x is built on WIF. IdentityServer3.Contrib.AccessTokenValidation 4.x, on IdentityModel 5, runs as it is: the OpenID Connect gate tests 4.1.16). `System.Security.Claims` (`ClaimsPrincipal`, `ClaimsIdentity`) is on .NET | WS-Federation sign-in: Katana's `Microsoft.Owin.Security.WsFederation` ([MIGRATING.md](MIGRATING.md#packages-that-need-more-than-a-reference)); tokens: `Microsoft.IdentityModel.Tokens`, `System.IdentityModel.Tokens.Jwt` |
 | Windows Workflow Foundation | WF3 (`System.Workflow.Runtime`, `.ComponentModel`, `.Activities`, XOML) and WF4 (`System.Activities`, `WorkflowServiceHost`): only in .NET Framework's GAC, with no .NET port from Microsoft (C1 CMS, #132) | WF4: [CoreWF](https://github.com/UiPath/CoreWF), the community port of `System.Activities`. WF3: a rewrite of the workflows, to WF4 (then CoreWF) or to plain code; CoreWF doesn't run WF3 |
-| `<system.diagnostics>` in Web.config | Trace listeners, sources, switches and `<trace autoflush>` configured in Web.config or machine.config aren't applied: `Trace.Listeners` has only the default listener, and a `TraceSource` its defaults. .NET's System.Diagnostics reads configuration only through `System.Diagnostics.TraceConfiguration.Register()` in .NET's System.Configuration.ConfigurationManager, which webForCore replaces with .NET Framework's System.Configuration (which hasn't that type); machine.config declares the section as an `IgnoreSection`. Web API's `EnableSystemDiagnosticsTracing()` writes its records to `Trace` all the same | Add the listeners in code, in `Application_Start` (`Trace.Listeners.Add(new TextWriterTraceListener(...))`), or give the trace writer a `TraceSource` with them ([MIGRATING.md](MIGRATING.md#5-configuration)) |
 | Run-time compilation through System.CodeDom | .NET's `CodeDomProvider.CreateProvider("c#")`, `Microsoft.CSharp.CSharpCodeProvider` and `CompileAssemblyFrom*` throw `PlatformNotSupportedException`, and read no `<system.codedom>` (#133) | webForCore's `WebFormsForCore.CodeDom.Compiler.CodeDomProvider.CreateProvider("c#")` or `CSharpCodeProvider`/`VBCodeProvider` ([MIGRATING.md](MIGRATING.md#6-code-changes)) |
 | Design-time support | System.Design: `System.Web.UI.Design` (`ControlDesigner`, `ExpressionEditor`, `DataSourceDesigner`) and its editors, for an app's own designer classes (#144) | Remove them from the build; attributes that name them by string still work ([MIGRATING.md](MIGRATING.md#2-convert-the-project)) |
 | Entity Framework 1–4 | `EntityDataSource` (System.Web.Entity, not built), Dynamic Data's Entity Framework model provider (`MetaModel.RegisterContext` with an `ObjectContext`), EF 1's `EntityState` in MVC's editor templates. LINQ to SQL and ASP.NET's integrations of it work: System.Data.Linq ([below](#other-assemblies), #142), `LinqDataSource`, MVC's `LinqBinaryModelBinder` and `Binary` in the hidden-input helpers and editor template, Dynamic Data's LINQ to SQL model provider | EF 6.4+ or EF Core, with `ObjectDataSource` or model binding; Dynamic Data through a `DataContext` or a `DataModelProvider` |
@@ -207,9 +206,38 @@ conformance warnings. An app's own `<wsdlHelpGenerator href>` still replaces it.
 
 Assembly `System.Configuration.ConfigurationManager`, which replaces both the NuGet package and .NET Framework's
 System.Configuration. Namespaces `System.Configuration` (`ConfigurationManager`, sections, providers, protected
-configuration, CodeDom compiler configuration), `.Internal`, `.Provider`, and `System.Net.Configuration`.
+configuration, CodeDom compiler configuration), `.Internal`, `.Provider`, and `System.Net.Configuration`; and
+`System.Diagnostics.TraceConfiguration`, as in .NET's package.
 
 The sources are Microsoft's Reference Source (System.Configuration.dll and the configuration parts of System.dll).
+
+`<system.diagnostics>` (#213): System.dll's classes for the section (`SystemDiagnosticsSection` and its listener,
+source, switch and filter elements) are compiled here, and `TraceConfiguration.Register()` applies them to .NET's
+System.Diagnostics through its public events (`Trace.Refreshing`, `TraceSource.Initializing`, `Switch.Initializing`), as
+.NET's System.Configuration.ConfigurationManager does. System.Web calls it when the application starts, so Web.config's
+section works as on .NET Framework: `<trace autoflush indentsize useGlobalLock>` and its `<listeners>`, `<sources>`
+(`switchValue`, `switchName`, `switchType`, their listeners), `<sharedListeners>`, `<switches>`, `<assert>`, `<filter>`,
+`initializeData` (a relative file name is relative to Web.config's folder), `traceOutputOptions`, attributes, and listener
+types from the application's assemblies or by System.dll's names (`System.Diagnostics.TextWriterTraceListener`, with or
+without `, System, Version=4.0.0.0, ...`; `XmlWriterTraceListener`, `DelimitedListTraceListener`, `EventTypeFilter`,
+`EventLogTraceListener`). The differences, each because .NET's System.Diagnostics keeps the member internal or raises
+no event for it:
+- `Trace.Refresh()` reads the section again for sources and switches, but Trace's own listeners become .NET's default
+  listener alone, and `AutoFlush` and `IndentSize` .NET's defaults: .NET resets them after `Trace.Refreshing`, the last
+  point where configuration can act. On .NET Framework they are `<trace>`'s again.
+- Trace's listeners are created when the application starts (sources' and switches' when first used, as on .NET
+  Framework), so an error in `<trace><listeners>` (a type that isn't there) stops the application at start, not at its
+  first trace. A listener the application's `Program.cs` added before is kept, after the configured ones.
+- An attribute that a listener, source or switch type doesn't support (`GetSupportedAttributes()`) isn't an error; .NET
+  Framework rejected it.
+- A source whose configuration is in error (a listener type that isn't there) throws .NET Framework's
+  `ConfigurationErrorsException` when first used, as on .NET Framework, but only then: .NET's `TraceSource` then stays
+  without listeners. On .NET Framework each use throws again, and so does `Trace.Refresh()`, which refreshes every
+  source (found by CI's `iis-compare`).
+- A `<filter>` from configuration doesn't apply to `XmlWriterTraceListener.TraceTransfer`.
+- `EventLogTraceListener` needs Windows: elsewhere .NET's System.Diagnostics.EventLog doesn't support event logs, and
+  creating one is a configuration error (`Could not create System.Diagnostics.EventLogTraceListener.`).
+- A Windows path in `initializeData` (`c:\logs\trace.log`, `App_Data\trace.log`) is a file name on Linux; use `/`.
 
 Caveats: `<system.net>` sections (`SmtpSection`, `DefaultProxySection`, ...) can be read with `ConfigurationManager.GetSection`, but .NET's System.Net doesn't apply them. `WebFormsForCore.Net.Configuration.NetConfiguration` applies `<defaultProxy>` (`ApplyDefaultProxy`, which System.Web calls at start) and `<mailSettings>` (`CreateSmtpClient`, `ApplyMailSettings`, `DefaultFrom`); see System.Web's caveats for what isn't applied. `DataProtectionConfigurationProvider` uses webForCore's DPAPI emulation, so a section Windows DPAPI encrypted
 can't be read on Linux (the error says so). `RsaProtectedConfigurationProvider` keeps key containers as XML files in
@@ -254,7 +282,7 @@ isn't provided ([MIGRATING.md](MIGRATING.md#3-references)).
 | System.Web.Http.WebHost 5.3 | `System.Web.Http.WebHost` | |
 | System.Web.Http.Owin 5.3 | `System.Web.Http.Owin` | |
 | System.Web.Http.Cors, System.Web.Cors 5.3 | `System.Web.Http.Cors`, `System.Web.Cors` | |
-| System.Web.Http.Tracing 5.3 | `System.Web.Http.Tracing` (`SystemDiagnosticsTraceWriter`), and `System.Web.Http`'s `HttpConfigurationTracingExtensions` (`config.EnableSystemDiagnosticsTracing()`) | Package `webForCore.Web.Http.Tracing` (Microsoft.AspNet.WebApi.Tracing 5.3.0). The records go through `System.Diagnostics.Trace`, or the `TraceSource` the writer is given, as on .NET Framework, but Web.config's `<system.diagnostics>` isn't applied, so its listeners aren't there ([summary](#summary-of-what-doesnt-work)): add them in code |
+| System.Web.Http.Tracing 5.3 | `System.Web.Http.Tracing` (`SystemDiagnosticsTraceWriter`), and `System.Web.Http`'s `HttpConfigurationTracingExtensions` (`config.EnableSystemDiagnosticsTracing()`) | Package `webForCore.Web.Http.Tracing` (Microsoft.AspNet.WebApi.Tracing 5.3.0). The records go through `System.Diagnostics.Trace`, or the `TraceSource` the writer is given, to the listeners Web.config's `<system.diagnostics>` configures, as on .NET Framework ([System.Configuration](#systemconfiguration-srcwebformsforcoreconfiguration), #213) |
 | System.Net.Http.Formatting 6.0 | `System.Net.Http`, `.Formatting`, `.Handlers`, `.Headers` | `ContentDispositionHeaderValue.FileName` is unquoted by .NET (Web API's providers handle this); indented JSON and XML use `\n` |
 
 ## OWIN / Katana (upstream)
