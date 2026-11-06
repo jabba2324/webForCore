@@ -12,7 +12,7 @@ that code and what had to change.
   | --- | --- | --- | --- |
   | `external/AspNetWebStack` | [xforcore/AspNetWebStack `webforcore`](https://github.com/xforcore/AspNetWebStack/commits/webforcore) | `2106565` | 163, a casing fix, and upstream's `.gitattributes` kept (Windows line endings for the tests) |
   | `external/AspNetKatana` | [xforcore/AspNetKatana `webforcore`](https://github.com/xforcore/AspNetKatana/commits/webforcore) | `096e225` | 10, and OpenIdConnect, Jwt, WsFederation, ActiveDirectory and the social providers brought back, unchanged |
-  | `external/SignalR` | [xforcore/SignalR `webforcore`](https://github.com/xforcore/SignalR/commits/webforcore) | `7f53f26` | 3 |
+  | `external/SignalR` | [xforcore/SignalR `webforcore`](https://github.com/xforcore/SignalR/commits/webforcore) | `7f53f26` | 3, and the Redis, StackExchange.Redis and SQL Server scale-out backplanes brought back, unchanged, with their tests |
   | `external/AspNetIdentity` | [xforcore/AspNetIdentity `webforcore`](https://github.com/xforcore/AspNetIdentity/commits/webforcore) | `b7fc094` | 5 |
   | `external/referencesource` | [xforcore/referencesource `webforcore`](https://github.com/xforcore/referencesource/commits/webforcore) | `ec9fa9a` | 44, and System.Data.Linq brought back (#142) |
   | `external/winforms` | [xforcore/winforms `webforcore`](https://github.com/xforcore/winforms/commits/webforcore) | `8266870` | 13 |
@@ -56,7 +56,7 @@ that code and what had to change.
 | --- | --- | --- | ---: | ---: |
 | ASP.NET Web API 2, Razor 3, Web Pages 3, MVC 5, MVC Futures, Helpers, CORS | [aspnet/AspNetWebStack@2106565](https://github.com/aspnet/AspNetWebStack/tree/2106565) | Apache 2.0 | 1,553 libraries · 1,266 tests | 26 · 131 |
 | Katana (Microsoft.Owin 4.2.3) | [aspnet/AspNetKatana@096e225](https://github.com/aspnet/AspNetKatana/tree/096e225) | Apache 2.0 | 421 · 63 | 8 · 3 |
-| ASP.NET SignalR 2.4.3 | [SignalR/SignalR@7f53f26](https://github.com/SignalR/SignalR/tree/7f53f26) | Apache 2.0 | 318 · 152 | 2 · 1 |
+| ASP.NET SignalR 2.4.3 | [SignalR/SignalR@7f53f26](https://github.com/SignalR/SignalR/tree/7f53f26) | Apache 2.0 | 362 · 158 | 2 · 1 |
 | ASP.NET Identity 2 | [aspnet/AspNetIdentity@b7fc094](https://github.com/aspnet/AspNetIdentity/tree/b7fc094) | MIT | 75 · 26 | 0 · 4 |
 | System.Data.SqlClient 4.9.1 (replacing Microsoft's package, #41) | [dotnet/maintenance-packages@e699209](https://github.com/dotnet/maintenance-packages/tree/e699209) (`src/System.Data.SqlClient`, `src/Common`) | MIT | 270 · 18 | 1 · 0 |
 | LINQ to SQL, System.Data.Linq (#142) | [microsoft/referencesource@ec9fa9a](https://github.com/microsoft/referencesource/tree/ec9fa9ae770d522a5b5f0607898044b7478574a3) (`System.Data.Linq`) | MIT | 98 | 3 |
@@ -101,7 +101,7 @@ fixed, or the BCL difference is documented.
 | **Mono's System.Web tests** | Corrected to Microsoft's .NET Framework 4.5+ behaviour wherever Mono's own implementation differed (Mono's tests follow Mono); hosting in the test process (.NET has one AppDomain) |
 | **Mono's System.Data.Linq tests** | One test expected the `System.Exception` that Mono's own `Error` class throws where .NET Framework's throws `ArgumentException` (#142) |
 | **webForCore's identities** | MVC Futures' `VersionTest` expects System.Web.Mvc 5.3.0.0, the released version webForCore's has, not the source's development version 5.3.1.0 (#141) |
-| **Selection** | Microsoft's own categories are used (`category!=failing`). SignalR's IIS Express and Service Bus tests aren't built |
+| **Selection** | Microsoft's own categories are used (`category!=failing`). SignalR's IIS Express tests aren't built, nor the Service Bus backplanes (`WindowsAzure.ServiceBus` is .NET Framework only), which have none |
 
 ## webForCore's changes to System.Web and the hosting layer
 

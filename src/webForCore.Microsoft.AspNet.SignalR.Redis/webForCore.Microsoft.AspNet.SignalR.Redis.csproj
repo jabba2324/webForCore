@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- From SignalR/SignalR 7f53f26 (src/Microsoft.AspNet.SignalR.Redis) by way of the external/SignalR submodule (xforcore/SignalR's webforcore branch, #61).
+       Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. A scale-out backplane: SignalR's message
+       bus across several instances of an application. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>Microsoft.AspNet.SignalR.Redis</AssemblyName>
+    <RootNamespace>Microsoft.AspNet.SignalR.Redis</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <AssemblyVersion>2.4.3.0</AssemblyVersion>
+    <FileVersion>2.4.3.0</FileVersion>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- The C# version of Microsoft's build, as in Microsoft.AspNet.SignalR.Core. -->
+    <LangVersion>7.3</LangVersion>
+    <DefineConstants>$(DefineConstants);SERVER;NET45;SIGNED</DefineConstants>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;CA1416;SYSLIB0011;SYSLIB0051;SYSLIB0014;SYSLIB0057</NoWarn>
+    <!-- Delay signed with Microsoft's public key, as Microsoft's build does: PublicKeyToken=31bf3856ad364e35. -->
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>../SigningKey/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <PackageId>webForCore.Microsoft.AspNet.SignalR.Redis</PackageId>
+    <Description>Redis messaging backplane for scaling out of ASP.NET SignalR applications in a web-farm (StackExchange.Redis.StrongName).</Description>
+    <IsTestProject>false</IsTestProject>
+  </PropertyGroup>
+
+  <Import Project="../webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Redis/DependencyResolverExtensions.cs" Link="DependencyResolverExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Redis/IRedisConnection.cs" Link="IRedisConnection.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Redis/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Redis/RedisConnection.cs" Link="RedisConnection.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Redis/RedisMessageBus.cs" Link="RedisMessageBus.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Redis/RedisMessage.cs" Link="RedisMessage.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Redis/RedisScaleoutConfiguration.cs" Link="RedisScaleoutConfiguration.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Redis/Resources.Designer.cs" Link="Resources.Designer.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Redis/TraceTextWriter.cs" Link="TraceTextWriter.cs" />
+    <!-- Linked from Core, as Microsoft's project does: internal copies in this assembly. -->
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/TaskAsyncHelper.cs" Link="Infrastructure/TaskAsyncHelper.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/DispatchingTaskCompletionSource.cs" Link="Infrastructure/DispatchingTaskCompletionSource.cs" />
+    <EmbeddedResource Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Redis/Resources.resx" Link="Resources.resx" LogicalName="Microsoft.AspNet.SignalR.Redis.Resources.resources" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../webForCore.Microsoft.AspNet.SignalR.Core/webForCore.Microsoft.AspNet.SignalR.Core.csproj" />
+    <!-- Microsoft's package depends on StackExchange.Redis.StrongName 1.1.608; 1.2.6 is the last 1.x, with a .NET Standard build. A NuGet
+         dependency, not shipped by webForCore. -->
+    <PackageReference Include="StackExchange.Redis.StrongName" Version="1.2.6" />
+  </ItemGroup>
+</Project>

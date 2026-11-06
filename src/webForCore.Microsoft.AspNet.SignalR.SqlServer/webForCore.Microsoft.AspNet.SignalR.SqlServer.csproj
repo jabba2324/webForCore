@@ -1,0 +1,73 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- From SignalR/SignalR 7f53f26 (src/Microsoft.AspNet.SignalR.SqlServer) by way of the external/SignalR submodule (xforcore/SignalR's webforcore branch, #61).
+       Apache License 2.0; see LICENSE-APACHE-2.0.txt and NOTICE at the repo root. A scale-out backplane: SignalR's message
+       bus across several instances of an application. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>Microsoft.AspNet.SignalR.SqlServer</AssemblyName>
+    <RootNamespace>Microsoft.AspNet.SignalR.SqlServer</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <AssemblyVersion>2.4.3.0</AssemblyVersion>
+    <FileVersion>2.4.3.0</FileVersion>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <!-- The C# version of Microsoft's build, as in Microsoft.AspNet.SignalR.Core. -->
+    <LangVersion>7.3</LangVersion>
+    <DefineConstants>$(DefineConstants);SERVER;NET45;SIGNED</DefineConstants>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591;CS0618;CS0612;CA1416;SYSLIB0011;SYSLIB0051;SYSLIB0014;SYSLIB0057</NoWarn>
+    <!-- Delay signed with Microsoft's public key, as Microsoft's build does: PublicKeyToken=31bf3856ad364e35. -->
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>../SigningKey/35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <PackageId>webForCore.Microsoft.AspNet.SignalR.SqlServer</PackageId>
+    <Description>SQL Server messaging backplane for scaling out of ASP.NET SignalR applications in a web-farm.</Description>
+    <IsTestProject>false</IsTestProject>
+  </PropertyGroup>
+
+  <Import Project="../webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SqlServer/AssemblyExtensions.cs" Link="AssemblyExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SqlServer/DbOperation.cs" Link="DbOperation.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SqlServer/DbProviderFactoryAdapter.cs" Link="DbProviderFactoryAdapter.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SqlServer/DbProviderFactoryExtensions.cs" Link="DbProviderFactoryExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SqlServer/DependencyResolverExtensions.cs" Link="DependencyResolverExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SqlServer/IDataParameterExtensions.cs" Link="IDataParameterExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SqlServer/IDataRecordExtensions.cs" Link="IDataRecordExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SqlServer/IDbBehavior.cs" Link="IDbBehavior.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SqlServer/IDbCommandExtensions.cs" Link="IDbCommandExtensions.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SqlServer/IDbProviderFactory.cs" Link="IDbProviderFactory.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SqlServer/ObservableDbOperation.cs" Link="ObservableDbOperation.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SqlServer/Properties/AssemblyInfo.cs" Link="Properties/AssemblyInfo.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SqlServer/Resources.Designer.cs" Link="Resources.Designer.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SqlServer/SqlInstaller.cs" Link="SqlInstaller.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SqlServer/SqlMessageBus.cs" Link="SqlMessageBus.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SqlServer/SqlMessageBusException.cs" Link="SqlMessageBusException.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SqlServer/SqlPayload.cs" Link="SqlPayload.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SqlServer/SqlReceiver.cs" Link="SqlReceiver.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SqlServer/SqlScaleoutConfiguration.cs" Link="SqlScaleoutConfiguration.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SqlServer/SqlSender.cs" Link="SqlSender.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SqlServer/SqlStream.cs" Link="SqlStream.cs" />
+    <!-- Linked from Core, as Microsoft's project does: internal copies in this assembly. -->
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/TaskAsyncHelper.cs" Link="Infrastructure/TaskAsyncHelper.cs" />
+    <Compile Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.Core/Infrastructure/DispatchingTaskCompletionSource.cs" Link="Infrastructure/DispatchingTaskCompletionSource.cs" />
+    <EmbeddedResource Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SqlServer/install.sql" Link="install.sql" LogicalName="Microsoft.AspNet.SignalR.SqlServer.install.sql" />
+    <EmbeddedResource Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SqlServer/send.sql" Link="send.sql" LogicalName="Microsoft.AspNet.SignalR.SqlServer.send.sql" />
+    <EmbeddedResource Include="../../external/SignalR/src/Microsoft.AspNet.SignalR.SqlServer/Resources.resx" Link="Resources.resx" LogicalName="Microsoft.AspNet.SignalR.SqlServer.Resources.resources" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../webForCore.Microsoft.AspNet.SignalR.Core/webForCore.Microsoft.AspNet.SignalR.Core.csproj" />
+    <!-- System.Data.SqlClient: webForCore's (Microsoft's 4.9.1, fixed), as on .NET Framework. -->
+    <ProjectReference Include="../webForCore.System.Data.SqlClient/webForCore.System.Data.SqlClient.csproj" />
+  </ItemGroup>
+</Project>
