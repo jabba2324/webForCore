@@ -61,6 +61,8 @@
         <!-- webForCore: as .NET Framework (was Microsoft.Data.SqlClient 7.1.0): Microsoft's System.Data.SqlClient 4.9.1, with
              Assembly.GetTypes() fixed (#41). -->
         <ProjectReference Include="..\webForCore.System.Data.SqlClient\webForCore.System.Data.SqlClient.csproj" />
+        <!-- webForCore: LINQ to SQL (#142) for LinqDataSource, which System.Web.Extensions builds on System.Data.Linq as on .NET Framework. -->
+        <ProjectReference Include="..\webForCore.System.Data.Linq\webForCore.System.Data.Linq.csproj" />
         <!--<PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
         <PackageReference Include="System.Text.Json" Version="10.0.0" />
         <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />-->

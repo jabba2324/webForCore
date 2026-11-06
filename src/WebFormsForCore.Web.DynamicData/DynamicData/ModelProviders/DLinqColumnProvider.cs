@@ -1,5 +1,4 @@
-﻿#if NETFRAMEWORK
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Linq;
@@ -157,4 +156,3 @@ namespace System.Web.DynamicData.ModelProviders {
         #endregion
     }
 }
-#endif

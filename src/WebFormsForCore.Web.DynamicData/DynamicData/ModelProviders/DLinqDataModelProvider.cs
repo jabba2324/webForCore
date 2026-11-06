@@ -1,6 +1,4 @@
-﻿#if NETFRAMEWORK
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Linq;
 using System.Linq;
@@ -11,7 +9,6 @@ using LinqMetaType = System.Data.Linq.Mapping.MetaType;
 namespace System.Web.DynamicData.ModelProviders {
     internal sealed class DLinqDataModelProvider : DataModelProvider {
         private ReadOnlyCollection<TableProvider> _roTables;
-
         private Dictionary<PropertyInfo, DLinqColumnProvider> _columnLookup = new Dictionary<PropertyInfo, DLinqColumnProvider>();
 
         private Func<object> ContextFactory { get; set; }
@@ -76,4 +73,3 @@ namespace System.Web.DynamicData.ModelProviders {
         }
     }
 }
-#endif

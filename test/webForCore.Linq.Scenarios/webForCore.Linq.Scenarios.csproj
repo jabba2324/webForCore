@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The LinqDataSource scenarios (#142 follow-up): a Web Forms user's requests to test/webForCore.Requests.Sample's
+       linq/ pages, postbacks included (paging, sorting, edit, update, a concurrency conflict, delete, insert).
+       IIS.Gate.Tests' LinqDataSourceTests runs them on Kestrel and writes linq-responses.json; CI's iis-compare job
+       runs them against the same folder on IIS 10 (`dotnet webForCore.Linq.Scenarios.dll <base URL> <out.json>`) and
+       compares the two with tools/ci/iis_compare.cs. Needs nothing of webForCore. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>LinqScenarios</RootNamespace>
+  </PropertyGroup>
+</Project>
