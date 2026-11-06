@@ -46,6 +46,7 @@ namespace WebFormsForCore.Hosting
 		const string IdVariable = "WEBFORCORE_WORKER_ID";
 		const string ControlVariable = "WEBFORCORE_HOST_CONTROL";
 		const string TokenVariable = "WEBFORCORE_HOST_TOKEN";
+		const string SiteIdVariable = "WEBFORCORE_SITE_ID";
 
 		internal const string RemoteHeader = "X-WebForCore-Remote";
 		internal const string LocalHeader = "X-WebForCore-Local";
@@ -69,6 +70,9 @@ namespace WebFormsForCore.Hosting
 		public static bool IsWorker => socketPath != null && id != null && controlPath != null && token != null;
 
 		public static string WorkerId => id;
+
+		// The host's WebForCore:Host:SiteId (#210), which it gives every worker; null in an application run on its own.
+		internal static string HostSiteId => IsWorker ? Variable(SiteIdVariable) : null;
 
 		// The application's virtual path, set by WebFormsMiddleware ("/" by default).
 		internal static string ApplicationVirtualPath { get; set; } = "/";

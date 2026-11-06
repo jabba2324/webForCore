@@ -14,6 +14,7 @@ using System.Web;
 using System.Web.Hosting;
 using System.Web.SessionState;
 using System.Threading;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -33,6 +34,10 @@ namespace Microsoft.AspNetCore.Builder
 		public string VirtualPath { get; set; }
 		public string PhysicalPath { get; set; }
 		public string AppId { get; set; }
+		// webForCore: the IIS site's ID (#210): webforcore-host's WebForCore:Host:SiteId, or the same key in the
+		// application's configuration when it runs on its own; 1 (IIS's Default Web Site) if neither has it.
+		// HttpRuntime.AppDomainAppId (AppId) is /LM/W3SVC/<SiteId>/ROOT[/path].
+		public int SiteId { get; set; } = 1;
 		public bool HandleAllRequestsWithWebForms = false;
 		public bool UseClassicMode = true;
 		public IEnumerable<string> HandleExtensions = null;
@@ -87,7 +92,7 @@ namespace Microsoft.AspNetCore.Builder
 
 		public WebFormsMiddleware(Core.RequestDelegate next, Action<WebFormsOptions> optionsBuilder,
 			IHostApplicationLifetime lifetime = null, ILoggerFactory loggerFactory = null, IWebHostEnvironment environment = null,
-			WebServerConfigurationAccessor webServerAccessor = null)
+			WebServerConfigurationAccessor webServerAccessor = null, IConfiguration configuration = null)
 		{
 			this.next = next;
 			this.lifetime = lifetime;
@@ -98,10 +103,11 @@ namespace Microsoft.AspNetCore.Builder
 			VirtualPath = "/";
 			// app.UseAspNetCoreSessionProvider() sets the provider before UseWebForms.
 			UseAspNetCoreSession = SessionStateModule.ProviderOverride != null;
+			SiteId = ReadSiteId(WorkerProcess.HostSiteId ?? configuration?[SiteIdSetting]);
 
 			optionsBuilder?.Invoke(new WebFormsOptions(this));
 
-			AppId = ApplicationManager.CreateApplicationId(VirtualPath, PhysicalPath);
+			AppId = AspNetCoreHost.ApplicationId(SiteId, VirtualPath);
 			WorkerProcess.ApplicationVirtualPath = VirtualPath;
 			if (IIS.Enabled)
 			{
@@ -131,11 +137,21 @@ namespace Microsoft.AspNetCore.Builder
 			recycleTimer = new Timer(_ => CheckRecycling(), null, Recycling.CheckInterval, Recycling.CheckInterval);
 		}
 
+		const string SiteIdSetting = "WebForCore:Host:SiteId";
+
+		static int ReadSiteId(string value)
+		{
+			if (string.IsNullOrEmpty(value)) return 1;
+			if (!int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out int siteId) || siteId < 1)
+				throw new InvalidOperationException($"{SiteIdSetting} is \"{value}\"; an IIS site's ID is a number, 1 or more.");
+			return siteId;
+		}
+
 		Application StartApplication()
 		{
 			var app = new Application();
 			Action onShutdown = () => OnApplicationShutdown(app);
-			var host = AspNetCoreHost.CreateForMiddleware(VirtualPath, PhysicalPath, HandleExtensions?.ToArray(), AddHandleExtensions.ToArray(),
+			var host = AspNetCoreHost.CreateForMiddleware(VirtualPath, PhysicalPath, SiteId, HandleExtensions?.ToArray(), AddHandleExtensions.ToArray(),
 				DefaultDocuments?.ToArray(), AddDefaultDocuments.ToArray(), HandleAllRequestsWithWebForms, UseClassicMode, UseAspNetCoreSession,
 				IIS.Enabled, onShutdown);
 			app.IsLegacyRequest = (Func<Core.HttpContext, bool>)host[0];

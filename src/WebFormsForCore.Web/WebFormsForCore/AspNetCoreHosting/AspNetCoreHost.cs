@@ -61,7 +61,9 @@ namespace System.Web.Hosting
             "App_WebReferences", "App_Data", "App_Browsers", "obj" };
         public string[] DefaultDocuments { get; set; } = new string[] { "index.htm", "index.html", "Index.html", "Index.htm", "Default.htm", "iistart.htm", "Default.aspx", "default.aspx" };
         public bool UseClassicMode = false;
-        public Compilation.ClientBuildManager ClientBuildManager { get; set; } 
+        // webForCore: the IIS site's ID (WebForCore:Host:SiteId, #210), for INSTANCE_ID, INSTANCE_META_PATH and APPL_MD_PATH.
+        public int SiteId { get; set; } = 1;
+        public Compilation.ClientBuildManager ClientBuildManager { get; set; }
 		public AppDomain AppDomain
         {
             get { return AppDomain.CurrentDomain; }
@@ -127,9 +129,15 @@ namespace System.Web.Hosting
         // webForCore: called once when the hosting environment starts shutting the application down.
         public Action OnShutdown;
 
+        // webForCore: IIS's metabase path of the application, /LM/W3SVC/<site ID>/ROOT, and /ROOT/<path> under a virtual
+        // path: HttpRuntime.AppDomainAppId and APPL_MD_PATH (#207, #210).
+        internal static string ApplicationId(int siteId, string virtualPath) =>
+            "/LM/W3SVC/" + siteId.ToString(System.Globalization.CultureInfo.InvariantCulture) + "/ROOT" +
+            (virtualPath == "/" ? "" : virtualPath.TrimEnd('/'));
+
         // webForCore: creates the host for WebFormsMiddleware, the application's only start in this process (#56). The
         // host is returned as delegates.
-        internal static object[] CreateForMiddleware(string virtualPath, string physicalPath, string[] handleExtensions,
+        internal static object[] CreateForMiddleware(string virtualPath, string physicalPath, int siteId, string[] handleExtensions,
             string[] addHandleExtensions, string[] defaultDocuments, string[] addDefaultDocuments, bool handleAllRequestsWithWebForms,
             bool useClassicMode, bool useAspNetCoreSession, bool iisModules, Action onShutdown)
         {
@@ -146,11 +154,12 @@ namespace System.Web.Hosting
             // create BuildManagerHost in the worker app domain
             Type buildManagerHostType = typeof(System.Web.Compilation.BuildManagerHost);
             // webForCore: HttpRuntime.AppDomainAppId is IIS's metabase path of the application, as the worker request's
-            // APPL_MD_PATH (site 1), not a hash of the folder's path (Cassini's ApplicationHost): the same on every server
-            // of a farm, as on IIS when the servers' site IDs match. SQL Server session state keys sessions by it
+            // APPL_MD_PATH, not a hash of the folder's path (Cassini's ApplicationHost): the same on every server of a farm,
+            // as on IIS when the servers' site IDs match. SQL Server session state keys sessions by it
             // (ASPStateTempApplications, SqlSessionStateProviderAsync), so servers with the site in different folders
-            // didn't share sessions.
-            var appId = "/LM/W3SVC/1/ROOT" + (virtualPath == "/" ? "" : virtualPath.TrimEnd('/'));
+            // didn't share sessions. The site's ID is WebForCore:Host:SiteId (#210), so that different applications on one
+            // machine have different IDs, as different IIS sites do.
+            var appId = ApplicationId(siteId, virtualPath);
             var vpath = System.Web.VirtualPath.Create(virtualPath);
             var buildManagerHost = (System.Web.Compilation.BuildManagerHost)applicationManager.CreateInstanceInNewWorkerLoadContext(buildManagerHostType, appId, vpath, physicalPath, false);
             // call BuildManagerHost.RegisterAssembly to make Host type loadable in the worker app domain
@@ -165,6 +174,7 @@ namespace System.Web.Hosting
             if (addDefaultDocuments.Length > 0) host.DefaultDocuments = host.DefaultDocuments.Concat(addDefaultDocuments).ToArray();
             host.HandleAllRequestsWithWebForms = handleAllRequestsWithWebForms;
             host.UseClassicMode = useClassicMode;
+            host.SiteId = siteId;
             // webForCore: the hosting environment can stop the application before the middleware listens for it: a change
             // while the worker was starting (#49). The middleware then hears of it now, and the worker is replaced, rather
             // than it serving on with a runtime that answers every request with 503 (Server Too Busy).

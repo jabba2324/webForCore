@@ -9,6 +9,7 @@ static class WorkerProtocol
 	public const string IdVariable = "WEBFORCORE_WORKER_ID";           // the worker's number
 	public const string ControlVariable = "WEBFORCORE_HOST_CONTROL";   // the host's control socket
 	public const string TokenVariable = "WEBFORCORE_HOST_TOKEN";       // proves a control message comes from a worker
+	public const string SiteIdVariable = "WEBFORCORE_SITE_ID";         // HostSettings.SiteId: the IIS site's ID (#210)
 	// ASP.NET Core's: System.Web's WorkerHostingStartup sets the worker up before the application's Program.cs runs.
 	public const string HostingStartupVariable = "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES";
 

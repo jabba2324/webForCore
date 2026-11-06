@@ -61,7 +61,7 @@ sealed class Worker : IDisposable
 	public Task Exited { get; private set; } = Task.CompletedTask;
 	public int ExitCode { get; private set; }
 
-	public void Start(WorkerCommand command, string controlSocket, string token)
+	public void Start(WorkerCommand command, string controlSocket, string token, int siteId)
 	{
 		var start = new ProcessStartInfo(DotnetPath())
 		{
@@ -74,6 +74,9 @@ sealed class Worker : IDisposable
 		start.Environment[WorkerProtocol.IdVariable] = Id.ToString(CultureInfo.InvariantCulture);
 		start.Environment[WorkerProtocol.ControlVariable] = controlSocket;
 		start.Environment[WorkerProtocol.TokenVariable] = token;
+		// The site's ID (#210): the worker's HttpRuntime.AppDomainAppId is /LM/W3SVC/<site ID>/ROOT, whatever its own
+		// configuration says (the host's may come from its command line).
+		start.Environment[WorkerProtocol.SiteIdVariable] = siteId.ToString(CultureInfo.InvariantCulture);
 		// System.Web's hosting startup makes the application a worker (serving on the socket, with the host's connection
 		// details) before its Program.cs runs, whatever that contains.
 		var startups = Environment.GetEnvironmentVariable(WorkerProtocol.HostingStartupVariable);
