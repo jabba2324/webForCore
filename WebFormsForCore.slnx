@@ -163,6 +163,7 @@
     <Project Path="test/webForCore.Mvc.Sample/webForCore.Mvc.Sample.csproj" />
     <Project Path="test/webForCore.Mvc.Gate.Tests/webForCore.Mvc.Gate.Tests.csproj" />
     <Project Path="test/webForCore.IIS.Gate.Tests/webForCore.IIS.Gate.Tests.csproj" />
+    <Project Path="test/webForCore.Linq.Scenarios/webForCore.Linq.Scenarios.csproj" />
     <Project Path="test/webForCore.IIS.Sample/webForCore.IIS.Sample.csproj" />
     <Project Path="test/webForCore.Requests.Sample/webForCore.Requests.Sample.csproj" />
     <Project Path="test/webForCore.VirtualPath.Sample/webForCore.VirtualPath.Sample.csproj" />

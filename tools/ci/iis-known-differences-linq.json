@@ -1,0 +1,7 @@
+[
+  {
+    "requests": "^linq ",
+    "field": "header (__VIEWSTATEGENERATOR)",
+    "reason": "__VIEWSTATEGENERATOR (Page.GetClientStateIdentifier) hashes the page's directory and class name with StringUtil.GetNonRandomizedHashCode: .NET Framework uses StringComparer.InvariantCultureIgnoreCase.GetHashCode (NLS sort keys), which .NET doesn't have; webForCore uses System.Web's own stable string hash. The rest of each page is the same."
+  }
+]

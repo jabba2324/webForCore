@@ -138,6 +138,14 @@ jobs:
           path: test/webForCore.IIS.Gate.Tests/bin/Release/net10.0/requests-responses.json
           if-no-files-found: error
 
+      # ... and every response of IIS.Gate.Tests' LinqDataSourceTests (LinqDataSource and LINQ to SQL, #142).
+      - name: Upload the LinqDataSource responses
+        uses: actions/upload-artifact@v4
+        with:
+          name: linq-responses
+          path: test/webForCore.IIS.Gate.Tests/bin/Release/net10.0/linq-responses.json
+          if-no-files-found: error
+
       # ... and every response of the OpenID Connect gate (OidcGateTests), for the same scenarios on IIS 10.
       - name: Upload the OpenID Connect gate's responses
         uses: actions/upload-artifact@v4
@@ -526,6 +534,33 @@ jobs:
           dotnet run tools/ci/iis_compare.cs -- replay "$RUNNER_TEMP/gate/packages-responses.json" http://localhost:8102/ "$RUNNER_TEMP/gate/iis-packages-responses.json"
           dotnet run tools/ci/iis_compare.cs -- diff "$RUNNER_TEMP/gate/packages-responses.json" "$RUNNER_TEMP/gate/iis-packages-responses.json" \
             tools/ci/iis-known-differences-packages.json "--gate=Third-party packages" "--title=IIS 10 (integrated pipeline)" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      # LinqDataSource over LINQ to SQL (#142): test/webForCore.Linq.Scenarios drives the same folder's linq/ pages on
+      # IIS's classic pipeline as IIS.Gate.Tests' LinqDataSourceTests did on Kestrel (GETs and postbacks: paging,
+      # sorting, update, a rowversion conflict, delete, insert, AutoGenerateWhereClause, Dynamic Data's model provider),
+      # against SQL Server Express on the same address and login, and the responses are compared
+      # (tools/ci/iis-known-differences-linq.json).
+      - uses: actions/download-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: linq-responses
+          path: ${{ runner.temp }}/gate
+
+      - name: SQL Server Express for the LINQ to SQL pages
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        run: tools/ci/sqlserver-windows.ps1
+
+      - name: Run the LinqDataSource scenarios on IIS
+        if: ${{ !cancelled() }}
+        run: dotnet run --project test/webForCore.Linq.Scenarios -c Release -- http://localhost:8092/ "$RUNNER_TEMP/gate/iis-linq-responses.json"
+
+      - name: Compare LinqDataSource
+        if: ${{ !cancelled() }}
+        run: |
+          set -o pipefail
+          dotnet run tools/ci/iis_compare.cs -- diff "$RUNNER_TEMP/gate/linq-responses.json" "$RUNNER_TEMP/gate/iis-linq-responses.json" \
+            tools/ci/iis-known-differences-linq.json "--gate=LinqDataSource" "--title=IIS 10 (classic pipeline)" | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Upload the responses
         if: always()

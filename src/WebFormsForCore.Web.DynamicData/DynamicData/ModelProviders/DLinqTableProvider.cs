@@ -1,6 +1,4 @@
-﻿#if NETFRAMEWORK
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Linq.Mapping;
 using System.Linq;
@@ -70,7 +68,7 @@ namespace System.Web.DynamicData.ModelProviders {
             _columns.RemoveAll(c => ((DLinqColumnProvider)c).ShouldRemove);
         }
 
-		#region IEntity Members
+        #region IEntity Members
 
         public override IQueryable GetQuery(object context) {
             return (IQueryable)_prop.GetValue(context, null);
@@ -82,7 +80,6 @@ namespace System.Web.DynamicData.ModelProviders {
             }
         }
 
-		#endregion
+        #endregion
     }
 }
-#endif

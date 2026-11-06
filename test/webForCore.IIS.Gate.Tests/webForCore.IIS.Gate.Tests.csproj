@@ -22,6 +22,8 @@
     <ProjectReference Include="..\webForCore.Requests.Sample\webForCore.Requests.Sample.csproj" ReferenceOutputAssembly="false" />
     <!-- VirtualPathTests and ForwardedHeadersTests: an application under /app (#190) and behind a proxy (#194). -->
     <ProjectReference Include="..\webForCore.VirtualPath.Sample\webForCore.VirtualPath.Sample.csproj" ReferenceOutputAssembly="false" />
+    <!-- LinqDataSourceTests: the scenarios that CI's iis-compare job also runs against IIS 10. -->
+    <ProjectReference Include="..\webForCore.Linq.Scenarios\webForCore.Linq.Scenarios.csproj" />
     <!-- The samples run under webforcore-host (#56), from its build here. -->
     <ProjectReference Include="..\..\src\WebFormsForCore.Host\WebFormsForCore.Host.csproj" ReferenceOutputAssembly="false" />
     <Compile Include="..\Shared\WebForCoreHost.cs" Link="WebForCoreHost.cs" />

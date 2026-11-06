@@ -4,8 +4,6 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-#if NETFRAMEWORK
-
 namespace System.Web.UI.WebControls {
     using System;
     using System.Collections;
@@ -13,10 +11,8 @@ namespace System.Web.UI.WebControls {
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
     using System.ComponentModel;
-#if NETFRAMEWORK
     using System.Data.Linq;
     using System.Data.Linq.Mapping;
-#endif
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
@@ -979,4 +975,3 @@ namespace System.Web.UI.WebControls {
 
 }
 
-#endif

@@ -1,5 +1,5 @@
-﻿#if NETFRAMEWORK
-using System.Data.Linq;
+﻿using System.Data.Linq;
+#if NETFRAMEWORK // webForCore: Entity Framework 1-4 (System.Data.Entity's ObjectContext) isn't on .NET (docs/NAMESPACES.md).
 using System.Data.Objects;
 #endif
 using System.Globalization;
@@ -16,10 +16,10 @@ namespace System.Web.DynamicData.ModelProviders {
         }
 
         public virtual DataModelProvider CreateDataModel(object contextInstance, Func<object> contextFactory) {
-#if NETFRAMEWORK
             if (IsDataContext(contextInstance.GetType())) {
                 return new DLinqDataModelProvider(contextInstance, contextFactory);
             }
+#if NETFRAMEWORK
             if (IsObjectContext(contextInstance.GetType())) {
                 return new EFDataModelProvider(contextInstance, contextFactory);
             }
@@ -33,16 +33,12 @@ namespace System.Web.DynamicData.ModelProviders {
             return IsDataContext(contextType) || IsObjectContext(contextType);
         }
 
-        // webForCore: no LINQ to SQL DataContext or EF 1-4 ObjectContext on .NET; RegisterContext takes a DataModelProvider.
         internal static bool IsDataContext(Type contextType) {
-#if NETFRAMEWORK
             return IsValidType<DataContext>(contextType);
-#else
-            return false;
-#endif
         }
 
         internal static bool IsObjectContext(Type contextType) {
+        // webForCore: no EF 1-4 ObjectContext on .NET; RegisterContext takes a DataContext or a DataModelProvider.
 #if NETFRAMEWORK
             return IsValidType<ObjectContext>(contextType);
 #else

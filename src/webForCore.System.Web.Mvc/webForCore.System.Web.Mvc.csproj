@@ -276,6 +276,7 @@
     <Compile Include="../../external/AspNetWebStack/src/System.Web.Mvc/JavaScriptResult.cs" Link="JavaScriptResult.cs" />
     <Compile Include="../../external/AspNetWebStack/src/System.Web.Mvc/JsonRequestBehavior.cs" Link="JsonRequestBehavior.cs" />
     <Compile Include="../../external/AspNetWebStack/src/System.Web.Mvc/JsonResult.cs" Link="JsonResult.cs" />
+    <Compile Include="../../external/AspNetWebStack/src/System.Web.Mvc/LinqBinaryModelBinder.cs" Link="LinqBinaryModelBinder.cs" />
     <Compile Include="../../external/AspNetWebStack/src/System.Web.Mvc/JsonValueProviderFactory.cs" Link="JsonValueProviderFactory.cs" />
     <Compile Include="../../external/AspNetWebStack/src/System.Web.Mvc/MaxLengthAttributeAdapter.cs" Link="MaxLengthAttributeAdapter.cs" />
     <Compile Include="../../external/AspNetWebStack/src/System.Web.Mvc/MembershipPasswordAttributeAdapter.cs" Link="MembershipPasswordAttributeAdapter.cs" />
