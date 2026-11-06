@@ -295,8 +295,8 @@ namespace System.Web.Hosting
 
 
 		// webForCore: off Windows there is no Windows token or account, and WindowsIdentity.GetCurrent threw
-		// PlatformNotSupportedException for LOGON_USER, AUTH_TYPE and Request.LogonUserIdentity (#165). There the worker
-		// request has no user token (IntPtr.Zero, as .NET Framework's SimpleWorkerRequest): LOGON_USER and AUTH_TYPE are
+		// PlatformNotSupportedException for Request.LogonUserIdentity and impersonation (#165). There the worker
+		// request has no user token (IntPtr.Zero, as .NET Framework's SimpleWorkerRequest): LOGON_USER and AUTH_TYPE stay
 		// empty, as IIS gives them for an anonymous request, LogonUserIdentity is null (HttpWorkerRequest.
 		// GetLogonUserIdentity's "invalid token"), and <identity impersonate="true"/> impersonates nothing
 		// (ClientImpersonationContext impersonates only a token). Windows is unchanged.

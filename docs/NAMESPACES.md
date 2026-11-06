@@ -106,17 +106,18 @@ Caveats:
   tables.
 - **Build providers:** `App_WebReferences` produce no proxy (`Compilation/WebReferencesBuildProvider.cs`).
 - **Windows authentication**, impersonation and `FileAuthorizationModule`'s ACL checks aren't available. **Windows
-  identity off Windows** (#165): there is no Windows token, so the worker request has none for a request
-  (`HttpWorkerRequest.GetUserToken()` is `IntPtr.Zero`, as for .NET Framework's `SimpleWorkerRequest`). The
-  `LOGON_USER` and `AUTH_TYPE` server variables are empty, as IIS gives them for an anonymous request.
+  identity off Windows** (#165): the `LOGON_USER` and `AUTH_TYPE` server variables are empty, on every platform, as IIS
+  gives them for an anonymous request. Off Windows there is no Windows token, so the worker request has none for a
+  request (`HttpWorkerRequest.GetUserToken()` is `IntPtr.Zero`, as for .NET Framework's `SimpleWorkerRequest`), and
   `Request.LogonUserIdentity` is `null`: on IIS it is the anonymous account's `WindowsIdentity` (`IUSR`, or the
   application pool's identity), which can't exist on Linux, and `null` is what .NET Framework's
   `HttpWorkerRequest.GetLogonUserIdentity` returns for a worker request without a token ("invalid token"), rather than
   an exception every reader would have to catch. Code that reads `Request.LogonUserIdentity.Name` checks for `null`
   first, or uses `User.Identity`. `<identity impersonate="true"/>` impersonates nothing (ASP.NET impersonates only a
   token, `ClientImpersonationContext`): requests run as the worker process's user. On Windows the worker request has
-  the worker process's token, as Visual Studio's development server (Cassini, which it comes from) had: `LOGON_USER`
-  is the process's account, `AUTH_TYPE` is `NTLM`, and `LogonUserIdentity` is its `WindowsIdentity`.
+  the worker process's token, as Visual Studio's development server (Cassini, which it comes from) had, so
+  `LogonUserIdentity` is the process's account, not authenticated, and a page under `impersonate="true"` fails with
+  a 500 (impersonating that token fails).
 - **`System.Web.Mail.SmtpMail.Send`** sends with `System.Net.Mail.SmtpClient` instead of Windows CDO
   (`WebFormsForCore/SmtpMailSender.cs`). The message's CDO fields (`smtpserver`, `smtpserverport`, `smtpusessl`,
   `smtpauthenticate` with `sendusername`/`sendpassword`, `sendusing` with a pickup directory) are honoured; without
