@@ -88,15 +88,18 @@ namespace SessionCacheGate
         private readonly StringBuilder _output = new StringBuilder();
         private readonly string _tempDirectory;
 
-        public Instance(Sites sites, string directory, string name)
+        public Instance(Sites sites, string directory, string name, IEnumerable<string> hostArguments = null,
+            IDictionary<string, string> environment = null)
         {
             Name = name;
             BaseAddress = new Uri($"http://127.0.0.1:{FreePort()}");
-            var start = WebForCoreHost.StartInfo(sites.Repository, directory, Sites.Sample, new Dictionary<string, string>
+            var settings = new Dictionary<string, string>
             {
                 ["Kestrel__Endpoints__Http__Url"] = BaseAddress.ToString(),
                 ["SESSIONCACHE_INSTANCE"] = name,
-            }, out _tempDirectory);
+            };
+            foreach (var variable in environment ?? new Dictionary<string, string>()) settings[variable.Key] = variable.Value;
+            var start = WebForCoreHost.StartInfo(sites.Repository, directory, Sites.Sample, settings, out _tempDirectory, hostArguments);
             _process = Process.Start(start);
             _process.OutputDataReceived += (s, e) => { lock (_output) _output.AppendLine(e.Data); };
             _process.ErrorDataReceived += (s, e) => { lock (_output) _output.AppendLine(e.Data); };
@@ -191,14 +194,17 @@ namespace SessionCacheGate
 
         protected abstract string Replace(string config);
 
+        // The host's arguments for instance "A" or "B" (its settings, such as WebForCore:Host:SiteId).
+        protected virtual IEnumerable<string> HostArguments(string instance) => null;
+
         public async Task InitializeAsync()
         {
             await Prepare();
             string config = Replace(_sites.Config(ConfigName));
             File.WriteAllText(Path.Combine(_sites.A, "Web.config"), config);
             File.WriteAllText(Path.Combine(_sites.B, "Web.config"), config);
-            A = new Instance(_sites, _sites.A, "A");
-            B = new Instance(_sites, _sites.B, "B");
+            A = new Instance(_sites, _sites.A, "A", HostArguments("A"));
+            B = new Instance(_sites, _sites.B, "B", HostArguments("B"));
             await Task.WhenAll(A.WaitUntilReady(), B.WaitUntilReady());
         }
 
