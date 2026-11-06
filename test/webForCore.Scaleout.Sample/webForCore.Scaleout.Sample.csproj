@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- SignalR 2 scale-out: a site with a hub on Katana's System.Web host and a backplane, of which ScaleoutTests
+       (test/webForCore.IIS.Gate.Tests) run two instances, each under its own webforcore-host, on one Redis or one SQL
+       Server. Startup.cs chooses the backplane from the instance's environment, as each server of a web farm reads it
+       from its Web.config. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <!-- The fork serves the parent of the output folder (WebFormsMiddleware: PhysicalPath), as in the TestApp. -->
+    <OutputPath>bin_dotnet</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <GenerateDependencyFile>true</GenerateDependencyFile>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+  </PropertyGroup>
+
+  <Import Project="..\..\src\webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Content Remove="bin_dotnet\**" />
+    <None Remove="bin_dotnet\**" />
+    <Compile Remove="bin_dotnet\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\WebFormsForCore.Configuration\WebFormsForCore.Configuration.csproj" />
+    <PackageReference Include="drawingForCore" Version="$(DrawingForCoreVersion)" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Serialization.Formatters\WebFormsForCore.Serialization.Formatters.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web\WebFormsForCore.Web.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.ApplicationServices\WebFormsForCore.Web.ApplicationServices.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Services\WebFormsForCore.Web.Services.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Extensions\WebFormsForCore.Web.Extensions.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Infrastructure\WebFormsForCore.Web.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Abstractions\WebFormsForCore.Web.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Routing\WebFormsForCore.Web.Routing.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Compilers\WebFormsForCore.Compilers.csproj" />
+    <ProjectReference Include="..\..\src\webForCore.Microsoft.AspNet.SignalR.SystemWeb\webForCore.Microsoft.AspNet.SignalR.SystemWeb.csproj" />
+    <ProjectReference Include="..\..\src\webForCore.Microsoft.Owin.Host.SystemWeb\webForCore.Microsoft.Owin.Host.SystemWeb.csproj" />
+    <!-- The backplanes. -->
+    <ProjectReference Include="..\..\src\webForCore.Microsoft.AspNet.SignalR.StackExchangeRedis\webForCore.Microsoft.AspNet.SignalR.StackExchangeRedis.csproj" />
+    <!-- Its RedisScaleoutConfiguration has the name of StackExchangeRedis's, in the same namespace: an alias tells them apart
+         (Startup.Redis.cs). An application references one of the two. -->
+    <ProjectReference Include="..\..\src\webForCore.Microsoft.AspNet.SignalR.Redis\webForCore.Microsoft.AspNet.SignalR.Redis.csproj" Aliases="redis1" />
+    <ProjectReference Include="..\..\src\webForCore.Microsoft.AspNet.SignalR.SqlServer\webForCore.Microsoft.AspNet.SignalR.SqlServer.csproj" />
+  </ItemGroup>
+</Project>

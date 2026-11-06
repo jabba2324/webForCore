@@ -38,6 +38,7 @@
   "System.Web.Http.WebHost": { "package": "Microsoft.AspNet.WebApi.WebHost", "version": "5.3.0", "path": "lib/net45/System.Web.Http.WebHost.dll" },
   "System.Web.Http.Owin": { "package": "Microsoft.AspNet.WebApi.Owin", "version": "5.3.0", "path": "lib/net45/System.Web.Http.Owin.dll" },
   "System.Web.Http.Cors": { "package": "Microsoft.AspNet.WebApi.Cors", "version": "5.3.0", "path": "lib/net45/System.Web.Http.Cors.dll" },
+  "System.Web.Http.Tracing": { "package": "Microsoft.AspNet.WebApi.Tracing", "version": "5.3.0", "path": "lib/net45/System.Web.Http.Tracing.dll" },
   "System.Web.Cors": { "package": "Microsoft.AspNet.Cors", "version": "5.3.0", "path": "lib/net45/System.Web.Cors.dll" },
   "System.Net.Http.Formatting": { "package": "Microsoft.AspNet.WebApi.Client", "version": "6.0.0", "path": "lib/netstandard2.0/System.Net.Http.Formatting.dll" },
 
@@ -61,6 +62,9 @@
   "Microsoft.AspNet.SignalR.Core": { "package": "Microsoft.AspNet.SignalR.Core", "version": "2.4.3", "path": "lib/net45/Microsoft.AspNet.SignalR.Core.dll" },
   "Microsoft.AspNet.SignalR.SystemWeb": { "package": "Microsoft.AspNet.SignalR.SystemWeb", "version": "2.4.3", "path": "lib/net45/Microsoft.AspNet.SignalR.SystemWeb.dll" },
   "Microsoft.AspNet.SignalR.Client": { "package": "Microsoft.AspNet.SignalR.Client", "version": "2.4.3", "path": "lib/netstandard2.0/Microsoft.AspNet.SignalR.Client.dll" },
+  "Microsoft.AspNet.SignalR.Redis": { "package": "Microsoft.AspNet.SignalR.Redis", "version": "2.4.3", "path": "lib/net45/Microsoft.AspNet.SignalR.Redis.dll" },
+  "Microsoft.AspNet.SignalR.StackExchangeRedis": { "package": "Microsoft.AspNet.SignalR.StackExchangeRedis", "version": "2.4.3", "path": "lib/net461/Microsoft.AspNet.SignalR.StackExchangeRedis.dll" },
+  "Microsoft.AspNet.SignalR.SqlServer": { "package": "Microsoft.AspNet.SignalR.SqlServer", "version": "2.4.3", "path": "lib/net45/Microsoft.AspNet.SignalR.SqlServer.dll" },
   "Microsoft.AspNet.Identity.Core": { "package": "Microsoft.AspNet.Identity.Core", "version": "2.2.4", "path": "lib/net45/Microsoft.AspNet.Identity.Core.dll" },
   "Microsoft.AspNet.Identity.EntityFramework": { "package": "Microsoft.AspNet.Identity.EntityFramework", "version": "2.2.4", "path": "lib/net45/Microsoft.AspNet.Identity.EntityFramework.dll" },
   "Microsoft.AspNet.Identity.Owin": { "package": "Microsoft.AspNet.Identity.Owin", "version": "2.2.4", "path": "lib/net45/Microsoft.AspNet.Identity.Owin.dll" },

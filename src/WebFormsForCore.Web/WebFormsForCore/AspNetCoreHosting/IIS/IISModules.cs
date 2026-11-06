@@ -169,9 +169,17 @@ namespace WebFormsForCore.Hosting.IIS
 				return false;
 
 			if (request.ContentLength > Long(limits, "maxAllowedContentLength", 30000000))
+			{
 				// #192: IIS 10 answers 413.1 "Request Entity Too Large" (IIS 7 to 8.5: 404.13), as CI's iis-compare job saw.
+				// webForCore: Kestrel drains the body after this answer, as it drains any body the application didn't read,
+				// so the connection to webforcore-host stays usable. With the limit in place it couldn't, and closed the
+				// connection: the host's pool sent its next request on it now and then, or the close reset this answer before
+				// the host had read it, and a client was reset (ErrorsAndLimitsTests on Windows). The client's connection is the
+				// host's, which keeps it either way.
+				if (bodySize != null && !bodySize.IsReadOnly) bodySize.MaxRequestBodySize = null;
 				return await WriteError(context, 413, 1, "Request Entity Too Large", "The request filtering module is configured to deny a request that exceeds the request content length.")
 					.ContinueWith(_ => true, TaskContinuationOptions.ExecuteSynchronously);
+			}
 			if (rawPath.Length > Long(limits, "maxUrl", 4096))
 				return await Reject(context, 14, "The request filtering module is configured to deny a request where the URL is too long.");
 			if (query.Length > Long(limits, "maxQueryString", 2048))

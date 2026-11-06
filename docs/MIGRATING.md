@@ -308,10 +308,10 @@ packages, so the app's `nuget.config` needs drawingForCore's feed (above). Every
 | MVC 5 | `webForCore.System.Web.Mvc` (brings Razor and Web Pages); `webForCore.Microsoft.Web.Mvc` for MVC Futures |
 | Web Pages (`.cshtml` without MVC) | `webForCore.System.Web.WebPages.Razor`, `webForCore.System.Web.WebPages.Deployment` |
 | Helpers (WebGrid, Chart, WebImage) | `webForCore.System.Web.Helpers` |
-| Web API 2 | `webForCore.System.Web.Http.WebHost` (and `webForCore.System.Web.Http.Cors` for CORS) |
+| Web API 2 | `webForCore.System.Web.Http.WebHost` (and `webForCore.System.Web.Http.Cors` for CORS, `webForCore.System.Web.Http.Tracing` for `EnableSystemDiagnosticsTracing`) |
 | Web API on OWIN | `webForCore.System.Web.Http.Owin`, `webForCore.Microsoft.Owin.Host.SystemWeb` |
 | OWIN security | `webForCore.Microsoft.Owin.Security.Cookies`, `.OAuth`; `.OpenIdConnect` and `.Jwt` (Entra ID / Azure AD), `.WsFederation`, `.ActiveDirectory`, `.Google`, `.Facebook`, `.MicrosoftAccount`, `.Twitter` ([below](#packages-that-need-more-than-a-reference)) |
-| SignalR 2 | `webForCore.Microsoft.AspNet.SignalR.SystemWeb` |
+| SignalR 2 | `webForCore.Microsoft.AspNet.SignalR.SystemWeb`; for several instances, a backplane: `webForCore.Microsoft.AspNet.SignalR.StackExchangeRedis`, `.Redis` or `.SqlServer` ([below](#scaling-out-signalr)) |
 | ASP.NET Identity 2 | `webForCore.Microsoft.AspNet.Identity.Owin`, `webForCore.Microsoft.AspNet.Identity.EntityFramework` |
 | Bundling | `WebFormsForCore.Web.Optimization` (+ `.Optimization.WebForms` for `<webopt:BundleReference>`) |
 | Chart control | `WebFormsForCore.Web.DataVisualization` |
@@ -325,7 +325,10 @@ webForCore ships only Microsoft assemblies. Two libraries apps commonly have:
   application is in the default context, so `LoadFrom` on a `bin` assembly returns the copy the application has.
   Checked on 0.7.0 with the original WebActivatorEx 2.2.0 and WebActivator 1.5.0 packages (WebActivator 1.x is what MVC
   3 era packages such as Ninject.MVC3 bring; #38, Subtext). As on IIS, a pre-start method in `App_Code` doesn't run:
-  `App_Code` is compiled after the pre-start phase.
+  `App_Code` is compiled after the pre-start phase. Its shutdown methods (`ApplicationShutdownMethod`) run when the
+  application restarts, in the worker that stops, as in the AppDomain that unloaded on IIS: the third-party packages
+  gate (`test/webForCore.Packages.Sample`) checks Ninject.Web.Common.WebHost's `NinjectWebCommon.Start` and `Stop`
+  across a restart.
 - **AjaxControlToolkit** isn't provided: the original package is built for .NET Framework.
   [webForCore-thirdparty](https://github.com/xforcore/webForCore-thirdparty) builds it for .NET 10 (it isn't part of
   webForCore).
@@ -349,6 +352,26 @@ Keep other NuGet packages, preferring versions that target .NET Standard or .NET
 projects in this repository are working examples for Web Forms, MVC, Web API and Web Pages. A .NET Framework package
 built against MVC 5 runs as it is unless it uses an API .NET lacks: Microsoft's own MVC Futures 5.0.0 binary (built for
 .NET Framework 4.0 against MVC 5.0) ran unmodified on webForCore's MVC 5.3, with .NET binding its 5.0.0.0 reference.
+
+The same goes for Web API and OWIN. These net4x packages a customer application has run as they are, checked by the
+third-party packages gate (`test/webForCore.Packages.Sample`, Packages.Gate.Tests) on Linux and Windows, and compared
+with the same application on IIS 10 by CI's `iis-compare` job:
+
+- **Ninject's web integration** (Ninject 3.3.6, Ninject.Web.Common 3.3.2): Ninject.Web.Common.WebHost 3.3.2, started by
+  WebActivatorEx from the `App_Start/NinjectWebCommon.cs` the package wrote, with its `OnePerRequestHttpModule` and
+  `NinjectHttpModule` (`InRequestScope` keyed on `HttpContext.Current`: one object per request, disposed at
+  `EndRequest`); Ninject.Web.Common.OwinHost 3.3.1's `UseNinjectMiddleware` (an OWIN middleware resolving in the request
+  scope it puts in the OWIN environment); and Ninject.Web.WebApi.OwinHost 3.3.0's `UseNinjectWebApi` (controllers
+  constructed by Ninject). Two things Ninject does on IIS too: Ninject.Web.WebApi.OwinHost 3.3.0 needs Ninject.Web.WebApi
+  3.3.0, not 3.3.1, which removed the `IWebApiRequestScopeProvider` it uses (`TypeLoadException`); and its request scope
+  in Web API is a named scope that reaches a controller's dependencies' dependencies only with
+  Ninject.Extensions.ContextPreservation. And `UseNinjectMiddleware` replaces the kernel `Bootstrapper` holds, so with
+  NinjectWebCommon too, keep the kernel each creates where the code that resolves from it can find it.
+- **Swashbuckle.Core 5.6.0** (net40): `config.EnableSwagger(...).EnableSwaggerUi()`, the document
+  (`/swagger/docs/v1`) and the UI with the files embedded in Swashbuckle.Core.dll (`/swagger/ui/index`).
+- **CacheCow.Server.WebApi 2.5.0** (net452): `[HttpCache]`'s ETags, 304 for `If-None-Match`, and a new ETag once a
+  `PUT` or `POST` has changed the resource. It needs the `net452` builds of CacheCow.Server and CacheCow.Common, as
+  below.
 
 ### Packages that need more than a reference
 
@@ -463,11 +486,21 @@ These came up migrating real applications; each names one that needed it.
 - **A package's .NET Standard build can have less than its `net45` build** (#31). NuGet picks the .NET Standard build
   for .NET 10, and some packages built it with a smaller API. WindowsAzure.Storage 9.x has no synchronous blob methods
   there (`Exists`, `OpenRead`, ...: aspnet-mvc5-starter). Hangfire 1.6's has no OWIN extensions (`app.UseHangfireServer`),
-  and its SqlServer storage can't look a connection string name up in web.config (MVCForum). Use the version's `net45`
-  build, in every project that gets the package, the web project included:
+  and its SqlServer storage can't look a connection string name up in web.config (MVCForum). Some have another API
+  altogether: CacheCow.Server and CacheCow.Common 2.x's .NET Standard builds are CacheCow for ASP.NET Core, so
+  CacheCow.Server.WebApi, which has only a `net452` build, fails every `[HttpCache]` action with `MissingMethodException:
+  Method not found: 'Boolean CacheCow.Server.ICacheabilityValidator.IsCacheable(System.Net.Http.HttpRequestMessage)'`
+  (a customer application). Use the version's `net45` (or `net452`) build, in every project that gets the package, the
+  web project included:
   ```xml
   <PackageReference Include="Hangfire.Core" Version="1.6.17" GeneratePathProperty="true" ExcludeAssets="compile;runtime" />
   <Reference Include="Hangfire.Core" HintPath="$(PkgHangfire_Core)/lib/net45/Hangfire.Core.dll" />
+
+  <PackageReference Include="CacheCow.Server.WebApi" Version="2.5.0" />
+  <PackageReference Include="CacheCow.Server" Version="2.5.0" GeneratePathProperty="true" ExcludeAssets="compile;runtime" />
+  <PackageReference Include="CacheCow.Common" Version="2.5.0" GeneratePathProperty="true" ExcludeAssets="compile;runtime" />
+  <Reference Include="CacheCow.Server" HintPath="$(PkgCacheCow_Server)/lib/net452/CacheCow.Server.dll" />
+  <Reference Include="CacheCow.Common" HintPath="$(PkgCacheCow_Common)/lib/net452/CacheCow.Common.dll" />
   ```
 - **Katana's sign-in and token middleware** (#14, #18). webForCore builds all of Katana 4.2.3's security packages:
   `Microsoft.Owin.Security.OpenIdConnect`, `.Jwt`, `.WsFederation`, `.ActiveDirectory` and the social logins of the
@@ -595,8 +628,9 @@ Without `HandleAllRequestsWithWebForms()`, only ASP.NET's own extensions (`.aspx
 reach System.Web, and ASP.NET Core serves everything else.
 
 Session state needs nothing here when it was in process on IIS (`<sessionState mode="InProc">`, or no `mode`: the
-default). Only an application whose session state was out of process adds a distributed cache and
-`UseAspNetCoreSessionProvider()` ("Session state", next).
+default), or out of process in SQL Server or Redis through `web.config` (its providers run as they are). Only an
+application that used the ASP.NET State Service (`mode="StateServer"`), or that moves to ASP.NET Core's distributed
+cache, adds one and `UseAspNetCoreSessionProvider()` ("Session state", next).
 
 ### Session state
 
@@ -607,10 +641,39 @@ application's cache: a value is the object the application stored, not a copy, s
 a `web.config` change), as on IIS. Keep it this way for an application that ran in process on IIS, which is most of
 them: changing it would make every session value go through `BinaryFormatter` (#180).
 
+**Out of process, configured in `web.config` as on IIS (from 0.10.0).** `<sessionState mode="SQLServer">` and the
+scale-out packages Microsoft made for .NET Framework run as they are, with the `web.config` they had on IIS: keep the
+package references (they restore for `net10.0` from their `net462`/`net472` builds) and the configuration. Each is
+tested with two instances sharing one store (`test/webForCore.SessionCache.Gate.Tests`, on Linux and Windows): a value
+set on one is read on the other, a request holding a session's exclusive lock makes a request for the same session on
+the other instance wait (read-only requests don't wait for each other), `Session.Abandon` on one ends it on both, a
+session ends `Session.Timeout` minutes after its last request, and a value that isn't serializable fails the request
+with "Unable to serialize the session state", as on IIS:
+
+| On IIS | On webForCore |
+| --- | --- |
+| `<sessionState mode="SQLServer" sqlConnectionString="...">` (System.Web's `SqlSessionStateStore`) | As it is. Create the database with `webforcore-regsql -ssadd` (`-sstype t`, `p` or `c`, as `aspnet_regsql`, section 5). Expired sessions are deleted by the SQL Server Agent job the script adds, as on IIS: where no agent runs (SQL Server Express, the Linux container by default), run `DeleteExpiredSessions` on a schedule |
+| `Microsoft.Web.RedisSessionStateProvider` (`<sessionState mode="Custom" customProvider=...>` with `type="Microsoft.Web.Redis.RedisSessionStateProvider"`; 5.x with the async module below) | As it is |
+| `Microsoft.AspNet.SessionState.SessionStateModule` (the async module: `<system.webServer><modules>`'s `<remove name="Session" />` and `<add name="Session" type="Microsoft.AspNet.SessionState.SessionStateModuleAsync, ...">`) | As it is: webForCore runs `<system.webServer><modules>`' managed modules, and the swap replaces System.Web's module |
+| `Microsoft.AspNet.SessionState.SqlSessionStateProviderAsync` | **2.1.0-preview1 or later** (with the module of the same version), as it is (it creates its table). 2.0.0 adds `String.GetHashCode()` of the application's ID to every session ID; .NET Framework's string hash is the same in every process, .NET's is different in every process (randomized), so with 2.0.0 two servers never share a session and a restart loses them all. 2.1.0-preview1 uses a hash of its own. Update the package and the version in `web.config`'s `type` |
+| `Microsoft.AspNet.SessionState.CosmosDBSessionStateProviderAsync` | Restores and loads; not tested against Cosmos DB |
+| `Microsoft.Web.RedisOutputCacheProvider` (`<caching><outputCache defaultProvider=...>`) | As it is, with System.Web's output cache module: pages are cached and served to every server until they expire, but see below. **`VaryByParam` (and any other vary) doesn't cache with 4.0.1, on IIS either**: its `Add` casts the Redis result to `byte[]` and fails (Microsoft's bug; 3.x converted it but serializes with `BinaryFormatter`, which .NET doesn't have), so after a page's first rendering no response of it is found again. Pages without a vary (`VaryByParam="none"`) are cached and shared. **Remove the `OutputCache` module swap** that its dependency `Microsoft.AspNet.OutputCache.OutputCacheModuleAsync` adds to `<system.webServer><modules>` (`<remove name="OutputCache" />` and `<add name="OutputCache" type="Microsoft.AspNet.OutputCache.OutputCacheModuleAsync, ...">`): the async module hands the provider entries of its own types, which System.Web's `OutputCache.Serialize` refuses, so the provider logs a warning and caches nothing, on IIS too |
+
+Every server must have the same application path (all at `/`, or all at the same virtual directory):
+`HttpRuntime.AppDomainAppId` is IIS's `/LM/W3SVC/1/ROOT` (and the path of a virtual directory), as on IIS servers
+whose site IDs match, and SQL Server session state keys sessions by it. Up to 0.9.0 it was a hash of the site's folder,
+so servers with the site in different folders didn't share sessions through SQL Server. Use the same `<machineKey>` on
+every server for forms authentication and view state.
+
+The async module's `aspnet:AllowConcurrentRequestsPerSession` setting keeps objects in its own collection, which
+serializes them with .NET's `BinaryFormatter`; it throws `PlatformNotSupportedException` on .NET, so with that setting
+only strings and primitive values can be stored out of process. The default (off) uses System.Web's collection and
+webForCore's BinaryFormatter.
+
 **Out of process: `UseAspNetCoreSessionProvider()`.** It keeps session state in ASP.NET Core's distributed cache
-(`IDistributedCache`), as `<sessionState mode="StateServer">` or `"SQLServer"` kept it out of process on IIS. Use it
-where the application's session state was out of process on IIS (`mode="StateServer"`, `"SQLServer"` or `"Custom"`
-with a provider that stored it elsewhere, such as Redis's), or to share sessions between servers (scaling out):
+(`IDistributedCache`), as `<sessionState mode="StateServer">` kept it out of process on IIS. Use it where the
+application used the ASP.NET State Service (`mode="StateServer"`; the service is part of .NET Framework on
+Windows), or a store its `web.config` can't name, or to share sessions between servers through a distributed cache:
 
 ```csharp
 builder.Services.AddDistributedMemoryCache();   // one server; or AddStackExchangeRedisCache(...),
@@ -806,6 +869,21 @@ value="true" />` in `<appSettings>` makes `Request.Url` from the `Host` header i
 - **`<system.net><defaultProxy>`** is applied at application start to `HttpClient.DefaultProxy`. Without it, .NET
   uses `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`. `<connectionManagement>` and the other `<system.net>` sections
   have no effect.
+- **`<system.diagnostics>` isn't applied.** Trace listeners, sources and switches in Web.config (or machine.config)
+  aren't created: `System.Diagnostics.Trace` writes only to its default listener, so a `TextWriterTraceListener` that
+  wrote a log file on IIS writes nothing ([NAMESPACES.md](NAMESPACES.md#summary-of-what-doesnt-work)). Web API's
+  tracing (`config.EnableSystemDiagnosticsTracing()`, "Tracing in ASP.NET Web API 2", package
+  `webForCore.Web.Http.Tracing`) writes its records through `Trace` as on .NET Framework, so add the listeners in code
+  at the start of `Application_Start`:
+
+  ```csharp
+  System.Diagnostics.Trace.AutoFlush = true;
+  System.Diagnostics.Trace.Listeners.Add(new System.Diagnostics.TextWriterTraceListener(
+      System.Web.Hosting.HostingEnvironment.MapPath("~/App_Data/trace.log"), "file"));
+  ```
+
+  Keep the file in `App_Data` or outside the application: a relative path is resolved against `bin_dotnet/`, and a file
+  written there restarts the application at every line (#173).
 - **Typed DataSets** (`.xsd` in App_Code) and their TableAdapters are generated when the site compiles. The `.xsd`'s
   provider must be registered; a TableAdapter's connection string comes from `<connectionStrings>`, as on IIS.
 
@@ -986,6 +1064,14 @@ The first request compiles pages, as on IIS. Then compare the responses recorded
   endpoints the app's `Program.cs` sets up itself (`ConfigureKestrel(k => k.Listen(...))`) would conflict: move them to
   configuration. The host's own settings (startup and shutdown time limits, rapid-fail protection) are in the
   `WebForCore:Host` section ([IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md#process-model)).
+- **In a container:** Microsoft's ASP.NET Core runtime image is enough (no SDK: pages and views compile with
+  webForCore's own compilers). On Windows, the Nano Server image runs it
+  (`mcr.microsoft.com/dotnet/aspnet:10.0-nanoserver-ltsc2025`; with process isolation, the tag of the host's Windows
+  version); Server Core isn't needed. Copy the site folder in, set the binding
+  (`Kestrel__Endpoints__Http__Url=http://+:8080`) and start the host from the site folder:
+  `ENTRYPOINT ["dotnet", "bin_dotnet\\webforcore-host\\webforcore-host.dll"]`. A `web.config` change inside the
+  container recycles the worker as on IIS, and `docker stop` stops the host and its worker. CI's `windows-container`
+  job checks this ([TESTING.md](TESTING.md#in-a-windows-container)).
 - **In front:** a reverse proxy (nginx, Apache, a load balancer) for TLS and the public port, or the host's own HTTPS.
   Behind a proxy, have the host apply its `X-Forwarded-*` headers ([Behind a reverse proxy](#behind-a-reverse-proxy));
   an application that IIS ran under a site's path gets the path with `VirtualPath`, and the proxy forwards it as it is
@@ -1007,9 +1093,43 @@ The first request compiles pages, as on IIS. Then compare the responses recorded
   [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md#process-model).
 - **Precompilation** (optional): `aspnetcore_compiler -v / -p <site> -b bin_dotnet [-u] <target>`, then copy the build
   into `<target>/bin_dotnet`. Use `-u` for updatable sites.
-- **Scaling out:** use out-of-process session state (Redis or SQL Server through ASP.NET Core's distributed cache) and
-  the same `<machineKey>` everywhere.
+- **Scaling out:** use out-of-process session state (SQL Server or Redis through `web.config` as on IIS, or ASP.NET
+  Core's distributed cache; "Session state", section 4), the same application path on every server, and the same
+  `<machineKey>` everywhere.
+  SignalR needs a backplane too ([below](#scaling-out-signalr)).
 - Several processes must not share one site folder: they share the compilation folder.
+
+### Scaling out SignalR
+
+On one instance SignalR keeps its messages in that process: behind a load balancer, a client connected to one instance
+gets nothing a hub sends on another. As on IIS, a **backplane** joins the instances' message buses. webForCore builds
+Microsoft's three that run on .NET, from SignalR 2.4.3's source, with Microsoft's names and versions, so the code and
+configuration an IIS web farm has work unchanged:
+
+| Backplane | Package (in place of Microsoft's) | In `Startup.Configuration`, before `MapSignalR` |
+| --- | --- | --- |
+| Redis, on StackExchange.Redis 2 | `webForCore.Microsoft.AspNet.SignalR.StackExchangeRedis` (`Microsoft.AspNet.SignalR.StackExchangeRedis`) | `GlobalHost.DependencyResolver.UseStackExchangeRedis(new RedisScaleoutConfiguration("redis:6379,password=...", "MyApp"));` |
+| Redis, on StackExchange.Redis.StrongName 1.x | `webForCore.Microsoft.AspNet.SignalR.Redis` (`Microsoft.AspNet.SignalR.Redis`) | `GlobalHost.DependencyResolver.UseRedis("redis", 6379, "password", "MyApp");` |
+| SQL Server | `webForCore.Microsoft.AspNet.SignalR.SqlServer` (`Microsoft.AspNet.SignalR.SqlServer`) | `GlobalHost.DependencyResolver.UseSqlServer(ConfigurationManager.ConnectionStrings["SignalR"].ConnectionString);` |
+
+- **Connection settings** are the backplane's own, as on .NET Framework: a StackExchange.Redis configuration string
+  (`host:port,password=...,ssl=true,abortConnect=false`) and an event key, the Redis channel every instance of the
+  application shares; or a SQL Server connection string (with `TrustServerCertificate=True` or a trusted certificate,
+  as above). The SQL Server backplane creates its `[SignalR]` schema and tables at start, so its login needs
+  `CREATE SCHEMA` and `CREATE TABLE` the first time; turn Service Broker on in its database (`ALTER DATABASE ... SET
+  ENABLE_BROKER`) and it is notified of each message, otherwise it polls. `SqlScaleoutConfiguration.TableCount` spreads
+  the messages over several tables. Azure SQL Database isn't supported, as upstream.
+- **Sticky sessions aren't needed** with a backplane, as on IIS: any instance can serve any request of a connection,
+  long polling's polls and sends included. Every instance needs **the same `<machineKey>`**: SignalR protects its
+  connection and groups tokens with it, so a token one instance gave must read on the others and on an instance after
+  it restarts. With the keys the same, a client whose instance restarts reconnects to it (or to another) with its
+  connection and groups.
+- The **Redis and StackExchange.Redis packages' dependencies** (StackExchange.Redis.StrongName, StackExchange.Redis) are
+  NuGet packages, restored as they are: webForCore ships only Microsoft's assemblies.
+- **Azure Service Bus** (`Microsoft.AspNet.SignalR.ServiceBus`, `.ServiceBus3`) isn't built: `WindowsAzure.ServiceBus`
+  is .NET Framework only. Move to the Redis or SQL Server backplane (or Azure Cache for Redis).
+- The IIS gate tests run two instances of an application, each under its own `webforcore-host`, on each backplane
+  (`ScaleoutTests`, [TESTING.md](TESTING.md)).
 
 ## Troubleshooting
 

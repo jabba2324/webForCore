@@ -48,6 +48,7 @@ namespace IISGate
             Assert.StartsWith("/app/bundles/site?v=", values["bundle_script"]);
             Assert.StartsWith("/app/Content/css?v=", values["bundle_style"]);
             Assert.Equal("/LM/W3SVC/n/ROOT/app", values["appl_md_path"]);
+            Assert.Equal("/LM/W3SVC/n/ROOT/app", values["app_domain_app_id"]); // as IIS names the application (#207)
             Assert.Equal("/app/Probe.aspx", values["script_name"]);
             Assert.Equal("/app/Probe.aspx", values["url_var"]);
         }

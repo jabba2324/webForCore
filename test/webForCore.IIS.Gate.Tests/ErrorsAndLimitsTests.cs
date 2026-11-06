@@ -213,6 +213,45 @@ namespace IISGate
             Assert.StartsWith("files: 1, file upload.bin ", withinBody);
         }
 
+        // Over maxRequestLength, ASP.NET answers 500 and closes the connection without reading the body (its Content-Length
+        // is over the limit); over maxAllowedContentLength, request filtering answers 413.1 and Kestrel closes it, since it
+        // can't read a body over its limit. Each client gets its answer, as from IIS. The worker closed its connection to the
+        // host after an answer that didn't say so, and the host's pool sometimes sent the next request on it: that request's
+        // client was reset (LimitStatusIsIISs failed now and then on build-windows; about one request in a hundred here).
+        [Fact]
+        public async Task RequestsOverTheLimitsAreAnsweredEveryTime()
+        {
+            var cases = new[]
+            {
+                ("/limits/app/Files.ashx", "multipart", 8193, 500),
+                ("/limits/app/Form.ashx", "form", 16384, 500),
+                ("/limits/iis/Files.ashx", "multipart", 8193, 413),
+                ("/limits/app/Files.ashx", "multipart", 8192, 200),
+                ("/limits/iis/Form.ashx", "form", 8193, 413),
+            };
+            const string head = "--b\r\nContent-Disposition: form-data; name=\"file\"; filename=\"upload.bin\"\r\n\r\n", tail = "\r\n--b--\r\n";
+            var failures = new List<string>();
+            for (int i = 0; i < 60; i++)
+            {
+                foreach (var (path, kind, length, status) in cases)
+                {
+                    string body = kind == "form" ? "a=" + new string('x', length - 2) : head + new string('x', length - head.Length - tail.Length) + tail;
+                    var content = new ByteArrayContent(Encoding.UTF8.GetBytes(body));
+                    content.Headers.ContentType = MediaTypeHeaderValue.Parse(kind == "form" ? "application/x-www-form-urlencoded" : "multipart/form-data; boundary=b");
+                    try
+                    {
+                        using var response = await _server.Client.PostAsync(path, content);
+                        if ((int)response.StatusCode != status) failures.Add($"{i} {path} {length}: {(int)response.StatusCode}");
+                    }
+                    catch (HttpRequestException e)
+                    {
+                        failures.Add($"{i} {path} {length}: {e.GetBaseException().Message}");
+                    }
+                }
+            }
+            Assert.True(failures.Count == 0, $"{failures.Count} of {60 * cases.Length} requests:\n{string.Join("\n", failures)}");
+        }
+
         // Over maxAllowedContentLength, request filtering's 413.1 "Request Entity Too Large", before the application runs:
         // IIS 10's answer (IIS 7 to 8.5 answered 404.13, as webForCore did before #192).
         [Fact]

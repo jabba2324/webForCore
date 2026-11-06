@@ -76,24 +76,49 @@ namespace IISGate
         [Fact]
         public async Task RequestsDuringARestartAreAllAnswered()
         {
-            var before = await Current();
+            await AllAnsweredDuringRestarts(clients: 4, restarts: 1);
+        }
+
+        // #209: the same with more clients and restart after restart, which hits the moment a request is between the old
+        // worker's check that its application is still running and the runtime counting it more often. The runtime had
+        // already begun disposing by then and answered "Server Too Busy" (503) without the request being processed; on
+        // IIS such a request waits in http.sys's queue for the next worker, and here it goes to the next worker too.
+        [Fact]
+        public async Task RequestsDuringRepeatedRestartsUnderLoadAreAllAnswered()
+        {
+            await AllAnsweredDuringRestarts(clients: 16, restarts: 5);
+        }
+
+        private async Task AllAnsweredDuringRestarts(int clients, int restarts)
+        {
             using var stop = new CancellationTokenSource();
-            var statuses = new System.Collections.Concurrent.ConcurrentBag<HttpStatusCode>();
-            var load = Enumerable.Range(0, 4).Select(_ => Task.Run(async () =>
+            int answered = 0;
+            var others = new System.Collections.Concurrent.ConcurrentQueue<string>();
+            var load = Enumerable.Range(0, clients).Select(_ => Task.Run(async () =>
             {
                 while (!stop.IsCancellationRequested)
                 {
-                    statuses.Add((await _server.Client.GetAsync("/Domain.aspx")).StatusCode);
+                    using var response = await _server.Client.GetAsync("/Domain.aspx");
+                    Interlocked.Increment(ref answered);
+                    if (response.StatusCode != HttpStatusCode.OK)
+                    {
+                        var body = await response.Content.ReadAsStringAsync();
+                        others.Enqueue($"{DateTime.UtcNow:HH:mm:ss.fff} {(int)response.StatusCode} {(body.Length > 300 ? body[..300] : body)}");
+                    }
                 }
             })).ToArray();
             await Task.Delay(500);
-            Assert.Equal(HttpStatusCode.OK, (await _server.Client.GetAsync("/Restart.aspx")).StatusCode);
-            await Next(before, TimeSpan.FromSeconds(60));
-            await Task.Delay(500);
+            for (int i = 0; i < restarts; i++)
+            {
+                var before = await Current();
+                Assert.Equal(HttpStatusCode.OK, (await _server.Client.GetAsync("/Restart.aspx")).StatusCode);
+                await Next(before, TimeSpan.FromSeconds(60));
+                await Task.Delay(500);
+            }
             stop.Cancel();
             await Task.WhenAll(load);
-            Assert.True(statuses.Count > 10, $"{statuses.Count} requests");
-            Assert.All(statuses, status => Assert.Equal(HttpStatusCode.OK, status));
+            Assert.True(answered > 10, $"{answered} requests");
+            Assert.True(others.IsEmpty, $"{others.Count} of {answered} requests weren't answered 200:\n{string.Join("\n", others)}\nThe host's output:\n{OutputTail()}");
         }
 
         // A WebSocket open across a restart is aborted once the application's registered objects have stopped, without

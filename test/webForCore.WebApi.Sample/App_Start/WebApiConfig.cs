@@ -9,6 +9,10 @@ namespace WebApiSample
         {
             // Web API configuration and services
 
+            // As "Tracing in ASP.NET Web API 2" adds it (Microsoft.AspNet.WebApi.Tracing): Web API's trace records go
+            // to System.Diagnostics.Trace's listeners (TraceRecordListener, Global.asax.cs).
+            config.EnableSystemDiagnosticsTracing();
+
             // Web API routes
             config.MapHttpAttributeRoutes();
 

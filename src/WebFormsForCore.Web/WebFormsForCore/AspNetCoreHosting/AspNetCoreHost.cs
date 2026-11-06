@@ -145,7 +145,12 @@ namespace System.Web.Hosting
             var applicationManager = new ApplicationManager();
             // create BuildManagerHost in the worker app domain
             Type buildManagerHostType = typeof(System.Web.Compilation.BuildManagerHost);
-            var appId = ApplicationManager.CreateApplicationId(virtualPath, physicalPath);
+            // webForCore: HttpRuntime.AppDomainAppId is IIS's metabase path of the application, as the worker request's
+            // APPL_MD_PATH (site 1), not a hash of the folder's path (Cassini's ApplicationHost): the same on every server
+            // of a farm, as on IIS when the servers' site IDs match. SQL Server session state keys sessions by it
+            // (ASPStateTempApplications, SqlSessionStateProviderAsync), so servers with the site in different folders
+            // didn't share sessions.
+            var appId = "/LM/W3SVC/1/ROOT" + (virtualPath == "/" ? "" : virtualPath.TrimEnd('/'));
             var vpath = System.Web.VirtualPath.Create(virtualPath);
             var buildManagerHost = (System.Web.Compilation.BuildManagerHost)applicationManager.CreateInstanceInNewWorkerLoadContext(buildManagerHostType, appId, vpath, physicalPath, false);
             // call BuildManagerHost.RegisterAssembly to make Host type loadable in the worker app domain

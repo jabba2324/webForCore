@@ -35,6 +35,7 @@
             "bundle_style=" + Styles.Url("~/Content/css"),
             // The application's part of APPL_MD_PATH: the site's number is IIS's (webForCore's site is 1).
             "appl_md_path=" + System.Text.RegularExpressions.Regex.Replace(v["APPL_MD_PATH"], @"^/LM/W3SVC/\d+/", "/LM/W3SVC/n/"),
+            "app_domain_app_id=" + System.Text.RegularExpressions.Regex.Replace(HttpRuntime.AppDomainAppId, @"^/LM/W3SVC/\d+/", "/LM/W3SVC/n/"),
             "path_info_var=" + v["PATH_INFO"],
             "script_name=" + v["SCRIPT_NAME"],
             "url_var=" + v["URL"],

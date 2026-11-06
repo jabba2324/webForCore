@@ -59,6 +59,7 @@ Do this before changing anything, and present the findings to the user.
    | No `.csproj` for the web site (a solution `Project("{E24C65DC-...}")` web site), `CodeFile=` in `.aspx`/`.ascx`, `Bin/*.dll.refresh` | A Web Site Project: not a blocker, but Phase 2 differs (step 3) |
    | `Transaction=` in `@Page`, `System.EnterpriseServices` | COM+: not available |
    | `DataProtectionConfigurationProvider` in a `configProtectedData` section | Must be decrypted on Windows first |
+   | `UseServiceBus`, `Microsoft.AspNet.SignalR.ServiceBus`, `.ServiceBus3` | SignalR's Azure Service Bus backplane: not available (`WindowsAzure.ServiceBus` is .NET Framework only). The Redis and SQL Server backplanes work (`webForCore.Microsoft.AspNet.SignalR.StackExchangeRedis`, `.Redis`, `.SqlServer`, MIGRATING.md "Scaling out SignalR") |
 3. List NuGet packages and DLL references in three groups:
    - (a) replaced by webForCore (the Microsoft ASP.NET packages in Phase 2);
    - (b) managed libraries to keep;
@@ -147,18 +148,25 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
    `CS0104` (#122), and a Razor 1 view (MVC 3, Web Pages 1) with `@` before a C# keyword in a code block
    (`@string.Join(...)`) needs `@( ... )` (#174). A prebuilt net4x library that uses `CallContext` (`TypeLoadException`
    for `System.Runtime.Remoting.Messaging.CallContext`) needs a version with a .NET Standard or .NET build: SimpleInjector
-   3.1 → 3.3.2 with its ExecutionContextScoping (#178). Plug-in libraries built into their own folder need their
-   packages copied there (#150).
+   3.1 → 3.3.2 with its ExecutionContextScoping (#178). A package whose .NET Standard build has a smaller or another API
+   than its `net45` one keeps its `net45` build (`MissingMethodException` for the package's own types: CacheCow.Server and
+   CacheCow.Common 2.x under CacheCow.Server.WebApi, Hangfire 1.6, WindowsAzure.Storage 9; #31). Plug-in libraries
+   built into their own folder need their packages copied there (#150).
 6. Add `Program.cs` from `docs/MIGRATING.md` section 4. Use `HandleAllRequestsWithWebForms()` unless the app serves
    only `.aspx`/`.asmx`/`.ashx`. Session state (`Session`, MVC's `TempData`) needs nothing: it is in process, as
-   `<sessionState mode="InProc">` (or no `mode`, the default) was on IIS. Add `AddDistributedMemoryCache()` and
-   `UseAspNetCoreSessionProvider()` only if web.config's `<sessionState mode>` is `StateServer`, `SQLServer` or `Custom`
-   (tell the user, and ask which distributed cache to use: Redis, SQL Server or memory), or the user asks to scale out.
-   The provider is out of process: every session value must then be serializable (`docs/MIGRATING.md` section 4,
-   "Session state", #180). If IIS ran the app as an application under a site's path (`https://host/app`; ask the user,
-   or look for absolute links and cookies with `/app/`), add `.VirtualPath("/app")` ("An application under a path",
-   #190). Behind a proxy that ends TLS, the host applies its `X-Forwarded-*` headers (`WebForCore:Host:ForwardedHeaders`,
-   "Behind a reverse proxy", #194); keep a module that sets `REMOTE_ADDR` or `HTTPS` as it is.
+   `<sessionState mode="InProc">` (or no `mode`, the default) was on IIS. `mode="SQLServer"` and `mode="Custom"` with
+   Microsoft's Redis or SQL providers (`Microsoft.Web.RedisSessionStateProvider`, `SqlSessionStateProviderAsync`,
+   `RedisOutputCacheProvider`) keep their web.config and packages: they run as on IIS. Raise
+   `SqlSessionStateProviderAsync` and `Microsoft.AspNet.SessionState.SessionStateModule` 2.0.0 to 2.1.0-preview1 (and
+   the versions in web.config's `type`s), and remove the `OutputCacheModuleAsync` swap from `<system.webServer><modules>`
+   (`docs/MIGRATING.md` section 4, "Session state"). Add `AddDistributedMemoryCache()` and
+   `UseAspNetCoreSessionProvider()` only for `mode="StateServer"` (tell the user, and ask which distributed cache to
+   use: Redis, SQL Server or memory), or if the user asks to scale out without those providers. Out of process, every
+   session value must be serializable (#180). If IIS ran the app as an application under a site's path
+   (`https://host/app`; ask the user, or look for absolute links and cookies with `/app/`), add `.VirtualPath("/app")`
+   ("An application under a path", #190). Behind a proxy that ends TLS, the host applies its `X-Forwarded-*` headers
+   (`WebForCore:Host:ForwardedHeaders`, "Behind a reverse proxy", #194); keep a module that sets `REMOTE_ADDR` or
+   `HTTPS` as it is.
 7. Search the code for what behaves differently on Linux (`docs/MIGRATING.md` section 6), and fix each hit minimally:
    - `"~/bin` or `\bin` used to load or scan assemblies: they are in `bin_dotnet/`; use `HttpRuntime.BinDirectory` or
      the app's own setting (Umbraco: `umbracoBinDirectory` = `~/bin_dotnet`).
@@ -225,6 +233,7 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
    | Lost logins or view state errors after a restart | Add an explicit `<machineKey>` (ask the user for keys, or generate new ones and say so) |
    | "No parameterless constructor defined" for a controller, or a DI container (Unity, Ninject, StructureMap) that was never set up | Before 0.7.0, WebActivatorEx's start methods didn't run (upgrade to 0.7.0 or later). From 0.7.0 they run when they are in a `bin` assembly; a pre-start method in `App_Code` doesn't run, as on IIS: move it to a `bin` assembly, or call it from `Application_Start` (`docs/MIGRATING.md` section 3) |
    | "The SMTP host was not specified" from the app's own mail code | .NET's `SmtpClient` ignores `<mailSettings>`: replace `new SmtpClient()` with `WebFormsForCore.Net.Configuration.NetConfiguration.CreateSmtpClient()` |
+   | A trace log (`TextWriterTraceListener`, Web API's `EnableSystemDiagnosticsTracing`) stays empty | `<system.diagnostics>` isn't applied: add the listeners to `Trace.Listeners` in `Application_Start` (`docs/MIGRATING.md` section 5) |
    | `Conflicting versions of ASP.NET Web Pages detected: specified version is "1.0.0.0"` | An MVC 3/4 `webpages:Version`: set `3.0.0.0` (Phase 2 step 5) |
    | ``LINQ to Entities does not recognize the method '... Contains[Int32](System.ReadOnlySpan`1[...], Int32)'`` | No `<LangVersion>`: set the project's (Phase 2 step 2) |
    | `ArgumentNullException ... (Parameter 'path')` at `DirectoryInfo..ctor` in a plug-in loader | `DynamicDirectory` is null: `HttpRuntime.CodegenDir` (Phase 2 step 7) |
@@ -240,6 +249,7 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
    | `Could not load file or assembly 'System.IdentityModel, Version=4.0.0.0'` | Windows Identity Foundation, a blocker (Phase 0): stop and ask |
    | `FileNotFoundException` for a package of a plug-in built into its own folder | Copy the plug-in's packages there (`docs/MIGRATING.md` section 2, "Plug-in libraries") |
    | `MissingMethodException: ... AppDomainSetup.get_ConfigurationFile()` or `... AppDomain.DefineDynamicAssembly(...)` | Autofac.Configuration 3, Castle.Core 3 or NHibernate 4: newer versions (Phase 2 step 5) |
+   | `MissingMethodException` for a method of a package's own types, such as `CacheCow.Server.ICacheabilityValidator.IsCacheable(System.Net.Http.HttpRequestMessage)` | NuGet picked the package's .NET Standard build, whose API differs: reference its `net45` build (Phase 2 step 5) |
    | Prices shown with three decimals (`8.990`) | ICU's `en-US`/`en-GB` `NumberDecimalDigits` (Phase 2 step 7) |
    | `HttpException: Unable to serialize the session state` and `SerializationException: Type '...' is not marked as serializable` at `AspNetCoreSessionProvider.SetAndReleaseItemExclusive` (often the request after a redirect, with a view model in `TempData`) | `UseAspNetCoreSessionProvider()` where the app's session state was in process on IIS: remove it and `AddDistributedMemoryCache()` (Phase 2 step 6). If web.config says `StateServer`, `SQLServer` or `Custom`, the type was serializable on IIS too; otherwise ask the user before marking types `[Serializable]` |
 
