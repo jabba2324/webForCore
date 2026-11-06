@@ -27,8 +27,6 @@ namespace System.Web.Hosting
 {
 	public class AspNetCoreWorkerRequest : SimpleWorkerRequest, IAspNetCoreWorkerRequest
 	{
-		private const int MaxChunkLength = 64 * 1024;
-
 		private const int MaxHeaderBytes = 32 * 1024;
 
 
@@ -1212,9 +1210,17 @@ namespace System.Web.Hosting
 				length = fileSize - offset;
 			}
 
-			if (length == 0 || offset < 0 || length > fileSize - offset || SuppressOutput)
+			if (length == 0 || SuppressOutput)
 			{
 				return;
+			}
+
+			// webForCore: a range the file doesn't have (it became shorter after HttpResponse checked the range) is the
+			// HttpException of .NET Framework's worker requests (IIS7WorkerRequest, ISAPIWorkerRequest); it was sent as
+			// nothing (#187).
+			if (offset < 0 || length > fileSize - offset)
+			{
+				throw new HttpException(SR.GetString(SR.Invalid_range));
 			}
 
 			if (offset > 0)
@@ -1225,49 +1231,11 @@ namespace System.Web.Hosting
 			chunkEnded = false;
 			using (var noSyncContext = new SafeAsync())
 			{
-				if (length <= MaxChunkLength)
-				{
-					var fileBytes = ArrayPool<byte>.Shared.Rent((int)length);
-					try
-					{
-						int bytesRead = f.Read(fileBytes, 0, (int)length);
-						//SendResponseFromMemory(fileBytes, bytesRead);
-						Context.Response.Body.Write(fileBytes, 0, bytesRead);
-					}
-					finally
-					{
-						ArrayPool<byte>.Shared.Return(fileBytes);
-					}
-				}
-				else
-				{
-					var chunk = ArrayPool<byte>.Shared.Rent(MaxChunkLength);
-					try
-					{
-						var bytesRemaining = (int)length;
-
-						while (bytesRemaining > 0)
-						{
-							int bytesToRead = (bytesRemaining < MaxChunkLength) ? bytesRemaining : MaxChunkLength;
-							int bytesRead = f.Read(chunk, 0, bytesToRead);
-
-							//SendResponseFromMemory(chunk, bytesRead);
-							Context.Response.Body.Write(chunk, 0, bytesRead);
-							bytesRemaining -= bytesRead;
-
-							// flush to release keep memory
-							if ((bytesRemaining > 0) && (bytesRead > 0))
-							{
-								//FlushResponse(false);
-								Context.Response.Body.Flush();
-							}
-						}
-					}
-					finally
-					{
-						ArrayPool<byte>.Shared.Return(chunk);
-					}
-				}
+				// webForCore: reads until the range is sent or the file ends, as .NET Framework reads a file's range
+				// (HttpFileResponseElement); one Read was taken to fill the buffer, and the chunks' loop spun if Read
+				// returned 0 (#187).
+				var body = Context.Response.Body;
+				FileRange.Copy(f, body, length, body.Flush);
 			}
 		}
 
