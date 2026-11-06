@@ -63,11 +63,13 @@ namespace HostTests
 
         record State(int Process, string Warm);
 
+        // An answer other than 200 fails with its error and, on Linux, the user's inotify instances first (#204: on a
+        // machine shared with other test runs, their processes held 119 of the 128, and the worker answered 500).
         static async Task<State> GetState(Running host)
         {
             var response = await host.GetAsync("/State.aspx");
             var body = await response.Content.ReadAsStringAsync();
-            Assert.True(response.StatusCode == HttpStatusCode.OK, $"{response.StatusCode}: {body}\n{host.Output}");
+            Assert.True(response.StatusCode == HttpStatusCode.OK, host.Unexpected("/State.aspx", response, body));
             var match = Regex.Match(body, @"process=(\d+);warm=([^;]*);");
             Assert.True(match.Success, body);
             return new State(int.Parse(match.Groups[1].Value), match.Groups[2].Value);
@@ -193,9 +195,9 @@ namespace HostTests
             }
             var fromOld = answers.TakeWhile(a => a.State.Process == first.Process).ToList();
             var fromNew = answers.Skip(fromOld.Count).ToList();
-            Assert.True(fromNew.Count >= 3, $"the next worker didn't serve:\n{host.Output}");
+            Assert.True(fromNew.Count >= 3, host.Explain("the next worker didn't serve"));
             // While the next worker warmed up, the old one served (each request takes a moment; warm-up takes 4 s).
-            Assert.True(fromOld.Count(a => a.Overlapping) >= 3, $"{fromOld.Count(a => a.Overlapping)} answers from the old worker during the warm-up");
+            Assert.True(fromOld.Count(a => a.Overlapping) >= 3, host.Explain($"{fromOld.Count(a => a.Overlapping)} answers from the old worker during the warm-up"));
             // Once the next worker serves, the old one doesn't, and every answer of the next one comes after its warm-up.
             Assert.All(fromNew, a => Assert.NotEqual(first.Process, a.State.Process));
             Assert.All(fromNew, a => Assert.Equal(Warmed("1"), a.State.Warm));
