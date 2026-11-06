@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Net;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using Xunit;
 
@@ -158,15 +159,11 @@ namespace HostTests
         // makes the same decision on, every time (CI's iis-compare job, tools/ci/iis_fcn.cs): a new file
         // in a subfolder, a subfolder's LastWriteTime set after the start (a restart in Single mode only, as IIS's
         // Single mode tells bin of any change below it), and a file in a folder whose name starts with "bin" (Single
-        // mode compares the special folders' names as prefixes).
+        // mode compares the special folders' names as prefixes). The cases, with IIS 10's decisions, are
+        // tools/ci/iis-fcn-cases.json, which iis_fcn.cs reads too: webForCore's decision is asserted here, and compared
+        // with IIS's there (#189).
         [Theory]
-        [InlineData(null, "file", true)]
-        [InlineData("Default", "file", true)]
-        [InlineData("Single", "file", true)]
-        [InlineData("Default", "folder time", false)]
-        [InlineData("Single", "folder time", true)]
-        [InlineData("Default", "binaries", false)]
-        [InlineData("Single", "binaries", true)]
+        [MemberData(nameof(FcnModeCases))]
         public async Task AChangeInBinDotnetRestartsTheApplicationAndStartingDoesNot(string fcnMode, string change, bool restarts)
         {
             using var site = new Site(fcnMode);
@@ -175,9 +172,12 @@ namespace HostTests
             using var app = site.Start();
             var first = await Get(app, "");
             await Task.Delay(5000);
+            // Every case's precondition, and the start case's assertion: webForCore doesn't restart a site as it starts.
+            Assert.False(change == "start" && restarts, "iis-fcn-cases.json: a start case with webForCore restarting");
             Assert.False(app.Process.HasExited, "the application restarted while it started\n" + app.Output);
             Assert.Equal(first["process"], (await Get(app, ""))["process"]);
             Assert.DoesNotContain("is shutting down", app.Output);
+            if (change == "start") return;
 
             var cs = Path.Combine(site.Directory, "bin_dotnet", "cs");
             switch (change)
@@ -185,6 +185,7 @@ namespace HostTests
                 case "file": File.WriteAllText(Path.Combine(cs, "new.txt"), "new"); break;
                 case "folder time": System.IO.Directory.SetLastWriteTimeUtc(cs, DateTime.UtcNow); break;
                 case "binaries": File.WriteAllText(Path.Combine(binaries, "x.txt"), "x"); break;
+                default: throw new ArgumentException($"iis-fcn-cases.json: unknown change \"{change}\"");
             }
 
             if (restarts)
@@ -197,6 +198,15 @@ namespace HostTests
                 await Task.Delay(5000);
                 Assert.False(app.Process.HasExited, $"the change ({change}) restarted the application\n" + app.Output);
             }
+        }
+
+        // tools/ci/iis-fcn-cases.json's cases (#189), and fcnMode unset (Default), which IIS isn't compared in.
+        public static IEnumerable<object[]> FcnModeCases()
+        {
+            yield return new object[] { null, "file", true };
+            using var cases = JsonDocument.Parse(File.ReadAllText(Path.Combine(Repository, "tools", "ci", "iis-fcn-cases.json")));
+            foreach (var c in cases.RootElement.GetProperty("cases").EnumerateArray())
+                yield return new object[] { c.GetProperty("fcnMode").GetString(), c.GetProperty("change").GetString(), c.GetProperty("webForCore").GetString() == "restart" };
         }
 
         [Fact]
