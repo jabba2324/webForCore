@@ -125,13 +125,18 @@ namespace System.Web.Hosting
 			set { Context.Items[TrySkipIisCustomErrorsKey] = value; }
 		}
 
+		// webForCore: the client's connection closes after the response (ASP.NET's error page for a body over maxRequestLength,
+		// HttpResponse.CloseConnectionAfterError), as on IIS, with the connection to webforcore-host kept open (#219).
+		internal void CloseClientConnectionAfterResponse() => WebFormsForCore.Hosting.WorkerProcess.CloseClientConnection(Context);
+
 		// webForCore: the connection closes after the response, with "Connection: close" when the response hasn't started,
 		// so that the other side knows. Under webforcore-host, once the response has started (ASP.NET's error for a body over
 		// maxRequestLength flushes its error page, then closes, without reading the body), the connection stays open and
 		// Kestrel drains the unread body, as for any request. Closed after a response that didn't say so, it was a connection
 		// the host's pool sent its next request on, and that request's client was reset now and then
-		// (ErrorsAndLimitsTests.LimitStatusIsIISs on Windows). The connection is the host's, not the client's, which the host
-		// kept open either way. Run on its own, the application closes the client's connection as before.
+		// (ErrorsAndLimitsTests.LimitStatusIsIISs on Windows). The connection is the host's, not the client's; the host
+		// closes the client's after that error page (CloseClientConnectionAfterResponse, #219). Run on its own, the application
+		// closes the client's connection as before.
 		public override void CloseConnection()
 		{
 			if (Context.Response.HasStarted)

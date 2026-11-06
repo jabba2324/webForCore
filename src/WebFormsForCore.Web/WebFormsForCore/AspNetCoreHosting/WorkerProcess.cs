@@ -58,6 +58,9 @@ namespace WebFormsForCore.Hosting
 		internal const string ExpectHeader = "X-WebForCore-Expect";
 		internal const string HostAddedExpectKey = "webForCore.HostAddedExpect";
 		internal const string RestartingHeader = "X-WebForCore-Restarting";
+		// #219: response header with which the worker asks the host to close the client's connection after the response
+		// (Connection: close), where IIS closes it; the connection between the worker and the host stays open.
+		internal const string CloseHeader = "X-WebForCore-Close";
 
 		static readonly string socketPath = Variable(SocketVariable);
 		static readonly string id = Variable(IdVariable);
@@ -127,6 +130,24 @@ namespace WebFormsForCore.Hosting
 			{
 				return false;
 			}
+		}
+
+		// #219: the client's connection closes after this response, as IIS closes it after request filtering's rejections
+		// (whatever page httpErrors then sends) and after ASP.NET's error for a body over maxRequestLength. In a worker the
+		// host closes it (CloseHeader), and the worker's connection to the host, which its pool reuses, stays open; run on its
+		// own, the application says Connection: close itself. Set when the response starts, so that a response httpErrors
+		// replaces keeps it.
+		internal static void CloseClientConnection(HttpContext context)
+		{
+			var response = context.Response;
+			if (response.HasStarted || context.Items.ContainsKey(CloseHeader)) return;
+			context.Items[CloseHeader] = true;
+			response.OnStarting(() =>
+			{
+				if (IsWorker) response.Headers[CloseHeader] = "1";
+				else response.Headers.Connection = "close";
+				return Task.CompletedTask;
+			});
 		}
 
 		// The host's connection details, before any of the application's middleware.

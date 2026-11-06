@@ -123,6 +123,10 @@ commit that made it, and its issue, say why.
   the worker's restarting header, so that webforcore-host sends it to the next worker (#209), with its body: the
   host keeps a small body, and has the worker's Kestrel ask for a larger one (`Expect: 100-continue`), which
   `AspNetCoreWorkerRequest.ParseHeaders` hides from System.Web (#214).
+  `HttpResponse.WriteErrorMessage`, before it flushes the error page it closes the connection after
+  (`CloseConnectionAfterError`: a body over `maxRequestLength`), asks the worker request to have the client's
+  connection closed, as IIS closes it (`Connection: close`, from webforcore-host, which keeps its connection to the
+  worker); request filtering's rejections (`IIS/IISModules.cs`) do the same (#219).
   `AspNetCoreWorkerRequest.CloseConnection` sends `Connection: close` when the response hasn't started. In a worker of
   webforcore-host, once the response has started, it leaves the connection to the host open (Kestrel drains the
   unread body): a close the response didn't announce reset the next request the host's pool sent on that connection.

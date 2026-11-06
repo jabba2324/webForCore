@@ -26,6 +26,9 @@ static class WorkerProtocol
 	// Response header of a worker that is shutting down and didn't process the request (with 503): the host can send
 	// the request to the next worker (RequestBody).
 	public const string RestartingHeader = "X-WebForCore-Restarting";
+	// #219: response header of a worker that asks for the client's connection to be closed after the response, as IIS
+	// closes it; the host sends Connection: close in its place.
+	public const string CloseHeader = "X-WebForCore-Close";
 
 	// Control messages, one line each, worker to host: "<token> ready <id> <virtual path>" once the worker serves (the
 	// initialization pages are under the application's path, #190), and

@@ -177,6 +177,8 @@ namespace WebFormsForCore.Hosting.IIS
 				// the host had read it, and a client was reset (ErrorsAndLimitsTests on Windows). The client's connection is the
 				// host's, which keeps it either way.
 				if (bodySize != null && !bodySize.IsReadOnly) bodySize.MaxRequestBodySize = null;
+				// #219: IIS closes the client's connection after it, as after its other rejections (CI's iis-compare job).
+				WorkerProcess.CloseClientConnection(context);
 				return await WriteError(context, 413, 1, "Request Entity Too Large", "The request filtering module is configured to deny a request that exceeds the request content length.")
 					.ContinueWith(_ => true, TaskContinuationOptions.ExecuteSynchronously);
 			}
@@ -232,8 +234,13 @@ namespace WebFormsForCore.Hosting.IIS
 			return false;
 		}
 
-		Task<bool> Reject(HttpContext context, int subStatus, string reason) =>
-			WriteError(context, 404, subStatus, "Not Found", reason).ContinueWith(_ => true, TaskContinuationOptions.ExecuteSynchronously);
+		// #219: IIS 10 closes the client's connection after a rejection, also when httpErrors answers it with a page of its
+		// own (CI's iis-compare job).
+		Task<bool> Reject(HttpContext context, int subStatus, string reason)
+		{
+			WorkerProcess.CloseClientConnection(context);
+			return WriteError(context, 404, subStatus, "Not Found", reason).ContinueWith(_ => true, TaskContinuationOptions.ExecuteSynchronously);
+		}
 
 		// <httpRedirect>
 		async Task<bool> HttpRedirect(HttpContext context, XElement section)

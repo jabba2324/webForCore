@@ -59,15 +59,22 @@ sealed class WorkerTransformer : HttpTransformer
 		}
 	}
 
-	public override ValueTask<bool> TransformResponseAsync(HttpContext context, HttpResponseMessage? proxyResponse, CancellationToken cancellationToken)
+	public override async ValueTask<bool> TransformResponseAsync(HttpContext context, HttpResponseMessage? proxyResponse, CancellationToken cancellationToken)
 	{
 		if (canRetry && body.CanSendAgain && proxyResponse is { StatusCode: HttpStatusCode.ServiceUnavailable }
 			&& proxyResponse.Headers.Contains(WorkerProtocol.RestartingHeader))
 		{
 			WorkerRestarting = true;
-			return new ValueTask<bool>(false); // nothing copied: the pool sends the request again
+			return false; // nothing copied: the pool sends the request again
 		}
-		return base.TransformResponseAsync(context, proxyResponse, cancellationToken);
+		if (!await base.TransformResponseAsync(context, proxyResponse, cancellationToken)) return false;
+		// #219: the worker asks for the client's connection to be closed after the response, where IIS closes it (request
+		// filtering's rejections, ASP.NET's error for a body over maxRequestLength). The worker's own connection stays open
+		// for the next request. HTTP/2 and HTTP/3 have no Connection header.
+		if (context.Response.Headers.Remove(WorkerProtocol.CloseHeader)
+			&& (HttpProtocol.IsHttp11(context.Request.Protocol) || HttpProtocol.IsHttp10(context.Request.Protocol)))
+			context.Response.Headers.Connection = "close";
+		return true;
 	}
 
 	static string Endpoint(IPAddress? address, int port) =>
