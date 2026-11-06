@@ -148,7 +148,7 @@ namespace IISGate
             { "DELETE", "Page.aspx", 404, 200, true },                       // 404.6 verbs
             { "GET", "file.forbidden", 404, 200, true },                     // 404.7 fileExtensions
             { "GET", "App_Data/data.txt", 404, 200, true },                  // 404.8 hiddenSegments
-            { "GET", "data.txt (X-Big)", 404, 200, true },                   // 404.10 headerLimits
+            { "GET", "data.txt (X-Big)", 431, 431, true },                   // 431.0 headerLimits (IIS 7 to 8.5: 404.10)
             { "GET", "a%2525b.txt", 404, 200, true },                        // 404.11 double escaping
             { "GET", "data.txt?q=" + new string('q', 60), 404, 200, true },  // 404.15 maxQueryString
             { "GET", new string('l', 200) + ".txt", 404, 200, true },        // 404.14 maxUrl

@@ -109,20 +109,31 @@ namespace IISGate
                 for (int n = 0; !stop.IsCancellationRequested; n++)
                 {
                     HttpResponseMessage response;
-                    string sent = null;
-                    if (!withBodies) response = await _server.Client.GetAsync("/Domain.aspx");
-                    else
+                    string sent = null, what = "GET";
+                    try
                     {
-                        // Small bodies, bodies the host keeps in memory until the request is answered (up to 49,152 bytes)
-                        // and larger ones, which it sends only when the application reads them; and bodies of unknown
-                        // length (chunked).
-                        sent = $"{client}-{n}-" + new string((char)('a' + n % 26), (n % 3) switch { 0 => 200, 1 => 20000, _ => 100000 });
-                        HttpContent content = client % 2 == 0
-                            ? new FormUrlEncodedContent(new Dictionary<string, string> { ["data"] = sent })
-                            : new StringContent(sent, Encoding.UTF8, "text/plain");
-                        using var request = new HttpRequestMessage(client % 2 == 0 ? HttpMethod.Post : HttpMethod.Put, "/Posted.aspx") { Content = content };
-                        if (n % 4 == 3) request.Headers.TransferEncodingChunked = true;
-                        response = await _server.Client.SendAsync(request);
+                        if (!withBodies) response = await _server.Client.GetAsync("/Domain.aspx");
+                        else
+                        {
+                            // Small bodies, bodies the host keeps in memory until the request is answered (up to 49,152 bytes)
+                            // and larger ones, which it sends only when the application reads them; and bodies of unknown
+                            // length (chunked).
+                            sent = $"{client}-{n}-" + new string((char)('a' + n % 26), (n % 3) switch { 0 => 200, 1 => 20000, _ => 100000 });
+                            HttpContent content = client % 2 == 0
+                                ? new FormUrlEncodedContent(new Dictionary<string, string> { ["data"] = sent })
+                                : new StringContent(sent, Encoding.UTF8, "text/plain");
+                            using var request = new HttpRequestMessage(client % 2 == 0 ? HttpMethod.Post : HttpMethod.Put, "/Posted.aspx") { Content = content };
+                            if (n % 4 == 3) request.Headers.TransferEncodingChunked = true;
+                            what = $"{request.Method} of {sent.Length} characters{(n % 4 == 3 ? ", chunked" : "")}";
+                            response = await _server.Client.SendAsync(request);
+                        }
+                    }
+                    catch (HttpRequestException e)
+                    {
+                        // The client's connection was reset or closed without an answer.
+                        Interlocked.Increment(ref answered);
+                        others.Enqueue($"{DateTime.UtcNow:HH:mm:ss.fff} {what}: {e.GetBaseException().Message}");
+                        continue;
                     }
                     using (response)
                     {

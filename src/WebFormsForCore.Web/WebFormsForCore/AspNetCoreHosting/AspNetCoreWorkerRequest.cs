@@ -117,6 +117,10 @@ namespace System.Web.Hosting
 			Context = context;
 		}
 
+		// webForCore: WebFormsMiddleware counts the request as one of HttpRuntime's active requests from before its check that
+		// the application is still running until the runtime has completed the response (#214).
+		internal const string ReleaseRuntimeCountKey = "webForCore.ReleaseRuntimeCount";
+
 		// webForCore: IIS's fTrySkipCustomErrors, for the httpErrors module (IIS/IISModules.cs) in the hosting layer.
 		public const string TrySkipIisCustomErrorsKey = "webForCore.TrySkipIisCustomErrors";
 		internal override bool TrySkipIisCustomErrors
@@ -674,6 +678,8 @@ namespace System.Web.Hosting
 #if DebugWF4C
 				Debug.WriteLine($"Request {Context.Request.Path} finished");
 #endif
+				// webForCore: the runtime is done with the request; a WebSocket or a file transfer runs on (#214).
+				(Context.Items[ReleaseRuntimeCountKey] as Action)?.Invoke();
 				if (pendingWebSocket != null) await RunWebSocket();
 				else if (pendingTransfer != null) await RunTransfer();
 			}

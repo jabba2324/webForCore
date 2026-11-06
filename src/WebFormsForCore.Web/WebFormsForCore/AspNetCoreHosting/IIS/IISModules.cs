@@ -190,7 +190,12 @@ namespace WebFormsForCore.Hosting.IIS
 			{
 				var name = Attr(header, "header");
 				if (name != null && request.Headers.TryGetValue(name, out var value) && value.ToString().Length > Long(header, "sizeLimit", long.MaxValue))
-					return await Reject(context, 10, "The request filtering module is configured to deny a request where the header is too long.");
+				{
+					// IIS 10 answers 431.0 "Request Header Fields Too Large" (IIS 7 to 8.5: 404.10), as CI's iis-compare job saw (#219).
+					WorkerProcess.CloseClientConnection(context);
+					return await WriteError(context, 431, 0, "Request Header Fields Too Large", "The request filtering module is configured to deny a request header that is too large.")
+						.ContinueWith(_ => true, TaskContinuationOptions.ExecuteSynchronously);
+				}
 			}
 
 			var verbs = Element(section, "security/requestFiltering/verbs");
