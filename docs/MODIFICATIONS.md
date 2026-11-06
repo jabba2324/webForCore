@@ -129,6 +129,10 @@ commit that made it, and its issue, say why.
   `AspNetCoreWorkerRequest.ParseHeaders` stores the request's unknown headers whatever the path: the cookieless
   session check it took from IIS's filter returned before storing them when a path had a `(` and no `/(...)/`
   (#170, OData's `/People(1)` lost `Prefer`).
+  `AspNetCoreHost.GetProcessToken`, `GetProcessUser` and `GetProcessSid` (the worker request's `GetUserToken`) give no
+  token, an empty name and no SID off Windows, where `WindowsIdentity.GetCurrent` threw
+  `PlatformNotSupportedException` for `Request.LogonUserIdentity` and under `<identity impersonate="true"/>` (#165);
+  [NAMESPACES.md](NAMESPACES.md#systemweb-srcwebformsforcoreweb) says what an application gets.
 - **Integrated-mode semantics** on the classic pipeline: writable `Response.Headers`, the Content-Type rule, the
   server name from the Host header, `X-AspNet-Version` and the default `Cache-Control: private` only once a managed
   handler ran, the response was flushed or an error was reported; a cache header (`Expires`, `Cache-Control`, ...) set
