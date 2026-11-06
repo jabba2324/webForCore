@@ -5,9 +5,6 @@
 name: IIS fcnMode stability
 
 on:
-  # Temporary: a workflow_dispatch workflow runs only from the default branch, so this branch measures on push.
-  push:
-    branches: [fix/189-fcn-stability]
   workflow_dispatch:
     inputs:
       runs:

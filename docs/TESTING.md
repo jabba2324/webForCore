@@ -150,11 +150,11 @@ and IIS 10's: Host.Tests' `AChangeInBinDotnetRestartsTheApplicationAndStartingDo
 `bin_dotnet`) on Linux and Windows, and the job fails if a case's two decisions differ or if IIS decides otherwise than
 it did in every earlier run. In two cases IIS 10 varies from run to run (#189), and the job records a run where it
 decides otherwise rather than failing: in Single mode it didn't restart for `bin\cs`'s LastWriteTime within 20 s in 6
-of 149 runs, and restarted at the start in 1 (CI's runs, and `.github/workflows/iis-fcn-stability.yml`, a
+of 209 runs, and restarted at the start in 1 (CI's runs, and `.github/workflows/iis-fcn-stability.yml`, a
 workflow_dispatch workflow that runs the checks many times on new sites and counts IIS's decisions). A third site, in
 Single mode, is written into a folder IIS already serves, as a deployment copies a site, and whether its first request
 restarts it is recorded only: Windows reports the copied folders as modified when the application first opens them,
-and IIS 10 restarted for that in all 148 of #189's runs (in some runs and not in others in #167's investigation).
+and IIS 10 restarted for that in all 208 of #189's runs (in some runs and not in others in #167's investigation).
 webForCore doesn't.
 
 Then a request running when the application restarts (#181): `tools/ci/iis_drain.cs` writes a site with
