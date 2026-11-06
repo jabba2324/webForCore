@@ -230,6 +230,10 @@ no event for it:
   first trace. A listener the application's `Program.cs` added before is kept, after the configured ones.
 - An attribute that a listener, source or switch type doesn't support (`GetSupportedAttributes()`) isn't an error; .NET
   Framework rejected it.
+- A source whose configuration is in error (a listener type that isn't there) throws .NET Framework's
+  `ConfigurationErrorsException` when first used, as on .NET Framework, but only then: .NET's `TraceSource` then stays
+  without listeners. On .NET Framework each use throws again, and so does `Trace.Refresh()`, which refreshes every
+  source (found by CI's `iis-compare`).
 - A `<filter>` from configuration doesn't apply to `XmlWriterTraceListener.TraceTransfer`.
 - `EventLogTraceListener` needs Windows: elsewhere .NET's System.Diagnostics.EventLog doesn't support event logs, and
   creating one is a configuration error (`Could not create System.Diagnostics.EventLogTraceListener.`).

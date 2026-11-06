@@ -114,7 +114,8 @@ namespace WebApiGate
         }
 
         // A listener whose type doesn't exist: the source fails with .NET Framework's ConfigurationErrorsException when
-        // it is first used.
+        // it is first used. The sample restarts after the request (TraceController: on .NET Framework the source would
+        // make Trace.Refresh() throw).
         [Fact]
         public async Task AListenerOfAnUnknownTypeIsAConfigurationError()
         {

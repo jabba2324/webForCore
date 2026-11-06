@@ -203,6 +203,13 @@ namespace WebApiSample.Controllers
             {
                 return Error(e);
             }
+            finally
+            {
+                // On .NET Framework the source stays broken: each use, and Trace.Refresh() (which refreshes every live
+                // source), throws the error again. So the application restarts after the response, for the requests
+                // that follow.
+                System.Web.HttpRuntime.UnloadAppDomain();
+            }
         }
 
         private static object Error(Exception e)
