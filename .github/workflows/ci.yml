@@ -154,6 +154,24 @@ jobs:
           path: test/webForCore.Oidc.Gate.Tests/bin/Release/net10.0/oidc-responses.json
           if-no-files-found: error
 
+      # ... and what webForCore protected with each <machineKey> of MachineKeyInteropTests (#191), for .NET Framework
+      # 4.8 to read (machinekey-framework-interop).
+      - name: Upload webForCore's machineKey outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: machinekey-webforcore
+          path: test/webForCore.IIS.Gate.Tests/bin/Release/net10.0/machinekey-webforcore/
+          if-no-files-found: warn
+
+      # ... and every response of the virtual path sample, the application /app (VirtualPathTests, #190, #194).
+      - name: Upload the virtual path responses
+        uses: actions/upload-artifact@v4
+        with:
+          name: vpath-responses
+          path: test/webForCore.IIS.Gate.Tests/bin/Release/net10.0/vpath-responses.json
+          if-no-files-found: error
+
 
 
       # ... and every request Packages.Gate.Tests sent to the third-party packages sample (Ninject, Swashbuckle, CacheCow).
