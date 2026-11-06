@@ -56,6 +56,12 @@
         <EmbeddedResource Include="FrameworkData\Sql\*">
             <LogicalName>System.Web.Management.Sql.%(FileName)%(Extension)</LogicalName>
         </EmbeddedResource>
+        <!-- webForCore: the invariant locale's sort-key weights behind .NET Framework 4.8's
+             StringComparer.InvariantCultureIgnoreCase hash, read from .NET Framework on Windows (#212,
+             tools/stringhash/FrameworkSortKeys), for WebFormsForCore\InvariantIgnoreCaseHash.cs. -->
+        <EmbeddedResource Include="FrameworkData\InvariantIgnoreCaseWeights.txt">
+            <LogicalName>System.Web.Util.InvariantIgnoreCaseWeights.txt</LogicalName>
+        </EmbeddedResource>
         <EmbeddedResource Include="*.resx">
             <LogicalName>%(FileName).resources</LogicalName>
         </EmbeddedResource>

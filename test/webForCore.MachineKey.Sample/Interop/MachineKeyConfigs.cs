@@ -123,7 +123,8 @@ namespace MachineKeyInterop
             configs.Add(new MachineKeyConfig("hmacsha256-aes-targetframework45-ticket40", "HMACSHA256", "AES", null, "4.5",
                 ticketCompatibilityMode: "Framework40"));
             // IsolateApps and IsolateByAppId on explicit keys: only the Framework20 modes take them (Framework45 rejects a
-            // key with a modifier); the key's first bytes are replaced with a hash of the application's virtual path or ID.
+            // key with a modifier); the key's first bytes are replaced with a hash of the application's virtual path or ID:
+            // StringComparer.InvariantCultureIgnoreCase's on .NET Framework, which webForCore reproduces (#212).
             configs.Add(new MachineKeyConfig("sha1-aes-framework20sp1-isolateapps-root", "SHA1", "AES", "Framework20SP1", null, ",IsolateApps"));
             configs.Add(new MachineKeyConfig("sha1-aes-framework20sp1-isolateapps", "SHA1", "AES", "Framework20SP1", null, ",IsolateApps", "/interop"));
             configs.Add(new MachineKeyConfig("hmacsha256-aes-framework20sp2-isolateapps", "HMACSHA256", "AES", "Framework20SP2", null, ",IsolateApps", "/interop"));
@@ -135,17 +136,6 @@ namespace MachineKeyInterop
         // Both sides check that each listed one still differs.
         public static string KnownDifference(string config, string kind)
         {
-            // IsolateByAppId on an explicit key replaces bytes 4 to 7 with a hash of HttpRuntime.AppDomainAppId (IIS's
-            // /LM/W3SVC/1/ROOT here, as FrameworkMachineKey creates the application): on .NET Framework
-            // StringComparer.InvariantCultureIgnoreCase's, as for IsolateApps below, so it differs even for the same ID.
-            // (MachineKey.Protect, and so the cookies, reject a key with a modifier on both runtimes.)
-            if (config.EndsWith("-isolatebyappid", StringComparison.Ordinal) && (kind == "forms-ticket" || kind == "encode"))
-                return "IsolateByAppId on an explicit key: the hash of the application ID differs";
-            // IsolateApps on an explicit key replaces its first 4 bytes with a hash of the virtual path: on .NET Framework
-            // StringComparer.InvariantCultureIgnoreCase's (from Windows' NLS sort keys), which .NET doesn't have (its
-            // string hashes are randomized; webForCore uses ASP.NET's stable string hash, StringUtil.GetStringHashCode).
-            if (config.Contains("-isolateapps") && (kind == "forms-ticket" || kind == "encode"))
-                return "IsolateApps on an explicit key: the hash of the virtual path differs";
             // No compatibilityMode and no targetFramework: Framework20SP1 on .NET Framework, Framework45 on webForCore,
             // which runs every application as targetFramework 4.5 or later (IIS-COMPATIBILITY.md, "Compatibility
             // decisions"). Only the forms ticket depends on it.

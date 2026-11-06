@@ -806,6 +806,85 @@ jobs:
           path: ${{ runner.temp }}/machinekey/
           if-no-files-found: warn
 
+  # .NET Framework's StringComparer.InvariantCultureIgnoreCase hash (#212), which System.Web uses for
+  # __VIEWSTATEGENERATOR and the <machineKey> IsolateApps and IsolateByAppId modifiers: webForCore builds the NLS sort key
+  # from src/WebFormsForCore.Web/FrameworkData/InvariantIgnoreCaseWeights.txt, the weights of the code units whose
+  # weights .NET Framework 4.8 gives the same on Windows Server 2022 and 2025 (invariant sort versions 6.4.3 and 6.5.2),
+  # and IIS.Gate.Tests' InvariantHashTests compare its hashes with test/webForCore.IIS.Gate.Tests/FrameworkData/
+  # invariant-hash-framework.tsv. tools/stringhash/FrameworkSortKeys reads the weights on each version again, checks the
+  # committed table and hashes against .NET Framework, and has 300,000 random strings of the table's characters hashed
+  # by .NET Framework and by webForCore's code; a difference fails the job. The 2025 job's output (the table merged with
+  # the 2022 job's, and the hashes) is the invariant-hash-framework artifact, to commit when the table or the strings
+  # change. It needs nothing of webForCore's build. Not a required check (docs/TESTING.md).
+  invariant-hash-framework-data-2022:
+    runs-on: windows-2022
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET (global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Read the weights on Windows Server 2022 and check the committed table and hashes
+        run: |
+          dotnet build tools/stringhash/FrameworkSortKeys/FrameworkSortKeys.csproj -c Release -nodeReuse:false
+          tools/stringhash/FrameworkSortKeys/bin/Release/net48/FrameworkSortKeys.exe "$RUNNER_TEMP/invariant-hash" \
+            --check src/WebFormsForCore.Web/FrameworkData/InvariantIgnoreCaseWeights.txt \
+            test/webForCore.IIS.Gate.Tests/FrameworkData/invariant-hash-framework.tsv
+
+      - name: Upload the weights
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: invariant-hash-framework-2022
+          path: ${{ runner.temp }}/invariant-hash/
+          if-no-files-found: warn
+
+  invariant-hash-framework-data:
+    needs: invariant-hash-framework-data-2022
+    if: ${{ !cancelled() }}
+    runs-on: windows-2025
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET (global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: invariant-hash-framework-2022
+          path: ${{ runner.temp }}/invariant-hash-2022
+
+      - name: Read the weights on Windows Server 2025, merge them with 2022's and check the committed table and hashes
+        run: |
+          dotnet build tools/stringhash/FrameworkSortKeys/FrameworkSortKeys.csproj -c Release -nodeReuse:false
+          tools/stringhash/FrameworkSortKeys/bin/Release/net48/FrameworkSortKeys.exe "$RUNNER_TEMP/invariant-hash" \
+            --other "$(ls "$RUNNER_TEMP"/invariant-hash-2022/full-*.txt)" \
+            --check src/WebFormsForCore.Web/FrameworkData/InvariantIgnoreCaseWeights.txt \
+            test/webForCore.IIS.Gate.Tests/FrameworkData/invariant-hash-framework.tsv
+          cmp src/WebFormsForCore.Web/FrameworkData/InvariantIgnoreCaseWeights.txt "$RUNNER_TEMP/invariant-hash/InvariantIgnoreCaseWeights.txt"
+
+      - name: Upload the table and the hashes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: invariant-hash-framework
+          path: ${{ runner.temp }}/invariant-hash/
+          if-no-files-found: warn
+
   # A version tag: the tested packages become a GitHub release (not published to nuget.org), and the feed is rebuilt.
   release:
     # Both platforms must pass: Windows is the development environment (#46).

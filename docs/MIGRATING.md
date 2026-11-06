@@ -830,10 +830,12 @@ value="true" />` in `<appSettings>` makes `Request.Url` from the `Host` header i
   the reverse (forms tickets, `MachineKey.Protect`/`Unprotect` and `Encode`/`Decode`, and Katana and ASP.NET Identity
   cookies, which `Microsoft.Owin.Host.SystemWeb` protects with the machine key, not DPAPI), so users stay signed in
   when you move one application or service at a time, or roll back (#191,
-  [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md#authentication)). Two settings don't carry over: without
-  `targetFramework` and `compatibilityMode`, .NET Framework uses `Framework20SP1` and webForCore `Framework45`, so set
-  `compatibilityMode` explicitly on both while they share tickets; and `IsolateApps` or `IsolateByAppId` after an
-  explicit key changes it with a hash that differs between the two, so remove the modifier on both (which signs users out once).
+  [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md#authentication)). `IsolateApps` and `IsolateByAppId` after an explicit key
+  carry over too (#212), unless the application's virtual path or ID has kana, conjoining Hangul jamo, private use or
+  supplementary characters ([IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md#net-frameworks-string-hash)): then remove the
+  modifier on both (which signs users out once). One setting doesn't carry over: without `targetFramework` and
+  `compatibilityMode`, .NET Framework uses `Framework20SP1` and webForCore `Framework45`, so set `compatibilityMode`
+  explicitly on both while they share tickets.
 - **`<trust level="Medium" />`** (or any partial trust level) can stay: it is ignored and the application runs in full
   trust (#87). Code that worked around Medium trust keeps working; code that checks the trust level sees full trust.
 - **Connection strings:** `System.Data.SqlClient` is used, as on .NET Framework. Add `TrustServerCertificate=True` or
@@ -1151,7 +1153,7 @@ configuration an IIS web farm has work unchanged:
 | `Type 'System.Web.Script.Services...' not found`, ScriptModule errors | System.Web.Extensions or System.Web.Services isn't referenced |
 | 404 for files that exist | Case mismatch in the path, or a request filtering rule (`<hiddenSegments>`, `<fileExtensions>`) |
 | Logins lost after a restart | No explicit `<machineKey>` |
-| Users signed out when requests move between IIS and webForCore | A different `<machineKey>` (keys, `validation`, `decryption`, `compatibilityMode`), no `targetFramework` and no `compatibilityMode`, or `IsolateApps`/`IsolateByAppId` after an explicit key (step 5) |
+| Users signed out when requests move between IIS and webForCore | A different `<machineKey>` (keys, `validation`, `decryption`, `compatibilityMode`), no `targetFramework` and no `compatibilityMode`, or `IsolateApps`/`IsolateByAppId` after an explicit key on a virtual path or application ID with characters webForCore doesn't hash as .NET Framework does (step 5) |
 | `PlatformNotSupportedException` | A Windows-only API: see [NAMESPACES.md](NAMESPACES.md) |
 | `PlatformNotSupportedException: The named version of this synchronization primitive is not supported` | A named `Semaphore` or `EventWaitHandle`: see "Named semaphores and events" (step 6) |
 | `CS0121: The call is ambiguous` | The app's own `DistinctBy`/`MaxBy`/`Chunk`, or a `params` call with no arguments (step 2) |

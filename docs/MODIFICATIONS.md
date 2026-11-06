@@ -307,3 +307,13 @@ commit that made it, and its issue, say why.
 - **CodeDom provider** (`WebFormsForCore/CodeDom`, from Microsoft's RoslynCodeDomProvider): `CompilerOptions` may be
   null (the `/nowarn:` check webForCore added didn't allow it), and an assembly compiled in memory without a PDB is
   loaded without a symbol stream, as `Assembly.Load(byte[], null)` was on .NET Framework (#135).
+- **.NET Framework's `StringComparer.InvariantCultureIgnoreCase` hash** (`Util/StringUtil.cs`
+  `GetNonRandomizedHashCode(s, ignoreCase: true)` and `GetNonRandomizedStringComparerHashCode`,
+  `src/WebFormsForCore.Web.Mobile/UI/MobileControls/MobilePage.cs` `GetMacKeyModifier`): on .NET Framework these are
+  the hash of the invariant locale's NLS sort key (non-randomized), which `__VIEWSTATEGENERATOR`, the legacy view state
+  MAC key and the `<machineKey>` `IsolateApps` and `IsolateByAppId` modifiers are made of. webForCore's own
+  `WebFormsForCore/InvariantIgnoreCaseHash.cs` builds the sort key from a table of Windows' weights
+  (`FrameworkData/InvariantIgnoreCaseWeights.txt`, read from .NET Framework 4.8 by `tools/stringhash/FrameworkSortKeys`)
+  and hashes it as .NET Framework does; a string with a character the table doesn't have keeps System.Web's stable
+  hash (#212). `MobilePage` used .NET's randomized `StringComparer.InvariantCultureIgnoreCase` hash, which changed the
+  MAC key in every process.

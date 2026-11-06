@@ -286,6 +286,13 @@ internal static class StringUtil {
 #endif
 
         if (ignoreCase) {
+#if !NETFRAMEWORK
+            // webForCore (#212): .NET Framework's StringComparer.InvariantCultureIgnoreCase hash (the branch above), which
+            // __VIEWSTATEGENERATOR shows, for every string whose characters it reproduces.
+            if (InvariantIgnoreCaseHash.TryGetFrameworkHashCode(s, out int frameworkHashCode)) {
+                return frameworkHashCode;
+            }
+#endif
             s = s.ToLower(CultureInfo.InvariantCulture);
         }
 
@@ -314,6 +321,13 @@ internal static class StringUtil {
             });
 
             return hashCode;
+        }
+#endif
+#if !NETFRAMEWORK
+        // webForCore (#212): .NET Framework's StringComparer.InvariantCultureIgnoreCase hash, which the <machineKey>
+        // IsolateApps and IsolateByAppId modifiers are made of, for every string whose characters it reproduces.
+        if (InvariantIgnoreCaseHash.TryGetFrameworkHashCode(s, out int frameworkHashCode)) {
+            return frameworkHashCode;
         }
 #endif
         // Fall back to non-compat result
