@@ -659,11 +659,23 @@ with "Unable to serialize the session state", as on IIS:
 | `Microsoft.AspNet.SessionState.CosmosDBSessionStateProviderAsync` | Restores and loads; not tested against Cosmos DB |
 | `Microsoft.Web.RedisOutputCacheProvider` (`<caching><outputCache defaultProvider=...>`) | As it is, with System.Web's output cache module: pages are cached and served to every server until they expire, but see below. **`VaryByParam` (and any other vary) doesn't cache with 4.0.1, on IIS either**: its `Add` casts the Redis result to `byte[]` and fails (Microsoft's bug; 3.x converted it but serializes with `BinaryFormatter`, which .NET doesn't have), so after a page's first rendering no response of it is found again. Pages without a vary (`VaryByParam="none"`) are cached and shared. **Remove the `OutputCache` module swap** that its dependency `Microsoft.AspNet.OutputCache.OutputCacheModuleAsync` adds to `<system.webServer><modules>` (`<remove name="OutputCache" />` and `<add name="OutputCache" type="Microsoft.AspNet.OutputCache.OutputCacheModuleAsync, ...">`): the async module hands the provider entries of its own types, which System.Web's `OutputCache.Serialize` refuses, so the provider logs a warning and caches nothing, on IIS too |
 
-Every server must have the same application path (all at `/`, or all at the same virtual directory):
-`HttpRuntime.AppDomainAppId` is IIS's `/LM/W3SVC/1/ROOT` (and the path of a virtual directory), as on IIS servers
-whose site IDs match, and SQL Server session state keys sessions by it. Up to 0.9.0 it was a hash of the site's folder,
-so servers with the site in different folders didn't share sessions through SQL Server. Use the same `<machineKey>` on
-every server for forms authentication and view state.
+Every server must have the same application path (all at `/`, or all at the same virtual directory) and the same site
+ID: `HttpRuntime.AppDomainAppId` is IIS's `/LM/W3SVC/<site ID>/ROOT` (and the path of a virtual directory), and SQL
+Server session state keys sessions by it, as on IIS, where a farm's servers share sessions when their site IDs match.
+The site ID is the host's `WebForCore:Host:SiteId` setting (#210), 1 by default (IIS's Default Web Site), in
+`appsettings.json`, the environment (`WebForCore__Host__SiteId=2`) or the host's command line; the host gives it to
+its workers. Up to 0.9.0 the application's ID was a hash of the site's folder, so servers with the site in different
+folders didn't share sessions through SQL Server. Use the same `<machineKey>` on every server for forms authentication
+and view state.
+
+- **A web farm:** the same `SiteId` on every server (the default, 1, is fine if none sets it). Keys a `<machineKey>`
+  derives with `IsolateByAppId` are then the same on every server too.
+- **Different applications on one machine** (or sharing one session database): a different `SiteId` for each, as
+  different IIS sites have different IDs. With the same one (up to 0.10.0 every application had 1), they would share
+  SQL Server session state's rows of the same session ID, accept each other's forms tickets and view state if their
+  `<machineKey>` keys are the same `IsolateByAppId` ones, and take each other's compilation lock. If the application
+  ran on IIS, use its site's ID there (IIS Manager's Sites list, or `<site id>` in applicationHost.config), so that
+  what it keyed by its ID (sessions in a shared database) carries over.
 
 The async module's `aspnet:AllowConcurrentRequestsPerSession` setting keeps objects in its own collection, which
 serializes them with .NET's `BinaryFormatter`; it throws `PlatformNotSupportedException` on .NET, so with that setting
@@ -1105,8 +1117,9 @@ The first request compiles pages, as on IIS. Then compare the responses recorded
 - **Precompilation** (optional): `aspnetcore_compiler -v / -p <site> -b bin_dotnet [-u] <target>`, then copy the build
   into `<target>/bin_dotnet`. Use `-u` for updatable sites.
 - **Scaling out:** use out-of-process session state (SQL Server or Redis through `web.config` as on IIS, or ASP.NET
-  Core's distributed cache; "Session state", section 4), the same application path on every server, and the same
-  `<machineKey>` everywhere.
+  Core's distributed cache; "Session state", section 4), the same application path and `WebForCore:Host:SiteId` on
+  every server (#210), and the same `<machineKey>` everywhere. Different applications on one machine get different
+  site IDs.
   SignalR needs a backplane too ([below](#scaling-out-signalr)).
 - Several processes must not share one site folder: they share the compilation folder.
 

@@ -165,7 +165,9 @@ On Fedora/RHEL, set `OPENSSL_ENABLE_SHA1_SIGNATURES=1` for every `dotnet` comman
    (`https://host/app`; ask the user, or look for absolute links and cookies with `/app/`), add `.VirtualPath("/app")`
    ("An application under a path", #190). Behind a proxy that ends TLS, the host applies its `X-Forwarded-*` headers
    (`WebForCore:Host:ForwardedHeaders`, "Behind a reverse proxy", #194); keep a module that sets `REMOTE_ADDR` or
-   `HTTPS` as it is.
+   `HTTPS` as it is. If the app keeps SQL Server session state or uses `<machineKey ... IsolateByAppId>`, ask the user
+   for the IIS site's ID and set `WebForCore:Host:SiteId` to it: the same on every server of a farm, different for
+   each application on one machine (#210).
 7. Search the code for what behaves differently on Linux (`docs/MIGRATING.md` section 6), and fix each hit minimally:
    - `"~/bin` or `\bin` used to load or scan assemblies: they are in `bin_dotnet/`; use `HttpRuntime.BinDirectory` or
      the app's own setting (Umbraco: `umbracoBinDirectory` = `~/bin_dotnet`).

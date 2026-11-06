@@ -31,6 +31,12 @@ if (!File.Exists(application))
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions { Args = hostArgs });
 var settings = builder.Configuration.GetSection(HostSettings.Section).Get<HostSettings>() ?? new HostSettings();
+if (settings.SiteId < 1)
+{
+	// IIS's site IDs are positive.
+	Console.Error.WriteLine($"webforcore-host: {HostSettings.Section}:SiteId is {settings.SiteId}; an IIS site's ID is 1 or more.");
+	return 2;
+}
 // The worker's System.Web enforces <httpRuntime maxRequestLength> and its own Kestrel limit, as when it runs on its own;
 // the host doesn't limit the body a second time unless the configuration says so.
 if (builder.Configuration["Kestrel:Limits:MaxRequestBodySize"] == null)

@@ -122,7 +122,7 @@ sealed class WorkerPool : IHostedLifecycleService, IDisposable
 		if (currentReady.Task.IsCompleted) currentReady = NewReady();
 		try
 		{
-			worker.Start(command, Path.Combine(runDirectory.FullName, "host.sock"), token);
+			worker.Start(command, Path.Combine(runDirectory.FullName, "host.sock"), token, settings.SiteId);
 		}
 		catch (Exception e) when (e is InvalidOperationException || e is System.ComponentModel.Win32Exception)
 		{

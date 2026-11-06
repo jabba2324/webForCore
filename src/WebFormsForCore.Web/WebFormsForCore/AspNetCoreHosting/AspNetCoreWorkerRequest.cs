@@ -439,9 +439,10 @@ namespace System.Web.Hosting
 				case "REMOTE_PORT": return GetRemotePort().ToString(CultureInfo.InvariantCulture);
 				case "GATEWAY_INTERFACE": return "CGI/1.1";
 				case "SERVER_SOFTWARE": return "Kestrel";
-				case "INSTANCE_ID": return "1";
-				case "INSTANCE_META_PATH": return "/LM/W3SVC/1";
-				case "APPL_MD_PATH": return "/LM/W3SVC/1/ROOT" + (Host.VirtualPath == "/" ? "" : Host.VirtualPath.TrimEnd('/'));
+				// The IIS site (WebForCore:Host:SiteId, #210).
+				case "INSTANCE_ID": return Host.SiteId.ToString(CultureInfo.InvariantCulture);
+				case "INSTANCE_META_PATH": return "/LM/W3SVC/" + Host.SiteId.ToString(CultureInfo.InvariantCulture);
+				case "APPL_MD_PATH": return AspNetCoreHost.ApplicationId(Host.SiteId, Host.VirtualPath);
 				// IIS's WebSocket module sets it on every request; Katana reads it to enable WebSockets (UseWebForms adds them).
 				case "WEBSOCKET_VERSION": return "13";
 			}

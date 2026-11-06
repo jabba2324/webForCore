@@ -7,6 +7,13 @@ public sealed class HostSettings
 {
 	public const string Section = "WebForCore:Host";
 
+	// The IIS site's ID (<sites><site id>), 1 by default (IIS's Default Web Site) (#210). The application's ID
+	// (HttpRuntime.AppDomainAppId, the APPL_MD_PATH server variable) is /LM/W3SVC/<SiteId>/ROOT, and /ROOT/<path> for an
+	// application under a virtual path; INSTANCE_ID is the site ID. What ASP.NET keys by the application's ID follows it:
+	// SQL Server session state, <machineKey> keys with IsolateByAppId. The servers of a farm that share session state or
+	// tickets have the same site ID, as on IIS; different applications on one machine have different ones.
+	public int SiteId { get; set; } = 1;
+
 	// <processModel startupTimeLimit="00:01:30">: a worker that isn't serving by then is stopped, and counts as a failure.
 	public TimeSpan StartupTimeLimit { get; set; } = TimeSpan.FromSeconds(90);
 
