@@ -20,6 +20,8 @@
     <ProjectReference Include="..\webForCore.IIS.Sample\webForCore.IIS.Sample.csproj" ReferenceOutputAssembly="false" />
     <!-- RequestHandlingTests: a site that IIS serves as it is (CI's iis-compare job). -->
     <ProjectReference Include="..\webForCore.Requests.Sample\webForCore.Requests.Sample.csproj" ReferenceOutputAssembly="false" />
+    <!-- FileRangeTests (#187): the worker request's copy of a file's range, tested with streams that return short reads. -->
+    <Compile Include="..\..\src\WebFormsForCore.Web\WebFormsForCore\AspNetCoreHosting\FileRange.cs" Link="FileRange.cs" />
     <!-- MachineKeyInteropTests (#191): the <machineKey> interop sample, run once for each configuration of its
          Interop/MachineKeyConfigs.cs, which is compiled in here too. -->
     <ProjectReference Include="..\webForCore.MachineKey.Sample\webForCore.MachineKey.Sample.csproj" ReferenceOutputAssembly="false" />

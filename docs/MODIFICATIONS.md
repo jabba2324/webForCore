@@ -129,6 +129,11 @@ commit that made it, and its issue, say why.
   `AspNetCoreWorkerRequest.ParseHeaders` stores the request's unknown headers whatever the path: the cookieless
   session check it took from IIS's filter returned before storing them when a path had a `(` and no `/(...)/`
   (#170, OData's `/People(1)` lost `Prefer`).
+  `AspNetCoreWorkerRequest.SendResponseFromFile` (`Response.TransmitFile` and `WriteFile`) reads a file's range until
+  it is sent or `Read` returns 0 (`FileRange.Copy`), as .NET Framework's `HttpFileResponseElement` reads one: it took
+  one `Read` to fill its buffer, and its loop over 64 KB chunks spun if the file ended early. A range the file no longer
+  has when it is sent is the `HttpException` of .NET Framework's worker requests ("Invalid range"); it was sent as
+  nothing (#187).
 - **Integrated-mode semantics** on the classic pipeline: writable `Response.Headers`, the Content-Type rule, the
   server name from the Host header, `X-AspNet-Version` and the default `Cache-Control: private` only once a managed
   handler ran, the response was flushed or an error was reported; a cache header (`Expires`, `Cache-Control`, ...) set
