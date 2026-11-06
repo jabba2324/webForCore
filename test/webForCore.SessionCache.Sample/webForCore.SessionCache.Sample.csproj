@@ -42,6 +42,8 @@
     <ProjectReference Include="..\..\src\WebFormsForCore.Web.Extensions\WebFormsForCore.Web.Extensions.csproj" />
     <ProjectReference Include="..\..\src\WebFormsForCore.Web.Infrastructure\WebFormsForCore.Web.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\WebFormsForCore.Compilers\WebFormsForCore.Compilers.csproj" />
+    <!-- MVC, for a controller with [SessionState(SessionStateBehavior.Disabled)] (#185). -->
+    <ProjectReference Include="..\..\src\webForCore.System.Web.Mvc\webForCore.System.Web.Mvc.csproj" />
     <!-- System.Data.SqlClient for <sessionState mode="SQLServer">, as the webForCore package brings it. -->
     <ProjectReference Include="..\..\src\webForCore.System.Data.SqlClient\webForCore.System.Data.SqlClient.csproj" />
   </ItemGroup>
