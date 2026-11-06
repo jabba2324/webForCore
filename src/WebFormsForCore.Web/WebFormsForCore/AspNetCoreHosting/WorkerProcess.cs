@@ -52,6 +52,11 @@ namespace WebFormsForCore.Hosting
 		internal const string SchemeHeader = "X-WebForCore-Scheme";
 		internal const string ClientCertificateHeader = "X-WebForCore-Client-Certificate";
 		internal const string TlsHeader = "X-WebForCore-Tls";
+		// #214: the host added "Expect: 100-continue", so that it sends the body only when the application reads it. Kestrel
+		// looks for it in the request's headers when the application first reads the body, to send 100 Continue, so it
+		// stays there; the worker request hides it from System.Web (HostAddedExpectKey), as the client didn't send it.
+		internal const string ExpectHeader = "X-WebForCore-Expect";
+		internal const string HostAddedExpectKey = "webForCore.HostAddedExpect";
 		internal const string RestartingHeader = "X-WebForCore-Restarting";
 
 		static readonly string socketPath = Variable(SocketVariable);
@@ -175,7 +180,8 @@ namespace WebFormsForCore.Hosting
 					&& int.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var strength))
 					context.Features.Set<ITlsHandshakeFeature>(new ForwardedTlsHandshake((SslProtocols)protocol, strength));
 			}
-			foreach (var name in new[] { RemoteHeader, LocalHeader, SchemeHeader, ClientCertificateHeader, TlsHeader }) headers.Remove(name);
+			if (!string.IsNullOrEmpty(headers[ExpectHeader])) context.Items[HostAddedExpectKey] = true;
+			foreach (var name in new[] { RemoteHeader, LocalHeader, SchemeHeader, ClientCertificateHeader, TlsHeader, ExpectHeader }) headers.Remove(name);
 			return next();
 		}
 

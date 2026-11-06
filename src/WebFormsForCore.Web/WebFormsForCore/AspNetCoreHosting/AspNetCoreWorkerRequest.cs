@@ -959,11 +959,13 @@ namespace System.Web.Hosting
 
 			// construct unknown headers as array list of name1,value1,...
 			var headers = new List<string>();
-
+			// webForCore: not the "Expect: 100-continue" webforcore-host added (WorkerProcess.ExpectHeader, #214).
+			bool hostAddedExpect = Context.Items.ContainsKey(WebFormsForCore.Hosting.WorkerProcess.HostAddedExpectKey);
 
 			foreach (var header in Context.Request.Headers)
 			{
 				string name = header.Key;
+				if (hostAddedExpect && string.Equals(name, "Expect", StringComparison.OrdinalIgnoreCase)) continue;
 				var strValues = header.Value;
 				string str;
 				switch (strValues.Count)

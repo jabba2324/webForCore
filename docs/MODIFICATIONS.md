@@ -120,7 +120,9 @@ commit that made it, and its issue, say why.
   aborted them after its own 30 s.
   The request `HttpRuntime.ProcessRequestInternal` turns away once `Dispose` has drained ("Server Too Busy", 503: it
   reached the old worker before the application began shutting down, and the runtime only after the drain) carries
-  the worker's restarting header, so that webforcore-host sends it to the next worker when it has no body (#209).
+  the worker's restarting header, so that webforcore-host sends it to the next worker (#209), with its body: the
+  host keeps a small body, and has the worker's Kestrel ask for a larger one (`Expect: 100-continue`), which
+  `AspNetCoreWorkerRequest.ParseHeaders` hides from System.Web (#214).
   `AspNetCoreWorkerRequest.CloseConnection` sends `Connection: close` when the response hasn't started. In a worker of
   webforcore-host, once the response has started, it leaves the connection to the host open (Kestrel drains the
   unread body): a close the response didn't announce reset the next request the host's pool sent on that connection.
