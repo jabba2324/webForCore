@@ -191,6 +191,8 @@
     <ProjectReference Include="../WebFormsForCore.Web/WebFormsForCore.Web.csproj" />
     <ProjectReference Include="../webForCore.System.Web.Razor/webForCore.System.Web.Razor.csproj" />
     <ProjectReference Include="../webForCore.System.Web.WebPages.Deployment/webForCore.System.Web.WebPages.Deployment.csproj" />
+    <!-- LINQ to SQL's Binary (#142), which HtmlHelper.Hidden writes as base64, as Web Pages does on .NET Framework. -->
+    <ProjectReference Include="../webForCore.System.Data.Linq/webForCore.System.Data.Linq.csproj" />
     <PackageReference Include="System.CodeDom" Version="10.0.14" />
   </ItemGroup>
 </Project>

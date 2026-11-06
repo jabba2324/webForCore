@@ -10,8 +10,8 @@ For an AI agent doing the migration, the same procedure is written as instructio
 ## Before you start
 
 1. **Check the blockers.** Search the solution for the APIs in the summary table of [NAMESPACES.md](NAMESPACES.md):
-   `WindowsIdentity`, `<authentication mode="Windows">`, `System.ServiceModel` hosting (`.svc`), `LinqDataSource`,
-   `ObjectContext`/EDMX (EF 1–4), registry and COM use, `App_WebReferences`,
+   `WindowsIdentity`, `<authentication mode="Windows">`, `System.ServiceModel` hosting (`.svc`),
+   `ObjectContext`/EDMX and `EntityDataSource` (EF 1–4), registry and COM use, `App_WebReferences`,
    EMF/WMF metafiles, Windows Identity Foundation (`System.IdentityModel`, `<system.identityModel>`,
    `WSFederationAuthenticationModule`), Windows Workflow Foundation (`System.Workflow`, `System.Activities`) and WCF
    Data Services hosting (`System.Data.Services`, `DataService<T>`). Each one needs a code change; plan these first.
@@ -925,8 +925,10 @@ Fix what the blocker search found (see [NAMESPACES.md](NAMESPACES.md) for replac
   `GetCommand(query).CommandText` (#175). CarrotCake CMS's batch delete and update helper, a pattern several LINQ to SQL
   applications copied, looked for `"\r\nFROM "` in the generated SELECT and threw `ArgumentOutOfRangeException:
   startIndex ('-1')` on Linux. Search for `"\r\n` in code that reads SQL text, and use `Environment.NewLine`.
-  `LinqDataSource` isn't available yet: bind an `ObjectDataSource` or model
-  binding to the `DataContext`'s queries. Web API OData's `ODataConventionModelBuilder` needs System.Data.Linq for
+  ASP.NET's LINQ to SQL integrations work too (from 0.10.0): `LinqDataSource` (with `ContextTypeName` naming the
+  `DataContext`), MVC binding a `System.Data.Linq.Binary` (a `rowversion` round-trips through a hidden input) and Dynamic
+  Data's `MetaModel.RegisterContext` with a `DataContext`. A Web Site Project that compiles the `DataContext` in
+  `App_Code` lists System.Data.Linq in `<compilation><assemblies>`, as on IIS, where the root Web.config doesn't. Web API OData's `ODataConventionModelBuilder` needs System.Data.Linq for
   its `Binary` mapping, so OData applications, which failed in `Application_Start` before 0.9.0, now start.
 - **Scanning every loaded assembly's types** (#41, fixed). `Assembly.GetTypes()` on Microsoft's System.Data.SqlClient
   packages throws on .NET, on Linux and on Windows: `ReflectionTypeLoadException ... Could not load type

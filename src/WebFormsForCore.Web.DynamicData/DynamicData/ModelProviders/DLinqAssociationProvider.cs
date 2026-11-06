@@ -1,5 +1,4 @@
-﻿#if NETFRAMEWORK
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Linq.Mapping;
 using System.Linq;
@@ -105,4 +104,3 @@ namespace System.Web.DynamicData.ModelProviders {
         }
     }
 }
-#endif

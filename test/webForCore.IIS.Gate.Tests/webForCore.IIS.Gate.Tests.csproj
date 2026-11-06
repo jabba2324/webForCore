@@ -24,6 +24,8 @@
          Interop/MachineKeyConfigs.cs, which is compiled in here too. -->
     <ProjectReference Include="..\webForCore.MachineKey.Sample\webForCore.MachineKey.Sample.csproj" ReferenceOutputAssembly="false" />
     <Compile Include="..\webForCore.MachineKey.Sample\Interop\MachineKeyConfigs.cs" Link="MachineKeyConfigs.cs" />
+    <!-- LinqDataSourceTests: the scenarios that CI's iis-compare job also runs against IIS 10. -->
+    <ProjectReference Include="..\webForCore.Linq.Scenarios\webForCore.Linq.Scenarios.csproj" />
     <!-- The samples run under webforcore-host (#56), from its build here. -->
     <ProjectReference Include="..\..\src\WebFormsForCore.Host\WebFormsForCore.Host.csproj" ReferenceOutputAssembly="false" />
     <Compile Include="..\Shared\WebForCoreHost.cs" Link="WebForCoreHost.cs" />
