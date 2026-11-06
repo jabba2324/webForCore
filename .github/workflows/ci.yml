@@ -111,6 +111,7 @@ jobs:
 
       # src/WebFormsForCore.TestApp rebuilt with its pages newer than their designer files, then started (#80).
       - name: TestApp smoke test
+        timeout-minutes: 10
         run: tools/ci/testapp-smoke.sh
 
       - name: Upload test results
@@ -193,6 +194,7 @@ jobs:
 
       # An application that references the webForCore package (not the projects) builds, runs and serves pages.
       - name: Package smoke test
+        timeout-minutes: 20
         run: tools/ci/package-smoke.sh "$RUNNER_TEMP/packages" ${{ steps.version.outputs.version }}
 
       - name: Upload packages
@@ -255,6 +257,7 @@ jobs:
 
       # src/WebFormsForCore.TestApp rebuilt with its pages newer than their designer files, then started (#80).
       - name: TestApp smoke test
+        timeout-minutes: 10
         run: tools/ci/testapp-smoke.sh
 
       - name: Upload test results
@@ -272,6 +275,7 @@ jobs:
         run: dotnet run tools/ci/check_assembly_identities.cs -- "$RUNNER_TEMP/packages"
 
       - name: Package smoke test
+        timeout-minutes: 20
         run: tools/ci/package-smoke.sh "$RUNNER_TEMP/packages" 0.0.0-windows.${{ github.run_number }}
 
   # The Web API gate on IIS 10 (#78): the same sample built for .NET Framework 4.8 against Microsoft's packages, served by
