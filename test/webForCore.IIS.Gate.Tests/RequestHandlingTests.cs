@@ -240,6 +240,20 @@ namespace IISGate
             Assert.Equal("Deep\n", deepBody);
         }
 
+        // A 304 Not Modified: ASP.NET calculates no Content-Length for it, and one the page appends (AppendHeader) is sent,
+        // as in IIS 10's classic pipeline. One set through Response.Headers isn't, as in the integrated pipeline: a
+        // customer application's CacheCow.Server.WebApi 304s through Katana (Packages.Gate.Tests' CacheCowValidatesWithETags,
+        // compared with IIS's integrated pipeline).
+        [Fact]
+        public async Task A304KeepsTheContentLengthAPageAppends()
+        {
+            var (response, body) = await Get("/status/NotModified.aspx");
+            Assert.Equal(HttpStatusCode.NotModified, response.StatusCode);
+            Assert.Equal("", body);
+            Assert.True(response.Content.Headers.TryGetValues("Content-Length", out var length));
+            Assert.Equal("0", Assert.Single(length));
+        }
+
         // #129 (a WebMatrix Starter Site: WebSecurity.RequireAuthenticatedUser() answered an empty 401 instead of the
         // redirect to the log-in page): after Response.End() the response is still buffered when EndRequest runs, so
         // FormsAuthenticationModule turns the 401 into its redirect, and every module's EndRequest can change it.

@@ -2,7 +2,8 @@
 # Runs every test suite in Release after a build of WebFormsForCore.slnx (Release), as CI does.
 # Usage: tools/ci/run-tests.sh [results-directory]
 # Identity.Test and System.Data.Linq.Tests need SQL Server at 127.0.0.1,14333 (tools/ci/sqlserver.sh starts one locally; CI uses a service
-# container on Linux and tools/ci/sqlserver-windows.ps1 on Windows). System.Drawing's own tests are drawingForCore's
+# container on Linux and tools/ci/sqlserver-windows.ps1 on Windows). SessionCache.Gate.Tests and IIS.Gate.Tests' SignalR scale-out tests also need Redis at
+# 127.0.0.1:16379 (tools/ci/redis.sh; CI: a service container on Linux, tools/ci/redis-windows.ps1 on Windows). System.Drawing's own tests are drawingForCore's
 # (https://github.com/xforcore/drawingForCore). A suite's failures do not stop the others; the exit code is non-zero if
 # any suite failed.
 set -uo pipefail
@@ -22,9 +23,10 @@ SUITES=(
   System.Web.Razor.Test System.Web.Http.Test System.Web.Http.WebHost.Test System.Web.Http.Owin.Test
   Microsoft.Owin.Tests Microsoft.Owin.Host.SystemWeb.Tests Microsoft.Owin.Security.Tests System.Web.MonoTests
   System.Web.Mvc.Test Microsoft.Web.Mvc.Test System.Web.WebPages.Test System.Web.WebPages.Razor.Test
-  System.Web.WebPages.Deployment.Test System.Web.Helpers.Test Microsoft.AspNet.SignalR.Tests Identity.Test
+  System.Web.WebPages.Deployment.Test System.Web.Helpers.Test Microsoft.AspNet.SignalR.Tests
+  Microsoft.AspNet.SignalR.StackExchangeRedis.Tests Microsoft.AspNet.SignalR.Redis.Tests Microsoft.AspNet.SignalR.SqlServer.Tests Identity.Test
   System.Data.SqlClient.Tests System.Data.Linq.Tests System.Data.Linq.MonoTests
-  WebApi.Gate.Tests Mvc.Gate.Tests Oidc.Gate.Tests IIS.Gate.Tests Host.Tests
+  WebApi.Gate.Tests Mvc.Gate.Tests Oidc.Gate.Tests Packages.Gate.Tests SessionCache.Gate.Tests IIS.Gate.Tests Host.Tests
 )
 
 failed=()
