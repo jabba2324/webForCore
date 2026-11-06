@@ -1448,9 +1448,16 @@ namespace System.Web.UI.MobileControls
             // We need to make sure that the hash is case insensitive, since the file system
             // is, and strange view state errors could otherwise happen (ASURT 128657)
 
+#if WebFormsForCore
+            // webForCore (#212): .NET Framework's StringComparer.InvariantCultureIgnoreCase hash; .NET's is randomized
+            // per process, which made the MAC key differ in each worker process.
+            int pageHashCode = InvariantIgnoreCaseHash.GetFrameworkOrStableHashCode(TemplateSourceDirectory);
+            pageHashCode += InvariantIgnoreCaseHash.GetFrameworkOrStableHashCode(GetType().Name);
+#else
             int pageHashCode = StringComparer.InvariantCultureIgnoreCase.GetHashCode(
                 TemplateSourceDirectory);
             pageHashCode += StringComparer.InvariantCultureIgnoreCase.GetHashCode(GetType().Name);
+#endif
 
 
             byte[] macKeyModifier;

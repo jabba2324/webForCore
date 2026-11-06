@@ -142,7 +142,7 @@ IIS hands ASP.NET a worker request (`HttpWorkerRequest`); on Kestrel this is `As
 | --- | --- | --- |
 | Anonymous | Works | |
 | Forms, ASP.NET Identity, OWIN cookies, OAuth | Works | All in managed code |
-| Sharing `<machineKey>` output with .NET Framework 4.8 (forms tickets, `MachineKey.Protect` and `Encode`, OWIN and ASP.NET Identity cookies) | Works | With the same `<machineKey>`, each runtime reads the other's output, both ways: validation SHA1, HMACSHA256 and HMACSHA512, decryption AES and 3DES, `compatibilityMode` Framework20SP1, Framework20SP2 and Framework45, and none with `<httpRuntime targetFramework="4.5">` or later. Katana's cookies (`UseCookieAuthentication` on `Microsoft.Owin.Host.SystemWeb`, Identity's application cookie with `SecurityStampValidator` too) are protected with the machine key, not DPAPI, as on IIS. Output that is the same on every call (`MachineKey.Encode` with `Validation`) is the same bytes; the rest has a random IV, on both. Not shared: an application without `targetFramework` and without `compatibilityMode` (Framework20SP1 on .NET Framework, Framework45 here: forms tickets; set `compatibilityMode` on both), and `IsolateApps` or `IsolateByAppId` after an explicit key (the key is changed with a hash of the virtual path or the application ID, which .NET Framework computes from Windows' sort keys, `StringComparer.InvariantCultureIgnoreCase`, so it differs even with IIS's application ID). Fixed in 0.10.0: HMACSHA256 and HMACSHA512 in the Framework20 modes and `MachineKey.Encode` (#191). Tested by `MachineKeyInteropTests` and CI's `machinekey-framework-interop` job ([TESTING.md](TESTING.md)) |
+| Sharing `<machineKey>` output with .NET Framework 4.8 (forms tickets, `MachineKey.Protect` and `Encode`, OWIN and ASP.NET Identity cookies) | Works | With the same `<machineKey>`, each runtime reads the other's output, both ways: validation SHA1, HMACSHA256 and HMACSHA512, decryption AES and 3DES, `compatibilityMode` Framework20SP1, Framework20SP2 and Framework45, and none with `<httpRuntime targetFramework="4.5">` or later, and `IsolateApps` and `IsolateByAppId` after an explicit key (the key is changed with .NET Framework's `StringComparer.InvariantCultureIgnoreCase` hash of the virtual path or the application ID, which webForCore reproduces for paths and IDs without kana, conjoining jamo, private use or supplementary characters, [below](#net-frameworks-string-hash); webForCore's application ID is IIS's for site 1, `/LM/W3SVC/1/ROOT`, #210). Katana's cookies (`UseCookieAuthentication` on `Microsoft.Owin.Host.SystemWeb`, Identity's application cookie with `SecurityStampValidator` too) are protected with the machine key, not DPAPI, as on IIS. Output that is the same on every call (`MachineKey.Encode` with `Validation`) is the same bytes; the rest has a random IV, on both. Not shared: an application without `targetFramework` and without `compatibilityMode` (Framework20SP1 on .NET Framework, Framework45 here: forms tickets; set `compatibilityMode` on both). Fixed in 0.10.0: HMACSHA256 and HMACSHA512 in the Framework20 modes and `MachineKey.Encode` (#191); in 0.10.1: `IsolateApps` and `IsolateByAppId` (#212). Tested by `MachineKeyInteropTests` and CI's `machinekey-framework-interop` job ([TESTING.md](TESTING.md)) |
 | URL authorization (`<system.web>` and `<system.webServer>`) | Works | |
 | Windows (Negotiate, Kerberos, NTLM) | Not built | Kestrel's Negotiate handler exists but isn't connected to System.Web's `User` |
 | Basic, Digest | Not built | There are no Windows accounts to check against |
@@ -363,13 +363,43 @@ insert, `AutoGenerateWhereClause` with a `Select` projection, a `Selecting` hand
 `MetaModel.RegisterContext` with the `DataContext`. Each page's form is compared, apart from the values of `__VIEWSTATE`
 and `__EVENTVALIDATION` (each server's machine key protects them) and `WebResource.axd`'s parameters, with line breaks
 read as `\n` (System.Web's `WriteLine(string)` calls write the platform's newline, [above](#compatibility-decisions)). Every page,
-grid row, pager, edit box, event log line and the conflict's message are the same as IIS's; the one difference, which
-`tools/ci/iis-known-differences-linq.json` lists, is `__VIEWSTATEGENERATOR`'s value (`D1602CB0` on IIS, `73C738F5` on
-webForCore for `linq/Products.aspx`): `Page.GetClientStateIdentifier` hashes the page's directory and class name with
-`StringUtil.GetNonRandomizedHashCode`, which on .NET Framework is `StringComparer.InvariantCultureIgnoreCase.GetHashCode`
-(Windows' NLS sort keys) and on webForCore System.Web's own stable hash. System.Web reads the value back only when a
-postback's view state fails its MAC check, to tell an error in the page's own view state (reported) from view state
-meant for another page (ignored): a page posted back to the server that rendered it isn't affected.
+grid row, pager, edit box, event log line and the conflict's message are the same as IIS's, and so is
+`__VIEWSTATEGENERATOR` (`D1602CB0` for `linq/Products.aspx`; before 0.10.1 webForCore's was `73C738F5`, #212):
+`Page.GetClientStateIdentifier` hashes the page's directory and class name with .NET Framework's
+`StringComparer.InvariantCultureIgnoreCase` hash ([below](#net-frameworks-string-hash)).
+
+### .NET Framework's string hash
+
+On .NET Framework, `StringComparer.InvariantCultureIgnoreCase.GetHashCode` is not randomized: it hashes the string's
+sort key, which Windows' NLS makes from the invariant locale's weights. System.Web uses it where the value leaves the
+process: `__VIEWSTATEGENERATOR` and the Framework20 view state MAC key (`Page.GetClientStateIdentifier`, and
+`MobilePage`'s), and the `<machineKey>` `IsolateApps` (virtual path) and `IsolateByAppId` (application ID) modifiers.
+.NET's hash is randomized, and Linux has no NLS sort keys, so webForCore builds the sort key from a table of the weights
+of each UTF-16 code unit, read from .NET Framework 4.8 (`src/WebFormsForCore.Web/FrameworkData/InvariantIgnoreCaseWeights.txt`,
+`tools/stringhash/FrameworkSortKeys`), and hashes it as .NET Framework does (#212).
+
+The table has the 56,274 code units whose weights it can explain and that .NET Framework weighs the same on Windows
+Server 2022 and Windows Server 2025 (invariant sort versions 6.4.3 and 6.5.2): all of ASCII and Latin, Greek, Cyrillic,
+Hebrew, Arabic, Indic and Thai, punctuation and symbols, the CJK ideographs of Unicode 6 and Hangul syllables, and
+combining marks. A string made of them gets .NET Framework's hash: CI checks the table on both Windows versions, the
+hashes of 7,152 strings (every ASCII path, class name and Latin string among them) and 300,000 random strings of the
+table's characters against .NET Framework (TESTING.md). A string with any other code unit keeps System.Web's own
+stable hash, which differs from .NET Framework's:
+
+- Japanese kana (U+3041–30FE, U+31F0–31FF, U+32D0–32FE, halfwidth U+FF66–FF9D), iteration and length marks (U+3005,
+  U+3031–3035, U+303B, U+309D–309E, U+A015): East Asian extra weights, and weights that depend on the character before.
+- Conjoining Hangul jamo (U+1100–11FF, U+A960–A97F, U+D7B0–D7FF), which Windows sorts as the syllables they form.
+- Characters outside the Basic Multilingual Plane (surrogates, U+D800–DFFF) and private use characters (U+E000–F8FF).
+- CJK ideographs and strokes added after Unicode 6 (U+2FFC–2FFF, U+31EF, U+4DB6–4DBF, U+9FCC–9FFF, U+FA2E–FA2F),
+  which Windows Server 2022 ignores and 2025 sorts: .NET Framework's hash itself depends on the Windows version.
+- 66 others whose weights depend on context: U+0385, U+1FEE, Tibetan U+0F73, 0F75, 0F77, 0F79, 0F81, and Hebrew and
+  Arabic presentation forms (U+FB1D–FB4E, U+FC5B–FC63, U+FC90, U+FCD9, U+FCF2–FCF4, U+FD3C–FD3D, U+FE70–FE7F).
+
+Paths and class names are usually ASCII; a page in a folder named in kana renders another `__VIEWSTATEGENERATOR` than
+IIS's. System.Web reads the value back only when a postback's view state fails its MAC check, to tell an error in the
+page's own view state (reported) from view state meant for another page (ignored), and puts it in the Framework20 view
+state MAC key; a page posted back to the server that rendered it isn't affected. `aspnet:UseRandomizedStringHashAlgorithm`
+isn't read (on .NET Framework it makes `__VIEWSTATEGENERATOR` System.Web's own hash).
 
 How each part came to be is in git: the fork commits in `external/` and this repository's history
 ([MODIFICATIONS.md](MODIFICATIONS.md)).

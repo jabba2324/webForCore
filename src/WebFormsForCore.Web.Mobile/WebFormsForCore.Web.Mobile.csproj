@@ -49,6 +49,12 @@
 
     <ItemGroup>
         <Compile Include="..\VersionInfo.cs" Link="Properties\VersionInfo.cs" />
+        <!-- webForCore (#212): .NET Framework's StringComparer.InvariantCultureIgnoreCase hash for MobilePage's view state
+             MAC key, as System.Web has it (System.Web's internals aren't visible here). -->
+        <Compile Include="..\WebFormsForCore.Web\WebFormsForCore\InvariantIgnoreCaseHash.cs" Link="WebFormsForCore\InvariantIgnoreCaseHash.cs" />
+        <EmbeddedResource Include="..\WebFormsForCore.Web\FrameworkData\InvariantIgnoreCaseWeights.txt" Link="FrameworkData\InvariantIgnoreCaseWeights.txt">
+            <LogicalName>System.Web.Util.InvariantIgnoreCaseWeights.txt</LogicalName>
+        </EmbeddedResource>
         <Compile Remove="UI\MobileControls\Design\Adapters\**\*.cs" />
         <Compile Remove="UI\MobileControls\Design\Util\**\*.cs" />
         <Compile Remove="UI\MobileControls\Design\*.cs" />

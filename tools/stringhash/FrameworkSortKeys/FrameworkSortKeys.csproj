@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- webForCore (#212): reads the sort keys behind .NET Framework 4.8's StringComparer.InvariantCultureIgnoreCase hash
+       (Windows' NLS weights for the invariant locale) and writes the character table System.Web hashes with
+       (src/WebFormsForCore.Web/FrameworkData/InvariantIgnoreCaseWeights.txt), and .NET Framework's hashes of a set of
+       strings (test/webForCore.IIS.Gate.Tests/FrameworkData/invariant-hash-framework.tsv), which IIS.Gate.Tests'
+       InvariantHashTests compare webForCore's with. Run on Windows by CI's invariant-hash-framework-data job (see
+       Program.cs). Not in WebFormsForCore.slnx: it needs .NET Framework to run. It builds on Linux too (reference
+       assemblies). -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <NuGetAudit>false</NuGetAudit>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\..\src\WebFormsForCore.Web\WebFormsForCore\InvariantIgnoreCaseHash.cs" Link="InvariantIgnoreCaseHash.cs" />
+  </ItemGroup>
+</Project>

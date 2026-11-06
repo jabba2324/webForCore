@@ -127,8 +127,8 @@ namespace LinqScenarios
                 string body = await response.Content.ReadAsStringAsync();
                 var headers = new JsonObject();
                 if (response.Content.Headers.ContentType != null) headers["Content-Type"] = response.Content.Headers.ContentType.ToString();
-                // The page's __VIEWSTATEGENERATOR, out of the body, under a name of its own: it differs from IIS's
-                // (tools/ci/iis-known-differences-linq.json), and everything else in the form must not.
+                // The page's __VIEWSTATEGENERATOR, out of the body, under a name of its own: it differed from IIS's until
+                // webForCore had .NET Framework's string hash (#212), and is compared as a value of its own.
                 Match generator = Regex.Match(body, "id=\"__VIEWSTATEGENERATOR\" value=\"([^\"]*)\"");
                 if (generator.Success) headers["(__VIEWSTATEGENERATOR)"] = generator.Groups[1].Value;
                 _results["linq " + key] = new JsonObject

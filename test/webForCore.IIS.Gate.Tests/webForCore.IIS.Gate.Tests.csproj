@@ -34,8 +34,14 @@
     <!-- webforcore-regiis, run by ProtectedConfigurationTests. -->
     <ProjectReference Include="..\..\src\WebFormsForCore.RegIIS\WebFormsForCore.RegIIS.csproj" ReferenceOutputAssembly="false" />
     <!-- What .NET Framework 4.8 gave: aspnet_regsql -sqlexportonly (SqlServicesTests, #123), CodeDom (CodeDomTests, #135),
-         <machineKey> output (MachineKeyInteropTests, #191). -->
+         <machineKey> output (MachineKeyInteropTests, #191), StringComparer.InvariantCultureIgnoreCase hashes
+         (InvariantHashTests, #212). -->
     <None Include="FrameworkData\*" CopyToOutputDirectory="PreserveNewest" />
+    <!-- InvariantHashTests (#212): System.Web's InvariantIgnoreCaseHash and its table, compiled in here. -->
+    <Compile Include="..\..\src\WebFormsForCore.Web\WebFormsForCore\InvariantIgnoreCaseHash.cs" Link="InvariantIgnoreCaseHash.cs" />
+    <EmbeddedResource Include="..\..\src\WebFormsForCore.Web\FrameworkData\InvariantIgnoreCaseWeights.txt" Link="InvariantIgnoreCaseWeights.txt">
+      <LogicalName>System.Web.Util.InvariantIgnoreCaseWeights.txt</LogicalName>
+    </EmbeddedResource>
     <!-- webforcore-regsql, run by SqlServicesTests. -->
     <ProjectReference Include="..\..\src\WebFormsForCore.RegSql\WebFormsForCore.RegSql.csproj" ReferenceOutputAssembly="false" />
     <!-- aspnet_compiler and the host for the precompiled site, run by PrecompilationTests. -->
