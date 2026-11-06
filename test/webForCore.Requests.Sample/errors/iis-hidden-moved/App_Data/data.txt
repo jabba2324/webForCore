@@ -1,0 +1,1 @@
+A file in a hidden segment: request filtering answers 404.8 for it.

@@ -106,6 +106,38 @@ namespace IISGate
             Assert.StartsWith("NotFound.aspx\n", notFoundBody);
         }
 
+        // Subtext (the smoke test, webForCore 0.10.0): its forbidden-path probes (/App_Data/, /bin_dotnet/...) got a 301
+        // "Object moved" where 0.9.0 answered 404. Request filtering still answers 404.8 for a hidden segment before any
+        // module runs, as on IIS; Subtext's Web.config then sends every 404 to its error page by httpErrors ExecuteURL
+        // (errorMode="Custom"), and that page's URL (/Subtext.Web/pages/..., the folder Subtext was developed in) names a
+        // blog subfolder, so Subtext's BlogRequestModule redirects the child request permanently. The response is the
+        // child request's, with its status, as on IIS 10 (#192); until 0.10.0 webForCore put the 404 back on it, so
+        // Subtext's 301 went out as a 404 with a Location. The child request sees the error page's Path and the
+        // client's RawUrl.
+        [Theory]
+        [InlineData("/errors/iis-hidden/App_Data/data.txt")]
+        [InlineData("/errors/iis-hidden/App_Data/")]
+        public async Task HiddenSegmentRunsTheHttpErrorsPage(string path)
+        {
+            var (response, body) = await Send(HttpMethod.Get, path);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.StartsWith("IisError.aspx\nstatus: 200\n", body);
+            Assert.Contains("Path: /errors/IisError.aspx\n", body);
+            Assert.Contains("RawUrl: " + path + "\n", body);
+        }
+
+        [Theory]
+        [InlineData("/errors/iis-hidden-moved/App_Data/data.txt")]
+        [InlineData("/errors/iis-hidden-moved/App_Data/")]
+        public async Task HiddenSegmentsHttpErrorsPageRedirectIsTheResponse(string path)
+        {
+            var (response, body) = await Send(HttpMethod.Get, path);
+            Assert.Equal(HttpStatusCode.MovedPermanently, response.StatusCode);
+            Assert.Equal("/errors/NotFound.aspx?path=%2ferrors%2fMoved.aspx&rawurl=" + Uri.EscapeDataString(path).Replace("%2F", "%2f"),
+                response.Headers.Location?.OriginalString);
+            Assert.Contains("<title>Object moved</title>", body);
+        }
+
         // The detailed error page (RemoteOnly for a local request, and Off), and the generic one (On, no defaultRedirect).
         [Fact]
         public async Task TheErrorPagesAreASPNETs()
