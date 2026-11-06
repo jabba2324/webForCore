@@ -463,8 +463,8 @@ sealed class WorkerPool : IHostedLifecycleService, IDisposable
 	{
 		// Only the host says where a request came from.
 		foreach (var header in WorkerProtocol.RequestHeaders) context.Request.Headers.Remove(header);
-		// A request without a body can be sent again to the next worker if one that is shutting down didn't take it.
-		bool canRetry = context.Features.Get<IHttpRequestBodyDetectionFeature>()?.CanHaveBody == false;
+		// A request can be sent again to the next worker if one that is shutting down didn't take it, its body too (#214).
+		var body = RequestBody.For(context);
 		for (int attempt = 0; ; attempt++)
 		{
 			var (worker, remap) = await GetReadyWorkerAsync(context.RequestAborted);
@@ -479,7 +479,7 @@ sealed class WorkerPool : IHostedLifecycleService, IDisposable
 				if (!context.RequestAborted.IsCancellationRequested) await ServiceUnavailableAsync(context);
 				return;
 			}
-			var transformer = new WorkerTransformer(canRetry && attempt < MaxRetries);
+			var transformer = new WorkerTransformer(attempt < MaxRetries, body);
 			ForwarderError error;
 			try
 			{
@@ -495,6 +495,7 @@ sealed class WorkerPool : IHostedLifecycleService, IDisposable
 				// forwarder has already set the worker's 503 on the response (and won't forward into a response that isn't a
 				// fresh 200): clear it first.
 				context.Response.Clear();
+				body.Rewind();
 				try { await Task.Delay(RetryDelay, context.RequestAborted); }
 				catch (OperationCanceledException) { return; }
 				continue;
@@ -502,7 +503,7 @@ sealed class WorkerPool : IHostedLifecycleService, IDisposable
 			if (error != ForwarderError.None && !context.Response.HasStarted && !context.RequestAborted.IsCancellationRequested)
 			{
 				var exception = context.Features.Get<IForwarderErrorFeature>()?.Exception;
-				if (canRetry && attempt < MaxRetries && await HasEndedAsync(worker))
+				if (body.Unread && attempt < MaxRetries && await HasEndedAsync(worker))
 				{
 					// The worker's process ended (a crash, Environment.Exit) without answering: the request goes to the next
 					// worker, as one queued for a w3wp that died does on IIS.
