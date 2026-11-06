@@ -20,8 +20,8 @@ restore the old behaviour, the difference is documented.
 | | |
 | --- | --- |
 | Target | .NET 10 LTS (`net10.0`), Linux x64; Windows as a development environment (built and tested in CI) |
-| Status | Pre-release (0.9.0). No production app has been migrated yet. NuGet packages are on a [feed on GitHub Pages](https://xforcore.github.io/webForCore/index.json) (from 0.7.0) and attached to [GitHub releases](https://github.com/xforcore/webForCore/releases), not published on nuget.org |
-| Tests | 24,534 tests in 27 suites, almost all of them Microsoft's and Mono's; all pass ([TESTING.md](docs/TESTING.md)). System.Drawing's own tests are [drawingForCore](https://github.com/xforcore/drawingForCore)'s |
+| Status | Pre-release (0.10.0). No production app has been migrated yet. NuGet packages are on a [feed on GitHub Pages](https://xforcore.github.io/webForCore/index.json) (from 0.7.0) and attached to [GitHub releases](https://github.com/xforcore/webForCore/releases), not published on nuget.org |
+| Tests | 24,933 tests in 34 suites, almost all of them Microsoft's and Mono's; all pass ([TESTING.md](docs/TESTING.md)). System.Drawing's own tests are [drawingForCore](https://github.com/xforcore/drawingForCore)'s |
 | Licence | MIT, Apache 2.0 and BSD 3-Clause, all of which allow commercial use; see [docs/LICENSING.md](docs/LICENSING.md) |
 
 ## What works
