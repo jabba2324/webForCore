@@ -1,0 +1,85 @@
+# What IIS 10 decides for each fcnMode change, over many runs (#189): tools/ci/iis_fcn.cs's sites and checks, as CI's
+# iis-compare job runs them, repeated on several runners, each run on new sites. The summary counts, for each mode and
+# change, the runs in which IIS restarted the application and those in which it didn't. iis_fcn.cs asserts only what
+# IIS decided the same way in every run, and records the rest (docs/TESTING.md).
+name: IIS fcnMode stability
+
+on:
+  # Temporary: a workflow_dispatch workflow runs only from the default branch, so this branch measures on push.
+  push:
+    branches: [fix/189-fcn-stability]
+  workflow_dispatch:
+    inputs:
+      runs:
+        description: Runs on each of the 5 runners
+        default: '10'
+
+permissions:
+  contents: read
+
+jobs:
+  measure:
+    runs-on: windows-2025
+    timeout-minutes: 65
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [1, 2, 3, 4, 5]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET (global.json)
+        uses: actions/setup-dotnet@v4
+
+      - name: Runs
+        timeout-minutes: 55
+        env:
+          RUNS: ${{ inputs.runs || '10' }}
+          MSYS_NO_PATHCONV: 1
+        run: |
+          mkdir -p "$RUNNER_TEMP/out"
+          for i in $(seq "$RUNS"); do
+            root="$RUNNER_TEMP/run$i"
+            # The compared sites are written before IIS serves them, as in iis-compare; Fresh after.
+            dotnet run tools/ci/iis_fcn.cs -- site "$root/fcn-Single" Single
+            dotnet run tools/ci/iis_fcn.cs -- site "$root/fcn-Default" Default
+            mkdir -p "$root/fcn-Fresh/App_Data"
+            for site in "Single 8094" "Default 8095" "Fresh 8096"; do
+              set -- $site
+              powershell -NoProfile -ExecutionPolicy Bypass -File tools/ci/iis-site.ps1 -Path "$(cygpath -w "$root/fcn-$1")" -Name "fcn-$1" -Port $2 -Pipeline Classic > /dev/null
+              icacls "$(cygpath -w "$root/fcn-$1/App_Data")" /grant "IIS_IUSRS:(OI)(CI)M" /T /Q > /dev/null
+            done
+            dotnet run tools/ci/iis_fcn.cs -- site "$root/fcn-Fresh" Single
+            report="$RUNNER_TEMP/out/run$i.md"
+            for site in "Single 8094" "Default 8095"; do
+              set -- $site
+              timeout 300 dotnet run tools/ci/iis_fcn.cs -- check "$root/fcn-$1" "http://localhost:$2/" "$1" "$report" | sed "s/^/$1: /" | tee -a "$RUNNER_TEMP/out/lines.txt" || true
+            done
+            timeout 300 dotnet run tools/ci/iis_fcn.cs -- check "$root/fcn-Fresh" http://localhost:8096/ Single "$report" fresh | sed "s/^/Fresh: /" | tee -a "$RUNNER_TEMP/out/lines.txt" || true
+          done
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fcn-${{ matrix.runner }}
+          path: ${{ runner.temp }}/out
+
+  summary:
+    needs: measure
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: out
+      - name: Count
+        run: |
+          {
+            echo "## IIS 10's decisions over $(cat out/*/run*.md | grep -c '^### IIS 10, fcnMode=\"Single\"$') runs of each site"
+            echo
+            echo '| count | site: change: IIS, webForCore |'
+            echo '| --- | --- |'
+            cat out/*/lines.txt | grep -E 'IIS (no )?restart, webForCore' | sort | uniq -c | sed -E 's/^ *([0-9]+) (.*)/| \1 | \2 |/'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
