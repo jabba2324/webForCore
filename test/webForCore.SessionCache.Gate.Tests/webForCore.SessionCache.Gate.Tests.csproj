@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The session state and output cache gate: two instances of test/webForCore.SessionCache.Sample under webforcore-host, each from its own copy
+       of the site (two servers), sharing session state and the output cache through Redis and SQL Server with
+       Microsoft's .NET Framework providers, configured in web.config as on IIS. Redis at 127.0.0.1:16379
+       (tools/ci/redis.sh; WEBFORCORE_REDIS to use another), SQL Server at 127.0.0.1,14333. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <ProjectReference Include="..\..\src\webForCore.System.Data.SqlClient\webForCore.System.Data.SqlClient.csproj" />
+    <!-- Built and run, not referenced. -->
+    <ProjectReference Include="..\webForCore.SessionCache.Sample\webForCore.SessionCache.Sample.csproj" ReferenceOutputAssembly="false" />
+    <!-- The sample runs under webforcore-host (#56), from its build here; webforcore-regsql makes the session database. -->
+    <ProjectReference Include="..\..\src\WebFormsForCore.Host\WebFormsForCore.Host.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.RegSql\WebFormsForCore.RegSql.csproj" ReferenceOutputAssembly="false" />
+    <Compile Include="..\Shared\WebForCoreHost.cs" Link="WebForCoreHost.cs" />
+  </ItemGroup>
+</Project>

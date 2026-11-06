@@ -23,7 +23,7 @@ namespace HostTests
             public string Directory { get; }
             readonly string temp;
 
-            public Site(string fcnMode)
+            public Site(string fcnMode, string runtime = null)
             {
                 temp = System.IO.Directory.CreateTempSubdirectory("webforcore-fcn-").FullName;
                 Directory = Path.Combine(temp, "site");
@@ -40,6 +40,7 @@ namespace HostTests
                         <compilation debug="false" targetFramework="4.8" />
                         <httpRuntime targetFramework="4.8"{attribute} />
                       </system.web>
+                    {runtime}
                     </configuration>
                     """);
                 System.IO.Directory.CreateDirectory(Path.Combine(Directory, "App_Data", "unwatched"));

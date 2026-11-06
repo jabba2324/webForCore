@@ -41,6 +41,7 @@
     <ProjectReference Include="..\..\src\WebFormsForCore.Web.Infrastructure\WebFormsForCore.Web.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\WebFormsForCore.Compilers\WebFormsForCore.Compilers.csproj" />
     <ProjectReference Include="..\..\src\webForCore.System.Web.Http.WebHost\webForCore.System.Web.Http.WebHost.csproj" />
+    <ProjectReference Include="..\..\src\webForCore.System.Web.Http.Tracing\webForCore.System.Web.Http.Tracing.csproj" />
     <ProjectReference Include="..\..\src\webForCore.System.Web.Http.Owin\webForCore.System.Web.Http.Owin.csproj" />
     <ProjectReference Include="..\..\src\webForCore.Microsoft.Owin.Host.SystemWeb\webForCore.Microsoft.Owin.Host.SystemWeb.csproj" />
   </ItemGroup>

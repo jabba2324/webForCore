@@ -13,5 +13,10 @@
     "requests": "^system\\.web GET ",
     "field": "header X-AspNet-Version",
     "reason": "IIS's native 404 page is not ASP.NET's, so it has no X-AspNet-Version."
+  },
+  {
+    "requests": "^trace GET /api/trace/listeners$",
+    "field": "body",
+    "reason": "Web.config's <system.diagnostics> trace listeners: on .NET Framework, System.Diagnostics.Trace creates them (Trace.Listeners has \"webconfig\"); webForCore doesn't apply the section (docs/NAMESPACES.md, WebApi.Gate.Tests' WebConfigTraceListenersAreNotApplied)."
   }
 ]
