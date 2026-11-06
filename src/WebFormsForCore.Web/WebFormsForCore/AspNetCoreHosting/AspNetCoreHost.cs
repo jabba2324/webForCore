@@ -294,9 +294,15 @@ namespace System.Web.Hosting
 		}
 
 
-		public SecurityIdentifier GetProcessSid() => WindowsIdentity.GetCurrent().User;
-        public IntPtr GetProcessToken() => WindowsIdentity.GetCurrent().Token;
-        public string GetProcessUser() => WindowsIdentity.GetCurrent().Name;
+		// webForCore: off Windows there is no Windows token or account, and WindowsIdentity.GetCurrent threw
+		// PlatformNotSupportedException for LOGON_USER, AUTH_TYPE and Request.LogonUserIdentity (#165). There the worker
+		// request has no user token (IntPtr.Zero, as .NET Framework's SimpleWorkerRequest): LOGON_USER and AUTH_TYPE are
+		// empty, as IIS gives them for an anonymous request, LogonUserIdentity is null (HttpWorkerRequest.
+		// GetLogonUserIdentity's "invalid token"), and <identity impersonate="true"/> impersonates nothing
+		// (ClientImpersonationContext impersonates only a token). Windows is unchanged.
+		public SecurityIdentifier GetProcessSid() => OperatingSystem.IsWindows() ? WindowsIdentity.GetCurrent().User : null;
+        public IntPtr GetProcessToken() => OperatingSystem.IsWindows() ? WindowsIdentity.GetCurrent().Token : IntPtr.Zero;
+        public string GetProcessUser() => OperatingSystem.IsWindows() ? WindowsIdentity.GetCurrent().Name : string.Empty;
 
         public override object InitializeLifetimeService()
         {

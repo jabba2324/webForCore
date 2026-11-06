@@ -140,13 +140,13 @@ IIS hands ASP.NET a worker request (`HttpWorkerRequest`); on Kestrel this is `As
 
 | IIS feature | Status | Notes |
 | --- | --- | --- |
-| Anonymous | Works | |
+| Anonymous | Works | Off Windows `LOGON_USER` and `AUTH_TYPE` are empty, as on IIS, and `Request.LogonUserIdentity` is `null`, not the anonymous account's `WindowsIdentity`; on Windows they are the worker process's account, as in Visual Studio's development server (#165, [NAMESPACES.md](NAMESPACES.md#systemweb-srcwebformsforcoreweb)) |
 | Forms, ASP.NET Identity, OWIN cookies, OAuth | Works | All in managed code |
 | Sharing `<machineKey>` output with .NET Framework 4.8 (forms tickets, `MachineKey.Protect` and `Encode`, OWIN and ASP.NET Identity cookies) | Works | With the same `<machineKey>`, each runtime reads the other's output, both ways: validation SHA1, HMACSHA256 and HMACSHA512, decryption AES and 3DES, `compatibilityMode` Framework20SP1, Framework20SP2 and Framework45, and none with `<httpRuntime targetFramework="4.5">` or later. Katana's cookies (`UseCookieAuthentication` on `Microsoft.Owin.Host.SystemWeb`, Identity's application cookie with `SecurityStampValidator` too) are protected with the machine key, not DPAPI, as on IIS. Output that is the same on every call (`MachineKey.Encode` with `Validation`) is the same bytes; the rest has a random IV, on both. Not shared: an application without `targetFramework` and without `compatibilityMode` (Framework20SP1 on .NET Framework, Framework45 here: forms tickets; set `compatibilityMode` on both), and `IsolateApps` or `IsolateByAppId` after an explicit key (the key is changed with a hash of the virtual path or the application ID, which .NET Framework computes from Windows' sort keys, `StringComparer.InvariantCultureIgnoreCase`, so it differs even with IIS's application ID). Fixed in 0.10.0: HMACSHA256 and HMACSHA512 in the Framework20 modes and `MachineKey.Encode` (#191). Tested by `MachineKeyInteropTests` and CI's `machinekey-framework-interop` job ([TESTING.md](TESTING.md)) |
 | URL authorization (`<system.web>` and `<system.webServer>`) | Works | |
 | Windows (Negotiate, Kerberos, NTLM) | Not built | Kestrel's Negotiate handler exists but isn't connected to System.Web's `User` |
 | Basic, Digest | Not built | There are no Windows accounts to check against |
-| Impersonation | Not possible | There's no Windows identity to impersonate |
+| Impersonation | Not possible | There's no Windows identity to impersonate. `<identity impersonate="true"/>` is accepted and impersonates nothing: requests run as the worker process's user (#165) |
 | WS-Federation through Windows Identity Foundation (`WSFederationAuthenticationModule`, `SessionAuthenticationModule`, `<system.identityModel>`) | Not available | .NET has no `System.IdentityModel` (WIF), #119. Katana's `Microsoft.Owin.Security.WsFederation` signs in with WS-Federation on OWIN ([NAMESPACES.md](NAMESPACES.md#summary-of-what-doesnt-work)) |
 
 ## Deployment tools
@@ -322,6 +322,7 @@ these, which `tools/ci/iis-known-differences-requests.json` lists:
 | An `ExecuteURL` static page (httpErrors) has ASP.NET's static file headers | As for any static file |
 | `existingResponse="Auto"` replaces an error response the application sent without `TrySkipIisCustomErrors` | As IIS's integrated pipeline does; IIS's classic pipeline leaves every ASP.NET response with a body |
 | customErrors' answer for a page that doesn't exist has no `X-AspNet-Version` or default `Cache-Control: private` | As IIS's integrated pipeline, whose rule webForCore follows ([decisions](#compatibility-decisions)) |
+| `Request.LogonUserIdentity` of an anonymous request is `null`; IIS gives the anonymous account's `WindowsIdentity`. `LOGON_USER` and `AUTH_TYPE` are empty on both (`identity/Anonymous.aspx`) | There is no Windows token off Windows (#165, [NAMESPACES.md](NAMESPACES.md#systemweb-srcwebformsforcoreweb)) |
 
 The integrated pipeline is recorded too: it also sets `HTTP_URL`, `UNENCODED_URL` and `CACHE_URL` (`ServerVariables.aspx`).
 

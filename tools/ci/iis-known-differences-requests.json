@@ -153,5 +153,10 @@
     "requests": "^GET /errors/(on|rewrite)/Missing\\.aspx$",
     "field": "header X-AspNet-Version",
     "reason": "customErrors' answer for a page that doesn't exist (an error before any handler ran) has no X-AspNet-Version or default Cache-Control: private, as in IIS's integrated pipeline, whose rule webForCore follows; IIS's classic pipeline adds them to every ASP.NET response (#192)."
+  },
+  {
+    "requests": "^GET /identity/Anonymous\\.aspx$",
+    "field": "body",
+    "reason": "Request.LogonUserIdentity of an anonymous request is null off Windows, where there is no Windows token (#165): .NET Framework's HttpWorkerRequest.GetLogonUserIdentity returns null for a worker request without one; IIS gives the anonymous account's WindowsIdentity. LOGON_USER and AUTH_TYPE are empty on both."
   }
 ]
