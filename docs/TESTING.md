@@ -78,6 +78,9 @@ System.Web.Optimization and WebGrease (#141). Before the smoke test, `tools/ci/c
 every assembly in the packages against the Microsoft assembly it replaces, read from Microsoft's NuGet package (name,
 version, culture and public key token; `tools/ci/assembly-identities.json` says where each one is, and why System.Web
 and System.Configuration.ConfigurationManager have higher versions), and fails on any difference (#141).
+The smoke test scripts (and `tools/ci/testapp-smoke.sh`) end: every request has a time limit (`--max-time`), the
+wait for a server to serve and for it to stop are bounded, and a timeout says what it waited for and prints the server's
+output (`tools/ci/smoke-lib.sh`); the steps have a `timeout-minutes` too (#215).
 
 CI's `linq-framework-data` job (#142) reads .NET Framework 4.8's `System.Data.Linq.dll` on a Windows runner with
 `tools/linq/framework_data.cs` and fails if the names, messages and exception types differ from the committed

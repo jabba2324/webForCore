@@ -4,10 +4,11 @@
 # Usage: tools/ci/testapp-smoke.sh
 set -euo pipefail
 root=$(cd "$(dirname "$0")/../.." && pwd)
+. "$root/tools/ci/smoke-lib.sh"
 app=$root/src/WebFormsForCore.TestApp
 port=5197
 log=$(mktemp)
-cleanup() { kill $server 2>/dev/null || true; rm -f "$log"; }
+cleanup() { [ -z "$server" ] || kill $server 2>/dev/null || true; rm -f "$log"; }
 server=
 trap cleanup EXIT
 
@@ -29,14 +30,14 @@ grep -q '".NETCoreApp,Version=v10.0"' "$deps" || { echo "deps.json: not the SDK'
 # The TestApp's own Kestrel endpoint (appsettings.json) is localhost:5000; configuration overrides it.
 (cd "$app" && Kestrel__Endpoints__Http__Url=http://127.0.0.1:$port exec dotnet bin_dotnet/WebFormsForCore.TestApp.dll) > "$log" 2>&1 &
 server=$!
-for i in $(seq 120); do curl -s -o /dev/null http://127.0.0.1:$port/favicon.ico && break; sleep 1; done
+wait_ready http://127.0.0.1:$port/favicon.ico $server "$log"
 # FriendlyUrls redirects /Default.aspx to /Default (301); -L follows it.
 for page in / /Default.aspx /About /Contact /Test /SessionTest; do
-  body=$(curl -sL -w '\n%{http_code}' http://127.0.0.1:$port$page)
+  body=$(http -L -w '\n%{http_code}' http://127.0.0.1:$port$page)
   code=${body##*$'\n'}
   if [ "$code" != 200 ] || ! grep -q '__VIEWSTATE' <<< "$body"; then echo "$page: $code"; fail=1; fi
 done
-code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:$port/NoSuchPage.aspx)
+code=$(http -o /dev/null -w '%{http_code}' http://127.0.0.1:$port/NoSuchPage.aspx)
 [ "$code" = 404 ] || { echo "/NoSuchPage.aspx: $code (expected 404)"; fail=1; }
 if [ $fail -ne 0 ]; then cat "$log"; exit 1; fi
 echo "TestApp smoke test passed."

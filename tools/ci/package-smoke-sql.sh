@@ -9,6 +9,7 @@
 set -euo pipefail
 packages=$(cd "$1" && { pwd -W 2>/dev/null || pwd; }); version=$2
 here=$(cd "$(dirname "$0")" && pwd)
+. "$here/smoke-lib.sh"
 base=$(mktemp -d)
 server=
 cleanup() {
@@ -58,8 +59,8 @@ CONFIG
 
   dotnet bin_dotnet/webforcore-host/webforcore-host.dll --urls http://127.0.0.1:5197 > server.log 2>&1 &
   server=$!
-  for i in $(seq 120); do curl -sf -o /dev/null http://127.0.0.1:5197/Session.aspx && break; sleep 1; done
-  sql=$(curl -s http://127.0.0.1:5197/Sql.aspx)
+  wait_ready http://127.0.0.1:5197/Session.aspx $server server.log
+  sql=$(http http://127.0.0.1:5197/Sql.aspx)
   echo "$variant: Sql.aspx:"; echo "$sql"
   if [ $variant = Microsoft ]; then
     expected_client="System.Data.SqlClient: 4.6.1.6, file 4.900."; getTypes=ReflectionTypeLoadException; shared=2
@@ -72,10 +73,10 @@ CONFIG
     echo "$sql" | grep -qF -- "$line" || { echo "$variant: Sql.aspx has no \"$line\""; fail=1; }
   done
   jar=$work/cookies
-  curl -s -c "$jar" -b "$jar" http://127.0.0.1:5197/Session.aspx > /dev/null
-  session=$(curl -s -c "$jar" -b "$jar" http://127.0.0.1:5197/Session.aspx)
+  http -c "$jar" -b "$jar" http://127.0.0.1:5197/Session.aspx > /dev/null
+  session=$(http -c "$jar" -b "$jar" http://127.0.0.1:5197/Session.aspx)
   [ "$session" = "session: 2" ] || { echo "$variant: Session.aspx: $session"; fail=1; }
-  kill $server; wait $server 2>/dev/null || true; server=
+  stop_server $server server.log; server=
   if [ $fail -ne 0 ]; then cat server.log; exit 1; fi
   cd "$base"
 done
