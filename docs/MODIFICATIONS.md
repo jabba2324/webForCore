@@ -118,6 +118,14 @@ commit that made it, and its issue, say why.
   `HttpRuntime.Unloaded` instead, and the worker process stops then. The host object used to wait for the requests
   itself and abort them after `<hostingEnvironment shutdownTimeout>`, and the worker stopped Kestrel at once, which
   aborted them after its own 30 s.
+  The request `HttpRuntime.ProcessRequestInternal` turns away once `Dispose` has drained ("Server Too Busy", 503: it
+  reached the old worker before the application began shutting down, and the runtime only after the drain) carries
+  the worker's restarting header, so that webforcore-host sends it to the next worker when it has no body (#209).
+  `AspNetCoreWorkerRequest.CloseConnection` sends `Connection: close` when the response hasn't started. In a worker of
+  webforcore-host, once the response has started, it leaves the connection to the host open (Kestrel drains the
+  unread body): a close the response didn't announce reset the next request the host's pool sent on that connection.
+  Request filtering's 413.1 for a body over `maxAllowedContentLength` (`IIS/IISModules.cs`) lifts Kestrel's body limit
+  for that request, so that Kestrel drains the body rather than closing the connection.
   `AspNetCoreWorkerRequest.ParseHeaders` stores the request's unknown headers whatever the path: the cookieless
   session check it took from IIS's filter returned before storing them when a path had a `(` and no `/(...)/`
   (#170, OData's `/People(1)` lost `Prefer`).

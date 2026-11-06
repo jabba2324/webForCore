@@ -1754,6 +1754,13 @@ namespace System.Web
                 try {
                     wr.SendStatus(503, "Server Too Busy");
                     wr.SendKnownResponseHeader(HttpWorkerRequest.HeaderContentType, "text/html; charset=utf-8");
+#if !NETFRAMEWORK
+                    // webForCore: the request wasn't processed. It reached the old worker's middleware before the application
+                    // began shutting down, and HttpRuntime only once the drain had found no request running. On IIS a
+                    // request that arrives during a restart is answered by the next application; webforcore-host sends
+                    // this one to the next worker, as it does those the middleware turns away (#209).
+                    if (wr is AspNetCoreWorkerRequest) wr.SendUnknownResponseHeader(WebFormsForCore.Hosting.WorkerProcess.RestartingHeader, "1");
+#endif
                     byte[] body = Encoding.ASCII.GetBytes("<html><body>Server Too Busy</body></html>");
                     wr.SendResponseFromMemory(body, body.Length);
                     // this will flush synchronously because of HttpRuntime.ShutdownInProgress
