@@ -136,6 +136,9 @@ commit that made it, and its issue, say why.
   in IIS's header block (Katana's cookie middleware's `Expires: -1`, found by the OpenID Connect comparison with IIS 10);
   `Response.Redirect` sets `text/html` as in the integrated pipeline, so a redirect before any handler ran (customErrors'
   for a page that doesn't exist) has its Content-Type (#192).
+  Server variables an application sets (`Request.ServerVariables["REMOTE_ADDR"] = ...`) are kept by the worker request,
+  as IIS keeps them in its own block, and it answers `UserHostAddress`, `IsSecureConnection`, `LOCAL_ADDR`,
+  `SERVER_NAME` and `SERVER_PORT` with them, as `IIS7WorkerRequest` does (`HttpServerVarsCollection` hands them to it, #194).
 - **.NET's base class library, where an application sees the difference:** `HttpException` and its subclasses built
   with a null message have .NET Framework's `Exception` default ("Exception of type '...' was thrown."), not .NET's
   `ExternalException` one ("External component has thrown an exception."): Page.HandleError's `HttpUnhandledException`

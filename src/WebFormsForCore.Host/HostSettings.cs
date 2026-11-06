@@ -66,6 +66,59 @@ public sealed class HostSettings
 	// is passed to the application, which sees whether it is valid (Request.ClientCertificate.IsValid, CERT_FLAGS).
 	// For tests and private deployments; off by default.
 	public bool AcceptUntrustedClientCertificates { get; set; }
+
+	// A reverse proxy in front of the host (a load balancer or an ingress that ends TLS) and the headers the host takes
+	// from it (#194). Off by default: the client's address and the scheme are the connection's, as on IIS.
+	public ForwardedHeadersSettings ForwardedHeaders { get; set; } = new();
+}
+
+// "WebForCore:Host:ForwardedHeaders": the host applies X-Forwarded-For, -Proto and -Host from the proxies it trusts, with
+// ASP.NET Core's forwarded headers middleware, before it forwards the request to the worker; the application then sees
+// the client's address (Request.UserHostAddress, REMOTE_ADDR, <ipSecurity>), the scheme (IsSecureConnection, HTTPS,
+// Request.Url, requireSSL) and the host name (SERVER_NAME, Request.Url) the proxy received. Only the host sees which
+// proxy a request came from: the worker's own connection is the host's (docs/MIGRATING.md).
+public sealed class ForwardedHeadersSettings
+{
+	// Which headers: XForwardedFor, XForwardedProto, XForwardedHost, comma-separated ("XForwardedFor, XForwardedProto").
+	// None by default. XForwardedPrefix isn't taken: an application under a path has it as its virtual path.
+	public Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders Headers { get; set; }
+
+	// The proxies whose headers are applied, by address, and by network in CIDR notation ("10.0.0.0/8"). With neither, a
+	// proxy on this machine (the loopback addresses, ASP.NET Core's default). Headers from any other address are ignored: a
+	// client that reaches the host directly can't set its own address or scheme.
+	public string[] KnownProxies { get; set; } = [];
+	public string[] KnownNetworks { get; set; } = [];
+
+	// How many proxies' entries are applied, from the right of each header: the number of trusted proxies in a chain.
+	public int ForwardLimit { get; set; } = 1;
+
+	// The host names X-Forwarded-Host may give ("example.com", "*.example.com"); any when empty, as in ASP.NET Core.
+	public string[] AllowedHosts { get; set; } = [];
+
+	public bool Enabled => Headers != Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.None;
+
+	public ForwardedHeadersOptions ToOptions()
+	{
+		var supported = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor
+			| Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto
+			| Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedHost;
+		if ((Headers & ~supported) != 0)
+			throw new InvalidOperationException($"{HostSettings.Section}:ForwardedHeaders:Headers: only XForwardedFor, XForwardedProto and XForwardedHost " +
+				"are taken. An application under a path sets it as its virtual path: UseWebForms(o => o.VirtualPath(\"/app\")).");
+		var options = new ForwardedHeadersOptions { ForwardedHeaders = Headers, ForwardLimit = ForwardLimit };
+		if (KnownProxies.Length + KnownNetworks.Length > 0)
+		{
+			options.KnownProxies.Clear();
+			options.KnownIPNetworks.Clear();
+		}
+		foreach (var proxy in KnownProxies) options.KnownProxies.Add(System.Net.IPAddress.Parse(proxy));
+		foreach (var network in KnownNetworks) options.KnownIPNetworks.Add(System.Net.IPNetwork.Parse(network));
+		foreach (var host in AllowedHosts) options.AllowedHosts.Add(host);
+		return options;
+	}
+
+	public override string ToString() => $"{Headers} from {string.Join(", ", KnownProxies.Length + KnownNetworks.Length == 0 ? ["loopback"] : KnownProxies.Concat(KnownNetworks))}" +
+		$" (ForwardLimit {ForwardLimit}{(AllowedHosts.Length > 0 ? ", hosts " + string.Join(", ", AllowedHosts) : "")})";
 }
 
 public enum StartMode { OnDemand, AlwaysRunning }

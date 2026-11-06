@@ -283,13 +283,15 @@ namespace WebFormsForCore.Hosting.IIS
 		// <defaultDocument>, and IIS's courtesy redirect of a directory URL without its trailing slash.
 		async Task<bool> DefaultDocument(HttpContext context, XElement section)
 		{
-			var path = context.Request.Path.Value ?? "/";
-			if (path == "") path = "/";
-			var mapped = MapPath(path);
+			var path = context.Request.Path.Value ?? "";
+			// webForCore: an empty path is the application's own URL without its trailing slash: "/app" for an application
+			// under a virtual path (#190), a directory URL like any other.
+			var mapped = MapPath(path.Length == 0 ? "/" : path);
 			if (!Directory.Exists(mapped)) return false;
 			if (!path.EndsWith("/"))
 			{
-				// A route of the application takes it first (RouteExistingFiles), as UrlRoutingModule does on IIS (#13).
+				// A route of the application takes it first (RouteExistingFiles, or the application's own URL), as
+				// UrlRoutingModule does on IIS (#13).
 				if (RouteClaims?.Invoke(context.Request.PathBase + path) == true) return false;
 				// An absolute URL, as IIS sends it (#127).
 				var location = context.Request.Scheme + "://" + context.Request.Host + context.Request.PathBase + path + "/" + context.Request.QueryString;

@@ -48,6 +48,13 @@ builder.Services.AddHostedService(services => services.GetRequiredService<Worker
 
 var app = builder.Build();
 var pool = app.Services.GetRequiredService<WorkerPool>();
+// The proxy's headers, before the request goes to the worker (#194): the worker's peer is the host, so only the host can
+// tell whether a request came from a trusted proxy. Invalid settings stop the host here, before it serves.
+if (settings.ForwardedHeaders.Enabled)
+{
+	app.UseForwardedHeaders(settings.ForwardedHeaders.ToOptions());
+	app.Logger.LogInformation("Forwarded headers: {ForwardedHeaders}.", settings.ForwardedHeaders);
+}
 app.Run(pool.ForwardAsync);
 await app.RunAsync();
 return 0;

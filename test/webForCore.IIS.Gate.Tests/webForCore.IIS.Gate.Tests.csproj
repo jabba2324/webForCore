@@ -24,6 +24,8 @@
          Interop/MachineKeyConfigs.cs, which is compiled in here too. -->
     <ProjectReference Include="..\webForCore.MachineKey.Sample\webForCore.MachineKey.Sample.csproj" ReferenceOutputAssembly="false" />
     <Compile Include="..\webForCore.MachineKey.Sample\Interop\MachineKeyConfigs.cs" Link="MachineKeyConfigs.cs" />
+    <!-- VirtualPathTests and ForwardedHeadersTests: an application under /app (#190) and behind a proxy (#194). -->
+    <ProjectReference Include="..\webForCore.VirtualPath.Sample\webForCore.VirtualPath.Sample.csproj" ReferenceOutputAssembly="false" />
     <!-- LinqDataSourceTests: the scenarios that CI's iis-compare job also runs against IIS 10. -->
     <ProjectReference Include="..\webForCore.Linq.Scenarios\webForCore.Linq.Scenarios.csproj" />
     <!-- The samples run under webforcore-host (#56), from its build here. -->

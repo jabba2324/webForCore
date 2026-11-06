@@ -248,6 +248,8 @@ namespace System.Web {
           
             if (_iis7workerRequest != null) _iis7workerRequest.SetServerVariable(name, value);
             else if (StringUtil.StringStartsWith(name, "HTTP_")) _kestrel.SetRequestHeader(name.Substring(5).Replace('_', '-'), value, true);
+            // webForCore: the others are kept by the worker request, as IIS keeps them, for UserHostAddress, IsSecureConnection, ... (#194).
+            else _kestrel?.SetServerVariable(name, value);
             SetServerVariableManagedOnly(name, value);
             SynchronizeHeader(name, value);
             _request.InvalidateParams();
@@ -333,6 +335,7 @@ namespace System.Web {
             // delete by sending null value
             if (_iis7workerRequest != null) _iis7workerRequest.SetServerVariable(name, null /*value*/);
             else if (StringUtil.StringStartsWith(name, "HTTP_")) _kestrel.SetRequestHeader(name.Substring(5).Replace('_', '-'), null, false);
+            else _kestrel?.SetServerVariable(name, null); // webForCore: as in SetNoDemand (#194)
 
             base.Remove(name);
             SynchronizeHeader(name, null);

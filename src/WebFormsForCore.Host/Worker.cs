@@ -15,6 +15,8 @@ sealed class Worker : IDisposable
 	public int Id { get; }
 	public string SocketPath { get; }
 	public WorkerState State { get; set; } = WorkerState.Starting;
+	// The application's virtual path without its trailing slash ("" at the root), from its ready message.
+	public string ApplicationPath { get; set; } = "";
 	public DateTime Started { get; } = DateTime.UtcNow;
 	public Process? Process { get; private set; }
 	public HttpMessageInvoker Invoker { get; }
@@ -76,6 +78,11 @@ sealed class Worker : IDisposable
 		// details) before its Program.cs runs, whatever that contains.
 		var startups = Environment.GetEnvironmentVariable(WorkerProtocol.HostingStartupVariable);
 		start.Environment[WorkerProtocol.HostingStartupVariable] = string.IsNullOrEmpty(startups) ? "System.Web" : startups + ";System.Web";
+		// ASP.NET Core's ASPNETCORE_FORWARDEDHEADERS_ENABLED (or ForwardedHeaders_Enabled in appsettings.json) is the host's:
+		// it has applied X-Forwarded-For and -Proto, trusting any peer, and the worker gets the result. Applied again in
+		// the worker, whose peer is always the host, it took the entry a client had put before the proxy's own, so a client
+		// could set its address past the proxy (#194). The application's own UseForwardedHeaders(...) still applies.
+		start.Environment["FORWARDEDHEADERS_ENABLED"] = "false";
 		var process = Process.Start(start) ?? throw new InvalidOperationException("The worker process didn't start.");
 		Process = process;
 		ProcessId = process.Id;

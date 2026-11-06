@@ -244,6 +244,23 @@ namespace System.Web.Hosting
 			ParseHeaders();
 		}
 
+		// webForCore: server variables the application set (Request.ServerVariables[name] = value, other than HTTP_ ones).
+		// IIS's integrated pipeline keeps them in IIS's own server variable block, from which IIS7WorkerRequest reads
+		// REMOTE_ADDR, REMOTE_HOST, LOCAL_ADDR, SERVER_NAME, SERVER_PORT and HTTPS: a module that copies the client's address
+		// and scheme from a proxy's headers into REMOTE_ADDR and HTTPS changes Request.UserHostAddress, IsSecureConnection and
+		// Url, as on IIS (#194). Before, only the ServerVariables collection had the new values.
+		Dictionary<string, string> serverVariables;
+
+		// A null value removes the variable: the connection's value is used again.
+		internal void SetServerVariable(string name, string value)
+		{
+			serverVariables ??= new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+			if (value == null) serverVariables.Remove(name);
+			else serverVariables[name] = value;
+		}
+
+		string SetVariable(string name) => serverVariables != null && serverVariables.TryGetValue(name, out var value) ? value : null;
+
 		// Request.InsertEntityBody: the body read so far, for whatever reads the request after ASP.NET (a transferred
 		// request, middleware after UseWebForms).
 		internal void InsertEntityBody(byte[] buffer, int offset, int count)
@@ -352,7 +369,7 @@ namespace System.Web.Hosting
 		public override string GetHttpVerbName() => Context.Request.Method;
 		public override string GetHttpVersion() => Context.Request.Protocol;
 		public override string GetKnownRequestHeader(int index) => knownRequestHeaders[index];
-		public override string GetLocalAddress() => Context.Connection.LocalIpAddress.ToString();
+		public override string GetLocalAddress() => SetVariable("LOCAL_ADDR") ?? Context.Connection.LocalIpAddress.ToString();
 		public override int GetLocalPort() => Context.Connection.LocalPort;
 		public override string GetPathInfo() => pathInfo;
 		public override byte[] GetPreloadedEntityBody() => null;
@@ -372,10 +389,14 @@ namespace System.Web.Hosting
 			if (string.IsNullOrEmpty(query)) return path;
 			return $"{path}?{query}";
 		}
-		public override string GetRemoteAddress() => Context.Connection.RemoteIpAddress.ToString();
+		public override string GetRemoteAddress() => SetVariable("REMOTE_ADDR") ?? Context.Connection.RemoteIpAddress.ToString();
+		// REMOTE_HOST is a variable of its own on IIS: the client's address (no reverse DNS), whatever REMOTE_ADDR was set to.
+		public override string GetRemoteName() => SetVariable("REMOTE_HOST") ?? Context.Connection.RemoteIpAddress.ToString();
 		public override int GetRemotePort() => Context.Connection.RemotePort;
+		internal override string GetLocalPortAsString() => SetVariable("SERVER_PORT") ?? base.GetLocalPortAsString();
 		public override string GetServerName()
 		{
+			if (SetVariable("SERVER_NAME") is string name) return name;
 			// webForCore: IIS sets SERVER_NAME from the request's Host header (the name the client used), and HttpRequest.Url
 			// is built from it. Fall back to the local address only when there is no Host header (HTTP/1.0).
 			string host = Context.Request.Host.Host;
@@ -399,6 +420,7 @@ namespace System.Web.Hosting
 			{
 				return processUser;
 			}
+			if (SetVariable(str2) is string set) return set;
 			// webForCore: the IIS server variables the classic pipeline asks the worker request for.
 			switch (str2)
 			{
@@ -502,8 +524,9 @@ namespace System.Web.Hosting
 
 		public override bool IsClientConnected() => !timedOut && !Context.RequestAborted.IsCancellationRequested;
 
-		// webForCore: HTTPS (Request.IsSecureConnection, Request.Url's scheme, SERVER_PORT_SECURE).
-		public override bool IsSecure() => Context.Request.IsHttps;
+		// webForCore: HTTPS (Request.IsSecureConnection, Request.Url's scheme, SERVER_PORT_SECURE); HTTPS as the application set
+		// it, as IIS7WorkerRequest reads it (#194).
+		public override bool IsSecure() => SetVariable("HTTPS") is string https ? https == "on" : Context.Request.IsHttps;
 
 		// webForCore: the client certificate Kestrel negotiated (HttpsConnectionAdapterOptions.ClientCertificateMode
 		// AllowCertificate or RequireCertificate), for Request.ClientCertificate and the CERT_ server variables.
@@ -1111,7 +1134,10 @@ namespace System.Web.Hosting
 		{
 			if (!requestParsed)
 			{
-				path = (Context.Request.PathBase.Value ?? "") + IisPath(Context.Request.Path.Value);
+				// webForCore: an empty path under a path base is the application's own URL without its trailing slash ("/app",
+				// #190): Request.Path is "/app", as on IIS.
+				var pathBase = Context.Request.PathBase.Value ?? "";
+				path = pathBase.Length > 0 && string.IsNullOrEmpty(Context.Request.Path.Value) ? pathBase : pathBase + IisPath(Context.Request.Path.Value);
 
 				// webForCore: the script is the first segment with an extension of a managed handler, as IIS maps it
 				// ("/Page.aspx/a.b/c": FilePath "/Page.aspx", PathInfo "/a.b/c"). This took the last dot's segment, and

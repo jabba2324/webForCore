@@ -102,6 +102,7 @@ namespace Microsoft.AspNetCore.Builder
 			optionsBuilder?.Invoke(new WebFormsOptions(this));
 
 			AppId = ApplicationManager.CreateApplicationId(VirtualPath, PhysicalPath);
+			WorkerProcess.ApplicationVirtualPath = VirtualPath;
 			if (IIS.Enabled)
 			{
 				var webServer = new WebServerConfiguration(PhysicalPath);
@@ -290,7 +291,25 @@ namespace Microsoft.AspNetCore.Builder
 		{
 			// webForCore: the request's path as IIS gives it, and its URL before any rewrite, for Request.RawUrl (#126, #127).
 			AspNetCoreWorkerRequest.BeginRequest(context);
+			if (!InApplication(context.Request)) return next.Invoke(context);
 			return iisModules != null ? iisModules.Invoke(context, InvokeApplication) : InvokeApplication(context);
+		}
+
+		// webForCore: an application under a virtual path (VirtualPath("/app")) is IIS's application /app of a site (#190).
+		// Its requests are the URLs at and below the path, in any case, as IIS matches them; the path becomes the request's
+		// PathBase, as UsePathBase would give it (and may already have), so that the IIS modules see the URL relative to the
+		// application, as IIS applies the application's Web.config, and System.Web sees the whole URL. The others aren't the
+		// application's: they go on to the rest of the pipeline, which answers 404 at its end, where IIS gave them to the
+		// site's other applications. They were the application's, and a path outside it failed with 500.
+		bool InApplication(Core.HttpRequest request)
+		{
+			if (VirtualPath == "/") return true;
+			string path = (request.PathBase.Value ?? "") + (request.Path.Value ?? "");
+			if (!path.StartsWith(VirtualPath, StringComparison.OrdinalIgnoreCase)
+				|| path.Length > VirtualPath.Length && path[VirtualPath.Length] != '/') return false;
+			request.PathBase = new Core.PathString(path.Substring(0, VirtualPath.Length));
+			request.Path = new Core.PathString(path.Substring(VirtualPath.Length));
+			return true;
 		}
 
 		async Task InvokeApplication(Core.HttpContext context)
@@ -330,9 +349,14 @@ namespace Microsoft.AspNetCore.Builder
 		public WebFormsOptions AddHandleExtensions(params string[] extensions) { Instance.AddHandleExtensions = Instance.AddHandleExtensions.Concat(extensions).ToArray(); return this; }
 		public WebFormsOptions DefaultDocuments(params string[] docs) { Instance.DefaultDocuments = docs; return this; }
 		public WebFormsOptions AddDefaultDocuments(params string[] docs) { Instance.AddDefaultDocuments = Instance.AddDefaultDocuments.Concat(docs).ToArray(); return this; }
+		// The application's virtual path, as IIS's application /app of a site: HttpRuntime.AppDomainAppVirtualPath,
+		// Request.ApplicationPath and the URLs System.Web, MVC and Web API make from "~/" start with it, and only the requests
+		// at and below it are the application's (docs/MIGRATING.md, #190). "/" by default.
 		public WebFormsOptions VirtualPath(string path) {
 			if (!path.StartsWith('/')) path = "/" + path;
-			Instance.VirtualPath = path;
+			// webForCore: without a trailing slash, as IIS names applications ("/app/" is "/app").
+			if (path.Length > 1) path = path.TrimEnd('/');
+			Instance.VirtualPath = path.Length == 0 ? "/" : path;
 			return this;
 		}
 		public WebFormsOptions PhysicalPath(string path) { Instance.PhysicalPath = path; return this; }

@@ -164,6 +164,16 @@ jobs:
           path: test/webForCore.IIS.Gate.Tests/bin/Release/net10.0/machinekey-webforcore/
           if-no-files-found: warn
 
+      # ... and every response of the virtual path sample, the application /app (VirtualPathTests, #190, #194).
+      - name: Upload the virtual path responses
+        uses: actions/upload-artifact@v4
+        with:
+          name: vpath-responses
+          path: test/webForCore.IIS.Gate.Tests/bin/Release/net10.0/vpath-responses.json
+          if-no-files-found: error
+
+
+
       # ... and every request Packages.Gate.Tests sent to the third-party packages sample (Ninject, Swashbuckle, CacheCow).
       - name: Upload the third-party packages gate's responses
         uses: actions/upload-artifact@v4
@@ -273,11 +283,12 @@ jobs:
   # gets the requests IIS.Gate.Tests' RequestHandlingTests sent to it, compared with the classic pipeline
   # (tools/ci/iis-known-differences-requests.json). Then <httpRuntime fcnMode> (#167): the changes that restart an application
   # in Single and Default mode, against what Host.Tests asserts of webForCore (tools/ci/iis_fcn.cs). Then a request running
-  # when the application restarts (#181, tools/ci/iis_drain.cs).
+  # when the application restarts (#181, tools/ci/iis_drain.cs). Then OpenID Connect, and an application under a virtual
+  # path (#190, #194).
   iis-compare:
     needs: build-and-test
     runs-on: windows-2025
-    timeout-minutes: 45
+    timeout-minutes: 50
     defaults:
       run:
         shell: bash
@@ -472,6 +483,41 @@ jobs:
           set -o pipefail
           dotnet run tools/ci/iis_compare.cs -- diff "$RUNNER_TEMP/gate/oidc-responses.json" "$RUNNER_TEMP/gate/iis-oidc-responses.json" \
             tools/ci/iis-known-differences-oidc.json "--gate=OpenID Connect" "--title=IIS 10 (integrated pipeline)" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      # An application under a virtual path (#190) and a module that sets REMOTE_ADDR and HTTPS (#194):
+      # test/webForCore.VirtualPath.Sample built for .NET Framework 4.8 against Microsoft's MVC 5, Web API 2 and
+      # System.Web.Optimization packages, served by IIS as the application /app of a site whose root is empty (integrated
+      # pipeline, which MVC's and Web API's extensionless URLs need on IIS), gets the requests VirtualPathTests sent to it
+      # on Kestrel (tools/ci/iis-known-differences-vpath.json). <ipSecurity> is unlocked, as the sample's Web.config has it
+      # for a folder the comparison doesn't ask for.
+      - uses: actions/download-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: vpath-responses
+          path: ${{ runner.temp }}/gate
+
+      - name: Build the virtual path sample for .NET Framework 4.8
+        if: ${{ !cancelled() }}
+        run: dotnet build test/webForCore.VirtualPath.Sample.Iis/webForCore.VirtualPath.Sample.Iis.csproj -c Release -nodeReuse:false "-p:IisSiteDirectory=$RUNNER_TEMP/vpath-app/"
+
+      - name: Virtual path sample on IIS 10
+        if: ${{ !cancelled() }}
+        shell: powershell
+        run: |
+          tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\vpath-app" -Name vpath-integrated -Port 8104 -Pipeline Integrated -Application app
+          & "$env:windir\system32\inetsrv\appcmd.exe" unlock config -section:system.webServer/security/ipSecurity
+
+      - name: Send the virtual path requests to IIS
+        if: ${{ !cancelled() }}
+        # MSYS_NO_PATHCONV: Git Bash would make "--warmup=/app/Probe.aspx" a Windows path.
+        run: MSYS_NO_PATHCONV=1 dotnet run tools/ci/iis_compare.cs -- replay "$RUNNER_TEMP/gate/vpath-responses.json" http://127.0.0.1:8104/ "$RUNNER_TEMP/gate/iis-vpath-responses.json" --warmup=/app/Probe.aspx
+
+      - name: Compare virtual path
+        if: ${{ !cancelled() }}
+        run: |
+          set -o pipefail
+          dotnet run tools/ci/iis_compare.cs -- diff "$RUNNER_TEMP/gate/vpath-responses.json" "$RUNNER_TEMP/gate/iis-vpath-responses.json" \
+            tools/ci/iis-known-differences-vpath.json "--gate=Virtual path" "--title=IIS 10 (integrated pipeline)" | tee -a "$GITHUB_STEP_SUMMARY"
 
       # Third-party net45 packages a customer application keeps as they are: test/webForCore.Packages.Sample built for
       # .NET Framework 4.8 with Microsoft's Web API 5.3.0 and Katana 4.2.3 and the same Ninject (WebHost, OwinHost,

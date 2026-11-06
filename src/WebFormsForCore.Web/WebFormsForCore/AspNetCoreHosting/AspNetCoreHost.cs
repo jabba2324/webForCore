@@ -187,11 +187,13 @@ namespace System.Web.Hosting
         // UrlRoutingModule maps a request to its route's handler before the native modules' courtesy redirect of a
         // directory to its trailing slash, which runs only for the static file handler; RouteTable.GetRouteData skips
         // existing files and directories unless RouteExistingFiles is set, as on IIS (#13). The routes are those of the
-        // started application: Application_Start runs with the first request it processes.
+        // started application: Application_Start runs with the first request it processes. GetRouteData doesn't skip the
+        // application's own URL ("~/"), which an application under a virtual path has without its trailing slash too
+        // ("/app", #190).
         public bool RouteClaims(string virtualPath)
         {
             var routes = System.Web.Routing.RouteTable.Routes;
-            if (!routes.RouteExistingFiles || routes.Count == 0) return false;
+            if (routes.Count == 0 || !routes.RouteExistingFiles && !IsVirtualPathAppPath(virtualPath)) return false;
             try
             {
                 var request = new HttpRequest(string.Empty, "http://localhost" + virtualPath, string.Empty);
@@ -375,7 +377,8 @@ namespace System.Web.Hosting
             if (path == "") path = "/";
             if (path != "/") path = pathWithoutSlash;
 
-			var fullpath = $"{context.Request.PathBase.Value.TrimEnd('/')}/{path}";
+			// webForCore: path starts with "/"; this put a second one after the path base ("/app//x").
+			var fullpath = context.Request.PathBase.Value.TrimEnd('/') + path;
 
             if (IsHiddenSegment(path)) return false;
 

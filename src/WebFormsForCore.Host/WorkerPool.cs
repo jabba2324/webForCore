@@ -218,6 +218,8 @@ sealed class WorkerPool : IHostedLifecycleService, IDisposable
 			{
 				case WorkerProtocol.Ready:
 					if (worker == null || worker.State != WorkerState.Starting) return true; // retired meanwhile
+					// The application's virtual path: the initialization pages are relative to it, as on IIS (#190).
+					if (reason.StartsWith('/')) worker.ApplicationPath = reason.TrimEnd('/');
 					logger.LogInformation("Worker {Id} (process {ProcessId}) is serving ({Seconds:0.0} s after it started){WarmUp}.", id, worker.ProcessId,
 						(DateTime.UtcNow - worker.Started).TotalSeconds, worker.WarmUpPages.Count > 0 ? ": warming it up" : "");
 					if (worker.WarmUpPages.Count > 0)
@@ -311,7 +313,7 @@ sealed class WorkerPool : IHostedLifecycleService, IDisposable
 		foreach (var (page, hostName) in worker.WarmUpPages)
 		{
 			if (worker.State != WorkerState.Warming) return; // exited or retired
-			var request = new HttpRequestMessage(HttpMethod.Get, "http://localhost" + page) { Version = System.Net.HttpVersion.Version11 };
+			var request = new HttpRequestMessage(HttpMethod.Get, "http://localhost" + worker.ApplicationPath + page) { Version = System.Net.HttpVersion.Version11 };
 			request.Headers.Host = hostName ?? "localhost";
 			request.Headers.TryAddWithoutValidation("User-Agent", ApplicationInitialization.UserAgent);
 			// From the server itself, as IIS sent them.
@@ -323,9 +325,9 @@ sealed class WorkerPool : IHostedLifecycleService, IDisposable
 				using var response = await worker.Invoker.SendAsync(request, limit.Token);
 				await response.Content.LoadIntoBufferAsync(limit.Token);
 				if ((int)response.StatusCode >= 400)
-					logger.LogWarning("Worker {Id}: initialization page {Host}{Page} answered {Status}.", worker.Id, hostName ?? "", page, (int)response.StatusCode);
+					logger.LogWarning("Worker {Id}: initialization page {Host}{Page} answered {Status}.", worker.Id, hostName ?? "", worker.ApplicationPath + page, (int)response.StatusCode);
 				else
-					logger.LogInformation("Worker {Id}: initialization page {Host}{Page} answered {Status}.", worker.Id, hostName ?? "", page, (int)response.StatusCode);
+					logger.LogInformation("Worker {Id}: initialization page {Host}{Page} answered {Status}.", worker.Id, hostName ?? "", worker.ApplicationPath + page, (int)response.StatusCode);
 			}
 			catch (OperationCanceledException) when (limit.IsCancellationRequested)
 			{
@@ -334,7 +336,7 @@ sealed class WorkerPool : IHostedLifecycleService, IDisposable
 			}
 			catch (Exception e) when (e is HttpRequestException || e is IOException || e is OperationCanceledException || e is ObjectDisposedException)
 			{
-				logger.LogWarning("Worker {Id}: initialization page {Host}{Page} failed: {Message}", worker.Id, hostName ?? "", page, e.Message);
+				logger.LogWarning("Worker {Id}: initialization page {Host}{Page} failed: {Message}", worker.Id, hostName ?? "", worker.ApplicationPath + page, e.Message);
 			}
 			finally
 			{
