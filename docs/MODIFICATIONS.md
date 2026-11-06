@@ -122,7 +122,9 @@ commit that made it, and its issue, say why.
   reached the old worker before the application began shutting down, and the runtime only after the drain) carries
   the worker's restarting header, so that webforcore-host sends it to the next worker (#209), with its body: the
   host keeps a small body, and has the worker's Kestrel ask for a larger one (`Expect: 100-continue`), which
-  `AspNetCoreWorkerRequest.ParseHeaders` hides from System.Web (#214).
+  `AspNetCoreWorkerRequest.ParseHeaders` hides from System.Web (#214). `WebFormsMiddleware` counts a request among
+  `HttpRuntime`'s active requests (`IncrementActivePipelineCount`) before it checks that the application is still
+  running, until the runtime has completed its response, so that the drain can't miss a request between the two (#214).
   `HttpResponse.WriteErrorMessage`, before it flushes the error page it closes the connection after
   (`CloseConnectionAfterError`: a body over `maxRequestLength`), asks the worker request to have the client's
   connection closed, as IIS closes it (`Connection: close`, from webforcore-host, which keeps its connection to the
