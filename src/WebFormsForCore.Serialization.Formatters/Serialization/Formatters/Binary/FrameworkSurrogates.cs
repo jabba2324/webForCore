@@ -6,11 +6,13 @@
 // them (a default NameValueCollection carries a CaseInsensitiveHashCodeProvider and a CaseInsensitiveComparer), and
 // System.Web stores them through BinaryFormatter (session state, view state, output cache); MVC's ModelState carries a
 // CultureInfo in each ValueProviderResult.
+// .NET writes CompareInfo (a CaseInsensitiveComparer's member) without .NET Framework's win32LCID and in another order.
 //
 // These surrogates are consulted after the caller's SurrogateSelector and write the members .NET Framework 4.8 writes,
 // under its type and assembly names, so streams go both ways. Reference: microsoft/referencesource
 //   System/compmod/system/collections/specialized/nameobjectcollectionbase.cs (GetObjectData, OnDeserialization)
 //   mscorlib/system/collections/caseinsensitivecomparer.cs, caseinsensitivehashcodeprovider.cs
+//   mscorlib/system/globalization/compareinfo.cs (serialized fields, OnSerializing, OnDeserialized)
 //   mscorlib/system/globalization/textinfo.cs (serialized fields, OnSerializing, OnDeserialized)
 //   mscorlib/system/globalization/cultureinfo.cs (serialized fields, OnSerializing, OnDeserialized)
 
@@ -37,13 +39,15 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
     internal sealed class FrameworkSurrogateSelector : ISurrogateSelector
     {
         private readonly ISurrogateSelector? _next;
+        private readonly bool _writing;
 
-        private FrameworkSurrogateSelector(ISurrogateSelector? next)
+        private FrameworkSurrogateSelector(ISurrogateSelector? next, bool writing)
         {
             _next = next;
+            _writing = writing;
         }
 
-        internal static ISurrogateSelector Wrap(ISurrogateSelector? selector) => new FrameworkSurrogateSelector(selector);
+        internal static ISurrogateSelector Wrap(ISurrogateSelector? selector, bool writing) => new FrameworkSurrogateSelector(selector, writing);
 
         public ISerializationSurrogate? GetSurrogate(Type type, StreamingContext context, out ISurrogateSelector selector)
         {
@@ -59,7 +63,7 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
             }
 
             selector = this;
-            return FrameworkSurrogates.GetSurrogate(type);
+            return FrameworkSurrogates.GetSurrogate(type, _writing);
         }
 
         public void ChainSelector(ISurrogateSelector selector) => throw new NotSupportedException();
@@ -75,6 +79,7 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
         private static readonly NameObjectCollectionSurrogate s_collection = new NameObjectCollectionSurrogate();
         private static readonly CaseInsensitiveComparerSurrogate s_comparer = new CaseInsensitiveComparerSurrogate();
         private static readonly CaseInsensitiveHashCodeProviderSurrogate s_hashProvider = new CaseInsensitiveHashCodeProviderSurrogate();
+        private static readonly CompareInfoSurrogate s_compareInfo = new CompareInfoSurrogate();
         private static readonly TextInfoSurrogate s_textInfo = new TextInfoSurrogate();
         private static readonly CultureInfoSurrogate s_culture = new CultureInfoSurrogate();
         private static readonly CultureMemberSurrogate s_cultureMember = new CultureMemberSurrogate();
@@ -83,7 +88,8 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
         // .NET keeps it in a private field.
         internal static readonly ConditionalWeakTable<object, CultureInfo> s_cultures = new ConditionalWeakTable<object, CultureInfo>();
 
-        internal static ISerializationSurrogate? GetSurrogate(Type type)
+        // writing: the surrogates that are only for writing (CompareInfoSurrogate) are included.
+        internal static ISerializationSurrogate? GetSurrogate(Type type, bool writing)
         {
             if (type == typeof(CaseInsensitiveComparer))
             {
@@ -92,6 +98,10 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
             if (type == typeof(CaseInsensitiveHashCodeProvider))
             {
                 return s_hashProvider;
+            }
+            if (writing && type == typeof(CompareInfo))
+            {
+                return s_compareInfo;
             }
             if (type == typeof(TextInfo))
             {
@@ -182,28 +192,18 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
 
         public object SetObjectData(object obj, SerializationInfo info, StreamingContext context, ISurrogateSelector? selector)
         {
-            // CompareInfo is deserialized by .NET itself; its Name is set only by its [OnDeserialized] callback, which runs
-            // after this, so take the serialized m_name.
-            object? compareInfo = info.GetValue("m_compareInfo", typeof(object));
-            string name = CompareInfoName(compareInfo);
-            CultureInfo culture = CultureInfo.GetCultureInfo(name);
+            // CompareInfo is read by .NET itself, and its Name is set by its deserialization callback, which the formatter
+            // runs once the whole graph is read, after this. The callback is public (IDeserializationCallback) and only
+            // completes this new CompareInfo from its serialized m_name, so run it now; running it again later is harmless.
+            if (info.GetValue("m_compareInfo", typeof(object)) is not CompareInfo compareInfo)
+            {
+                throw new SerializationException();
+            }
+            ((IDeserializationCallback)compareInfo).OnDeserialization(null);
+            CultureInfo culture = CultureInfo.GetCultureInfo(compareInfo.Name);
             var comparer = new CaseInsensitiveComparer(culture);
             FrameworkSurrogates.Remember(comparer, culture);
             return comparer;
-        }
-
-        internal static string CompareInfoName(object? compareInfo)
-        {
-            if (compareInfo is CompareInfo ci)
-            {
-                FieldInfo? nameField = typeof(CompareInfo).GetField("m_name", BindingFlags.Instance | BindingFlags.NonPublic);
-                if (nameField?.GetValue(ci) is string name)
-                {
-                    return name;
-                }
-                return ci.Name;
-            }
-            throw new SerializationException();
         }
     }
 
@@ -230,6 +230,27 @@ namespace WebFormsForCore.Serialization.Formatters.Binary
             FrameworkSurrogates.Remember(provider, culture);
             return provider;
         }
+    }
+
+    // .NET Framework 4.8 CompareInfo serializes these fields (compareinfo.cs, in declaration order): its OnSerializing sets
+    // culture to the LCID of the culture named Name; win32LCID is never set; m_SortVersion is created on demand. .NET
+    // writes the same members but win32LCID, in another order. Only for writing: .NET reads either layout itself (its
+    // OnDeserialized takes m_name, or culture in a .NET Framework 2.0 stream, as .NET Framework does).
+    internal sealed class CompareInfoSurrogate : ISerializationSurrogate
+    {
+        public void GetObjectData(object obj, SerializationInfo info, StreamingContext context)
+        {
+            var compareInfo = (CompareInfo)obj;
+            info.FullTypeName = "System.Globalization.CompareInfo";
+            info.AssemblyName = FrameworkSurrogates.Mscorlib;
+            info.AddValue("m_name", compareInfo.Name, typeof(string));
+            info.AddValue("win32LCID", 0);
+            info.AddValue("culture", CultureInfo.GetCultureInfo(compareInfo.Name).LCID);
+            info.AddValue("m_SortVersion", null, typeof(SortVersion));
+        }
+
+        public object SetObjectData(object obj, SerializationInfo info, StreamingContext context, ISurrogateSelector? selector) =>
+            throw new NotSupportedException();
     }
 
     // .NET Framework 4.8 TextInfo serializes these fields (textinfo.cs); its OnSerializing copies m_cultureName into

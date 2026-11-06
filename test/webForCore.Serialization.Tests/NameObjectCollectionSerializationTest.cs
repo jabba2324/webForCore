@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Web;
 using Xunit;
@@ -194,6 +195,53 @@ namespace WebForCore.Serialization.Tests
             Assert.False(((CultureInfo)copy[1]).UseUserOverride);
             Assert.Equal("", ((CultureInfo)copy[2]).Name);
             Assert.Equal("1,5", 1.5.ToString(fr));
+        }
+
+        [Fact]
+        public void CompareInfo_WritesFrameworkFields_AndRoundTrips()
+        {
+            // A CaseInsensitiveComparer's m_compareInfo (#57). .NET Framework 4.8 writes compareinfo.cs's fields in
+            // declaration order, with culture set by OnSerializing.
+            var graph = new object[] { CultureInfo.GetCultureInfo("de-DE").CompareInfo, CultureInfo.InvariantCulture.CompareInfo };
+
+            object[] copy = RoundTrip(graph, out byte[] bytes);
+
+            string text = Text(bytes);
+            AssertInOrder(text, "System.Globalization.CompareInfo", "m_name", "win32LCID", "culture", "m_SortVersion",
+                "System.Globalization.SortVersion", "de-DE");
+            Assert.DoesNotContain("System.Private.CoreLib", text);
+            Assert.Equal("de-DE", ((CompareInfo)copy[0]).Name);
+            Assert.Equal("", ((CompareInfo)copy[1]).Name);
+            Assert.Equal(0, ((CompareInfo)copy[0]).Compare("abc", "ABC", CompareOptions.IgnoreCase));
+        }
+
+        [Fact]
+        public void CompareInfo_WithoutName_ReadAsCultureId()
+        {
+            // A .NET Framework 2.0 stream has no m_name; .NET Framework's OnDeserialized takes the culture from its LCID.
+            var selector = new SurrogateSelector();
+            selector.AddSurrogate(typeof(CompareInfo), new StreamingContext(StreamingContextStates.All), new Framework20CompareInfo());
+            var ms = new MemoryStream();
+            new BinaryFormatter { SurrogateSelector = selector }.Serialize(ms, CultureInfo.GetCultureInfo("de-DE").CompareInfo);
+
+            var copy = (CompareInfo)new BinaryFormatter().Deserialize(new MemoryStream(ms.ToArray()));
+
+            Assert.Equal("de-DE", copy.Name);
+            Assert.Equal(0x0407, copy.LCID);
+        }
+
+        private sealed class Framework20CompareInfo : ISerializationSurrogate
+        {
+            public void GetObjectData(object obj, SerializationInfo info, StreamingContext context)
+            {
+                info.FullTypeName = "System.Globalization.CompareInfo";
+                info.AssemblyName = "mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089";
+                info.AddValue("win32LCID", ((CompareInfo)obj).LCID);
+                info.AddValue("culture", ((CompareInfo)obj).LCID);
+            }
+
+            public object SetObjectData(object obj, SerializationInfo info, StreamingContext context, ISurrogateSelector? selector) =>
+                throw new NotSupportedException();
         }
     }
 }

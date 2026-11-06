@@ -207,7 +207,9 @@ commit that made it, and its issue, say why.
   changes: types and assemblies are found as the rest of the reader finds them, mscorlib's assembly and module are
   .NET's core library's, .NET has no `System.Empty` (unity type 1 throws `SerializationException`), and a
   generic method whose type arguments aren't complete yet waits for them instead of throwing. The core library's
-  types that have no `TypeForwardedFrom` are written as mscorlib's.
+  types that have no `TypeForwardedFrom` are written as mscorlib's. `CompareInfo` (a `CaseInsensitiveComparer`'s
+  member) is written in .NET Framework 4.8's layout (`m_name`, `win32LCID`, `culture`, `m_SortVersion`) and read by
+  .NET itself; for this, `BinaryFormatter.Core.cs` tells the selector it wraps whether it is writing (#57).
 - **System.Configuration's `AssemblyRef.SystemConfiguration`** (webForCore's `AssemblyRef.cs`) names
   System.Configuration.ConfigurationManager 14.5.0.0, this assembly, instead of .NET's System.Configuration 4.0.0.0
   facade, which forwards only public types: the Reference Source creates `ConfigurationManagerInternal`,

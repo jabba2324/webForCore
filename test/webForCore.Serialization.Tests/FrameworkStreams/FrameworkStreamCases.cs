@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Web;
@@ -110,9 +111,14 @@ namespace WebForCore.Serialization.Tests
 #else
             new FrameworkStreamCase("empty", () => throw new NotSupportedException(".NET has no System.Empty"), portWrites: false),
 #endif
+
+            // CompareInfo (#57): what a CaseInsensitiveComparer carries (a default NameValueCollection's comparer).
+            new FrameworkStreamCase("compareinfo", () => new object[] { CultureInfo.GetCultureInfo("de-DE").CompareInfo, CultureInfo.InvariantCulture.CompareInfo }),
+            new FrameworkStreamCase("caseinsensitivecomparer", () => new object[] { new System.Collections.CaseInsensitiveComparer(CultureInfo.GetCultureInfo("tr-TR")), System.Collections.CaseInsensitiveComparer.DefaultInvariant }),
         };
 
-        // What a runtime read is the graph it makes: the same reflection object (or DBNull, Missing), or an array of them.
+        // What a runtime read is the graph it makes: the same reflection object (or DBNull, Missing, an equal CompareInfo, a
+        // CaseInsensitiveComparer of the same culture), or an array of them.
         public static bool Matches(object expected, object actual)
         {
             if (expected is object[] expectedArray)
@@ -129,6 +135,12 @@ namespace WebForCore.Serialization.Tests
                     }
                 }
                 return true;
+            }
+            if (expected is System.Collections.CaseInsensitiveComparer expectedComparer)
+            {
+                // Turkish upper-cases i to a dotted capital I; the invariant culture to I.
+                return actual is System.Collections.CaseInsensitiveComparer actualComparer
+                    && Math.Sign(expectedComparer.Compare("i", "I")) == Math.Sign(actualComparer.Compare("i", "I"));
             }
             return Equals(expected, actual);
         }
