@@ -44,6 +44,9 @@
         <PackageReference Include="System.CodeDom" Version="10.0.14" />
         <PackageReference Include="System.IO.FileSystem.AccessControl" Version="5.0.0" />
         <PackageReference Include="System.Security.Permissions" Version="10.0.14" />
+        <!-- EventLogTraceListener, which <system.diagnostics> may name (System.Diagnostics.TraceUtils, #213); .NET's
+             System.Configuration.ConfigurationManager depends on it too. -->
+        <PackageReference Include="System.Diagnostics.EventLog" Version="10.0.14" />
     </ItemGroup>
 
     <ItemGroup>
@@ -178,6 +181,17 @@
     <Compile Include="../../external/referencesource/System.Configuration/System/Configuration/ConfigXmlText.cs" Link="ReferenceSource/System.Configuration/System/Configuration/ConfigXmlText.cs" />
     <Compile Include="../../external/referencesource/System.Configuration/System/Configuration/ConfigXmlWhitespace.cs" Link="ReferenceSource/System.Configuration/System/Configuration/ConfigXmlWhitespace.cs" />
     <Compile Include="../../external/referencesource/System/compmod/system/configuration/appsettingsreader.cs" Link="ReferenceSource/System/compmod/system/configuration/appsettingsreader.cs" />
+    <Compile Include="../../external/referencesource/System/compmod/system/diagnostics/AssertSection.cs" Link="ReferenceSource/System/compmod/system/diagnostics/AssertSection.cs" />
+    <Compile Include="../../external/referencesource/System/compmod/system/diagnostics/DiagnosticsConfiguration.cs" Link="ReferenceSource/System/compmod/system/diagnostics/DiagnosticsConfiguration.cs" />
+    <Compile Include="../../external/referencesource/System/compmod/system/diagnostics/FilterElement.cs" Link="ReferenceSource/System/compmod/system/diagnostics/FilterElement.cs" />
+    <Compile Include="../../external/referencesource/System/compmod/system/diagnostics/ListenerElementsCollection.cs" Link="ReferenceSource/System/compmod/system/diagnostics/ListenerElementsCollection.cs" />
+    <Compile Include="../../external/referencesource/System/compmod/system/diagnostics/PerfCounterSection.cs" Link="ReferenceSource/System/compmod/system/diagnostics/PerfCounterSection.cs" />
+    <Compile Include="../../external/referencesource/System/compmod/system/diagnostics/SourceElementsCollection.cs" Link="ReferenceSource/System/compmod/system/diagnostics/SourceElementsCollection.cs" />
+    <Compile Include="../../external/referencesource/System/compmod/system/diagnostics/SwitchElementsCollection.cs" Link="ReferenceSource/System/compmod/system/diagnostics/SwitchElementsCollection.cs" />
+    <Compile Include="../../external/referencesource/System/compmod/system/diagnostics/SystemDiagnosticsSection.cs" Link="ReferenceSource/System/compmod/system/diagnostics/SystemDiagnosticsSection.cs" />
+    <Compile Include="../../external/referencesource/System/compmod/system/diagnostics/TraceSection.cs" Link="ReferenceSource/System/compmod/system/diagnostics/TraceSection.cs" />
+    <Compile Include="../../external/referencesource/System/compmod/system/diagnostics/TypedElement.cs" Link="ReferenceSource/System/compmod/system/diagnostics/TypedElement.cs" />
+    <Compile Include="../../external/referencesource/System/compmod/system/diagnostics/traceutils.cs" Link="ReferenceSource/System/compmod/system/diagnostics/traceutils.cs" />
     <Compile Include="../../external/referencesource/System/misc/SecurityUtils.cs" Link="ReferenceSource/System/misc/SecurityUtils.cs" />
     <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/AuthenticationModuleElement.cs" Link="ReferenceSource/System/net/System/Net/Configuration/AuthenticationModuleElement.cs" />
     <Compile Include="../../external/referencesource/System/net/System/Net/Configuration/AuthenticationModuleElementCollection.cs" Link="ReferenceSource/System/net/System/Net/Configuration/AuthenticationModuleElementCollection.cs" />

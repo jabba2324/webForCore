@@ -280,5 +280,17 @@ namespace System.Configuration
 		internal const string net_config_property_permission = "net_config_property_permission";
 		internal const string net_config_section_permission = "net_config_section_permission";
 		internal const string net_io_timeout_use_gt_zero = "net_io_timeout_use_gt_zero";
+		internal const string AttributeNotSupported = "AttributeNotSupported";
+		internal const string BadConfigSwitchValue = "BadConfigSwitchValue";
+		internal const string Could_not_create_listener = "Could_not_create_listener";
+		internal const string Could_not_create_type_instance = "Could_not_create_type_instance";
+		internal const string Could_not_find_type = "Could_not_find_type";
+		internal const string Could_not_get_constructor = "Could_not_get_constructor";
+		internal const string EmptyTypeName_NotAllowed = "EmptyTypeName_NotAllowed";
+		internal const string Incorrect_base_type = "Incorrect_base_type";
+		internal const string Only_specify_one = "Only_specify_one";
+		internal const string Reference_listener_cant_have_properties = "Reference_listener_cant_have_properties";
+		internal const string Reference_to_nonexistent_listener = "Reference_to_nonexistent_listener";
+		internal const string TL_InitializeData_NotSpecified = "TL_InitializeData_NotSpecified";
 	}
 }

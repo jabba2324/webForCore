@@ -18,6 +18,12 @@ namespace WebApiSample
         {
         }
 
+        // An attribute <add> may give it in Web.config (.NET Framework rejects one this doesn't list).
+        protected override string[] GetSupportedAttributes()
+        {
+            return new[] { "category" };
+        }
+
         public static string[] Snapshot()
         {
             lock (Records) return Records.ToArray();

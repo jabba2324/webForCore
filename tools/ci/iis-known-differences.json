@@ -15,8 +15,8 @@
     "reason": "IIS's native 404 page is not ASP.NET's, so it has no X-AspNet-Version."
   },
   {
-    "requests": "^trace GET /api/trace/listeners$",
+    "requests": "^trace GET /api/trace/refresh/listeners$",
     "field": "body",
-    "reason": "Web.config's <system.diagnostics> trace listeners: on .NET Framework, System.Diagnostics.Trace creates them (Trace.Listeners has \"webconfig\"); webForCore doesn't apply the section (docs/NAMESPACES.md, WebApi.Gate.Tests' WebConfigTraceListenersAreNotApplied)."
+    "reason": "Trace.Refresh() and Trace's own listeners: on .NET Framework, Trace.Listeners is <trace><listeners> again and autoflush and indentsize are configuration's; .NET resets them to its defaults after Trace.Refreshing, the last point where configuration can apply them (docs/NAMESPACES.md, WebApi.Gate.Tests' TraceRefreshLeavesTraceWithDotNetsDefaults, #213)."
   }
 ]

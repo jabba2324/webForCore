@@ -14,7 +14,7 @@ that code and what had to change.
   | `external/AspNetKatana` | [xforcore/AspNetKatana `webforcore`](https://github.com/xforcore/AspNetKatana/commits/webforcore) | `096e225` | 10, and OpenIdConnect, Jwt, WsFederation, ActiveDirectory and the social providers brought back, unchanged |
   | `external/SignalR` | [xforcore/SignalR `webforcore`](https://github.com/xforcore/SignalR/commits/webforcore) | `7f53f26` | 3, and the Redis, StackExchange.Redis and SQL Server scale-out backplanes brought back, unchanged, with their tests |
   | `external/AspNetIdentity` | [xforcore/AspNetIdentity `webforcore`](https://github.com/xforcore/AspNetIdentity/commits/webforcore) | `b7fc094` | 5 |
-  | `external/referencesource` | [xforcore/referencesource `webforcore`](https://github.com/xforcore/referencesource/commits/webforcore) | `ec9fa9a` | 44, and System.Data.Linq brought back (#142) |
+  | `external/referencesource` | [xforcore/referencesource `webforcore`](https://github.com/xforcore/referencesource/commits/webforcore) | `ec9fa9a` | 55, System.Data.Linq brought back (#142), and System.dll's `<system.diagnostics>` configuration classes brought back (#213) |
   | `external/winforms` | [xforcore/winforms `webforcore`](https://github.com/xforcore/winforms/commits/webforcore) | `8266870` | 13 |
   | `external/mono` | [xforcore/mono `webforcore`](https://github.com/xforcore/mono/commits/webforcore) | `0f53e9e` | 32, and System.Data.Linq's tests brought back (#142) |
   | `external/maintenance-packages` | [xforcore/maintenance-packages `webforcore`](https://github.com/xforcore/maintenance-packages/commits/webforcore) | `e699209` | 1 |
@@ -62,10 +62,10 @@ that code and what had to change.
 | LINQ to SQL, System.Data.Linq (#142) | [microsoft/referencesource@ec9fa9a](https://github.com/microsoft/referencesource/tree/ec9fa9ae770d522a5b5f0607898044b7478574a3) (`System.Data.Linq`) | MIT | 98 | 3 |
 | System.Web tests | [mono/mono@0f53e9e](https://github.com/mono/mono/tree/0f53e9e) (`mcs/class/System.Web/Test`) | MIT | 188 | 30 |
 | System.Data.Linq tests | mono/mono@0f53e9e (`mcs/class/System.Data.Linq/Test`) | MIT | 9 | 1 |
-| System.Configuration, System.Web.ApplicationServices, aspnet_compiler, `BindableTypeAttribute` (replacing WebFormsForCore's decompiled copies); System.Data's typed DataSet generator | [microsoft/referencesource@ec9fa9a](https://github.com/microsoft/referencesource/tree/ec9fa9ae770d522a5b5f0607898044b7478574a3) | MIT | 114 | 41 |
+| System.Configuration, System.Web.ApplicationServices, aspnet_compiler, `BindableTypeAttribute` (replacing WebFormsForCore's decompiled copies); System.Data's typed DataSet generator; System.dll's `<system.diagnostics>` configuration classes (`System/compmod/system/diagnostics`, #213) | [microsoft/referencesource@ec9fa9a](https://github.com/microsoft/referencesource/tree/ec9fa9ae770d522a5b5f0607898044b7478574a3) | MIT | 125 | 52 |
 | ResX classes (replacing decompiled copies) | [dotnet/winforms@8266870](https://github.com/dotnet/winforms/tree/8266870) (release/8.0) | MIT | 13 | 13 |
 | StronglyTypedResourceBuilder (replacing an API reconstruction) | mono/mono@0f53e9e (`mcs/class/System.Design`) | MIT | 1 | 1 |
-| **Total** | | | **4,594** | **259** |
+| **Total** | | | **4,605** | **270** |
 
 The fork itself starts from [webformsforcore/WebFormsForCore@52f4172](https://github.com/webformsforcore/WebFormsForCore/tree/52f4172dbc09b3ad0b849c97642720fa7a49aa22),
 whose System.Web, System.Configuration and related assemblies were ported from Microsoft's .NET Framework reference
@@ -77,7 +77,7 @@ webForCore's changes to the port are its git history since the fork: `git diff 5
 
 | Kind | Examples | Where |
 | --- | --- | --- |
-| **APIs .NET doesn't have** | `AppDomain.DefineDynamicAssembly` → `AssemblyBuilder.DefineDynamicAssembly` (SignalR); `AppDomainSetup.PrivateBinPath` → scan the app base (Katana's loader); `NetDataContractSerializer`, which MVC Futures' `MvcSerializer` uses, is replaced by a `DataContractSerializer` with a type-preserving resolver (`src/webForCore.Microsoft.Web.Mvc`), so `MvcSerializer.cs` itself is unchanged; Code Access Security policy removed, and LINQ to SQL's reflection-permission demands are empty; LINQ to SQL's `DBConvert` uses webForCore's BinaryFormatter port, and a debug build of it doesn't capture compiled readers to an assembly file (`AssemblyBuilderAccess.Save`) | Web Stack, Katana, SignalR, System.Data.Linq |
+| **APIs .NET doesn't have** | `AppDomain.DefineDynamicAssembly` → `AssemblyBuilder.DefineDynamicAssembly` (SignalR); `AppDomainSetup.PrivateBinPath` → scan the app base (Katana's loader); `NetDataContractSerializer`, which MVC Futures' `MvcSerializer` uses, is replaced by a `DataContractSerializer` with a type-preserving resolver (`src/webForCore.Microsoft.Web.Mvc`), so `MvcSerializer.cs` itself is unchanged; Code Access Security policy removed, and LINQ to SQL's reflection-permission demands are empty; LINQ to SQL's `DBConvert` uses webForCore's BinaryFormatter port, and a debug build of it doesn't capture compiled readers to an assembly file (`AssemblyBuilderAccess.Save`); System.dll's `<system.diagnostics>` classes use .NET's public `TraceListener` and `TraceFilter` members where System.dll used its internal ones (`initializeData`, which webForCore keeps, `SetAttributes`, `TraceListenerCollection`'s constructor, `TraceInternal.critSec`), and find System.dll's types by name in the assemblies that have them on .NET (#213) | Web Stack, Katana, SignalR, System.Data.Linq, System.Configuration |
 | **Windows-only APIs** | The CryptoAPI certificate context → `PublicKey.ExportSubjectPublicKeyInfo()` (Katana); `DpapiDataProtector` → webForCore's DPAPI emulation (`LocalDataProtection`); the HttpListener host's private-field access → Katana's Mono path | Katana |
 | **.NET Framework behaviour restored** | Web Pages' `WebMail` takes its defaults from `<system.net><mailSettings>`, which .NET's `SmtpClient` ignores; `float`/`double` route constraints reject overflow; a whitespace multipart root path is rejected; `HttpResponseMessage.Content` is never null on .NET, so `ResponseContent.Get` treats `EmptyContent` as no content (11 call sites in the Web API hosts); a request body copied through the seekable stream; `HostString` keeps the host's case | Web Stack, Katana |
 | **Compiler and language** | A `(string)null` where .NET's `ArraySegment<T>` overloads made `null` ambiguous; `LangVersion` pinned to what Microsoft built with (C# 7.3 for SignalR) | SignalR, Web Stack |
@@ -111,6 +111,11 @@ commit that made it, and its issue, say why.
 - **Hosting:** webforcore-host and its worker processes (process recycling, #56), IIS's `<system.webServer>` modules,
   the Kestrel worker request (WebSockets, client certificates, server variables, timeouts, integrated-pipeline APIs).
   See [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md).
+- **`<system.diagnostics>` is applied** (#213): `HttpRuntime`'s start calls `System.Diagnostics.TraceConfiguration.Register()`,
+  webForCore's own code in System.Configuration (`WebFormsForCore/Diagnostics/TraceConfiguration.cs`), which handles
+  .NET's `Trace.Refreshing`, `TraceSource.Initializing` and `Switch.Initializing` as the reference source's
+  `TraceInternal`, `TraceSource` and `Switch` read the section, over the reference source's configuration classes.
+  machine.config declares the section with `System.Diagnostics.SystemDiagnosticsSection` instead of `IgnoreSection`.
 - **A restart drains as on .NET Framework** (#181): the host object (`AspNetCoreHost`, Cassini's registered object)
   unregisters as soon as the hosting environment stops it, as IIS's `ISAPIRuntime` does, so the old worker's requests
   are drained by `HttpRuntime.Dispose` for `<httpRuntime shutdownTimeout>`, unchanged from the reference source.

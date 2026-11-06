@@ -15,6 +15,8 @@ string[] ownDirectories =
     "src/WebFormsForCore.Host",
     "src/WebFormsForCore.Compilers",
     "src/WebFormsForCore.Web.Infrastructure",
+    // <system.diagnostics> applied to .NET's System.Diagnostics (#213).
+    "src/WebFormsForCore.Configuration/WebFormsForCore/Diagnostics",
     // LINQ to SQL's generated classes (#142); its Microsoft code is in external/referencesource.
     "src/webForCore.System.Data.Linq",
 ];
