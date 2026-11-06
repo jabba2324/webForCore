@@ -1,0 +1,21 @@
+{
+  "_comment": [
+    "<httpRuntime fcnMode>: which changes restart an application (#167, #189). Host.Tests' FileChangeNotificationTests",
+    "asserts webForCore's decision (bin_dotnet for bin) on Linux and Windows; CI's iis-compare job (tools/ci/iis_fcn.cs)",
+    "checks IIS 10's on the same sites. 'iis' is IIS 10's decision in every run or, with 'varies', in most runs: webForCore",
+    "must make that decision. iis_fcn.cs fails when IIS decides otherwise, except in a case that varies, which it records.",
+    "'varies' says how often IIS decided otherwise (CI's iis-compare runs and .github/workflows/iis-fcn-stability.yml)."
+  ],
+  "cases": [
+    { "fcnMode": "Single", "change": "start", "webForCore": "no restart", "iis": "no restart",
+      "varies": "IIS 10 restarted the application in 1 of 149 runs (#189)" },
+    { "fcnMode": "Single", "change": "file", "webForCore": "restart", "iis": "restart" },
+    { "fcnMode": "Single", "change": "folder time", "webForCore": "restart", "iis": "restart",
+      "varies": "IIS 10 didn't restart the application within 20 s in 6 of 149 runs (#189)" },
+    { "fcnMode": "Single", "change": "binaries", "webForCore": "restart", "iis": "restart" },
+    { "fcnMode": "Default", "change": "start", "webForCore": "no restart", "iis": "no restart" },
+    { "fcnMode": "Default", "change": "file", "webForCore": "restart", "iis": "restart" },
+    { "fcnMode": "Default", "change": "folder time", "webForCore": "no restart", "iis": "no restart" },
+    { "fcnMode": "Default", "change": "binaries", "webForCore": "no restart", "iis": "no restart" }
+  ]
+}

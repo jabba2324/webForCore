@@ -11,8 +11,8 @@ on:
   workflow_dispatch:
     inputs:
       runs:
-        description: Runs on each of the 5 runners
-        default: '10'
+        description: Runs on each of the 10 runners
+        default: '6'
 
 permissions:
   contents: read
@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: [1, 2, 3, 4, 5]
+        runner: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     defaults:
       run:
         shell: bash
@@ -37,9 +37,11 @@ jobs:
       - name: Runs
         timeout-minutes: 55
         env:
-          RUNS: ${{ inputs.runs || '10' }}
+          RUNS: ${{ inputs.runs || '6' }}
           MSYS_NO_PATHCONV: 1
         run: |
+          # A failed check is counted, not the end of the runs (the step runs with -e and pipefail).
+          set +e
           mkdir -p "$RUNNER_TEMP/out"
           for i in $(seq "$RUNS"); do
             root="$RUNNER_TEMP/run$i"
@@ -56,12 +58,13 @@ jobs:
             report="$RUNNER_TEMP/out/run$i.md"
             for site in "Single 8094" "Default 8095"; do
               set -- $site
-              timeout 300 dotnet run tools/ci/iis_fcn.cs -- check "$root/fcn-$1" "http://localhost:$2/" "$1" "$report" | sed "s/^/$1: /" | tee -a "$RUNNER_TEMP/out/lines.txt" || true
+              timeout 300 dotnet run tools/ci/iis_fcn.cs -- check "$root/fcn-$1" "http://localhost:$2/" "$1" "$report" | sed "s/^/$1: /" | tee -a "$RUNNER_TEMP/out/lines.txt"; echo "$1: iis_fcn.cs exit code ${PIPESTATUS[0]}" | tee -a "$RUNNER_TEMP/out/lines.txt"
             done
             timeout 300 dotnet run tools/ci/iis_fcn.cs -- check "$root/fcn-Fresh" http://localhost:8096/ Single "$report" fresh | sed "s/^/Fresh: /" | tee -a "$RUNNER_TEMP/out/lines.txt" || true
           done
 
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: fcn-${{ matrix.runner }}
           path: ${{ runner.temp }}/out
@@ -81,5 +84,5 @@ jobs:
             echo
             echo '| count | site: change: IIS, webForCore |'
             echo '| --- | --- |'
-            cat out/*/lines.txt | grep -E 'IIS (no )?restart, webForCore' | sort | uniq -c | sed -E 's/^ *([0-9]+) (.*)/| \1 | \2 |/'
+            cat out/*/lines.txt | grep -E 'IIS (no )?restart, webForCore|exit code' | sort | uniq -c | sed -E 's/^ *([0-9]+) (.*)/| \1 | \2 |/'
           } | tee -a "$GITHUB_STEP_SUMMARY"
