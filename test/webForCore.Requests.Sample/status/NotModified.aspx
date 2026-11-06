@@ -1,0 +1,1 @@
+<%@ Page Language="C#" %><%-- A 304 from a page that answers a conditional GET itself, with a Content-Length it appends. --%><% Response.StatusCode = 304; Response.AppendHeader("Content-Length", "0"); Response.End(); %>

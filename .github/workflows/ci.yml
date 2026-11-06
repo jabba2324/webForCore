@@ -42,6 +42,14 @@ jobs:
         options: >-
           --health-cmd "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P 'webForCore-Test1!' -Q 'SELECT 1' -b"
           --health-interval 10s --health-timeout 5s --health-retries 20
+      # IIS.Gate.Tests' SignalR scale-out tests (ScaleoutTests): two instances of an application on one Redis; the same
+      # server tools/ci/redis.sh starts.
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 16379:6379
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 3s --health-retries 20
 
     outputs:
       version: ${{ steps.version.outputs.version }}
@@ -148,6 +156,14 @@ jobs:
           path: test/webForCore.IIS.Gate.Tests/bin/Release/net10.0/machinekey-webforcore/
           if-no-files-found: warn
 
+      # ... and every request Packages.Gate.Tests sent to the third-party packages sample (Ninject, Swashbuckle, CacheCow).
+      - name: Upload the third-party packages gate's responses
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages-responses
+          path: test/webForCore.Packages.Gate.Tests/bin/Release/net10.0/packages-responses.json
+          if-no-files-found: error
+
       - name: Pack
         run: tools/ci/pack.sh ${{ steps.version.outputs.version }} "$RUNNER_TEMP/packages"
 
@@ -206,6 +222,11 @@ jobs:
       - name: SQL Server
         shell: pwsh
         run: tools/ci/sqlserver-windows.ps1
+
+      # ... and Redis: Memurai Developer, a Redis for Windows.
+      - name: Redis
+        shell: pwsh
+        run: tools/ci/redis-windows.ps1
 
       - name: Test
         run: tools/ci/run-tests.sh "$RUNNER_TEMP/TestResults"
@@ -408,13 +429,33 @@ jobs:
         shell: powershell
         run: tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\oidc-site" -Name oidc-integrated -Port 8100 -Pipeline Integrated
 
+      # The provider must answer before the scenarios' first request starts the site (#208): IdentityServer3's access
+      # token validation reads the discovery document in the application's Startup, and Katana keeps a Startup that
+      # failed, so every request of the run answered the SocketException's error page. The provider must also still
+      # answer when the scenarios end; its output is shown when either isn't so.
       - name: Run the OpenID Connect scenarios on IIS
         if: ${{ !cancelled() }}
         run: |
           provider=test/webForCore.Oidc.Provider/bin/Release/net10.0/webForCore.Oidc.Provider.dll
-          dotnet $provider serve http://127.0.0.1:8101 > "$RUNNER_TEMP/gate/oidc-provider.log" 2>&1 &
+          discovery=http://127.0.0.1:8101/.well-known/openid-configuration
+          log="$RUNNER_TEMP/gate/oidc-provider.log"
+          dotnet $provider serve http://127.0.0.1:8101 > "$log" 2>&1 &
           pid=$!
-          dotnet $provider scenarios http://127.0.0.1:8100/ http://127.0.0.1:8101 "$RUNNER_TEMP/gate/iis-oidc-responses.json"
+          fail() { echo "::error::$1"; echo "The provider's output:"; cat "$log"; kill $pid 2>/dev/null || true; exit 1; }
+          for i in $(seq 1 120); do
+            curl -sf -o /dev/null "$discovery" && break
+            kill -0 $pid 2>/dev/null || fail "The OpenID Connect test provider exited before it served."
+            [ $i -eq 120 ] && fail "The OpenID Connect test provider didn't serve its discovery document within 60 s."
+            sleep 0.5
+          done
+          # Another process on the port (a provider left running) would answer too: this one must still be running.
+          kill -0 $pid 2>/dev/null || fail "The OpenID Connect test provider exited: is port 8101 in use?"
+          echo "The provider serves its discovery document."
+          status=0
+          dotnet $provider scenarios http://127.0.0.1:8100/ http://127.0.0.1:8101 "$RUNNER_TEMP/gate/iis-oidc-responses.json" || status=$?
+          kill -0 $pid 2>/dev/null || fail "The OpenID Connect test provider exited during the scenarios."
+          curl -sf -o /dev/null "$discovery" || fail "The OpenID Connect test provider stopped answering during the scenarios."
+          [ $status -eq 0 ] || fail "The scenarios failed ($status)."
           kill $pid || true
 
       - name: Compare OpenID Connect
@@ -423,6 +464,34 @@ jobs:
           set -o pipefail
           dotnet run tools/ci/iis_compare.cs -- diff "$RUNNER_TEMP/gate/oidc-responses.json" "$RUNNER_TEMP/gate/iis-oidc-responses.json" \
             tools/ci/iis-known-differences-oidc.json "--gate=OpenID Connect" "--title=IIS 10 (integrated pipeline)" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      # Third-party net45 packages a customer application keeps as they are: test/webForCore.Packages.Sample built for
+      # .NET Framework 4.8 with Microsoft's Web API 5.3.0 and Katana 4.2.3 and the same Ninject (WebHost, OwinHost,
+      # WebApi.OwinHost), WebActivatorEx, Swashbuckle.Core and CacheCow.Server.WebApi packages, served by IIS (integrated
+      # pipeline: Katana's System.Web host needs it on IIS). Packages.Gate.Tests' requests are sent again in their order
+      # and the responses compared (tools/ci/iis-known-differences-packages.json).
+      - uses: actions/download-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: packages-responses
+          path: ${{ runner.temp }}/gate
+
+      - name: Build the third-party packages sample for .NET Framework 4.8
+        if: ${{ !cancelled() }}
+        run: dotnet build test/webForCore.Packages.Sample.Iis/webForCore.Packages.Sample.Iis.csproj -c Release -nodeReuse:false "-p:IisSiteDirectory=$RUNNER_TEMP/packages-site/"
+
+      - name: Third-party packages sample on IIS 10
+        if: ${{ !cancelled() }}
+        shell: powershell
+        run: tools/ci/iis-site.ps1 -Path "$env:RUNNER_TEMP\packages-site" -Name packages-integrated -Port 8102 -Pipeline Integrated
+
+      - name: Compare the third-party packages
+        if: ${{ !cancelled() }}
+        run: |
+          set -o pipefail
+          dotnet run tools/ci/iis_compare.cs -- replay "$RUNNER_TEMP/gate/packages-responses.json" http://localhost:8102/ "$RUNNER_TEMP/gate/iis-packages-responses.json"
+          dotnet run tools/ci/iis_compare.cs -- diff "$RUNNER_TEMP/gate/packages-responses.json" "$RUNNER_TEMP/gate/iis-packages-responses.json" \
+            tools/ci/iis-known-differences-packages.json "--gate=Third-party packages" "--title=IIS 10 (integrated pipeline)" | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Upload the responses
         if: always()
@@ -433,6 +502,68 @@ jobs:
             ${{ runner.temp }}/gate/*.json
             ${{ runner.temp }}/gate/*.md
           if-no-files-found: warn
+
+  # webForCore in a Windows container: webforcore-host and test/webForCore.Mvc.Sample in Microsoft's ASP.NET Core runtime
+  # image for Windows (no SDK), run by docker on the runner and probed from it (tools/ci/windows_container.cs): Razor
+  # views, JSON and a POST's redirect, then Web.config changed inside the container, which must recycle the worker into
+  # a new process that serves the same responses. The runner's Docker engine runs Windows containers with process
+  # isolation, so the image is the one for Windows Server 2025 (ltsc2025: a container's build must match the host's).
+  # Not a required check (docs/TESTING.md).
+  windows-container:
+    runs-on: windows-2025
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+    env:
+      BASE_IMAGE: mcr.microsoft.com/dotnet/aspnet:10.0-nanoserver-ltsc2025
+
+    steps:
+      - name: Line endings
+        run: git config --global core.autocrlf false
+
+      - name: Long paths
+        run: git config --global core.longpaths true
+
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Set up .NET (global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      # The engine is an automatic service that may still be starting when the job begins.
+      - name: Docker engine
+        shell: pwsh
+        run: |
+          for ($i = 0; $i -lt 60; $i++) { docker version --format '{{.Server.Os}} {{.Server.Version}}' 2>$null; if ($LASTEXITCODE -eq 0) { break }; Start-Service docker -ErrorAction SilentlyContinue; Start-Sleep 2 }
+          docker info --format '{{.OSType}} {{.KernelVersion}} isolation={{.Isolation}}'
+          if ($LASTEXITCODE -ne 0) { throw "the Docker engine isn't running" }
+
+      - name: Build webforcore-host and the MVC sample
+        run: |
+          dotnet build src/WebFormsForCore.Build/WebFormsForCore.Build.csproj -c Release
+          dotnet build src/WebFormsForCore.Host/WebFormsForCore.Host.csproj -c Release -nodeReuse:false
+          dotnet build test/webForCore.Mvc.Sample/webForCore.Mvc.Sample.csproj -c Release -nodeReuse:false
+
+      - name: Stage the image's files
+        run: |
+          context="$RUNNER_TEMP/container"
+          mkdir -p "$context"
+          cp -r src/WebFormsForCore.Host/bin/Release/net10.0 "$context/host"
+          cp -r test/webForCore.Mvc.Sample "$context/app"
+          rm -rf "$context/app/obj"
+
+      - name: Run and probe the container
+        run: |
+          docker pull "$BASE_IMAGE"
+          echo "## webForCore in a Windows container" > "$RUNNER_TEMP/windows-container.md"
+          status=0
+          dotnet run tools/ci/windows_container.cs -- "$RUNNER_TEMP/container" "$BASE_IMAGE" 8080 "$RUNNER_TEMP/windows-container.md" || status=1
+          cat "$RUNNER_TEMP/windows-container.md" >> "$GITHUB_STEP_SUMMARY"
+          exit $status
 
   # LINQ to SQL's errors and messages (#142): webForCore generates System.Data.Linq's Error and Strings classes, which
   # referencesource doesn't publish, from src/webForCore.System.Data.Linq/FrameworkData/System.Data.Linq.json, data

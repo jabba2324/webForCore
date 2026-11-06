@@ -10,9 +10,9 @@ that code and what had to change.
 
   | Submodule | Fork branch | Upstream commit | Changes |
   | --- | --- | --- | --- |
-  | `external/AspNetWebStack` | [xforcore/AspNetWebStack `webforcore`](https://github.com/xforcore/AspNetWebStack/commits/webforcore) | `2106565` | 163, a casing fix, and upstream's `.gitattributes` kept (Windows line endings for the tests) |
+  | `external/AspNetWebStack` | [xforcore/AspNetWebStack `webforcore`](https://github.com/xforcore/AspNetWebStack/commits/webforcore) | `2106565` | 163, a casing fix, upstream's `.gitattributes` kept (Windows line endings for the tests), and System.Web.Http.Tracing brought back, unchanged |
   | `external/AspNetKatana` | [xforcore/AspNetKatana `webforcore`](https://github.com/xforcore/AspNetKatana/commits/webforcore) | `096e225` | 10, and OpenIdConnect, Jwt, WsFederation, ActiveDirectory and the social providers brought back, unchanged |
-  | `external/SignalR` | [xforcore/SignalR `webforcore`](https://github.com/xforcore/SignalR/commits/webforcore) | `7f53f26` | 3 |
+  | `external/SignalR` | [xforcore/SignalR `webforcore`](https://github.com/xforcore/SignalR/commits/webforcore) | `7f53f26` | 3, and the Redis, StackExchange.Redis and SQL Server scale-out backplanes brought back, unchanged, with their tests |
   | `external/AspNetIdentity` | [xforcore/AspNetIdentity `webforcore`](https://github.com/xforcore/AspNetIdentity/commits/webforcore) | `b7fc094` | 5 |
   | `external/referencesource` | [xforcore/referencesource `webforcore`](https://github.com/xforcore/referencesource/commits/webforcore) | `ec9fa9a` | 44, and System.Data.Linq brought back (#142) |
   | `external/winforms` | [xforcore/winforms `webforcore`](https://github.com/xforcore/winforms/commits/webforcore) | `8266870` | 13 |
@@ -54,9 +54,9 @@ that code and what had to change.
 
 | Component | Upstream (pinned commit) | Licence | Files used | Files changed |
 | --- | --- | --- | ---: | ---: |
-| ASP.NET Web API 2, Razor 3, Web Pages 3, MVC 5, MVC Futures, Helpers, CORS | [aspnet/AspNetWebStack@2106565](https://github.com/aspnet/AspNetWebStack/tree/2106565) | Apache 2.0 | 1,553 libraries · 1,266 tests | 26 · 131 |
+| ASP.NET Web API 2, Razor 3, Web Pages 3, MVC 5, MVC Futures, Helpers, CORS, Web API tracing | [aspnet/AspNetWebStack@2106565](https://github.com/aspnet/AspNetWebStack/tree/2106565) | Apache 2.0 | 1,558 libraries · 1,268 tests | 26 · 131 |
 | Katana (Microsoft.Owin 4.2.3) | [aspnet/AspNetKatana@096e225](https://github.com/aspnet/AspNetKatana/tree/096e225) | Apache 2.0 | 421 · 63 | 8 · 3 |
-| ASP.NET SignalR 2.4.3 | [SignalR/SignalR@7f53f26](https://github.com/SignalR/SignalR/tree/7f53f26) | Apache 2.0 | 318 · 152 | 2 · 1 |
+| ASP.NET SignalR 2.4.3 | [SignalR/SignalR@7f53f26](https://github.com/SignalR/SignalR/tree/7f53f26) | Apache 2.0 | 362 · 158 | 2 · 1 |
 | ASP.NET Identity 2 | [aspnet/AspNetIdentity@b7fc094](https://github.com/aspnet/AspNetIdentity/tree/b7fc094) | MIT | 75 · 26 | 0 · 4 |
 | System.Data.SqlClient 4.9.1 (replacing Microsoft's package, #41) | [dotnet/maintenance-packages@e699209](https://github.com/dotnet/maintenance-packages/tree/e699209) (`src/System.Data.SqlClient`, `src/Common`) | MIT | 270 · 18 | 1 · 0 |
 | LINQ to SQL, System.Data.Linq (#142) | [microsoft/referencesource@ec9fa9a](https://github.com/microsoft/referencesource/tree/ec9fa9ae770d522a5b5f0607898044b7478574a3) (`System.Data.Linq`) | MIT | 98 | 3 |
@@ -65,7 +65,7 @@ that code and what had to change.
 | System.Configuration, System.Web.ApplicationServices, aspnet_compiler, `BindableTypeAttribute` (replacing WebFormsForCore's decompiled copies); System.Data's typed DataSet generator | [microsoft/referencesource@ec9fa9a](https://github.com/microsoft/referencesource/tree/ec9fa9ae770d522a5b5f0607898044b7478574a3) | MIT | 114 | 41 |
 | ResX classes (replacing decompiled copies) | [dotnet/winforms@8266870](https://github.com/dotnet/winforms/tree/8266870) (release/8.0) | MIT | 13 | 13 |
 | StronglyTypedResourceBuilder (replacing an API reconstruction) | mono/mono@0f53e9e (`mcs/class/System.Design`) | MIT | 1 | 1 |
-| **Total** | | | **4,585** | **265** |
+| **Total** | | | **4,592** | **265** |
 
 The fork itself starts from [webformsforcore/WebFormsForCore@52f4172](https://github.com/webformsforcore/WebFormsForCore/tree/52f4172dbc09b3ad0b849c97642720fa7a49aa22),
 whose System.Web, System.Configuration and related assemblies were ported from Microsoft's .NET Framework reference
@@ -101,7 +101,7 @@ fixed, or the BCL difference is documented.
 | **Mono's System.Web tests** | Corrected to Microsoft's .NET Framework 4.5+ behaviour wherever Mono's own implementation differed (Mono's tests follow Mono); hosting in the test process (.NET has one AppDomain) |
 | **Mono's System.Data.Linq tests** | One test expected the `System.Exception` that Mono's own `Error` class throws where .NET Framework's throws `ArgumentException` (#142) |
 | **webForCore's identities** | MVC Futures' `VersionTest` expects System.Web.Mvc 5.3.0.0, the released version webForCore's has, not the source's development version 5.3.1.0 (#141) |
-| **Selection** | Microsoft's own categories are used (`category!=failing`). SignalR's IIS Express and Service Bus tests aren't built |
+| **Selection** | Microsoft's own categories are used (`category!=failing`). SignalR's IIS Express tests aren't built, nor the Service Bus backplanes (`WindowsAzure.ServiceBus` is .NET Framework only), which have none |
 
 ## webForCore's changes to System.Web and the hosting layer
 
@@ -118,6 +118,14 @@ commit that made it, and its issue, say why.
   `HttpRuntime.Unloaded` instead, and the worker process stops then. The host object used to wait for the requests
   itself and abort them after `<hostingEnvironment shutdownTimeout>`, and the worker stopped Kestrel at once, which
   aborted them after its own 30 s.
+  The request `HttpRuntime.ProcessRequestInternal` turns away once `Dispose` has drained ("Server Too Busy", 503: it
+  reached the old worker before the application began shutting down, and the runtime only after the drain) carries
+  the worker's restarting header, so that webforcore-host sends it to the next worker when it has no body (#209).
+  `AspNetCoreWorkerRequest.CloseConnection` sends `Connection: close` when the response hasn't started. In a worker of
+  webforcore-host, once the response has started, it leaves the connection to the host open (Kestrel drains the
+  unread body): a close the response didn't announce reset the next request the host's pool sent on that connection.
+  Request filtering's 413.1 for a body over `maxAllowedContentLength` (`IIS/IISModules.cs`) lifts Kestrel's body limit
+  for that request, so that Kestrel drains the body rather than closing the connection.
   `AspNetCoreWorkerRequest.ParseHeaders` stores the request's unknown headers whatever the path: the cookieless
   session check it took from IIS's filter returned before storing them when a path had a `(` and no `/(...)/`
   (#170, OData's `/People(1)` lost `Prefer`).
@@ -125,7 +133,13 @@ commit that made it, and its issue, say why.
   server name from the Host header, `X-AspNet-Version` and the default `Cache-Control: private` only once a managed
   handler ran, the response was flushed or an error was reported; a cache header (`Expires`, `Cache-Control`, ...) set
   through `Response.Headers` stays when the cache policy writes its own, which then replaces only the same names, as
-  in IIS's header block (Katana's cookie middleware's `Expires: -1`, found by the OpenID Connect comparison with IIS 10).
+  in IIS's header block (Katana's cookie middleware's `Expires: -1`, found by the OpenID Connect comparison with IIS 10);
+  `Response.Redirect` sets `text/html` as in the integrated pipeline, so a redirect before any handler ran (customErrors'
+  for a page that doesn't exist) has its Content-Type (#192).
+- **.NET's base class library, where an application sees the difference:** `HttpException` and its subclasses built
+  with a null message have .NET Framework's `Exception` default ("Exception of type '...' was thrown."), not .NET's
+  `ExternalException` one ("External component has thrown an exception."): Page.HandleError's `HttpUnhandledException`
+  on error pages and in `Server.GetLastError()` (#192).
 - **Configuration:** protected configuration on Linux (DPAPI emulation, RSA key containers as files), section type
   identity across load contexts, `machine.config` refreshed by content.
 - **Compilation:** csc and vbc run in process, through Roslyn's public API (below), and `AssemblyBuilder` loads every
@@ -176,6 +190,9 @@ commit that made it, and its issue, say why.
     next to webForCore's System.Web (CS0433, CS7069 otherwise). They are matched by the reference pack's name, not by
     the SDK's `packs` folder: an SDK newer than the target framework takes the pack from the NuGet cache
     (`microsoft.netcore.app.ref/<version>/`). `tools/ci/package-smoke.sh` builds once that way.
+  - One System.Data.SqlClient (#41, #195): Microsoft's package when the build has it at 4.9.0 or later, otherwise
+    `webForCore.Data.SqlClient`; the other's compile, runtime and runtime-target assets are removed as soon as NuGet's
+    assets are resolved (`WebForCoreSystemDataSqlClient` decides it explicitly).
 - **Run-time compilation** adds the targets of a referenced facade's type forwards (CS0012 otherwise), leaving out
   those whose types System.Web defines itself (`HttpUtility`).
 - **BinaryFormatter port:** surrogates for .NET Framework types .NET no longer serializes (`NameValueCollection`
@@ -232,7 +249,11 @@ commit that made it, and its issue, say why.
   application's web.config, and the load context's resolver searches those folders after the build output, in fusion's
   order (#147, Orchard; [NAMESPACES.md](NAMESPACES.md)). As fusion does, it checks the version only of a strong-named
   reference: for one without a public key token, the assembly of that name it finds is the one, whatever its version
-  (#171, JabbR deploys Nancy 0.20.0 and a library built against 0.21.1).
+  (#171, JabbR deploys Nancy 0.20.0 and a library built against 0.21.1). It reads `<dependentAssembly>` too and applies
+  `<bindingRedirect>` and `<codeBase>` as fusion does (#158; a customer application has about 60 redirects, many to a
+  version lower than or equal to the one its references were built against): a redirected reference loads the new
+  version through the load context, and a code base is the only place a version is looked for. The call in
+  `HttpRuntime.InitFusion` is webForCore's own (`AssemblyLoaderNetCore.ReadAssemblyBinding`).
 - **System.Web.DynamicData** (`src/WebFormsForCore.Web.DynamicData`, now built and in the "Always" set): the Entity
   Framework 1–4 and LINQ to SQL model providers, `LinqDataSource`/`EntityDataSource` hookups and EF 5 spatial column
   types are compiled out (`#if NETFRAMEWORK`); `AssemblyRef.cs` and `ScaffoldTableAttribute` (which .NET dropped) are
@@ -256,6 +277,11 @@ commit that made it, and its issue, say why.
   `HttpResponse` writes `Transfer-Encoding: chunked` and the chunks of an unbuffered response itself, and Kestrel
   passes them through. When the last chunk never went out (sending failed, and so did writing the error), the request
   ended and Kestrel kept the connection: the client waited for ever. The worker aborts the connection then (#184).
+- **No `Content-Length` set through `Response.Headers` on a 304** (`HttpResponse.WriteHeaders`): IIS's integrated
+  pipeline sends none with a 304 Not Modified; its classic pipeline sends one `AppendHeader` set. The emulated
+  integrated `Response.Headers` (`AppendHeaderThroughHeaders`) marks a `Content-Length` set through it, and a 304 leaves
+  that one out: Web API's OWIN adapter sets `Content-Length: 0` for an empty response (a customer application's
+  CacheCow.Server.WebApi 304s, compared with IIS 10).
 - **URLs find files in any case off Windows** (`Configuration/UserMapPath.cs`): `ResolveIgnoreCase`, which already
   found configuration paths, is internal so that the worker request (`Request.PhysicalPath`) and the IIS modules map a
   request's path with it too (#140).

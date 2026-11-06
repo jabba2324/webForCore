@@ -14,7 +14,7 @@ namespace WebApiGate
     // charset, body, Location and Allow must match the oracle. The headers ASP.NET adds are checked against what
     // System.Web on IIS sends. Every request and response is also written to gate-responses.json (beside the test
     // assembly); CI's iis-compare job sends the same requests to the sample on IIS 10 and diffs the two (#78).
-    public class GateTests : IClassFixture<SampleServer>
+    public partial class GateTests : IClassFixture<SampleServer>
     {
         public static readonly string[] Hosts = { "", "/owin" };
 

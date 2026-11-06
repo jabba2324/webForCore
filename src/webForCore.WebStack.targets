@@ -57,11 +57,12 @@
     <_WebForCoreReplacedPackages>
       Microsoft.AspNet.Mvc|99.0.0;Microsoft.AspNet.Mvc.Futures|99.0.0;Microsoft.AspNet.Razor|99.0.0;
       Microsoft.AspNet.WebPages|99.0.0;Microsoft.AspNet.WebApi.Core|99.0.0;Microsoft.AspNet.WebApi.WebHost|99.0.0;
-      Microsoft.AspNet.WebApi.Owin|99.0.0;Microsoft.AspNet.WebApi.Cors|99.0.0;Microsoft.AspNet.WebApi.Client|99.0.0;
+      Microsoft.AspNet.WebApi.Owin|99.0.0;Microsoft.AspNet.WebApi.Cors|99.0.0;Microsoft.AspNet.WebApi.Tracing|99.0.0;Microsoft.AspNet.WebApi.Client|99.0.0;
       Microsoft.AspNet.Cors|99.0.0;Microsoft.AspNet.Web.Optimization|99.0.0;Microsoft.AspNet.Web.Optimization.WebForms|99.0.0;
       WebGrease|99.0.0;Microsoft.Web.Infrastructure|99.0.0;Microsoft.AspNet.Identity.Core|99.0.0;
       Microsoft.AspNet.Identity.EntityFramework|99.0.0;Microsoft.AspNet.Identity.Owin|99.0.0;
       Microsoft.AspNet.SignalR.Core|99.0.0;Microsoft.AspNet.SignalR.SystemWeb|99.0.0;Microsoft.AspNet.SignalR.Client|99.0.0;
+      Microsoft.AspNet.SignalR.Redis|99.0.0;Microsoft.AspNet.SignalR.StackExchangeRedis|99.0.0;Microsoft.AspNet.SignalR.SqlServer|99.0.0;
       Microsoft.Owin|99.0.0;Microsoft.Owin.Host.SystemWeb|99.0.0;Microsoft.Owin.Host.HttpListener|99.0.0;
       Microsoft.Owin.Hosting|99.0.0;Microsoft.Owin.Security|99.0.0;Microsoft.Owin.Security.Cookies|99.0.0;
       Microsoft.Owin.Security.OAuth|99.0.0;Microsoft.Owin.Cors|99.0.0;Microsoft.Owin.Testing|99.0.0;
@@ -81,20 +82,48 @@
 
   <!-- webForCore builds System.Data.SqlClient from Microsoft's source, fixed (#41): Microsoft's packages, 4.4.3 to 4.9.1,
        contain a type .NET 8 and later can't load, so Assembly.GetTypes() on the assembly threw a
-       ReflectionTypeLoadException, and every application that scans its loaded assemblies failed. Entity Framework 6
-       and other packages bring Microsoft's System.Data.SqlClient back transitively. Its windows and unix builds are
-       runtime targets (runtimes/win/lib/..., runtimes/unix/lib/...) at other paths than webForCore's, so the SDK's
-       conflict resolution doesn't see them as conflicts and package overrides can't remove them: deps.json would list
-       both packages' builds, and the host would load whichever came first. Wherever webForCore's System.Data.SqlClient is
-       in the build (the webForCore.Data.SqlClient package, which webForCore.Web depends on, or this repository's
-       project), drop every asset of Microsoft's package, compile, runtime and runtime targets, as soon as NuGet's assets
-       are resolved: nothing of it reaches the compiler, the output, deps.json or a publish. -->
+       ReflectionTypeLoadException, and an application that scans every loaded assembly failed (webForCore's own
+       scanners, MVC's, Web API's and SignalR's, already skip what doesn't load, as on .NET Framework). Both packages
+       have an assembly of the same identity, System.Data.SqlClient 4.6.1.6, with windows and unix builds as runtime
+       targets (runtimes/win/lib/..., runtimes/unix/lib/...) at other paths in each, so the SDK's conflict resolution
+       doesn't see them as conflicts and package overrides can't remove them: deps.json would list both packages'
+       builds, and the host would load whichever came first. So exactly one of them stays, decided as soon as NuGet's
+       assets are resolved, the same way in every build, and nothing of the other reaches the compiler, the output,
+       deps.json or a publish (#195):
+       - Microsoft's, when the build has its System.Data.SqlClient package at 4.9.0 or later (referenced by the
+         application or by any project or package it references): an application chooses Microsoft's supported package
+         by referencing it.
+       - Otherwise webForCore's (the webForCore.Data.SqlClient package, which webForCore.Web depends on, or this
+         repository's project): Entity Framework 6.5.1 brings Microsoft's 4.8.6, ServiceStack's OrmLite 4.8.1, and
+         those are replaced.
+       WebForCoreSystemDataSqlClient=Microsoft or webForCore decides it whatever the versions. The build says which one
+       it kept when both were there. -->
   <Target Name="WebForCoreDropSystemDataSqlClientPackage" AfterTargets="ResolvePackageAssets" DependsOnTargets="IncludeTransitiveProjectReferences" Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">
     <ItemGroup>
       <_WebForCoreSqlClient Include="@(ResolvedCompileFileDefinitions);@(RuntimeCopyLocalItems)" Condition="'%(NuGetPackageId)' == 'webForCore.Data.SqlClient'" />
-      <_WebForCoreSqlClient Include="@(ProjectReference)" Condition="'%(Filename)' == 'webForCore.System.Data.SqlClient'" />
+      <_WebForCoreSqlClientProject Include="@(ProjectReference)" Condition="'%(Filename)' == 'webForCore.System.Data.SqlClient'" />
+      <_MicrosoftSqlClient Include="@(ResolvedCompileFileDefinitions);@(RuntimeCopyLocalItems);@(RuntimeTargetsCopyLocalItems)" Condition="'%(NuGetPackageId)' == 'System.Data.SqlClient'" />
     </ItemGroup>
-    <ItemGroup Condition="'@(_WebForCoreSqlClient)' != ''">
+    <PropertyGroup>
+      <_MicrosoftSqlClientVersion>@(_MicrosoftSqlClient->'%(NuGetPackageVersion)'->Distinct())</_MicrosoftSqlClientVersion>
+      <_WebForCoreSqlClientChoice>$(WebForCoreSystemDataSqlClient)</_WebForCoreSqlClientChoice>
+      <!-- This repository's own projects build against the project, which can't be left out. -->
+      <_WebForCoreSqlClientChoice Condition="'$(_WebForCoreSqlClientChoice)' == '' AND '@(_WebForCoreSqlClientProject)' != ''">webForCore</_WebForCoreSqlClientChoice>
+      <_WebForCoreSqlClientChoice Condition="'$(_WebForCoreSqlClientChoice)' == '' AND '$(_MicrosoftSqlClientVersion)' != '' AND $([MSBuild]::VersionGreaterThanOrEquals('$(_MicrosoftSqlClientVersion)', '4.9.0'))">Microsoft</_WebForCoreSqlClientChoice>
+      <_WebForCoreSqlClientChoice Condition="'$(_WebForCoreSqlClientChoice)' == ''">webForCore</_WebForCoreSqlClientChoice>
+    </PropertyGroup>
+    <Error Condition="'$(_WebForCoreSqlClientChoice)' == 'Microsoft' AND '$(_MicrosoftSqlClientVersion)' == ''" Code="WFC0195"
+           Text="WebForCoreSystemDataSqlClient is Microsoft, but the build has no System.Data.SqlClient package: reference Microsoft's System.Data.SqlClient package (4.9.0 or later), or remove the property (#195)." />
+    <Message Importance="high" Condition="'@(_WebForCoreSqlClient)' != '' AND '$(_MicrosoftSqlClientVersion)' != '' AND '$(_WebForCoreSqlClientChoice)' == 'Microsoft'"
+             Text="webForCore: System.Data.SqlClient is Microsoft's, from its System.Data.SqlClient $(_MicrosoftSqlClientVersion) package; webForCore.Data.SqlClient is left out (#195)." />
+    <Message Importance="high" Condition="'@(_WebForCoreSqlClient)' != '' AND '$(_MicrosoftSqlClientVersion)' != '' AND '$(_WebForCoreSqlClientChoice)' != 'Microsoft'"
+             Text="webForCore: System.Data.SqlClient is webForCore.Data.SqlClient's; Microsoft's System.Data.SqlClient $(_MicrosoftSqlClientVersion) package is left out. Reference Microsoft's 4.9.0 or later to use it instead (#41, #195)." />
+    <ItemGroup Condition="'$(_WebForCoreSqlClientChoice)' == 'Microsoft'">
+      <ResolvedCompileFileDefinitions Remove="@(ResolvedCompileFileDefinitions)" Condition="'%(NuGetPackageId)' == 'webForCore.Data.SqlClient'" />
+      <RuntimeCopyLocalItems Remove="@(RuntimeCopyLocalItems)" Condition="'%(NuGetPackageId)' == 'webForCore.Data.SqlClient'" />
+      <RuntimeTargetsCopyLocalItems Remove="@(RuntimeTargetsCopyLocalItems)" Condition="'%(NuGetPackageId)' == 'webForCore.Data.SqlClient'" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(_WebForCoreSqlClientChoice)' != 'Microsoft' AND ('@(_WebForCoreSqlClient)' != '' OR '@(_WebForCoreSqlClientProject)' != '')">
       <ResolvedCompileFileDefinitions Remove="@(ResolvedCompileFileDefinitions)" Condition="'%(NuGetPackageId)' == 'System.Data.SqlClient'" />
       <RuntimeCopyLocalItems Remove="@(RuntimeCopyLocalItems)" Condition="'%(NuGetPackageId)' == 'System.Data.SqlClient'" />
       <RuntimeTargetsCopyLocalItems Remove="@(RuntimeTargetsCopyLocalItems)" Condition="'%(NuGetPackageId)' == 'System.Data.SqlClient'" />

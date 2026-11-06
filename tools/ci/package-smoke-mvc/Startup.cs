@@ -43,6 +43,8 @@ namespace SmokeMvc
                 }));
             });
 
+            // #195: SignalR's hub proxy lists the hubs it found in the application's assemblies.
+            app.MapSignalR();
             app.UseCookieAuthentication(new CookieAuthenticationOptions { AuthenticationType = "External" });
             // SMOKE_WITHOUT_GOOGLE=1 leaves the provider out, to see the MVC checks on packages where it fails.
             if (System.Environment.GetEnvironmentVariable("SMOKE_WITHOUT_GOOGLE") == "1") return;

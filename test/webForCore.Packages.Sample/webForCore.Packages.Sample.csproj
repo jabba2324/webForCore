@@ -1,0 +1,78 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- The third-party packages gate's application: net45 packages a customer application keeps as they are, used
+       unchanged. Ninject's web integration (Ninject.Web.Common.WebHost, started by the original WebActivatorEx 2.2.0 from
+       App_Start/NinjectWebCommon.cs as the package wrote it, with its OnePerRequestHttpModule; Ninject.Web.Common.OwinHost's
+       UseNinjectMiddleware and Ninject.Web.WebApi.OwinHost's UseNinjectWebApi), Swashbuckle.Core 5.6.0 (net40, its UI
+       embedded and served by Web API handlers) and CacheCow.Server.WebApi 2.5.0 (net452). Hosted on Kestrel by the
+       fork's System.Web; test/webForCore.Packages.Gate.Tests drives it, and test/webForCore.Packages.Sample.Iis builds the
+       same files for IIS 10 with Microsoft's packages. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>PackagesSample</RootNamespace>
+    <OutputPath>bin_dotnet</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <GenerateDependencyFile>true</GenerateDependencyFile>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+  </PropertyGroup>
+
+  <Import Project="..\..\src\webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Content Remove="bin_dotnet\**;App_Data\**" />
+    <None Remove="bin_dotnet\**" />
+    <Compile Remove="bin_dotnet\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\WebFormsForCore.Configuration\WebFormsForCore.Configuration.csproj" />
+    <PackageReference Include="drawingForCore" Version="$(DrawingForCoreVersion)" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Serialization.Formatters\WebFormsForCore.Serialization.Formatters.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web\WebFormsForCore.Web.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.ApplicationServices\WebFormsForCore.Web.ApplicationServices.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.RegularExpressions\WebFormsForCore.Web.RegularExpressions.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Services\WebFormsForCore.Web.Services.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Extensions\WebFormsForCore.Web.Extensions.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Infrastructure\WebFormsForCore.Web.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Compilers\WebFormsForCore.Compilers.csproj" />
+    <ProjectReference Include="..\..\src\webForCore.System.Web.Http.Owin\webForCore.System.Web.Http.Owin.csproj" />
+    <ProjectReference Include="..\..\src\webForCore.Microsoft.Owin.Host.SystemWeb\webForCore.Microsoft.Owin.Host.SystemWeb.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Third-party, as the application has them (net45, net40 and net452 builds), unchanged. Ninject.Web.WebApi 3.3.0, not
+         3.3.1: Ninject.Web.WebApi.OwinHost 3.3.0 uses its IWebApiRequestScopeProvider, which 3.3.1 removed (on .NET
+         Framework too). -->
+    <PackageReference Include="Ninject" Version="3.3.6" />
+    <PackageReference Include="Ninject.Web.Common" Version="3.3.2" />
+    <PackageReference Include="Ninject.Web.Common.WebHost" Version="3.3.2" />
+    <PackageReference Include="Ninject.Web.Common.OwinHost" Version="3.3.1" />
+    <PackageReference Include="Ninject.Web.WebApi" Version="3.3.0" />
+    <PackageReference Include="Ninject.Web.WebApi.OwinHost" Version="3.3.0" />
+    <PackageReference Include="WebActivatorEx" Version="2.2.0" />
+    <PackageReference Include="Swashbuckle.Core" Version="5.6.0" />
+    <PackageReference Include="CacheCow.Server.WebApi" Version="2.5.0" />
+    <!-- CacheCow.Server.WebApi has only a net452 build, built against CacheCow.Server's and CacheCow.Common's net452 builds.
+         NuGet picks their netstandard2.0 builds for .NET 10, which are CacheCow for ASP.NET Core: ICacheabilityValidator
+         takes ASP.NET Core's HttpRequest there, not HttpRequestMessage, and every [HttpCache] action fails with
+         MissingMethodException. Use the net452 builds (docs/MIGRATING.md, "A package's .NET Standard build can have less
+         than its net45 build"). -->
+    <PackageReference Include="CacheCow.Server" Version="2.5.0" GeneratePathProperty="true" ExcludeAssets="compile;runtime" />
+    <PackageReference Include="CacheCow.Common" Version="2.5.0" GeneratePathProperty="true" ExcludeAssets="compile;runtime" />
+    <Reference Include="CacheCow.Server" HintPath="$(PkgCacheCow_Server)/lib/net452/CacheCow.Server.dll" />
+    <Reference Include="CacheCow.Common" HintPath="$(PkgCacheCow_Common)/lib/net452/CacheCow.Common.dll" />
+    <!-- A build against webForCore's projects (not its packages) gets the Microsoft packages these depend on as well; with
+         no assets, the projects' assemblies are the only ones (docs/MIGRATING.md, "Packages built on MVC, Web API or OWIN
+         bring Microsoft's packages back"). -->
+    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.7" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Owin" Version="5.2.7" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.Owin" Version="4.2.3" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.Web.Infrastructure" Version="1.0.0" ExcludeAssets="all" />
+  </ItemGroup>
+</Project>
