@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- #191: the <machineKey> interop sample. IIS.Gate.Tests' MachineKeyInteropTests runs it once for each configuration of
+       Interop/MachineKeyConfigs.cs (a site folder with that Web.config: MACHINEKEY_SITE, MACHINEKEY_VIRTUAL_PATH), gets
+       its FormsAuthentication tickets, MachineKey.Protect and Encode output and Katana cookies (Interop/MachineKeyInterop.cs,
+       interop.axd, and the cookie middleware through Microsoft.Owin.Host.SystemWeb: Startup.cs), and has it read .NET
+       Framework 4.8's (tools/machinekey/FrameworkMachineKey, which runs the same Interop files on .NET Framework). -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>MachineKeySample</RootNamespace>
+    <OutputPath>bin_dotnet</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <GenerateDependencyFile>true</GenerateDependencyFile>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+  </PropertyGroup>
+
+  <Import Project="..\..\src\webForCore.WebStack.targets" />
+
+  <ItemGroup>
+    <Content Remove="bin_dotnet\**" />
+    <None Remove="bin_dotnet\**" />
+    <Compile Remove="bin_dotnet\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\WebFormsForCore.Configuration\WebFormsForCore.Configuration.csproj" />
+    <PackageReference Include="drawingForCore" Version="$(DrawingForCoreVersion)" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Serialization.Formatters\WebFormsForCore.Serialization.Formatters.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web\WebFormsForCore.Web.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.ApplicationServices\WebFormsForCore.Web.ApplicationServices.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.RegularExpressions\WebFormsForCore.Web.RegularExpressions.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Services\WebFormsForCore.Web.Services.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Extensions\WebFormsForCore.Web.Extensions.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Web.Infrastructure\WebFormsForCore.Web.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\WebFormsForCore.Compilers\WebFormsForCore.Compilers.csproj" />
+    <ProjectReference Include="..\..\src\webForCore.Microsoft.Owin.Host.SystemWeb\webForCore.Microsoft.Owin.Host.SystemWeb.csproj" />
+    <ProjectReference Include="..\..\src\webForCore.Microsoft.Owin.Security.Cookies\webForCore.Microsoft.Owin.Security.Cookies.csproj" />
+    <ProjectReference Include="..\..\src\webForCore.Microsoft.AspNet.Identity.Core\webForCore.Microsoft.AspNet.Identity.Core.csproj" />
+    <ProjectReference Include="..\..\src\webForCore.Microsoft.AspNet.Identity.Owin\webForCore.Microsoft.AspNet.Identity.Owin.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- webForCore (#191): runs test/webForCore.MachineKey.Sample/Interop (the <machineKey> configurations and what is
+       protected with them) on .NET Framework 4.8, with its System.Web and Microsoft's Katana 4.2.3 and ASP.NET Identity
+       2.2.4 packages: writes .NET Framework's outputs, checks the committed ones
+       (test/webForCore.IIS.Gate.Tests/FrameworkData/MachineKey/framework.json) and reads webForCore's. Run on Windows by
+       CI's machinekey-framework-interop job (see Program.cs). Not in WebFormsForCore.slnx: it needs .NET Framework to
+       run. It builds on Linux too (reference assemblies). -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <NuGetAudit>false</NuGetAudit>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\..\test\webForCore.MachineKey.Sample\Interop\*.cs" Link="Interop\%(Filename)%(Extension)" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.2.3" />
+    <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.4" />
+  </ItemGroup>
+</Project>

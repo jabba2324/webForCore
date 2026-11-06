@@ -716,6 +716,15 @@ before the upgrade aren't found after it: users start new ones.
   System.Data.Linq's can stay from 0.9.0, at 3.5.0.0 or 4.0.0.0: the `webForCore` package brings it (#142).
 - **Set an explicit `<machineKey>`** (validation and decryption keys). Generated keys change with every process, so
   forms authentication cookies, view state and anti-forgery tokens wouldn't survive a restart or work across servers.
+  Keep the keys, `validation`, `decryption` and `compatibilityMode` the application had on IIS, and its
+  `<httpRuntime targetFramework>`: with the same `<machineKey>`, webForCore reads what .NET Framework 4.8 protected and
+  the reverse (forms tickets, `MachineKey.Protect`/`Unprotect` and `Encode`/`Decode`, and Katana and ASP.NET Identity
+  cookies, which `Microsoft.Owin.Host.SystemWeb` protects with the machine key, not DPAPI), so users stay signed in
+  when you move one application or service at a time, or roll back (#191,
+  [IIS-COMPATIBILITY.md](IIS-COMPATIBILITY.md#authentication)). Two settings don't carry over: without
+  `targetFramework` and `compatibilityMode`, .NET Framework uses `Framework20SP1` and webForCore `Framework45`, so set
+  `compatibilityMode` explicitly on both while they share tickets; and `IsolateApps` or `IsolateByAppId` after an
+  explicit key changes it with a hash that differs between the two, so remove the modifier on both (which signs users out once).
 - **`<trust level="Medium" />`** (or any partial trust level) can stay: it is ignored and the application runs in full
   trust (#87). Code that worked around Medium trust keeps working; code that checks the trust level sees full trust.
 - **Connection strings:** `System.Data.SqlClient` is used, as on .NET Framework. Add `TrustServerCertificate=True` or
@@ -1030,6 +1039,7 @@ configuration an IIS web farm has work unchanged:
 | `Type 'System.Web.Script.Services...' not found`, ScriptModule errors | System.Web.Extensions or System.Web.Services isn't referenced |
 | 404 for files that exist | Case mismatch in the path, or a request filtering rule (`<hiddenSegments>`, `<fileExtensions>`) |
 | Logins lost after a restart | No explicit `<machineKey>` |
+| Users signed out when requests move between IIS and webForCore | A different `<machineKey>` (keys, `validation`, `decryption`, `compatibilityMode`), no `targetFramework` and no `compatibilityMode`, or `IsolateApps`/`IsolateByAppId` after an explicit key (step 5) |
 | `PlatformNotSupportedException` | A Windows-only API: see [NAMESPACES.md](NAMESPACES.md) |
 | `PlatformNotSupportedException: The named version of this synchronization primitive is not supported` | A named `Semaphore` or `EventWaitHandle`: see "Named semaphores and events" (step 6) |
 | `CS0121: The call is ambiguous` | The app's own `DistinctBy`/`MaxBy`/`Chunk`, or a `params` call with no arguments (step 2) |
