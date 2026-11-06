@@ -1,5 +1,10 @@
 [
   {
+    "requests": "^GET /errors/iis-hidden(-moved)?/App_Data/",
+    "field": "header Connection",
+    "reason": "A request filtering rejection (a hidden segment) answered by <httpErrors> ExecuteURL: IIS 10 closes the connection (Connection: close); webForCore keeps it open (#219). Status and body are the same."
+  },
+  {
     "requests": ".*",
     "field": "header Server",
     "reason": "IIS sends Server: Microsoft-IIS/10.0; webForCore's host is Kestrel."
