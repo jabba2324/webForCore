@@ -333,7 +333,7 @@ namespace System.Web.SessionState {
 
         // Lets a host (e.g. the ASP.NET Core hosting layer) register a session-state store
         // programmatically instead of requiring a <sessionState mode="Custom"> web.config entry.
-        // When set, it takes precedence over whatever <sessionState> config specifies.
+        // When set, it takes the place of the store <sessionState> configures, except with mode="Off" (#185).
         public static Func<SessionStateStoreProviderBase> ProviderOverride { get; set; }
 
 #if NETCOREAPP
@@ -349,8 +349,9 @@ namespace System.Web.SessionState {
 #endif
 
         void InitModuleFromConfig(HttpApplication app, SessionStateSection config) {
-            if (ProviderOverride == null && config.Mode == SessionStateMode.Off)
-            {
+            // webForCore: as in the reference source, mode="Off" turns session state off, with a provider set in code too
+            // (UseAspNetCoreSessionProvider() replaces the store, it doesn't turn session state on, #185).
+            if (config.Mode == SessionStateMode.Off) {
                 return;
             }
 

@@ -139,6 +139,10 @@ commit that made it, and its issue, say why.
   Server variables an application sets (`Request.ServerVariables["REMOTE_ADDR"] = ...`) are kept by the worker request,
   as IIS keeps them in its own block, and it answers `UserHostAddress`, `IsSecureConnection`, `LOCAL_ADDR`,
   `SERVER_NAME` and `SERVER_PORT` with them, as `IIS7WorkerRequest` does (`HttpServerVarsCollection` hands them to it, #194).
+- **Session state through ASP.NET Core's distributed cache:** `SessionStateModule.ProviderOverride`, which
+  `UseAspNetCoreSessionProvider()` sets, takes the place of the store `<sessionState mode>` names
+  (`AspNetCoreSessionProvider`). `InitModuleFromConfig` still returns at once for `mode="Off"`, as in the reference
+  source: the provider replaces the store and never turns session state on (#185).
 - **.NET's base class library, where an application sees the difference:** `HttpException` and its subclasses built
   with a null message have .NET Framework's `Exception` default ("Exception of type '...' was thrown."), not .NET's
   `ExternalException` one ("External component has thrown an exception."): Page.HandleError's `HttpUnhandledException`

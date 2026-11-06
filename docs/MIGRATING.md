@@ -682,8 +682,13 @@ builder.Services.AddDistributedMemoryCache();   // one server; or AddStackExchan
 app.UseWebForms(o => o.HandleAllRequestsWithWebForms().UseAspNetCoreSessionProvider());
 ```
 
-It takes the place of `<sessionState mode>` (whatever it says) and of a custom provider; the rest of `<sessionState>`
-applies, as on IIS:
+It takes the place of the store `<sessionState mode>` names (`InProc`, `StateServer`, `SQLServer`, or a custom
+provider); the rest of `<sessionState>` applies, as on IIS:
+
+- **It doesn't turn session state on.** With `<sessionState mode="Off">` there is none, as on IIS: `Session` is null
+  and no session cookie is sent. A page with `EnableSessionState="false"`, the pages `<pages enableSessionState="false">`
+  covers and an MVC controller with `[SessionState(SessionStateBehavior.Disabled)]` have none either. Up to 0.10.0 the
+  provider turned session state on under `mode="Off"` (#185).
 
 - **Every session value must be serializable**, as with StateServer and SQLServer: each one is serialized at the end
   of the request. A value that isn't (a view model in MVC's `TempData` that isn't `[Serializable]`, MVCForum's

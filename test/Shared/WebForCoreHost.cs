@@ -14,7 +14,7 @@ namespace WebForCoreGate
     static class WebForCoreHost
     {
         public static ProcessStartInfo StartInfo(string repository, string sampleDirectory, string sample, IDictionary<string, string> settings,
-            out string tempDirectory)
+            out string tempDirectory, IEnumerable<string>? hostArguments = null)
         {
             var output = new DirectoryInfo(AppContext.BaseDirectory); // test/<suite>/bin/<configuration>/<framework>/
             var host = Path.Combine(repository, "src", "WebFormsForCore.Host", "bin", output.Parent!.Name, output.Name, "webforcore-host.dll");
@@ -26,6 +26,8 @@ namespace WebForCoreGate
                 RedirectStandardError = true,
             };
             start.ArgumentList.Add(host);
+            // The host's own settings on its command line ("--WebForCore:Host:SiteId=2"), which the worker doesn't get.
+            foreach (var argument in hostArguments ?? []) start.ArgumentList.Add(argument);
             start.ArgumentList.Add("--");
             start.ArgumentList.Add($"bin_dotnet/{sample}.dll");
             foreach (var setting in settings) start.Environment[setting.Key] = setting.Value;
