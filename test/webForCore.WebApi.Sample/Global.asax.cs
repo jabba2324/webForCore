@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Web;
 using System.Web.Http;
 
@@ -8,6 +9,9 @@ namespace WebApiSample
     {
         protected void Application_Start()
         {
+            // The listener that keeps the trace records for /api/trace (TraceController), added in code.
+            // Web.config's <system.diagnostics> adds another (named "webconfig"), as an application adds its listeners.
+            Trace.Listeners.Add(new TraceRecordListener("code"));
             GlobalConfiguration.Configure(WebApiConfig.Register);
         }
     }
