@@ -59,6 +59,53 @@ namespace HostTests
                 }
             }
 
+            // The failure message for an answer a test didn't expect (#204): its status and the error it names first
+            // (ASP.NET's error page is long, and the host's output longer), then, on Linux, how many inotify instances
+            // the user's processes hold against the limit, since a shared machine that has used them up fails a worker's
+            // first request with 500 ("Failed to start monitoring changes", #107); then the page and the host's output.
+            public string Unexpected(string path, HttpResponseMessage response, string body)
+            {
+                var message = new StringBuilder($"{(int)response.StatusCode} {response.StatusCode} for {path}");
+                var title = Regex.Match(body, "<title>(.*?)</title>", RegexOptions.Singleline);
+                if (title.Success) message.Append($": {WebUtility.HtmlDecode(title.Groups[1].Value.Trim())}");
+                var details = Regex.Match(body, "Exception Details: </b>(.*?)<br>", RegexOptions.Singleline);
+                if (details.Success) message.Append($"\nException: {WebUtility.HtmlDecode(Regex.Replace(details.Groups[1].Value, "<[^>]*>", "").Trim())}");
+                return Explain(message.ToString(), $"--- the answer ---\n{body}");
+            }
+
+            // A failure message: what failed, then, on Linux, the user's inotify instances (a worker whose initialization
+            // page fails for want of one is warm at once, and the overlap a recycle test expects is shorter), then the
+            // host's output.
+            public string Explain(string failure, string detail = null)
+            {
+                var message = new StringBuilder(failure);
+                if (OperatingSystem.IsLinux()) message.Append($"\n{InotifyInstances()}");
+                if (detail != null) message.Append($"\n{detail}");
+                message.Append($"\n--- the host's output ---\n{Output}");
+                return message.ToString();
+            }
+
+            static string InotifyInstances()
+            {
+                int held = 0;
+                foreach (var process in System.IO.Directory.EnumerateDirectories("/proc"))
+                {
+                    if (!int.TryParse(Path.GetFileName(process), out _)) continue;
+                    // Only the user's own processes' descriptors can be read; a process can exit meanwhile.
+                    try
+                    {
+                        foreach (var fd in System.IO.Directory.EnumerateFileSystemEntries(Path.Combine(process, "fd")))
+                            if (new FileInfo(fd).LinkTarget == "anon_inode:inotify") held++;
+                    }
+                    catch (Exception e) when (e is IOException || e is UnauthorizedAccessException) { }
+                }
+                // The limit of the user namespace the tests run in (fs.inotify.max_user_instances in the initial one).
+                string limit;
+                try { limit = File.ReadAllText("/proc/sys/user/max_inotify_instances").Trim(); }
+                catch (Exception e) when (e is IOException || e is UnauthorizedAccessException) { limit = "?"; }
+                return $"inotify instances held by this user's processes now: {held} of {limit}";
+            }
+
             public async Task WaitForOutput(string text, TimeSpan within)
             {
                 var deadline = DateTime.UtcNow + within;
